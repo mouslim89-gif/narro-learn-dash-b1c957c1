@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { dictionary } from '@/data/dictionary';
+import { tokenize } from '@/lib/tokenizer';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
 import { Progress } from '@/components/ui/progress';
@@ -17,10 +18,15 @@ export default function Reader() {
 
   const book = books.find((b) => b.id === id);
 
+  const tokens = useMemo(() => {
+    if (!book) return [];
+    return tokenize(book.content[difficulty]);
+  }, [book, difficulty]);
+
   const handleWordClick = useCallback(
-    (word: string, e: React.MouseEvent) => {
+    (tokenText: string, e: React.MouseEvent) => {
       const entry = dictionary.find(
-        (d) => word.includes(d.word) || word.includes(d.reading)
+        (d) => tokenText.includes(d.word) || tokenText.includes(d.reading)
       );
       if (entry) {
         setPopup({ entry, pos: { x: e.clientX, y: e.clientY } });
@@ -30,9 +36,6 @@ export default function Reader() {
   );
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
-
-  const text = book.content[difficulty];
-  const chars = text.split('');
 
   return (
     <div className="min-h-screen bg-[hsl(36,33%,96%)] pb-36 dark:bg-background">
@@ -74,15 +77,28 @@ export default function Reader() {
 
       <article className="mx-auto max-w-2xl px-6 py-10">
         <p className="font-japanese text-xl leading-[2.4] tracking-wide">
-          {chars.map((char, i) => (
-            <span
-              key={i}
-              onClick={(e) => handleWordClick(char, e)}
-              className="cursor-pointer transition-colors hover:bg-accent/10 hover:text-accent rounded"
-            >
-              {char}
-            </span>
-          ))}
+          {tokens.map((token, i) => {
+            if (token.entry) {
+              return (
+                <span
+                  key={i}
+                  onClick={(e) => setPopup({ entry: token.entry!, pos: { x: e.clientX, y: e.clientY } })}
+                  className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                >
+                  {token.text}
+                </span>
+              );
+            }
+            return (
+              <span
+                key={i}
+                onClick={(e) => handleWordClick(token.text, e)}
+                className="cursor-pointer rounded px-px transition-colors hover:bg-accent/10"
+              >
+                {token.text}
+              </span>
+            );
+          })}
         </p>
       </article>
 
