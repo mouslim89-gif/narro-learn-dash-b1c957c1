@@ -16,25 +16,25 @@ export interface Book {
 }
 
 export const genreLabels: Record<Genre, string> = {
-  'folk-tales': '📜 Folk Tales',
-  'fiction': '📖 Fiction',
-  'sci-fi': '🚀 Sci-Fi',
-  'slice-of-life': '🌸 Slice of Life',
-  'horror': '👻 Horror',
+  'folk-tales': 'Folk Tales',
+  'fiction': 'Fiction',
+  'sci-fi': 'Sci-Fi',
+  'slice-of-life': 'Slice of Life',
+  'horror': 'Horror',
 };
 
-export const difficultyConfig: Record<Difficulty, { label: string; emoji: string; color: string }> = {
-  simplified: { label: 'Simplified', emoji: '🟢', color: 'hsl(168, 72%, 40%)' },
-  intermediate: { label: 'Intermediate', emoji: '🟡', color: 'hsl(45, 90%, 55%)' },
-  original: { label: 'Original', emoji: '🔴', color: 'hsl(0, 75%, 55%)' },
+export const difficultyConfig: Record<Difficulty, { label: string; description: string; color: string }> = {
+  simplified: { label: 'Simplified', description: 'Simple vocabulary, short sentences', color: 'hsl(168, 50%, 35%)' },
+  intermediate: { label: 'Intermediate', description: 'Some kanji, moderate complexity', color: 'hsl(36, 60%, 45%)' },
+  original: { label: 'Original', description: 'Full original Japanese text', color: 'hsl(0, 50%, 42%)' },
 };
 
 export const jlptColors: Record<string, string> = {
-  N5: 'hsl(168, 72%, 40%)',
-  N4: 'hsl(200, 80%, 50%)',
-  N3: 'hsl(45, 90%, 55%)',
-  N2: 'hsl(25, 90%, 58%)',
-  N1: 'hsl(0, 75%, 55%)',
+  N5: 'hsl(168, 50%, 35%)',
+  N4: 'hsl(200, 55%, 42%)',
+  N3: 'hsl(36, 60%, 45%)',
+  N2: 'hsl(20, 60%, 45%)',
+  N1: 'hsl(0, 50%, 42%)',
 };
 
 const sampleSimplified = `むかしむかし、あるところに、おじいさんとおばあさんがいました。おじいさんはやまへしばかりに、おばあさんはかわへせんたくにいきました。おばあさんがかわでせんたくをしていると、おおきなももがどんぶらこどんぶらこと、ながれてきました。おばあさんはそのももをひろって、いえにもってかえりました。`;
@@ -51,7 +51,7 @@ export const books: Book[] = [
     author: 'Japanese Folklore',
     genre: 'folk-tales',
     jlptLevel: 'N5',
-    coverColor: 'hsl(340, 80%, 65%)',
+    coverColor: '#8B4513',
     readingTimeMin: 8,
     synopsis: 'The classic tale of a boy born from a peach who goes on a quest to defeat demons with his animal friends.',
     hasAudio: true,
@@ -64,7 +64,7 @@ export const books: Book[] = [
     author: 'Japanese Folklore',
     genre: 'folk-tales',
     jlptLevel: 'N4',
-    coverColor: 'hsl(200, 70%, 60%)',
+    coverColor: '#2F4F4F',
     readingTimeMin: 12,
     synopsis: 'A poor man saves a crane, which later returns in human form to repay his kindness by weaving beautiful cloth.',
     hasAudio: false,
@@ -77,7 +77,7 @@ export const books: Book[] = [
     author: 'Murata Sayaka',
     genre: 'fiction',
     jlptLevel: 'N3',
-    coverColor: 'hsl(260, 60%, 58%)',
+    coverColor: '#4A4A6A',
     readingTimeMin: 25,
     synopsis: 'A woman finds meaning and identity working at a convenience store, challenging societal expectations.',
     hasAudio: true,
@@ -90,7 +90,7 @@ export const books: Book[] = [
     author: 'Miyazawa Kenji',
     genre: 'sci-fi',
     jlptLevel: 'N2',
-    coverColor: 'hsl(230, 70%, 45%)',
+    coverColor: '#1B2838',
     readingTimeMin: 30,
     synopsis: 'Two boys embark on a dreamlike journey across the Milky Way aboard a mysterious train.',
     hasAudio: false,
@@ -103,7 +103,7 @@ export const books: Book[] = [
     author: 'Tanaka Yuki',
     genre: 'slice-of-life',
     jlptLevel: 'N4',
-    coverColor: 'hsl(30, 80%, 55%)',
+    coverColor: '#5D4037',
     readingTimeMin: 15,
     synopsis: 'A cozy late-night café where lonely souls find unexpected connections over coffee and conversation.',
     hasAudio: true,
@@ -116,7 +116,7 @@ export const books: Book[] = [
     author: 'Suzuki Ren',
     genre: 'horror',
     jlptLevel: 'N1',
-    coverColor: 'hsl(280, 40%, 25%)',
+    coverColor: '#1A1A2E',
     readingTimeMin: 20,
     synopsis: 'Strange whispers echo through an abandoned school, drawing a curious student deeper into its dark history.',
     hasAudio: false,
