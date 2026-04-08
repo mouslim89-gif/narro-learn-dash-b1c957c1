@@ -49,6 +49,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       getProgress: (bookId) => get().progress[bookId],
       setFontSize: (fontSize) => set({ fontSize }),
       setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
+      setShowFurigana: (showFurigana) => set({ showFurigana }),
     }),
     { name: 'reading-progress' }
   )
