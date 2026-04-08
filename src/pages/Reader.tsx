@@ -11,18 +11,14 @@ import type { DictionaryEntry } from '@/data/dictionary';
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const book = books.find((b) => b.id === id);
   const [difficulty, setDifficulty] = useState<Difficulty>((diffParam as Difficulty) || 'simplified');
   const [showSettings, setShowSettings] = useState(false);
   const [popup, setPopup] = useState<{ entry: DictionaryEntry; pos: { x: number; y: number } } | null>(null);
 
-  if (!book) return <div className="p-8 text-center">Book not found.</div>;
-
-  const text = book.content[difficulty];
+  const book = books.find((b) => b.id === id);
 
   const handleWordClick = useCallback(
     (word: string, e: React.MouseEvent) => {
-      // Try to find the word in dictionary
       const entry = dictionary.find(
         (d) => word.includes(d.word) || word.includes(d.reading)
       );
@@ -33,12 +29,13 @@ export default function Reader() {
     []
   );
 
-  // Split text into clickable segments (characters for Japanese)
+  if (!book) return <div className="p-8 text-center">Book not found.</div>;
+
+  const text = book.content[difficulty];
   const chars = text.split('');
 
   return (
     <div className="min-h-screen pb-36">
-      {/* Top bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
         <button onClick={() => navigate(-1)} className="rounded-full p-1">
           <ArrowLeft className="h-5 w-5" />
@@ -54,7 +51,6 @@ export default function Reader() {
         </button>
       </header>
 
-      {/* Settings dropdown */}
       {showSettings && (
         <div className="sticky top-14 z-20 border-b bg-card p-4 shadow-md">
           <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Reading Level</p>
@@ -74,10 +70,8 @@ export default function Reader() {
         </div>
       )}
 
-      {/* Progress */}
       <Progress value={35} className="h-1 rounded-none" />
 
-      {/* Text */}
       <article className="px-6 py-8">
         <p className="font-japanese text-xl leading-[2.2] tracking-wide">
           {chars.map((char, i) => (
@@ -92,12 +86,10 @@ export default function Reader() {
         </p>
       </article>
 
-      {/* Word popup */}
       {popup && (
         <WordPopup entry={popup.entry} position={popup.pos} onClose={() => setPopup(null)} />
       )}
 
-      {/* Audio player */}
       {book.hasAudio && <AudioPlayer />}
     </div>
   );
