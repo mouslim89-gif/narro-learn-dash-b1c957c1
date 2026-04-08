@@ -3,38 +3,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+const JISHO_API = 'https://jisho.org/api/v1/search/words';
 
+async function fetchWord(keyword: string) {
   try {
-    const url = new URL(req.url);
-    const keyword = url.searchParams.get('keyword');
-
-    if (!keyword) {
-      return new Response(
-        JSON.stringify({ error: 'Missing keyword parameter' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(keyword)}`;
-    const response = await fetch(jishoUrl);
-
-    if (!response.ok) {
-      await response.text();
-      return new Response(
-        JSON.stringify({ error: 'Jisho API error', status: response.status }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const data = await response.json();
-
-    const results = (data.data || []).slice(0, 5).map((item: any) => ({
+    const res = await fetch(`${JISHO_API}?keyword=${encodeURIComponent(keyword)}`);
+    if (!res.ok) return { keyword, results: [] };
+    const json = await res.json();
+    const results = (json.data || []).slice(0, 5).map((item: any) => ({
       slug: item.slug,
-      is_common: item.is_common,
+      is_common: item.is_common || false,
       jlpt: item.jlpt || [],
       tags: item.tags || [],
       japanese: (item.japanese || []).slice(0, 3).map((j: any) => ({
@@ -46,9 +24,41 @@ Deno.serve(async (req) => {
         parts_of_speech: s.parts_of_speech || [],
       })),
     }));
+    return { keyword, results };
+  } catch {
+    return { keyword, results: [] };
+  }
+}
 
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const url = new URL(req.url);
+    const keyword = url.searchParams.get('keyword');
+    const keywords = url.searchParams.get('keywords');
+
+    // Batch mode: fetch multiple words in one request
+    if (keywords) {
+      const words = keywords.split(',').map(w => w.trim()).filter(Boolean).slice(0, 50);
+      const results = await Promise.all(words.map(fetchWord));
+      return new Response(JSON.stringify({ batch: results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!keyword) {
+      return new Response(
+        JSON.stringify({ error: 'Missing keyword parameter' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const result = await fetchWord(keyword);
     return new Response(
-      JSON.stringify({ results }),
+      JSON.stringify({ results: result.results }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
