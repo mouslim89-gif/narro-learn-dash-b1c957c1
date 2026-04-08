@@ -10,7 +10,7 @@ const OKURIGANA_MAX = 4;
 
 function isKanji(ch: string): boolean {
   const code = ch.charCodeAt(0);
-  return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3400 && code <= 0x4DBF);
+  return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3400 && code <= 0x4DBF) || code === 0x3005; // 々 repeat mark
 }
 
 function isHiragana(ch: string): boolean {
