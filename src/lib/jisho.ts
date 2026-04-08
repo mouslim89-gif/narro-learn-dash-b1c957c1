@@ -17,15 +17,20 @@ export async function lookupWord(keyword: string): Promise<JishoResult[]> {
     return cache.get(keyword)!;
   }
 
-  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-  const url = `https://${projectId}.supabase.co/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
+  const { data, error } = await supabase.functions.invoke('jisho-lookup', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    body: undefined,
+  });
 
-  const { data: { session } } = await supabase.auth.getSession();
+  // supabase.functions.invoke doesn't support query params well for GET,
+  // so let's use fetch directly with the URL from the client
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
 
   const response = await fetch(url, {
     headers: {
       'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
   });
 
@@ -33,8 +38,8 @@ export async function lookupWord(keyword: string): Promise<JishoResult[]> {
     throw new Error(`Jisho lookup failed: ${response.status}`);
   }
 
-  const data = await response.json();
-  const results: JishoResult[] = data.results || [];
+  const responseData = await response.json();
+  const results: JishoResult[] = responseData.results || [];
   cache.set(keyword, results);
   return results;
 }
