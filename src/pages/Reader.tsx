@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
 import { preloadWords } from '@/lib/jisho';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
+import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, type FontSize } from '@/stores/reading-progress';
 
@@ -26,6 +27,7 @@ export default function Reader() {
   const [preloadProgress, setPreloadProgress] = useState(0);
   const [preloaded, setPreloaded] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
+  const [showGrammar, setShowGrammar] = useState(false);
   const articleRef = useRef<HTMLDivElement>(null);
   const restoredScroll = useRef(false);
 
@@ -34,6 +36,11 @@ export default function Reader() {
   const tokens = useMemo(() => {
     if (!book) return [];
     return tokenize(book.content[difficulty]);
+  }, [book, difficulty]);
+
+  const bookText = useMemo(() => {
+    if (!book) return '';
+    return book.content[difficulty];
   }, [book, difficulty]);
 
   useEffect(() => {
@@ -77,7 +84,6 @@ export default function Reader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [preloaded, handleScroll]);
 
-  // Apply dark mode class to reader
   useEffect(() => {
     if (readerDarkMode) {
       document.documentElement.classList.add('dark');
@@ -87,7 +93,6 @@ export default function Reader() {
     return () => document.documentElement.classList.remove('dark');
   }, [readerDarkMode]);
 
-  // Estimated time remaining
   const timeRemaining = useMemo(() => {
     if (!book || scrollPercent >= 100) return null;
     const remaining = book.readingTimeMin * ((100 - scrollPercent) / 100);
@@ -109,9 +114,18 @@ export default function Reader() {
             {timeRemaining && ` · ~${timeRemaining} min left`}
           </p>
         </div>
-        <button onClick={() => setShowSettings(!showSettings)} className="rounded p-1">
-          <Settings className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setShowGrammar(true)}
+            className="rounded p-1 text-primary hover:bg-primary/10"
+            title="Grammar Notes"
+          >
+            <Sparkles className="h-5 w-5" />
+          </button>
+          <button onClick={() => setShowSettings(!showSettings)} className="rounded p-1">
+            <Settings className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       {showSettings && (
@@ -190,6 +204,12 @@ export default function Reader() {
       {popup && (
         <WordPopup word={popup.word} position={popup.pos} onClose={() => setPopup(null)} />
       )}
+
+      <GrammarPanel
+        text={bookText}
+        open={showGrammar}
+        onClose={() => setShowGrammar(false)}
+      />
 
       {book.hasAudio && <AudioPlayer />}
     </div>
