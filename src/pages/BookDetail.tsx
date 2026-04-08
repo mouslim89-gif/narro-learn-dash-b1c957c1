@@ -3,12 +3,20 @@ import { books, difficultyConfig, jlptColors, genreLabels, type Difficulty } fro
 import { useState } from 'react';
 import { ArrowLeft, Headphones, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { useReadingProgressStore } from '@/stores/reading-progress';
 
 export default function BookDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const book = books.find((b) => b.id === id);
-  const [difficulty, setDifficulty] = useState<Difficulty>('simplified');
+  const { getProgress } = useReadingProgressStore();
+  const saved = id ? getProgress(id) : undefined;
+  const hasProgress = saved && saved.progressPercent > 0;
+
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    saved?.difficulty || 'simplified'
+  );
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -18,7 +26,6 @@ export default function BookDetail() {
         <ArrowLeft className="h-5 w-5" />
       </button>
 
-      {/* Cover hero */}
       <div className="flex items-end gap-5 border-b bg-card px-6 pb-6 pt-16">
         <div
           className="relative flex h-40 w-28 flex-shrink-0 items-end rounded p-3 shadow-lg"
@@ -42,13 +49,18 @@ export default function BookDetail() {
               </span>
             )}
           </div>
+          {hasProgress && (
+            <div className="mt-3 flex items-center gap-2">
+              <Progress value={saved.progressPercent} className="h-1.5 flex-1" />
+              <span className="text-xs font-medium text-muted-foreground">{saved.progressPercent}% read</span>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="px-6 py-5">
         <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
-        {/* Difficulty selection */}
         <h3 className="mt-8 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Reading Level</h3>
         <div className="mt-3 flex flex-col gap-2">
           {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
@@ -62,10 +74,7 @@ export default function BookDetail() {
                   selected ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/30'
                 }`}
               >
-                <div
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: cfg.color }}
-                />
+                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
                 <div>
                   <p className="text-sm font-semibold">{cfg.label}</p>
                   <p className="text-xs text-muted-foreground">{cfg.description}</p>
@@ -77,7 +86,8 @@ export default function BookDetail() {
 
         <Link to={`/reader/${book.id}/${difficulty}`}>
           <Button className="mt-6 w-full py-6 text-sm font-semibold shadow-sm">
-            <BookOpen className="mr-2 h-4 w-4" /> Start Reading
+            <BookOpen className="mr-2 h-4 w-4" />
+            {hasProgress ? 'Continue Reading' : 'Start Reading'}
           </Button>
         </Link>
       </div>

@@ -1,18 +1,21 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
 import { preloadWords } from '@/lib/jisho';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, type FontSize } from '@/stores/reading-progress';
+
+const fontSizes: FontSize[] = ['small', 'medium', 'large'];
+const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -44,7 +47,6 @@ export default function Reader() {
     }).then(() => setPreloaded(true));
   }, [tokens]);
 
-  // Restore scroll position after preload
   useEffect(() => {
     if (!preloaded || restoredScroll.current || !saved?.progressPercent) return;
     restoredScroll.current = true;
@@ -56,7 +58,6 @@ export default function Reader() {
     });
   }, [preloaded, saved?.progressPercent]);
 
-  // Track scroll progress
   const rafRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
     if (rafRef.current) return;
@@ -76,6 +77,23 @@ export default function Reader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [preloaded, handleScroll]);
 
+  // Apply dark mode class to reader
+  useEffect(() => {
+    if (readerDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    return () => document.documentElement.classList.remove('dark');
+  }, [readerDarkMode]);
+
+  // Estimated time remaining
+  const timeRemaining = useMemo(() => {
+    if (!book || scrollPercent >= 100) return null;
+    const remaining = book.readingTimeMin * ((100 - scrollPercent) / 100);
+    return Math.max(1, Math.round(remaining));
+  }, [book, scrollPercent]);
+
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
@@ -88,6 +106,7 @@ export default function Reader() {
           <p className="font-japanese text-sm font-bold">{book.titleJp}</p>
           <p className="text-[10px] text-muted-foreground">
             {difficultyConfig[difficulty].label}
+            {timeRemaining && ` · ~${timeRemaining} min left`}
           </p>
         </div>
         <button onClick={() => setShowSettings(!showSettings)} className="rounded p-1">
@@ -96,13 +115,13 @@ export default function Reader() {
       </header>
 
       {showSettings && (
-        <div className="sticky top-14 z-20 border-b bg-card p-4 shadow-sm">
+        <div className="sticky top-14 z-20 border-b bg-card p-4 shadow-sm animate-fade-in">
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Reading Level</p>
           <div className="flex gap-2">
             {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
               <button
                 key={d}
-                onClick={() => { setDifficulty(d); setShowSettings(false); }}
+                onClick={() => { setDifficulty(d); }}
                 className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
                   d === difficulty ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
                 }`}
@@ -111,6 +130,30 @@ export default function Reader() {
               </button>
             ))}
           </div>
+
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Font Size</p>
+          <div className="flex gap-2">
+            {fontSizes.map((s) => (
+              <button
+                key={s}
+                onClick={() => setFontSize(s)}
+                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                  s === fontSize ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                }`}
+              >
+                <Type className="h-3 w-3" /> {fontSizeLabels[s]}
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
+          <button
+            onClick={() => setReaderDarkMode(!readerDarkMode)}
+            className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
+          >
+            {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
         </div>
       )}
 
@@ -124,7 +167,7 @@ export default function Reader() {
         <>
           <Progress value={scrollPercent} className="h-0.5 rounded-none" />
           <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-            <p className="font-japanese text-xl leading-[2.4] tracking-wide">
+            <p className={`font-japanese tracking-wide ${fontSizeMap[fontSize]}`}>
               {tokens.map((token, i) => {
                 if (!token.isJapanese) {
                   return <span key={i}>{token.text}</span>;

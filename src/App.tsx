@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
 import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
@@ -14,21 +15,38 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function AppContent() {
-  const { pathname } = useLocation();
-  const hideNav = pathname.startsWith('/reader/');
+const pageVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  const hideNav = location.pathname.startsWith('/reader/');
 
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Library />} />
-        <Route path="/my-books" element={<MyBooks />} />
-        <Route path="/flashcards" element={<Flashcards />} />
-        <Route path="/dictionary" element={<DictionaryPage />} />
-        <Route path="/book/:id" element={<BookDetail />} />
-        <Route path="/reader/:id/:difficulty" element={<Reader />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<Library />} />
+            <Route path="/my-books" element={<MyBooks />} />
+            <Route path="/flashcards" element={<Flashcards />} />
+            <Route path="/dictionary" element={<DictionaryPage />} />
+            <Route path="/book/:id" element={<BookDetail />} />
+            <Route path="/reader/:id/:difficulty" element={<Reader />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
       {!hideNav && <BottomNav />}
     </>
   );
@@ -40,7 +58,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppContent />
+        <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
