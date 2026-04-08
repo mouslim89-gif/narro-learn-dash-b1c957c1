@@ -1,8 +1,8 @@
 import { books, genreLabels, type Genre } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
-import { Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { jlptColors } from '@/data/books';
+import { Clock, Headphones } from 'lucide-react';
 
 const genres = Object.keys(genreLabels) as Genre[];
 
@@ -12,35 +12,48 @@ export default function Library() {
   return (
     <div className="pb-20">
       {/* Header */}
-      <header className="px-5 pt-6 pb-2">
-        <h1 className="text-2xl font-black tracking-tight">
-          読みます <span className="text-base font-bold text-muted-foreground">Yomimasu</span>
+      <header className="px-6 pt-8 pb-2">
+        <h1 className="text-2xl font-bold tracking-tight">
+          読みます
         </h1>
-        <p className="text-sm text-muted-foreground">Learn Japanese through reading</p>
+        <p className="mt-0.5 text-sm text-muted-foreground">Learn Japanese through reading</p>
       </header>
 
       {/* Featured */}
-      <section className="px-5 py-3">
+      <section className="px-6 py-4">
         <Link to={`/book/${featured.id}`}>
-          <div
-            className="relative overflow-hidden rounded-3xl p-5 shadow-lg"
-            style={{ background: `linear-gradient(135deg, ${featured.coverColor}, ${featured.coverColor}dd)` }}
-          >
-            <div className="flex items-center gap-2 text-white/80">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Featured</span>
-            </div>
-            <h2 className="font-japanese mt-2 text-3xl font-black text-white">{featured.titleJp}</h2>
-            <p className="text-sm font-semibold text-white/90">{featured.titleEn}</p>
-            <p className="mt-2 text-xs text-white/70 line-clamp-2">{featured.synopsis}</p>
-            <div className="mt-3 flex items-center gap-2">
-              <span
-                className="rounded-md px-2 py-0.5 text-xs font-bold text-white"
-                style={{ backgroundColor: jlptColors[featured.jlptLevel] }}
+          <div className="relative overflow-hidden rounded-lg border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+            <div className="flex items-start gap-5">
+              <div
+                className="flex h-32 w-24 flex-shrink-0 items-end rounded p-3 shadow-md"
+                style={{ backgroundColor: featured.coverColor }}
               >
-                {featured.jlptLevel}
-              </span>
-              <span className="text-xs text-white/70">{featured.readingTimeMin} min read</span>
+                <p className="font-japanese text-sm font-bold leading-tight text-white">
+                  {featured.titleJp}
+                </p>
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Featured</p>
+                <h2 className="mt-1 font-serif text-xl font-bold">{featured.titleEn}</h2>
+                <p className="text-xs text-muted-foreground">{featured.author}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">{featured.synopsis}</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <span
+                    className="rounded px-1.5 py-0.5 text-[10px] font-bold text-white"
+                    style={{ backgroundColor: jlptColors[featured.jlptLevel] }}
+                  >
+                    {featured.jlptLevel}
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <Clock className="h-3 w-3" /> {featured.readingTimeMin} min
+                  </span>
+                  {featured.hasAudio && (
+                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <Headphones className="h-3 w-3" /> Audio
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </Link>
@@ -52,8 +65,10 @@ export default function Library() {
         if (genreBooks.length === 0) return null;
         return (
           <section key={genre} className="py-3">
-            <h3 className="px-5 text-lg font-extrabold">{genreLabels[genre]}</h3>
-            <div className="mt-2 flex gap-4 overflow-x-auto px-5 pb-2 scrollbar-none">
+            <h3 className="px-6 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              {genreLabels[genre]}
+            </h3>
+            <div className="mt-3 flex gap-4 overflow-x-auto px-6 pb-2 scrollbar-none">
               {genreBooks.map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}

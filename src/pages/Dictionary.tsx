@@ -24,10 +24,8 @@ export default function DictionaryPage() {
   }, [query]);
 
   return (
-    <div className="pb-20 px-5 pt-6">
-      <h1 className="flex items-center gap-2 text-2xl font-black">
-        <Search className="h-6 w-6 text-secondary" /> Dictionary
-      </h1>
+    <div className="pb-20 px-6 pt-8">
+      <h1 className="text-2xl font-bold">Dictionary</h1>
 
       <div className="relative mt-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -35,7 +33,7 @@ export default function DictionaryPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search in romaji, kana, or English..."
-          className="rounded-2xl pl-10"
+          className="pl-10"
         />
       </div>
 
@@ -43,24 +41,24 @@ export default function DictionaryPage() {
         {results.map((entry) => {
           const saved = hasWord(entry.id);
           return (
-            <div key={entry.id} className="rounded-2xl border bg-card p-4">
+            <div key={entry.id} className="rounded-lg border bg-card p-4">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-japanese text-xl font-bold">{entry.word}</p>
                   <p className="font-japanese text-sm text-muted-foreground">{entry.reading} ({entry.romaji})</p>
-                  <p className="mt-1 text-sm font-semibold text-primary">{entry.translation}</p>
+                  <p className="mt-1 text-sm font-semibold text-accent">{entry.translation}</p>
                 </div>
                 <button
                   onClick={() => addWord(entry)}
                   disabled={saved}
-                  className={`rounded-full p-2 transition-colors ${
+                  className={`rounded p-2 transition-colors ${
                     saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
                   }`}
                 >
                   <Star className="h-5 w-5" fill={saved ? 'currentColor' : 'none'} />
                 </button>
               </div>
-              <div className="mt-2 rounded-xl bg-muted/50 p-2">
+              <div className="mt-2 rounded bg-muted/50 p-2">
                 <p className="font-japanese text-xs">{entry.example}</p>
                 <p className="text-xs text-muted-foreground">{entry.exampleTranslation}</p>
               </div>

@@ -18,7 +18,7 @@ export function WordPopup({ entry, position, onClose }: WordPopupProps) {
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
-        className="fixed z-50 w-64 animate-in fade-in zoom-in-95 rounded-2xl border bg-card p-4 shadow-xl"
+        className="fixed z-50 w-60 animate-in fade-in zoom-in-95 rounded-lg border bg-card p-4 shadow-lg"
         style={{
           left: Math.min(position.x, window.innerWidth - 270),
           top: Math.min(position.y + 10, window.innerHeight - 200),
@@ -29,12 +29,12 @@ export function WordPopup({ entry, position, onClose }: WordPopupProps) {
         </button>
         <p className="font-japanese text-2xl font-bold">{entry.word}</p>
         <p className="font-japanese text-sm text-muted-foreground">{entry.reading}</p>
-        <p className="mt-1 text-sm font-semibold text-primary">{entry.translation}</p>
+        <p className="mt-1 text-sm font-semibold text-accent">{entry.translation}</p>
         <div className="mt-3 flex gap-2">
           <button
             onClick={() => addWord(entry)}
             disabled={saved}
-            className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+            className={`flex items-center gap-1 rounded px-3 py-1.5 text-xs font-semibold transition-colors ${
               saved
                 ? 'bg-muted text-muted-foreground'
                 : 'bg-accent text-accent-foreground hover:bg-accent/80'
@@ -44,7 +44,7 @@ export function WordPopup({ entry, position, onClose }: WordPopupProps) {
           </button>
           <button
             onClick={() => { onClose(); navigate(`/dictionary?q=${entry.word}`); }}
-            className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground hover:bg-secondary/80"
+            className="flex items-center gap-1 rounded bg-secondary px-3 py-1.5 text-xs font-semibold text-secondary-foreground hover:bg-secondary/80"
           >
             <BookOpen className="h-3.5 w-3.5" /> Dictionary
           </button>

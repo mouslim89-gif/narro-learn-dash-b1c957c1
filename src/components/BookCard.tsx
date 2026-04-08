@@ -10,24 +10,26 @@ export function BookCard({ book }: { book: Book }) {
       className="group flex w-36 flex-shrink-0 flex-col gap-2 md:w-44"
     >
       <div
-        className="relative flex h-48 items-end overflow-hidden rounded-2xl p-3 shadow-lg transition-transform group-hover:scale-[1.03] md:h-56"
+        className="relative flex h-52 items-end overflow-hidden rounded p-3 shadow-md transition-transform group-hover:scale-[1.02] md:h-60"
         style={{ backgroundColor: book.coverColor }}
       >
+        {/* Spine effect */}
+        <div className="absolute inset-y-0 left-0 w-2 bg-black/15" />
         {book.hasAudio && (
-          <div className="absolute right-2 top-2 rounded-full bg-white/25 p-1.5 backdrop-blur-sm">
-            <Headphones className="h-3.5 w-3.5 text-white" />
+          <div className="absolute right-2 top-2 rounded bg-white/20 p-1 backdrop-blur-sm">
+            <Headphones className="h-3 w-3 text-white" />
           </div>
         )}
         <div className="w-full">
           <p className="font-japanese text-lg font-bold leading-tight text-white drop-shadow-md">
             {book.titleJp}
           </p>
-          <p className="text-xs font-semibold text-white/80">{book.titleEn}</p>
+          <p className="text-[11px] text-white/75">{book.titleEn}</p>
         </div>
       </div>
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-center gap-2 px-0.5">
         <span
-          className="rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white"
+          className="rounded px-1.5 py-0.5 text-[10px] font-bold text-white"
           style={{ backgroundColor: jlptColors[book.jlptLevel] }}
         >
           {book.jlptLevel}

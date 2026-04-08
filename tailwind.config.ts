@@ -58,6 +58,11 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      fontFamily: {
+        serif: ["Merriweather", "serif"],
+        sans: ["Inter", "sans-serif"],
+        japanese: ["Noto Sans JP", "sans-serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
