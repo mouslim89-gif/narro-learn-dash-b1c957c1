@@ -37,7 +37,7 @@ export default function DictionaryPage() {
   }, [query]);
 
   const handleSave = (result: JishoResult) => {
-    const entry: SavedWord = {
+    const entry: Omit<SavedWord, 'mastery'> = {
       id: result.japanese[0]?.word || result.slug,
       word: result.japanese[0]?.word || result.slug,
       reading: result.japanese[0]?.reading || '',

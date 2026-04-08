@@ -7,13 +7,18 @@ export interface JishoResult {
   senses: { english_definitions: string[]; parts_of_speech: string[] }[];
 }
 
-const cache = new Map<string, JishoResult[]>();
+export interface CacheEntry {
+  results: JishoResult[];
+  deinflected?: string | null;
+}
 
-export function getCached(keyword: string): JishoResult[] | undefined {
+const cache = new Map<string, CacheEntry>();
+
+export function getCached(keyword: string): CacheEntry | undefined {
   return cache.get(keyword);
 }
 
-export async function lookupWord(keyword: string): Promise<JishoResult[]> {
+export async function lookupWord(keyword: string): Promise<CacheEntry> {
   if (cache.has(keyword)) return cache.get(keyword)!;
 
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
@@ -26,9 +31,12 @@ export async function lookupWord(keyword: string): Promise<JishoResult[]> {
 
   if (!response.ok) throw new Error(`Jisho lookup failed: ${response.status}`);
   const data = await response.json();
-  const results: JishoResult[] = data.results || [];
-  cache.set(keyword, results);
-  return results;
+  const entry: CacheEntry = {
+    results: data.results || [],
+    deinflected: data.deinflected || null,
+  };
+  cache.set(keyword, entry);
+  return entry;
 }
 
 async function batchLookup(words: string[]): Promise<void> {
@@ -43,7 +51,10 @@ async function batchLookup(words: string[]): Promise<void> {
   if (!response.ok) return;
   const data = await response.json();
   for (const entry of data.batch || []) {
-    cache.set(entry.keyword, entry.results || []);
+    cache.set(entry.keyword, {
+      results: entry.results || [],
+      deinflected: entry.deinflected || null,
+    });
   }
 }
 
@@ -67,5 +78,6 @@ export async function preloadWords(
 }
 
 export async function searchJisho(query: string): Promise<JishoResult[]> {
-  return lookupWord(query);
+  const entry = await lookupWord(query);
+  return entry.results;
 }

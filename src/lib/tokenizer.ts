@@ -1,16 +1,42 @@
-// Common particles and suffixes that should be separate tokens
+// Common particles
 const PARTICLES = new Set([
   'は', 'が', 'を', 'に', 'へ', 'で', 'と', 'も', 'の', 'か', 'よ', 'ね',
   'な', 'だ', 'から', 'まで', 'より', 'など', 'って', 'けど', 'けれど',
   'ので', 'のに', 'ても', 'でも', 'しか', 'だけ', 'ばかり', 'こそ',
 ]);
 
-// Common verb/adjective endings (okurigana patterns)
-const OKURIGANA_MAX = 4;
+// Common verb/adj endings to include with kanji
+const VERB_ENDINGS = [
+  'しました', 'ました', 'ません', 'ている', 'ていた', 'ていました',
+  'ておる', 'ており', 'ておりました', 'てきました', 'てきた',
+  'ている', 'ていた', 'てくる', 'てきた', 'てある', 'てあった',
+  'られる', 'られた', 'させる', 'させた',
+  'れました', 'りました', 'きました', 'しまう', 'しまった',
+  'なければ', 'なかった', 'ないで', 'なくて',
+  'そうです', 'ようです', 'みたいです', 'らしい',
+  'った', 'った', 'んだ', 'んで',
+  'ます', 'ない', 'たい', 'よう',
+  'える', 'める', 'れる', 'せる', 'てる', 'ける', 'ねる', 'べる', 'える',
+  'いた', 'した', 'った', 'んだ',
+  'える', 'おる', 'ある',
+  'って', 'して', 'いて', 'んで', 'ちて',
+  'った', 'いた', 'った',
+  'まる', 'める', 'みる', 'もる',
+  'がる', 'さる', 'ざる',
+  'く', 'ぐ', 'す', 'つ', 'ぬ', 'ぶ', 'む', 'る', 'う',
+  'き', 'ぎ', 'し', 'ち', 'に', 'び', 'み', 'り', 'い',
+  'け', 'げ', 'せ', 'て', 'ね', 'べ', 'め', 'れ', 'え',
+];
+
+// Sort by length descending for greedy match
+const SORTED_VERB_ENDINGS = VERB_ENDINGS.sort((a, b) => b.length - a.length);
+const SORTED_PARTICLES = Array.from(PARTICLES).sort((a, b) => b.length - a.length);
+
+const OKURIGANA_MAX = 8; // increased to handle longer conjugations
 
 function isKanji(ch: string): boolean {
   const code = ch.charCodeAt(0);
-  return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3400 && code <= 0x4DBF) || code === 0x3005; // 々 repeat mark
+  return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3400 && code <= 0x4DBF) || code === 0x3005;
 }
 
 function isHiragana(ch: string): boolean {
@@ -24,7 +50,7 @@ function isKatakana(ch: string): boolean {
 }
 
 function isPunctuation(ch: string): boolean {
-  return '。、！？「」『』（）・…ー〜～\n\r\t '.includes(ch);
+  return '。、！？「」『』（）・…ー〜～\n\r\t 　'.includes(ch);
 }
 
 export interface TextToken {
@@ -34,11 +60,7 @@ export interface TextToken {
 
 /**
  * Tokenize Japanese text into clickable word-like chunks.
- * Strategy:
- * - Kanji blocks get up to OKURIGANA_MAX trailing hiragana (okurigana)
- * - Pure hiragana is split by checking for particle prefixes
- * - Katakana runs stay together
- * - Punctuation is individual
+ * Improved: better handling of verb conjugation endings attached to kanji.
  */
 export function tokenize(text: string): TextToken[] {
   const tokens: TextToken[] = [];
@@ -53,41 +75,54 @@ export function tokenize(text: string): TextToken[] {
       continue;
     }
 
-    // Kanji block + limited okurigana
+    // Kanji block + okurigana (verb/adj endings)
     if (isKanji(ch)) {
       let end = i + 1;
       while (end < text.length && isKanji(text[end])) end++;
-      
-      // Add trailing hiragana as okurigana, but limit length and stop at particles
+
       const kanjiEnd = end;
-      let hiraCount = 0;
-      while (end < text.length && isHiragana(text[end]) && hiraCount < OKURIGANA_MAX) {
-        // Check if remaining hiragana starts with a particle — if so, stop
-        const remaining = text.slice(end);
-        let isParticle = false;
-        for (const p of PARTICLES) {
-          if (remaining.startsWith(p)) {
-            isParticle = true;
-            break;
-          }
+
+      // Try matching known verb endings first (greedy, longest match)
+      const remaining = text.slice(end);
+      let bestEnding = '';
+      for (const ending of SORTED_VERB_ENDINGS) {
+        if (remaining.startsWith(ending)) {
+          // Make sure the ending isn't followed by more of the same type
+          // and check it's not actually a particle at the start
+          bestEnding = ending;
+          break;
         }
-        if (isParticle) break;
-        end++;
-        hiraCount++;
       }
-      
+
+      if (bestEnding) {
+        end += bestEnding.length;
+      } else {
+        // Fallback: add trailing hiragana up to a particle or limit
+        let hiraCount = 0;
+        while (end < text.length && isHiragana(text[end]) && hiraCount < OKURIGANA_MAX) {
+          const rem = text.slice(end);
+          let isParticle = false;
+          for (const p of SORTED_PARTICLES) {
+            if (rem.startsWith(p) && (end + p.length >= text.length || !isHiragana(text[end + p.length]) || PARTICLES.has(text[end + p.length]))) {
+              isParticle = true;
+              break;
+            }
+          }
+          if (isParticle) break;
+          end++;
+          hiraCount++;
+        }
+      }
+
       tokens.push({ text: text.slice(i, end), isJapanese: true });
       i = end;
       continue;
     }
 
-    // Pure hiragana — try to split into particles and word chunks
+    // Pure hiragana
     if (isHiragana(ch)) {
-      // First check for multi-char particles
       let matched = false;
-      // Sort particles by length desc for greedy match
-      const sortedParticles = Array.from(PARTICLES).sort((a, b) => b.length - a.length);
-      for (const p of sortedParticles) {
+      for (const p of SORTED_PARTICLES) {
         if (text.startsWith(p, i)) {
           tokens.push({ text: p, isJapanese: true });
           i += p.length;
@@ -97,12 +132,10 @@ export function tokenize(text: string): TextToken[] {
       }
       if (matched) continue;
 
-      // Otherwise group hiragana until we hit a particle, kanji, katakana, or punctuation
       let end = i + 1;
       while (end < text.length && isHiragana(text[end])) {
-        // Check if current position starts a particle
         let isParticle = false;
-        for (const p of sortedParticles) {
+        for (const p of SORTED_PARTICLES) {
           if (text.startsWith(p, end)) {
             isParticle = true;
             break;
@@ -119,7 +152,7 @@ export function tokenize(text: string): TextToken[] {
     // Katakana run
     if (isKatakana(ch)) {
       let end = i + 1;
-      while (end < text.length && isKatakana(text[end])) end++;
+      while (end < text.length && (isKatakana(text[end]) || text[end] === 'ー')) end++;
       tokens.push({ text: text.slice(i, end), isJapanese: true });
       i = end;
       continue;

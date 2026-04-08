@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles, Languages } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
-import { preloadWords } from '@/lib/jisho';
+import { preloadWords, getCached } from '@/lib/jisho';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
@@ -13,10 +13,41 @@ import { useReadingProgressStore, fontSizeMap, type FontSize } from '@/stores/re
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
 
+function FuriganaWord({ text, onClick }: { text: string; onClick: (e: React.MouseEvent) => void }) {
+  const cached = getCached(text);
+  const reading = cached?.results?.[0]?.japanese?.[0]?.reading;
+  const dictWord = cached?.results?.[0]?.japanese?.[0]?.word || text;
+
+  // Only show furigana if there's a reading and the word contains kanji
+  const hasKanji = /[\u4E00-\u9FFF\u3400-\u4DBF]/.test(text);
+  if (!reading || !hasKanji) {
+    return (
+      <span
+        onClick={onClick}
+        className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+      >
+        {text}
+      </span>
+    );
+  }
+
+  return (
+    <ruby
+      onClick={onClick}
+      className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+    >
+      {text}
+      <rp>(</rp>
+      <rt className="text-[0.5em] font-normal text-muted-foreground">{reading}</rt>
+      <rp>)</rp>
+    </ruby>
+  );
+}
+
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -160,14 +191,30 @@ export default function Reader() {
             ))}
           </div>
 
-          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
-          <button
-            onClick={() => setReaderDarkMode(!readerDarkMode)}
-            className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
-          >
-            {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
-          </button>
+          <div className="mt-4 flex items-center gap-3">
+            <div>
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
+              <button
+                onClick={() => setReaderDarkMode(!readerDarkMode)}
+                className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
+              >
+                {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                {readerDarkMode ? 'Light' : 'Dark'}
+              </button>
+            </div>
+            <div>
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Furigana</p>
+              <button
+                onClick={() => setShowFurigana(!showFurigana)}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                  showFurigana ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                }`}
+              >
+                <Languages className="h-3.5 w-3.5" />
+                {showFurigana ? 'On' : 'Off'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -181,15 +228,24 @@ export default function Reader() {
         <>
           <Progress value={scrollPercent} className="h-0.5 rounded-none" />
           <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-            <p className={`font-japanese tracking-wide ${fontSizeMap[fontSize]}`}>
+            <p className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3]' : ''}`}>
               {tokens.map((token, i) => {
                 if (!token.isJapanese) {
                   return <span key={i}>{token.text}</span>;
                 }
+
+                const handleClick = (e: React.MouseEvent) => {
+                  setPopup({ word: token.text, pos: { x: e.clientX, y: e.clientY } });
+                };
+
+                if (showFurigana) {
+                  return <FuriganaWord key={i} text={token.text} onClick={handleClick} />;
+                }
+
                 return (
                   <span
                     key={i}
-                    onClick={(e) => setPopup({ word: token.text, pos: { x: e.clientX, y: e.clientY } })}
+                    onClick={handleClick}
                     className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
                   >
                     {token.text}

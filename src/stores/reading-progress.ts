@@ -14,10 +14,12 @@ interface ReadingProgressState {
   progress: Record<string, ReadingProgress>;
   fontSize: FontSize;
   readerDarkMode: boolean;
+  showFurigana: boolean;
   updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
   getProgress: (bookId: string) => ReadingProgress | undefined;
   setFontSize: (size: FontSize) => void;
   setReaderDarkMode: (dark: boolean) => void;
+  setShowFurigana: (show: boolean) => void;
 }
 
 export const fontSizeMap: Record<FontSize, string> = {
@@ -32,6 +34,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       progress: {},
       fontSize: 'medium',
       readerDarkMode: false,
+      showFurigana: false,
       updateProgress: (bookId, difficulty, percent) =>
         set((state) => ({
           progress: {
@@ -46,6 +49,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       getProgress: (bookId) => get().progress[bookId],
       setFontSize: (fontSize) => set({ fontSize }),
       setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
+      setShowFurigana: (showFurigana) => set({ showFurigana }),
     }),
     { name: 'reading-progress' }
   )
