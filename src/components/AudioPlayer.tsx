@@ -14,13 +14,13 @@ export function AudioPlayer() {
   };
 
   return (
-    <div className="fixed bottom-[60px] left-0 right-0 z-40 border-t bg-card/95 px-4 py-2 backdrop-blur-lg">
+    <div className="fixed bottom-[60px] left-0 right-0 z-40 border-t bg-card/95 px-4 py-2.5 backdrop-blur-lg">
       <div className="mx-auto flex max-w-lg items-center gap-3">
         <button
           onClick={() => setPlaying(!playing)}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md"
+          className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground shadow-sm"
         >
-          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
+          {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 ml-0.5" />}
         </button>
         <Slider
           value={progress}
@@ -32,7 +32,7 @@ export function AudioPlayer() {
         <Volume2 className="h-4 w-4 text-muted-foreground" />
         <button
           onClick={nextSpeed}
-          className="rounded-lg bg-muted px-2 py-1 text-xs font-bold text-foreground"
+          className="rounded bg-muted px-2 py-1 text-[11px] font-semibold text-foreground"
         >
           {speed}x
         </button>

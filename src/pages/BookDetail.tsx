@@ -14,41 +14,42 @@ export default function BookDetail() {
 
   return (
     <div className="pb-24">
-      <button onClick={() => navigate(-1)} className="fixed left-4 top-4 z-30 rounded-full bg-card/80 p-2 shadow backdrop-blur-sm">
+      <button onClick={() => navigate(-1)} className="fixed left-4 top-4 z-30 rounded bg-card/80 p-2 shadow backdrop-blur-sm">
         <ArrowLeft className="h-5 w-5" />
       </button>
 
       {/* Cover hero */}
-      <div
-        className="flex h-56 items-end p-6"
-        style={{ background: `linear-gradient(180deg, ${book.coverColor}cc, ${book.coverColor})` }}
-      >
+      <div className="flex items-end gap-5 border-b bg-card px-6 pb-6 pt-16">
+        <div
+          className="relative flex h-40 w-28 flex-shrink-0 items-end rounded p-3 shadow-lg"
+          style={{ backgroundColor: book.coverColor }}
+        >
+          <div className="absolute inset-y-0 left-0 w-2 bg-black/15" />
+          <p className="font-japanese text-base font-bold leading-tight text-white">{book.titleJp}</p>
+        </div>
         <div>
-          <p className="font-japanese text-4xl font-black text-white drop-shadow-lg">{book.titleJp}</p>
-          <p className="text-lg font-bold text-white/90">{book.titleEn}</p>
-          <p className="text-sm text-white/70">{book.author}</p>
+          <h1 className="font-serif text-2xl font-bold">{book.titleEn}</h1>
+          <p className="text-sm text-muted-foreground">{book.author}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="rounded px-1.5 py-0.5 text-[10px] font-bold text-white" style={{ backgroundColor: jlptColors[book.jlptLevel] }}>
+              {book.jlptLevel}
+            </span>
+            <span className="text-xs text-muted-foreground">{genreLabels[book.genre]}</span>
+            <span className="text-xs text-muted-foreground">{book.readingTimeMin} min</span>
+            {book.hasAudio && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Headphones className="h-3 w-3" /> Audio
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="px-5 py-4">
-        {/* Meta */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-lg px-2 py-0.5 text-xs font-bold text-white" style={{ backgroundColor: jlptColors[book.jlptLevel] }}>
-            {book.jlptLevel}
-          </span>
-          <span className="rounded-lg bg-muted px-2 py-0.5 text-xs font-semibold">{genreLabels[book.genre]}</span>
-          <span className="text-xs text-muted-foreground">{book.readingTimeMin} min</span>
-          {book.hasAudio && (
-            <span className="flex items-center gap-1 rounded-lg bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-              <Headphones className="h-3 w-3" /> Audio
-            </span>
-          )}
-        </div>
-
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
+      <div className="px-6 py-5">
+        <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
         {/* Difficulty selection */}
-        <h3 className="mt-6 text-sm font-extrabold uppercase tracking-wider text-muted-foreground">Choose Reading Level</h3>
+        <h3 className="mt-8 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Reading Level</h3>
         <div className="mt-3 flex flex-col gap-2">
           {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
             const cfg = difficultyConfig[d];
@@ -57,18 +58,17 @@ export default function BookDetail() {
               <button
                 key={d}
                 onClick={() => setDifficulty(d)}
-                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${
-                  selected ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/30'
+                className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-all ${
+                  selected ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/30'
                 }`}
               >
-                <span className="text-2xl">{cfg.emoji}</span>
+                <div
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: cfg.color }}
+                />
                 <div>
-                  <p className="text-sm font-bold">{cfg.label}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {d === 'simplified' && 'Simple vocabulary, short sentences'}
-                    {d === 'intermediate' && 'Some kanji, moderate complexity'}
-                    {d === 'original' && 'Full original Japanese text'}
-                  </p>
+                  <p className="text-sm font-semibold">{cfg.label}</p>
+                  <p className="text-xs text-muted-foreground">{cfg.description}</p>
                 </div>
               </button>
             );
@@ -76,8 +76,8 @@ export default function BookDetail() {
         </div>
 
         <Link to={`/reader/${book.id}/${difficulty}`}>
-          <Button className="mt-6 w-full rounded-2xl py-6 text-base font-extrabold shadow-lg">
-            <BookOpen className="mr-2 h-5 w-5" /> Start Reading
+          <Button className="mt-6 w-full py-6 text-sm font-semibold shadow-sm">
+            <BookOpen className="mr-2 h-4 w-4" /> Start Reading
           </Button>
         </Link>
       </div>

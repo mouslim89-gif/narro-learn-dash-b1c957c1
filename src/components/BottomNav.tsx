@@ -4,7 +4,7 @@ import { Library, BookOpen, Layers, Search } from 'lucide-react';
 const tabs = [
   { path: '/', label: 'Library', icon: Library },
   { path: '/my-books', label: 'My Books', icon: BookOpen },
-  { path: '/flashcards', label: 'Flashcards', icon: Layers },
+  { path: '/flashcards', label: 'Cards', icon: Layers },
   { path: '/dictionary', label: 'Dictionary', icon: Search },
 ];
 
@@ -20,11 +20,11 @@ export function BottomNav() {
             <Link
               key={path}
               to={path}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-semibold transition-colors ${
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium transition-colors ${
                 active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
+              <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
               {label}
             </Link>
           );
