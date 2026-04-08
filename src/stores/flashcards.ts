@@ -8,13 +8,16 @@ export interface SavedWord {
   meanings: string[];
   jlpt?: string[];
   partsOfSpeech?: string[];
+  mastery: number; // 0 = new, 1-2 = learning, 3+ = known
 }
 
 interface FlashcardStore {
   savedWords: SavedWord[];
-  addWord: (entry: SavedWord) => void;
+  addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
   removeWord: (id: string) => void;
   hasWord: (id: string) => boolean;
+  incrementMastery: (id: string) => void;
+  resetMastery: (id: string) => void;
 }
 
 export const useFlashcardStore = create<FlashcardStore>()(
@@ -23,7 +26,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
       savedWords: [],
       addWord: (entry) => {
         if (!get().savedWords.find(w => w.id === entry.id)) {
-          set({ savedWords: [...get().savedWords, entry] });
+          set({ savedWords: [...get().savedWords, { ...entry, mastery: 0 }] });
         }
       },
       removeWord: (id) => {
@@ -31,6 +34,20 @@ export const useFlashcardStore = create<FlashcardStore>()(
       },
       hasWord: (id) => {
         return !!get().savedWords.find(w => w.id === id);
+      },
+      incrementMastery: (id) => {
+        set({
+          savedWords: get().savedWords.map(w =>
+            w.id === id ? { ...w, mastery: (w.mastery || 0) + 1 } : w
+          ),
+        });
+      },
+      resetMastery: (id) => {
+        set({
+          savedWords: get().savedWords.map(w =>
+            w.id === id ? { ...w, mastery: 0 } : w
+          ),
+        });
       },
     }),
     { name: 'yomimasu-flashcards' }

@@ -26,6 +26,9 @@ export function BottomNav() {
             >
               <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
               {label}
+              {active && (
+                <span className="mt-0.5 h-1 w-1 rounded-full bg-primary" />
+              )}
             </Link>
           );
         })}
