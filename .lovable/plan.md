@@ -1,39 +1,37 @@
 
 
-## Preload All Definitions on Book Open
+## Reading Progress Tracking
 
-### Approach
-Storing the entire JMDict dictionary locally (~3.5M entries, ~500MB+) is not practical. Instead, we'll **preload definitions for every unique word in the current text** when the reader opens. This way the popup is instant.
+### What it does
+- Tracks scroll position in the Reader and saves it as a percentage per book+difficulty
+- Persists to localStorage via a new Zustand store
+- My Books page shows only books the user has started, with progress bars and last-read difficulty
+- BookCard gets an optional progress indicator
+- Reader resumes scroll position on re-open
 
-### How It Works
+### Files to create
+**`src/stores/reading-progress.ts`** — Zustand store with `persist` middleware
+- State: `Map<bookId, { difficulty, progressPercent, lastReadAt }>`
+- Actions: `updateProgress(bookId, difficulty, percent)`, `getProgress(bookId)`, `getAll()`
 
-1. **Extract unique words** from the tokenized text (deduplicate)
-2. **Batch-fetch all definitions** in parallel when the Reader mounts (with a concurrency limit of ~5 to avoid overloading)
-3. **Store results in the existing `jisho.ts` cache** — the same `Map<string, JishoResult[]>` already used
-4. **Show a loading indicator** on the Reader page while preloading ("Loading dictionary…" with a progress bar)
-5. **WordPopup reads from cache** — since all words are already fetched, lookups are synchronous/instant
+### Files to modify
 
-### Technical Details
+**`src/pages/Reader.tsx`**
+- Track scroll position relative to the article container, compute percentage
+- Debounce updates to the store (every ~500ms on scroll)
+- On mount, restore scroll position from stored progress
+- Replace hardcoded `<Progress value={35}>` with actual progress value
 
-**`src/lib/jisho.ts`** — Add a `preloadWords(words: string[])` function:
-- Accepts an array of unique words
-- Filters out already-cached words
-- Fetches remaining words in parallel batches (5 concurrent requests)
-- Reports progress via a callback
-- Populates the existing cache
+**`src/pages/MyBooks.tsx`**
+- Filter to only show books that have progress entries in the store
+- Display progress bar, difficulty label, and "last read" time on each card
+- Show empty state if no books have been started
 
-**`src/pages/Reader.tsx`** — Add preloading on mount:
-- After tokenizing, extract unique Japanese token texts
-- Call `preloadWords()` with a progress callback
-- Show a thin progress bar or skeleton while loading
-- Once complete, render the text as normal (popups will be instant)
+**`src/components/BookCard.tsx`**
+- Accept optional `progress` prop to show a thin progress bar overlay on the book cover
 
-**`src/components/WordPopup.tsx`** — Simplify:
-- Try cache first (synchronous) — if found, show immediately with no loading state
-- Fall back to fetch only if somehow not preloaded (edge case)
-
-### Files to Modify
-1. `src/lib/jisho.ts` — Add `preloadWords()` with batched parallel fetching and progress callback
-2. `src/pages/Reader.tsx` — Preload on mount, show loading state during preload
-3. `src/components/WordPopup.tsx` — Prefer synchronous cache read, remove loading delay for preloaded words
+### Technical approach
+- Pure localStorage, no database needed (consistent with existing flashcards store pattern)
+- Scroll percentage = `scrollTop / (scrollHeight - clientHeight) * 100`
+- Scroll listener with `requestAnimationFrame` debounce for performance
 
