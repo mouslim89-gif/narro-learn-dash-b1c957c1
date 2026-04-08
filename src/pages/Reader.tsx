@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
@@ -7,15 +7,24 @@ import { preloadWords } from '@/lib/jisho';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
 import { Progress } from '@/components/ui/progress';
+import { useReadingProgressStore } from '@/stores/reading-progress';
 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const [difficulty, setDifficulty] = useState<Difficulty>((diffParam as Difficulty) || 'simplified');
+  const { updateProgress, getProgress } = useReadingProgressStore();
+  const saved = id ? getProgress(id) : undefined;
+
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    (diffParam as Difficulty) || saved?.difficulty || 'simplified'
+  );
   const [showSettings, setShowSettings] = useState(false);
   const [popup, setPopup] = useState<{ word: string; pos: { x: number; y: number } } | null>(null);
   const [preloadProgress, setPreloadProgress] = useState(0);
   const [preloaded, setPreloaded] = useState(false);
+  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
+  const articleRef = useRef<HTMLDivElement>(null);
+  const restoredScroll = useRef(false);
 
   const book = books.find((b) => b.id === id);
 
@@ -27,12 +36,45 @@ export default function Reader() {
   useEffect(() => {
     setPreloaded(false);
     setPreloadProgress(0);
+    restoredScroll.current = false;
     const uniqueWords = [...new Set(tokens.filter((t) => t.isJapanese).map((t) => t.text))];
     if (uniqueWords.length === 0) { setPreloaded(true); return; }
     preloadWords(uniqueWords, (loaded, total) => {
       setPreloadProgress(Math.round((loaded / total) * 100));
     }).then(() => setPreloaded(true));
   }, [tokens]);
+
+  // Restore scroll position after preload
+  useEffect(() => {
+    if (!preloaded || restoredScroll.current || !saved?.progressPercent) return;
+    restoredScroll.current = true;
+    requestAnimationFrame(() => {
+      const scrollH = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollH > 0) {
+        window.scrollTo(0, (saved.progressPercent / 100) * scrollH);
+      }
+    });
+  }, [preloaded, saved?.progressPercent]);
+
+  // Track scroll progress
+  const rafRef = useRef<number>(0);
+  const handleScroll = useCallback(() => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const scrollH = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollH <= 0) return;
+      const pct = Math.min(100, (window.scrollY / scrollH) * 100);
+      setScrollPercent(Math.round(pct));
+      if (id) updateProgress(id, difficulty, pct);
+    });
+  }, [id, difficulty, updateProgress]);
+
+  useEffect(() => {
+    if (!preloaded) return;
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [preloaded, handleScroll]);
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -80,8 +122,8 @@ export default function Reader() {
         </div>
       ) : (
         <>
-          <Progress value={35} className="h-0.5 rounded-none" />
-          <article className="mx-auto max-w-2xl px-6 py-10">
+          <Progress value={scrollPercent} className="h-0.5 rounded-none" />
+          <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
             <p className="font-japanese text-xl leading-[2.4] tracking-wide">
               {tokens.map((token, i) => {
                 if (!token.isJapanese) {
