@@ -15,12 +15,12 @@ const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', larg
 
 function FuriganaWord({ text, onClick }: { text: string; onClick: (e: React.MouseEvent) => void }) {
   const cached = getCached(text);
-  const reading = cached?.results?.[0]?.japanese?.[0]?.reading;
-  const dictWord = cached?.results?.[0]?.japanese?.[0]?.word || text;
+  const entry = cached?.results?.[0];
 
-  // Only show furigana if there's a reading and the word contains kanji
+  // Only show furigana if we have a result and the word contains kanji
   const hasKanji = /[\u4E00-\u9FFF\u3400-\u4DBF]/.test(text);
-  if (!reading || !hasKanji) {
+  
+  if (!entry || !hasKanji) {
     return (
       <span
         onClick={onClick}
@@ -31,6 +31,25 @@ function FuriganaWord({ text, onClick }: { text: string; onClick: (e: React.Mous
     );
   }
 
+  // Find the best matching reading
+  // If the dictionary word matches the text, use its reading directly
+  // Otherwise, use the reading from the first japanese entry
+  const dictWord = entry.japanese?.[0]?.word || '';
+  const reading = entry.japanese?.[0]?.reading || '';
+  
+  if (!reading) {
+    return (
+      <span
+        onClick={onClick}
+        className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+      >
+        {text}
+      </span>
+    );
+  }
+
+  // For conjugated forms, show the reading above the kanji portion only
+  // Simple approach: show the full reading above the whole word
   return (
     <ruby
       onClick={onClick}
@@ -146,9 +165,17 @@ export default function Reader() {
           </p>
         </div>
         <div className="flex items-center gap-1">
+          {/* Furigana toggle - always visible */}
+          <button
+            onClick={() => setShowFurigana(!showFurigana)}
+            className={`rounded p-1 transition-colors ${showFurigana ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground'}`}
+            title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
+          >
+            <Languages className="h-5 w-5" />
+          </button>
           <button
             onClick={() => setShowGrammar(true)}
-            className="rounded p-1 text-primary hover:bg-primary/10"
+            className="rounded p-1 text-muted-foreground hover:text-primary"
             title="Grammar Notes"
           >
             <Sparkles className="h-5 w-5" />
@@ -191,30 +218,14 @@ export default function Reader() {
             ))}
           </div>
 
-          <div className="mt-4 flex items-center gap-3">
-            <div>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
-              <button
-                onClick={() => setReaderDarkMode(!readerDarkMode)}
-                className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
-              >
-                {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                {readerDarkMode ? 'Light' : 'Dark'}
-              </button>
-            </div>
-            <div>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Furigana</p>
-              <button
-                onClick={() => setShowFurigana(!showFurigana)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                  showFurigana ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
-                }`}
-              >
-                <Languages className="h-3.5 w-3.5" />
-                {showFurigana ? 'On' : 'Off'}
-              </button>
-            </div>
-          </div>
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
+          <button
+            onClick={() => setReaderDarkMode(!readerDarkMode)}
+            className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
+          >
+            {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
         </div>
       )}
 
@@ -228,7 +239,7 @@ export default function Reader() {
         <>
           <Progress value={scrollPercent} className="h-0.5 rounded-none" />
           <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-            <p className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3]' : ''}`}>
+            <p className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
               {tokens.map((token, i) => {
                 if (!token.isJapanese) {
                   return <span key={i}>{token.text}</span>;
