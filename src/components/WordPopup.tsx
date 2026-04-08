@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Star, Loader2 } from 'lucide-react';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { lookupWord, type JishoResult } from '@/lib/jisho';
+import { getCached, lookupWord, type JishoResult } from '@/lib/jisho';
 
 interface WordPopupProps {
   word: string;
@@ -11,14 +11,28 @@ interface WordPopupProps {
 
 export function WordPopup({ word, position, onClose }: WordPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<JishoResult | null>(null);
+
+  // Try cache first (instant)
+  const cached = getCached(word);
+  const [loading, setLoading] = useState(!cached);
+  const [result, setResult] = useState<JishoResult | null>(cached?.[0] ?? null);
   const [error, setError] = useState(false);
 
-  const wordId = word; // Use the word itself as ID
+  const wordId = word;
   const saved = hasWord(wordId);
 
   useEffect(() => {
+    if (cached && cached.length > 0) {
+      setResult(cached[0]);
+      setLoading(false);
+      return;
+    }
+    if (cached && cached.length === 0) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     setError(false);
@@ -39,7 +53,7 @@ export function WordPopup({ word, position, onClose }: WordPopupProps) {
       });
 
     return () => { cancelled = true; };
-  }, [word]);
+  }, [word, cached]);
 
   const handleSave = () => {
     if (!result) return;
