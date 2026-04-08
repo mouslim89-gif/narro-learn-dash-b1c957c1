@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Star, Loader2 } from 'lucide-react';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { getCached, lookupWord, type JishoResult } from '@/lib/jisho';
+import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 
 interface WordPopupProps {
   word: string;
@@ -9,26 +9,47 @@ interface WordPopupProps {
   onClose: () => void;
 }
 
+// Detect conjugation form from the original word vs dictionary form
+function getConjugationLabel(original: string, deinflected: string | null | undefined): string | null {
+  if (!deinflected || deinflected === original) return null;
+
+  const suffix = original.slice(0, -deinflected.length + 1);
+  
+  if (original.endsWith('ました') || original.endsWith('ます')) return 'Polite form (丁寧形)';
+  if (original.endsWith('ている') || original.endsWith('ていた') || original.endsWith('ておる') || original.endsWith('ており') || original.endsWith('ておりました')) return 'Continuous (ている形)';
+  if (original.endsWith('ない') || original.endsWith('ません')) return 'Negative (否定形)';
+  if (original.endsWith('た') || original.endsWith('だ')) return 'Past tense (過去形)';
+  if (original.endsWith('て') || original.endsWith('で')) return 'Te-form (て形)';
+  if (original.endsWith('たい')) return 'Want to~ (たい形)';
+  if (original.endsWith('られる') || original.endsWith('られた')) return 'Passive (受身形)';
+  if (original.endsWith('させる') || original.endsWith('させた')) return 'Causative (使役形)';
+  if (original.endsWith('かった')) return 'Past adjective';
+  if (original.endsWith('くない')) return 'Negative adjective';
+  if (original.endsWith('くて')) return 'Te-form adjective';
+  
+  return `Dictionary form: ${deinflected}`;
+}
+
 export function WordPopup({ word, position, onClose }: WordPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
 
-  // Try cache first (instant)
   const cached = getCached(word);
   const [loading, setLoading] = useState(!cached);
-  const [result, setResult] = useState<JishoResult | null>(cached?.[0] ?? null);
+  const [result, setResult] = useState<JishoResult | null>(cached?.results?.[0] ?? null);
+  const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? null);
   const [error, setError] = useState(false);
 
   const wordId = word;
   const saved = hasWord(wordId);
 
   useEffect(() => {
-    if (cached && cached.length > 0) {
-      setResult(cached[0]);
-      setLoading(false);
-      return;
-    }
-    if (cached && cached.length === 0) {
-      setError(true);
+    if (cached) {
+      if (cached.results.length > 0) {
+        setResult(cached.results[0]);
+        setDeinflected(cached.deinflected ?? null);
+      } else {
+        setError(true);
+      }
       setLoading(false);
       return;
     }
@@ -38,9 +59,10 @@ export function WordPopup({ word, position, onClose }: WordPopupProps) {
     setError(false);
 
     lookupWord(word)
-      .then((results) => {
-        if (!cancelled && results.length > 0) {
-          setResult(results[0]);
+      .then((entry: CacheEntry) => {
+        if (!cancelled && entry.results.length > 0) {
+          setResult(entry.results[0]);
+          setDeinflected(entry.deinflected ?? null);
         } else if (!cancelled) {
           setError(true);
         }
@@ -55,6 +77,8 @@ export function WordPopup({ word, position, onClose }: WordPopupProps) {
     return () => { cancelled = true; };
   }, [word, cached]);
 
+  const conjugationLabel = getConjugationLabel(word, deinflected);
+
   const handleSave = () => {
     if (!result) return;
     const entry: SavedWord = {
@@ -64,6 +88,7 @@ export function WordPopup({ word, position, onClose }: WordPopupProps) {
       meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
+      mastery: 0,
     };
     addWord(entry);
   };
@@ -104,6 +129,21 @@ export function WordPopup({ word, position, onClose }: WordPopupProps) {
             <p className="font-japanese text-sm text-muted-foreground">
               {result.japanese[0]?.reading}
             </p>
+
+            {/* Conjugation info */}
+            {conjugationLabel && (
+              <div className="mt-1 rounded bg-primary/10 px-2 py-1">
+                <p className="text-[10px] font-semibold text-primary">
+                  {conjugationLabel}
+                </p>
+                {deinflected && deinflected !== word && (
+                  <p className="font-japanese text-[11px] text-muted-foreground">
+                    Original text: {word}
+                  </p>
+                )}
+              </div>
+            )}
+
             {result.jlpt.length > 0 && (
               <span className="mt-1 inline-block rounded bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-accent">
                 {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
