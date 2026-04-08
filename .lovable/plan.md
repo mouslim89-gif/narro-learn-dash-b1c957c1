@@ -1,60 +1,62 @@
 
 
-## Japanese Reading App — "Yomimasu" (読みます)
+## Redesign: Serious, Book-Like Aesthetic
 
-### Pages & Navigation
+### Current State
+The app uses a playful Duolingo-inspired design with bright teal/coral/purple colors, rounded cards, and emoji-heavy UI.
 
-**Bottom tab bar** with 4 tabs: Library, My Books, Flashcards, Dictionary
+### New Direction
+A refined, literary aesthetic — think Kindle meets a beautiful bookshop app. Warm, muted tones with elegant typography.
 
----
+### Design Changes
 
-### 1. Library (Home)
-- **Hero section** with a featured/recommended book
-- **Genre sections** (horizontal scroll): Folk Tales, Fiction, Sci-Fi, Slice of Life, Horror
-- Each **book card** shows: cover image (colored placeholder), title (JP + EN), difficulty badge (N5→N1 color-coded), estimated reading time
-- Tapping a card → Book Detail page
+**Color Palette**
+- Background: warm off-white/cream (#FAF8F5) with dark mode using deep charcoal (#1A1A1A)
+- Primary: deep navy (#2C3E50) or warm brown (#5D4037)
+- Accent: muted gold (#B8860B) for highlights and badges
+- Cards: soft white with subtle shadows
+- Remove the vibrant teal/coral/purple palette
 
-### 2. Book Detail Page
-- Book cover, title, synopsis, genre badge, difficulty badge
-- **3 reading modes** as selectable cards:
-  - 🟢 Simplified — very easy Japanese (short sentences, basic kanji)
-  - 🟡 Intermediate — moderately simplified
-  - 🔴 Original — full original text
-- "Start Reading" button → Reader page
-- Audio toggle: if audio file is available, show an audio badge
+**Typography**
+- Replace Nunito with a more literary font: **Merriweather** for headings (serif), keep **Noto Sans JP** for Japanese text
+- Use an elegant sans-serif like **Inter** for UI labels
+- Increase line-height in the reader for comfortable reading
 
-### 3. Reader Page
-- Clean reading view with large Japanese text (vertical or horizontal layout)
-- **Sticky audio player bar** at bottom (play/pause, progress bar, speed control) — audio file based, no TTS
-- **Word tap popup bubble**: tap any word → floating bubble with:
-  - The word in kanji + furigana reading
-  - English translation
-  - "Save to flashcards" ⭐ button
-  - "Open in dictionary" 📖 button
-- Progress indicator (chapter/percentage)
-- Difficulty switcher accessible from a top menu to switch version mid-read
+**Component Styling**
+- Softer border-radius (0.5rem instead of 1rem) — less bubbly
+- Subtle borders and shadows instead of bold colored backgrounds
+- Book cards: taller, more like actual book covers with a spine effect
+- Remove emoji from difficulty levels, use clean text labels or minimal icons
+- More whitespace, less visual density
 
-### 4. Flashcards Page
-- List of all saved words, grouped by book
-- Simple flashcard review mode: show word → tap to reveal meaning
-- Delete/archive saved words
+**Library Page**
+- Replace the bright gradient featured card with an elegant hero using a subtle background
+- Genre sections with refined typography headers (thin uppercase tracking)
+- Book cards styled like physical book covers
 
-### 5. Dictionary Page
-- Search bar (search by romaji, kana, or English)
-- Results show: word, reading, translation, example sentence
-- "Save to flashcards" button on each entry
+**Book Detail Page**
+- More editorial layout — like a book's back cover
+- Clean difficulty selector with radio-style buttons instead of colorful cards
 
----
+**Reader Page**
+- Cream/sepia background option for reading comfort
+- More refined header bar
+- Subtle word highlight on tap instead of bright primary color
 
-### Data & Content
-- All books use Lorem Ipsum–style Japanese placeholder text (mix of hiragana/katakana/kanji gibberish) for now
-- ~6 sample books across genres
-- Word definitions are hardcoded sample data (a set of ~30 common Japanese words)
-- No backend needed initially — all data stored locally in the app
+**Audio Player**
+- Minimal, dark-toned player bar
+- Less playful, more like a podcast player
 
-### Design
-- Modern, colorful UI with Duolingo-like energy
-- Primary: vibrant teal/green, accents: coral, purple badges
-- Rounded cards, playful icons, smooth transitions
-- Responsive but mobile-first feel
+### Files to Modify
+1. `src/index.css` — New color tokens, typography imports
+2. `tailwind.config.ts` — Update border-radius default
+3. `src/pages/Library.tsx` — Refined hero and genre sections
+4. `src/components/BookCard.tsx` — Book-like card styling
+5. `src/pages/BookDetail.tsx` — Editorial layout
+6. `src/pages/Reader.tsx` — Sepia reading mode, refined styling
+7. `src/components/AudioPlayer.tsx` — Minimal dark player
+8. `src/components/WordPopup.tsx` — Cleaner popup design
+9. `src/components/BottomNav.tsx` — Refined navigation
+10. `src/pages/Dictionary.tsx`, `Flashcards.tsx`, `MyBooks.tsx` — Consistent styling
+11. `src/data/books.ts` — Update cover colors to muted tones, remove emoji from difficulty config
 
