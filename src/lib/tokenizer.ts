@@ -1,5 +1,3 @@
-import { dictionary, type DictionaryEntry } from '@/data/dictionary';
-
 // Character type helpers
 function isKanji(ch: string): boolean {
   const code = ch.charCodeAt(0);
@@ -16,76 +14,71 @@ function isKatakana(ch: string): boolean {
   return code >= 0x30A0 && code <= 0x30FF;
 }
 
+function isJapanese(ch: string): boolean {
+  return isKanji(ch) || isHiragana(ch) || isKatakana(ch);
+}
+
 function isPunctuation(ch: string): boolean {
   return '。、！？「」『』（）・…ー〜～\n '.includes(ch);
 }
 
 export interface TextToken {
   text: string;
-  entry: DictionaryEntry | null;
+  isJapanese: boolean;
 }
 
-// Build a set of all dictionary surface forms and readings for quick lookup
-const dictWords: { text: string; entry: DictionaryEntry }[] = [];
-dictionary.forEach((entry) => {
-  dictWords.push({ text: entry.word, entry });
-  if (entry.reading !== entry.word) {
-    dictWords.push({ text: entry.reading, entry });
-  }
-});
-// Sort by length descending for greedy matching
-dictWords.sort((a, b) => b.text.length - a.text.length);
-
 /**
- * Tokenize Japanese text using greedy longest-match against dictionary,
- * with fallback character-type grouping.
+ * Tokenize Japanese text by grouping characters into meaningful chunks.
+ * Groups kanji+hiragana together (e.g. 食べました), keeps katakana runs together,
+ * and separates punctuation.
  */
 export function tokenize(text: string): TextToken[] {
   const tokens: TextToken[] = [];
   let i = 0;
 
   while (i < text.length) {
-    // Try greedy longest dictionary match
-    let matched = false;
-    for (const dw of dictWords) {
-      if (text.startsWith(dw.text, i)) {
-        tokens.push({ text: dw.text, entry: dw.entry });
-        i += dw.text.length;
-        matched = true;
-        break;
-      }
-    }
-    if (matched) continue;
-
     const ch = text[i];
 
-    // Group punctuation/whitespace individually
+    // Punctuation / whitespace / newlines
     if (isPunctuation(ch)) {
-      tokens.push({ text: ch, entry: null });
+      tokens.push({ text: ch, isJapanese: false });
       i++;
       continue;
     }
 
-    // Group consecutive characters of the same type
+    // Kanji possibly followed by hiragana (okurigana) — forms a single word
     if (isKanji(ch)) {
       let end = i + 1;
+      // Consume consecutive kanji
       while (end < text.length && isKanji(text[end])) end++;
-      tokens.push({ text: text.slice(i, end), entry: null });
+      // Consume trailing hiragana (okurigana like 食べる, 大きい)
+      while (end < text.length && isHiragana(text[end])) end++;
+      tokens.push({ text: text.slice(i, end), isJapanese: true });
       i = end;
-    } else if (isHiragana(ch)) {
+      continue;
+    }
+
+    // Pure hiragana run (particles, conjugations)
+    if (isHiragana(ch)) {
       let end = i + 1;
       while (end < text.length && isHiragana(text[end])) end++;
-      tokens.push({ text: text.slice(i, end), entry: null });
+      tokens.push({ text: text.slice(i, end), isJapanese: true });
       i = end;
-    } else if (isKatakana(ch)) {
+      continue;
+    }
+
+    // Katakana run
+    if (isKatakana(ch)) {
       let end = i + 1;
       while (end < text.length && isKatakana(text[end])) end++;
-      tokens.push({ text: text.slice(i, end), entry: null });
+      tokens.push({ text: text.slice(i, end), isJapanese: true });
       i = end;
-    } else {
-      tokens.push({ text: ch, entry: null });
-      i++;
+      continue;
     }
+
+    // Non-Japanese character
+    tokens.push({ text: ch, isJapanese: false });
+    i++;
   }
 
   return tokens;

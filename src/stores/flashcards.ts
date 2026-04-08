@@ -1,10 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { DictionaryEntry } from '@/data/dictionary';
+
+export interface SavedWord {
+  id: string;
+  word: string;
+  reading: string;
+  meanings: string[];
+  jlpt?: string[];
+  partsOfSpeech?: string[];
+}
 
 interface FlashcardStore {
-  savedWords: DictionaryEntry[];
-  addWord: (entry: DictionaryEntry) => void;
+  savedWords: SavedWord[];
+  addWord: (entry: SavedWord) => void;
   removeWord: (id: string) => void;
   hasWord: (id: string) => boolean;
 }
