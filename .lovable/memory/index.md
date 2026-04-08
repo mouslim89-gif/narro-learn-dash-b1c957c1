@@ -1,11 +1,11 @@
 # Project Memory
 
 ## Core
-Yomimasu — Japanese reading app. Serious literary aesthetic, book-like UI.
-Primary deep navy, accent muted gold, warm cream background. No bright colors.
-Merriweather serif headings, Inter body, Noto Sans JP for Japanese. App in English.
+Yomimasu — Japanese reading app. Modern colorful Duolingo-like UI. Primary teal, accent coral, secondary purple.
+Nunito headings, Noto Sans JP for Japanese text. App is in English.
 No backend — localStorage via Zustand. Books use placeholder text for now.
-No emoji in UI elements — clean text labels and minimal icons only.
+Lovable Cloud enabled. Jisho.org API via edge function for dictionary lookups.
 
 ## Memories
 - [App structure](mem://features/app-structure) — Pages, navigation, data model overview
+- [Dictionary integration](mem://features/dictionary) — Jisho API via edge function, client-side caching, SavedWord type
