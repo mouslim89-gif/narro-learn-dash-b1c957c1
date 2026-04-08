@@ -3,7 +3,7 @@ import { Clock, Headphones } from 'lucide-react';
 import type { Book } from '@/data/books';
 import { jlptColors } from '@/data/books';
 
-export function BookCard({ book }: { book: Book }) {
+export function BookCard({ book, progress }: { book: Book; progress?: number }) {
   return (
     <Link
       to={`/book/${book.id}`}
@@ -26,6 +26,14 @@ export function BookCard({ book }: { book: Book }) {
           </p>
           <p className="text-[11px] text-white/75">{book.titleEn}</p>
         </div>
+        {progress != null && (
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-black/20">
+            <div
+              className="h-full bg-white/80 transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2 px-0.5">
         <span
