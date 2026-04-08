@@ -3,8 +3,9 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles, Languages } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
-import { preloadWords, getCached } from '@/lib/jisho';
+import { preloadWords } from '@/lib/jisho';
 import { AudioPlayer } from '@/components/AudioPlayer';
+import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
@@ -12,56 +13,6 @@ import { useReadingProgressStore, fontSizeMap, type FontSize } from '@/stores/re
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
-
-function FuriganaWord({ text, onClick }: { text: string; onClick: (e: React.MouseEvent) => void }) {
-  const cached = getCached(text);
-  const entry = cached?.results?.[0];
-
-  // Only show furigana if we have a result and the word contains kanji
-  const hasKanji = /[\u4E00-\u9FFF\u3400-\u4DBF]/.test(text);
-  
-  if (!entry || !hasKanji) {
-    return (
-      <span
-        onClick={onClick}
-        className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-      >
-        {text}
-      </span>
-    );
-  }
-
-  // Find the best matching reading
-  // If the dictionary word matches the text, use its reading directly
-  // Otherwise, use the reading from the first japanese entry
-  const dictWord = entry.japanese?.[0]?.word || '';
-  const reading = entry.japanese?.[0]?.reading || '';
-  
-  if (!reading) {
-    return (
-      <span
-        onClick={onClick}
-        className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-      >
-        {text}
-      </span>
-    );
-  }
-
-  // For conjugated forms, show the reading above the kanji portion only
-  // Simple approach: show the full reading above the whole word
-  return (
-    <ruby
-      onClick={onClick}
-      className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-    >
-      {text}
-      <rp>(</rp>
-      <rt className="text-[0.5em] font-normal text-muted-foreground">{reading}</rt>
-      <rp>)</rp>
-    </ruby>
-  );
-}
 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
