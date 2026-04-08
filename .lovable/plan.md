@@ -1,57 +1,39 @@
 
 
-## Online Dictionary Integration
+## Preload All Definitions on Book Open
 
-### Problem
-The current dictionary is hardcoded with only 30 words, so most words in the reader are not clickable.
+### Approach
+Storing the entire JMDict dictionary locally (~3.5M entries, ~500MB+) is not practical. Instead, we'll **preload definitions for every unique word in the current text** when the reader opens. This way the popup is instant.
 
-### Solution
-Two changes are needed:
+### How It Works
 
-1. **Proper Japanese tokenization** — Replace the custom greedy tokenizer with `kuromoji.js`, a real Japanese morphological analyzer that runs in the browser. It correctly segments any Japanese text into words with their dictionary forms (lemmas), readings, and parts of speech.
-
-2. **Online dictionary lookups via Jisho.org** — When a user taps any word, query the Jisho.org API (`https://jisho.org/api/v1/search/words?keyword=...`) through a Supabase Edge Function (to avoid CORS issues). This gives full definitions, readings, JLPT level, and example sentences for any Japanese word.
-
-### Architecture
-
-```text
-User taps word in Reader
-        │
-        ▼
-kuromoji tokenizer (client-side, ~2MB dictionary loaded once)
-splits text into proper words with base forms
-        │
-        ▼
-WordPopup appears with loading state
-        │
-        ▼
-Edge Function proxies request to Jisho.org API
-        │
-        ▼
-Popup shows: word, reading, all meanings, JLPT tag, save-to-flashcards button
-```
-
-Results are cached in memory so repeated taps on the same word are instant.
+1. **Extract unique words** from the tokenized text (deduplicate)
+2. **Batch-fetch all definitions** in parallel when the Reader mounts (with a concurrency limit of ~5 to avoid overloading)
+3. **Store results in the existing `jisho.ts` cache** — the same `Map<string, JishoResult[]>` already used
+4. **Show a loading indicator** on the Reader page while preloading ("Loading dictionary…" with a progress bar)
+5. **WordPopup reads from cache** — since all words are already fetched, lookups are synchronous/instant
 
 ### Technical Details
 
-**Files to create:**
-- `supabase/functions/jisho-lookup/index.ts` — Edge function that proxies `GET https://jisho.org/api/v1/search/words?keyword={word}` and returns cleaned results
-- `src/lib/jisho.ts` — Client-side API helper that calls the edge function, with in-memory cache
+**`src/lib/jisho.ts`** — Add a `preloadWords(words: string[])` function:
+- Accepts an array of unique words
+- Filters out already-cached words
+- Fetches remaining words in parallel batches (5 concurrent requests)
+- Reports progress via a callback
+- Populates the existing cache
 
-**Files to modify:**
-- `src/lib/tokenizer.ts` — Replace greedy matcher with `kuromoji.js` initialization and tokenization. Export async `tokenize()` that returns tokens with surface form, reading, and base form (for dictionary lookup)
-- `src/pages/Reader.tsx` — Load tokenizer asynchronously (show skeleton while loading), pass base form to popup
-- `src/components/WordPopup.tsx` — Accept a raw word string instead of a `DictionaryEntry`, fetch definition from Jisho on mount, show loading/error states
-- `src/pages/Dictionary.tsx` — Add live search against Jisho API (with debounce) in addition to local results
-- `src/stores/flashcards.ts` — Update types to store Jisho-sourced word data (word, reading, meanings array)
-- `package.json` — Add `kuromoji` dependency
+**`src/pages/Reader.tsx`** — Add preloading on mount:
+- After tokenizing, extract unique Japanese token texts
+- Call `preloadWords()` with a progress callback
+- Show a thin progress bar or skeleton while loading
+- Once complete, render the text as normal (popups will be instant)
 
-**Requires:** Lovable Cloud enabled for the edge function deployment.
+**`src/components/WordPopup.tsx`** — Simplify:
+- Try cache first (synchronous) — if found, show immediately with no loading state
+- Fall back to fetch only if somehow not preloaded (edge case)
 
-### What the user gets
-- Every single word in any text becomes tappable
-- Full dictionary definitions from Jisho.org (the most comprehensive free Japanese-English dictionary, based on JMDict)
-- Dictionary page search works for any Japanese or English word
-- The local 30-word dictionary is kept as a fallback/offline cache
+### Files to Modify
+1. `src/lib/jisho.ts` — Add `preloadWords()` with batched parallel fetching and progress callback
+2. `src/pages/Reader.tsx` — Preload on mount, show loading state during preload
+3. `src/components/WordPopup.tsx` — Prefer synchronous cache read, remove loading delay for preloaded words
 
