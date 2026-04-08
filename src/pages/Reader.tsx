@@ -1,20 +1,18 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
-import { dictionary } from '@/data/dictionary';
 import { tokenize } from '@/lib/tokenizer';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
 import { Progress } from '@/components/ui/progress';
-import type { DictionaryEntry } from '@/data/dictionary';
 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
   const [difficulty, setDifficulty] = useState<Difficulty>((diffParam as Difficulty) || 'simplified');
   const [showSettings, setShowSettings] = useState(false);
-  const [popup, setPopup] = useState<{ entry: DictionaryEntry; pos: { x: number; y: number } } | null>(null);
+  const [popup, setPopup] = useState<{ word: string; pos: { x: number; y: number } } | null>(null);
 
   const book = books.find((b) => b.id === id);
 
@@ -22,18 +20,6 @@ export default function Reader() {
     if (!book) return [];
     return tokenize(book.content[difficulty]);
   }, [book, difficulty]);
-
-  const handleWordClick = useCallback(
-    (tokenText: string, e: React.MouseEvent) => {
-      const entry = dictionary.find(
-        (d) => tokenText.includes(d.word) || tokenText.includes(d.reading)
-      );
-      if (entry) {
-        setPopup({ entry, pos: { x: e.clientX, y: e.clientY } });
-      }
-    },
-    []
-  );
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -78,22 +64,14 @@ export default function Reader() {
       <article className="mx-auto max-w-2xl px-6 py-10">
         <p className="font-japanese text-xl leading-[2.4] tracking-wide">
           {tokens.map((token, i) => {
-            if (token.entry) {
-              return (
-                <span
-                  key={i}
-                  onClick={(e) => setPopup({ entry: token.entry!, pos: { x: e.clientX, y: e.clientY } })}
-                  className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-                >
-                  {token.text}
-                </span>
-              );
+            if (!token.isJapanese) {
+              return <span key={i}>{token.text}</span>;
             }
             return (
               <span
                 key={i}
-                onClick={(e) => handleWordClick(token.text, e)}
-                className="cursor-pointer rounded px-px transition-colors hover:bg-accent/10"
+                onClick={(e) => setPopup({ word: token.text, pos: { x: e.clientX, y: e.clientY } })}
+                className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
               >
                 {token.text}
               </span>
@@ -103,7 +81,7 @@ export default function Reader() {
       </article>
 
       {popup && (
-        <WordPopup entry={popup.entry} position={popup.pos} onClose={() => setPopup(null)} />
+        <WordPopup word={popup.word} position={popup.pos} onClose={() => setPopup(null)} />
       )}
 
       {book.hasAudio && <AudioPlayer />}

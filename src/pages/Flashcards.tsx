@@ -23,7 +23,11 @@ export default function Flashcards() {
           <p className="font-japanese text-5xl font-bold">{card.word}</p>
           <p className="font-japanese mt-2 text-lg text-muted-foreground">{card.reading}</p>
           {revealed && (
-            <p className="mt-4 text-xl font-semibold text-accent animate-in fade-in">{card.translation}</p>
+            <div className="mt-4 animate-in fade-in text-center">
+              {card.meanings.map((m, i) => (
+                <p key={i} className="text-lg font-semibold text-accent">{m}</p>
+              ))}
+            </div>
           )}
           {!revealed && <p className="mt-6 text-xs text-muted-foreground">Tap to reveal</p>}
         </button>
@@ -62,7 +66,9 @@ export default function Flashcards() {
             <div key={word.id} className="flex items-center justify-between rounded-lg border bg-card p-4">
               <div>
                 <p className="font-japanese text-lg font-bold">{word.word}</p>
-                <p className="text-xs text-muted-foreground">{word.reading} — {word.translation}</p>
+                <p className="text-xs text-muted-foreground">
+                  {word.reading} — {word.meanings.join(', ')}
+                </p>
               </div>
               <button onClick={() => removeWord(word.id)} className="rounded p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
                 <Trash2 className="h-4 w-4" />
