@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
+import { preloadWords } from '@/lib/jisho';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { WordPopup } from '@/components/WordPopup';
 import { Progress } from '@/components/ui/progress';
@@ -13,6 +14,8 @@ export default function Reader() {
   const [difficulty, setDifficulty] = useState<Difficulty>((diffParam as Difficulty) || 'simplified');
   const [showSettings, setShowSettings] = useState(false);
   const [popup, setPopup] = useState<{ word: string; pos: { x: number; y: number } } | null>(null);
+  const [preloadProgress, setPreloadProgress] = useState(0);
+  const [preloaded, setPreloaded] = useState(false);
 
   const book = books.find((b) => b.id === id);
 
@@ -20,6 +23,16 @@ export default function Reader() {
     if (!book) return [];
     return tokenize(book.content[difficulty]);
   }, [book, difficulty]);
+
+  useEffect(() => {
+    setPreloaded(false);
+    setPreloadProgress(0);
+    const uniqueWords = [...new Set(tokens.filter((t) => t.isJapanese).map((t) => t.text))];
+    if (uniqueWords.length === 0) { setPreloaded(true); return; }
+    preloadWords(uniqueWords, (loaded, total) => {
+      setPreloadProgress(Math.round((loaded / total) * 100));
+    }).then(() => setPreloaded(true));
+  }, [tokens]);
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -59,26 +72,35 @@ export default function Reader() {
         </div>
       )}
 
-      <Progress value={35} className="h-0.5 rounded-none" />
-
-      <article className="mx-auto max-w-2xl px-6 py-10">
-        <p className="font-japanese text-xl leading-[2.4] tracking-wide">
-          {tokens.map((token, i) => {
-            if (!token.isJapanese) {
-              return <span key={i}>{token.text}</span>;
-            }
-            return (
-              <span
-                key={i}
-                onClick={(e) => setPopup({ word: token.text, pos: { x: e.clientX, y: e.clientY } })}
-                className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-              >
-                {token.text}
-              </span>
-            );
-          })}
-        </p>
-      </article>
+      {!preloaded ? (
+        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
+          <p className="mb-3 text-sm text-muted-foreground">Loading dictionary…</p>
+          <Progress value={preloadProgress} className="h-1.5 rounded-full" />
+          <p className="mt-2 text-xs text-muted-foreground">{preloadProgress}%</p>
+        </div>
+      ) : (
+        <>
+          <Progress value={35} className="h-0.5 rounded-none" />
+          <article className="mx-auto max-w-2xl px-6 py-10">
+            <p className="font-japanese text-xl leading-[2.4] tracking-wide">
+              {tokens.map((token, i) => {
+                if (!token.isJapanese) {
+                  return <span key={i}>{token.text}</span>;
+                }
+                return (
+                  <span
+                    key={i}
+                    onClick={(e) => setPopup({ word: token.text, pos: { x: e.clientX, y: e.clientY } })}
+                    className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                  >
+                    {token.text}
+                  </span>
+                );
+              })}
+            </p>
+          </article>
+        </>
+      )}
 
       {popup && (
         <WordPopup word={popup.word} position={popup.pos} onClose={() => setPopup(null)} />
