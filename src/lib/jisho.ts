@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 export interface JishoResult {
   slug: string;
   is_common: boolean;
@@ -9,7 +7,6 @@ export interface JishoResult {
   senses: { english_definitions: string[]; parts_of_speech: string[] }[];
 }
 
-// In-memory cache
 const cache = new Map<string, JishoResult[]>();
 
 export async function lookupWord(keyword: string): Promise<JishoResult[]> {
@@ -17,14 +14,6 @@ export async function lookupWord(keyword: string): Promise<JishoResult[]> {
     return cache.get(keyword)!;
   }
 
-  const { data, error } = await supabase.functions.invoke('jisho-lookup', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    body: undefined,
-  });
-
-  // supabase.functions.invoke doesn't support query params well for GET,
-  // so let's use fetch directly with the URL from the client
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
 
   const response = await fetch(url, {
@@ -38,8 +27,8 @@ export async function lookupWord(keyword: string): Promise<JishoResult[]> {
     throw new Error(`Jisho lookup failed: ${response.status}`);
   }
 
-  const responseData = await response.json();
-  const results: JishoResult[] = responseData.results || [];
+  const data = await response.json();
+  const results: JishoResult[] = data.results || [];
   cache.set(keyword, results);
   return results;
 }
