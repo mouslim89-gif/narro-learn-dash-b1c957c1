@@ -2,23 +2,18 @@ import { useState, useEffect } from 'react';
 import { BookOpen, ChevronDown, ChevronUp, Sparkles, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
+import { bookGrammar, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface GrammarNote {
-  pattern: string;
-  meaning: string;
-  example: string;
-  jlpt: string;
-  tip: string;
-}
 
 interface GrammarPanelProps {
   text: string;
+  bookId: string;
+  difficulty: string;
   open: boolean;
   onClose: () => void;
 }
 
-export function GrammarPanel({ text, open, onClose }: GrammarPanelProps) {
+export function GrammarPanel({ text, bookId, difficulty, open, onClose }: GrammarPanelProps) {
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +22,16 @@ export function GrammarPanel({ text, open, onClose }: GrammarPanelProps) {
 
   useEffect(() => {
     if (!open || fetched || !text) return;
+
+    // Check pre-baked data first
+    const prebaked = bookGrammar[bookId]?.[difficulty];
+    if (prebaked && prebaked.length > 0) {
+      setNotes(prebaked);
+      setFetched(true);
+      return;
+    }
+
+    // Fallback to edge function
     setLoading(true);
     setError(null);
 
@@ -44,7 +49,7 @@ export function GrammarPanel({ text, open, onClose }: GrammarPanelProps) {
         }
       })
       .finally(() => setLoading(false));
-  }, [open, fetched, text]);
+  }, [open, fetched, text, bookId, difficulty]);
 
   if (!open) return null;
 

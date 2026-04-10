@@ -3,7 +3,9 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles, Languages } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
-import { preloadWords } from '@/lib/jisho';
+import { seedCache } from '@/lib/jisho';
+import { bookDictionary } from '@/data/book-dictionary';
+import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
@@ -25,7 +27,7 @@ export default function Reader() {
   );
   const [showSettings, setShowSettings] = useState(false);
   const [popup, setPopup] = useState<{ word: string; pos: { x: number; y: number } } | null>(null);
-  const [preloadProgress, setPreloadProgress] = useState(0);
+  
   const [preloaded, setPreloaded] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -45,15 +47,14 @@ export default function Reader() {
   }, [book, difficulty]);
 
   useEffect(() => {
-    setPreloaded(false);
-    setPreloadProgress(0);
     restoredScroll.current = false;
-    const uniqueWords = [...new Set(tokens.filter((t) => t.isJapanese).map((t) => t.text))];
-    if (uniqueWords.length === 0) { setPreloaded(true); return; }
-    preloadWords(uniqueWords, (loaded, total) => {
-      setPreloadProgress(Math.round((loaded / total) * 100));
-    }).then(() => setPreloaded(true));
-  }, [tokens]);
+    // Seed cache from pre-baked data
+    const dictData = id ? bookDictionary[id]?.[difficulty] : undefined;
+    if (dictData) {
+      seedCache(dictData);
+    }
+    setPreloaded(true);
+  }, [id, difficulty]);
 
   useEffect(() => {
     if (!preloaded || restoredScroll.current || !saved?.progressPercent) return;
@@ -180,13 +181,7 @@ export default function Reader() {
         </div>
       )}
 
-      {!preloaded ? (
-        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-          <p className="mb-3 text-sm text-muted-foreground">Loading dictionary…</p>
-          <Progress value={preloadProgress} className="h-1.5 rounded-full" />
-          <p className="mt-2 text-xs text-muted-foreground">{preloadProgress}%</p>
-        </div>
-      ) : (
+      {preloaded && (
         <>
           <Progress value={scrollPercent} className="h-0.5 rounded-none" />
           <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
@@ -225,6 +220,8 @@ export default function Reader() {
 
       <GrammarPanel
         text={bookText}
+        bookId={id || ''}
+        difficulty={difficulty}
         open={showGrammar}
         onClose={() => setShowGrammar(false)}
       />
