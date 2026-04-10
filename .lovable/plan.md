@@ -1,60 +1,55 @@
 
 
-## Pre-baked Dictionary & Grammar Notes
+## Mobile-First App Improvements
 
-### What it does
-Eliminates all loading time in the Reader by shipping pre-generated dictionary lookups and grammar notes as static data bundled with each book. No API calls needed when reading.
+Since this is a mobile app, the improvements focus on touch interactions, mobile UX patterns, and proper mobile viewport handling.
 
-### How it works
+### 1. WordPopup → Bottom Sheet on Mobile
+The current popup uses absolute positioning which clips on small screens. Replace with a slide-up bottom sheet using Drawer component (vaul, already installed).
+- Tap word → bottom sheet slides up from bottom with drag handle
+- Swipe down to dismiss
+- Keep all existing content (definition, conjugation, JLPT badge, save button)
 
-**1. Generate static data via a build script**
+**Files**: `src/components/WordPopup.tsx`, `src/pages/Reader.tsx`
 
-Create a one-time Node script (`scripts/generate-book-data.ts`) that:
-- For each book x difficulty, tokenizes the text, calls the Jisho edge function for all unique tokens, and saves the results
-- Calls the grammar-notes edge function for each book x difficulty text
-- Writes everything to `src/data/book-dictionary.ts` and `src/data/book-grammar.ts` as exported constants
+### 2. Flashcards — Flip Animation + SRS Scheduling
+- Add 3D CSS flip animation on the review card (tap to flip)
+- Add `lastReviewedAt`, `nextReviewAt` to SavedWord for spaced repetition intervals (1d → 3d → 7d → 30d)
+- Show "X cards due" notification badge on the Cards tab in BottomNav
+- Add progress bar during review
 
-The output shape:
-```typescript
-// src/data/book-dictionary.ts
-// Map<bookId, Map<difficulty, Map<word, CacheEntry>>>
-export const bookDictionary: Record<string, Record<string, Record<string, CacheEntry>>> = { ... };
+**Files**: `src/stores/flashcards.ts`, `src/pages/Flashcards.tsx`, `src/components/BottomNav.tsx`, `src/index.css`
 
-// src/data/book-grammar.ts  
-export const bookGrammar: Record<string, Record<string, GrammarNote[]>> = { ... };
-```
+### 3. Mobile Meta Tags + PWA Setup
+- Update `index.html`: set title to "Yomimasu", add `apple-mobile-web-app-capable`, status bar color, theme-color meta tags
+- Add `viewport-fit=cover` for notched devices
+- Add safe-area padding to BottomNav for home indicator
 
-**2. Pre-seed the jisho cache on Reader mount**
+**Files**: `index.html`, `src/components/BottomNav.tsx`
 
-In `Reader.tsx`, instead of calling `preloadWords()` (which hits the edge function), import `bookDictionary` and seed the in-memory cache directly:
-```typescript
-import { bookDictionary } from '@/data/book-dictionary';
-// On mount: iterate bookDictionary[bookId][difficulty] and call cache.set() for each entry
-```
+### 4. Reader Touch Improvements
+- Increase tap target size for Japanese words (slightly more padding)
+- Add haptic-style visual feedback on word tap (brief scale animation)
+- Sentence-level highlighting: tap a sentence to softly highlight it for tracking position
 
-This makes `preloaded` immediately true — no loading bar, no network requests.
+**Files**: `src/pages/Reader.tsx`, `src/index.css`
 
-**3. Inline grammar notes**
+### 5. My Books — Reading Stats Header
+- Stats row at top: total words saved, books in progress, estimated reading time
+- Streak counter based on `lastReadAt` timestamps (calculated at render)
 
-In `GrammarPanel.tsx`, check `bookGrammar[bookId][difficulty]` first. If data exists, use it directly instead of invoking the edge function. Grammar panel opens instantly.
+**Files**: `src/pages/MyBooks.tsx`
 
-**4. Fallback for unknown words**
+### 6. Visual Polish
+- BookCard: subtle gradient overlay on covers for depth
+- Better empty state illustrations (emoji-based) for My Books and Flashcards
+- Smooth page transitions using framer-motion (already installed)
 
-Keep the existing edge function calls as fallback for words not in the pre-baked data (e.g. if the user taps a word the tokenizer split differently). The popup already handles this gracefully.
+**Files**: `src/components/BookCard.tsx`, `src/pages/MyBooks.tsx`, `src/pages/Flashcards.tsx`, `src/App.tsx`
 
-### Files to create/modify
-1. **`scripts/generate-book-data.ts`** — Build script to generate static data (run once, output committed)
-2. **`src/data/book-dictionary.ts`** — Generated static dictionary data for all books
-3. **`src/data/book-grammar.ts`** — Generated static grammar notes for all books
-4. **`src/lib/jisho.ts`** — Add `seedCache(entries)` function to bulk-load the cache
-5. **`src/pages/Reader.tsx`** — Replace `preloadWords` call with cache seeding from static data; remove loading bar; pass bookId/difficulty to GrammarPanel
-6. **`src/components/GrammarPanel.tsx`** — Check static data first, skip edge function if available
-
-### Execution approach
-Since I can't run the build script against the live edge functions from within the app, I'll generate the dictionary and grammar data directly by:
-- Tokenizing each book text in code
-- Calling the edge functions once to get all results
-- Hardcoding the results into the static data files
-
-This means the data files will be large but the app will be instant.
+### Technical notes
+- Bottom sheet uses the existing `vaul` Drawer component — no new dependencies
+- SRS intervals stored alongside existing mastery data in the flashcards Zustand store
+- Safe-area insets use `env(safe-area-inset-bottom)` CSS
+- All changes are client-side only, no backend modifications
 
