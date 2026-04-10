@@ -101,3 +101,17 @@
     font-family: 'Noto Sans JP', sans-serif;
   }
 }
+
+/* 3D Flip Card */
+.perspective-800 {
+  perspective: 800px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
