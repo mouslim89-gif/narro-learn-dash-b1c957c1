@@ -1,47 +1,60 @@
 
 
-## App Improvements
+## Pre-baked Dictionary & Grammar Notes
 
-After reviewing the full codebase, here are focused improvements across UX, reader experience, and feature polish.
+### What it does
+Eliminates all loading time in the Reader by shipping pre-generated dictionary lookups and grammar notes as static data bundled with each book. No API calls needed when reading.
 
-### 1. Library — "Continue Reading" banner + search
-- Add a "Continue Reading" section at the top of Library when there are books in progress (showing the most recently read book with a large card + progress bar + "Resume" button)
-- Add a search/filter bar to find books by title, author, or JLPT level
+### How it works
 
-### 2. BookDetail — Smart "Continue" button
-- If the user has progress for a book, show "Continue Reading" instead of "Start Reading" with the saved difficulty pre-selected
-- Show a small progress indicator (e.g. "42% read")
+**1. Generate static data via a build script**
 
-### 3. Reader — Font size & dark mode controls
-- Add font size adjustment (small/medium/large) to the settings panel, persisted in localStorage
-- Add a dark/light mode toggle in the reader settings panel (separate from system theme)
-- Show estimated reading time remaining based on scroll position
+Create a one-time Node script (`scripts/generate-book-data.ts`) that:
+- For each book x difficulty, tokenizes the text, calls the Jisho edge function for all unique tokens, and saves the results
+- Calls the grammar-notes edge function for each book x difficulty text
+- Writes everything to `src/data/book-dictionary.ts` and `src/data/book-grammar.ts` as exported constants
 
-### 4. Flashcards — Shuffle + progress stats
-- Add a "Shuffle" toggle for review mode
-- Show a simple stats summary: total words saved, words reviewed today
-- Add "Know it" / "Still learning" buttons during review to track mastery (persisted in store)
+The output shape:
+```typescript
+// src/data/book-dictionary.ts
+// Map<bookId, Map<difficulty, Map<word, CacheEntry>>>
+export const bookDictionary: Record<string, Record<string, Record<string, CacheEntry>>> = { ... };
 
-### 5. Page transitions & polish
-- Add smooth fade transitions between pages using `framer-motion`
-- Add skeleton loading states for the Library page
-- Improve the bottom nav with a subtle active indicator dot instead of just color change
+// src/data/book-grammar.ts  
+export const bookGrammar: Record<string, Record<string, GrammarNote[]>> = { ... };
+```
 
-### Files to modify
-1. `src/pages/Library.tsx` — Continue reading banner, search bar
-2. `src/pages/BookDetail.tsx` — Continue vs Start, progress display
-3. `src/pages/Reader.tsx` — Font size control, dark mode toggle, time remaining
-4. `src/pages/Flashcards.tsx` — Shuffle, stats, know/learning buttons
-5. `src/stores/flashcards.ts` — Add mastery tracking fields
-6. `src/stores/reading-progress.ts` — Add font size preference
-7. `src/components/BottomNav.tsx` — Active indicator dot
-8. `src/index.css` — CSS variables for font size levels
-9. `package.json` — Add `framer-motion`
-10. `src/App.tsx` — Wrap routes with AnimatePresence
+**2. Pre-seed the jisho cache on Reader mount**
 
-### Technical notes
-- Font size stored as a user preference in the reading-progress store
-- Dark mode uses Tailwind's `dark` class toggle, scoped to the reader page
-- Flashcard mastery uses a simple counter per word (0 = new, 1-2 = learning, 3+ = known)
-- framer-motion page transitions use `AnimatePresence` + `motion.div` wrappers
+In `Reader.tsx`, instead of calling `preloadWords()` (which hits the edge function), import `bookDictionary` and seed the in-memory cache directly:
+```typescript
+import { bookDictionary } from '@/data/book-dictionary';
+// On mount: iterate bookDictionary[bookId][difficulty] and call cache.set() for each entry
+```
+
+This makes `preloaded` immediately true — no loading bar, no network requests.
+
+**3. Inline grammar notes**
+
+In `GrammarPanel.tsx`, check `bookGrammar[bookId][difficulty]` first. If data exists, use it directly instead of invoking the edge function. Grammar panel opens instantly.
+
+**4. Fallback for unknown words**
+
+Keep the existing edge function calls as fallback for words not in the pre-baked data (e.g. if the user taps a word the tokenizer split differently). The popup already handles this gracefully.
+
+### Files to create/modify
+1. **`scripts/generate-book-data.ts`** — Build script to generate static data (run once, output committed)
+2. **`src/data/book-dictionary.ts`** — Generated static dictionary data for all books
+3. **`src/data/book-grammar.ts`** — Generated static grammar notes for all books
+4. **`src/lib/jisho.ts`** — Add `seedCache(entries)` function to bulk-load the cache
+5. **`src/pages/Reader.tsx`** — Replace `preloadWords` call with cache seeding from static data; remove loading bar; pass bookId/difficulty to GrammarPanel
+6. **`src/components/GrammarPanel.tsx`** — Check static data first, skip edge function if available
+
+### Execution approach
+Since I can't run the build script against the live edge functions from within the app, I'll generate the dictionary and grammar data directly by:
+- Tokenizing each book text in code
+- Calling the edge functions once to get all results
+- Hardcoding the results into the static data files
+
+This means the data files will be large but the app will be instant.
 
