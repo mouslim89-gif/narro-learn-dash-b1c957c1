@@ -3,7 +3,9 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles, Languages } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { tokenize } from '@/lib/tokenizer';
-import { preloadWords } from '@/lib/jisho';
+import { seedCache } from '@/lib/jisho';
+import { bookDictionary } from '@/data/book-dictionary';
+import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
@@ -45,15 +47,14 @@ export default function Reader() {
   }, [book, difficulty]);
 
   useEffect(() => {
-    setPreloaded(false);
-    setPreloadProgress(0);
     restoredScroll.current = false;
-    const uniqueWords = [...new Set(tokens.filter((t) => t.isJapanese).map((t) => t.text))];
-    if (uniqueWords.length === 0) { setPreloaded(true); return; }
-    preloadWords(uniqueWords, (loaded, total) => {
-      setPreloadProgress(Math.round((loaded / total) * 100));
-    }).then(() => setPreloaded(true));
-  }, [tokens]);
+    // Seed cache from pre-baked data
+    const dictData = id ? bookDictionary[id]?.[difficulty] : undefined;
+    if (dictData) {
+      seedCache(dictData);
+    }
+    setPreloaded(true);
+  }, [id, difficulty]);
 
   useEffect(() => {
     if (!preloaded || restoredScroll.current || !saved?.progressPercent) return;

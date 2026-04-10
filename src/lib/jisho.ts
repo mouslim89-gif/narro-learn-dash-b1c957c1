@@ -18,6 +18,12 @@ export function getCached(keyword: string): CacheEntry | undefined {
   return cache.get(keyword);
 }
 
+export function seedCache(entries: Record<string, CacheEntry>): void {
+  for (const [word, entry] of Object.entries(entries)) {
+    cache.set(word, entry);
+  }
+}
+
 export async function lookupWord(keyword: string): Promise<CacheEntry> {
   if (cache.has(keyword)) return cache.get(keyword)!;
 
