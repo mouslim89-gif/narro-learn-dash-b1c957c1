@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Library, BookOpen, Layers, Search } from 'lucide-react';
+import { useFlashcardStore } from '@/stores/flashcards';
 
 const tabs = [
   { path: '/', label: 'Library', icon: Library },
@@ -10,21 +11,30 @@ const tabs = [
 
 export function BottomNav() {
   const { pathname } = useLocation();
+  const dueCount = useFlashcardStore(s => s.getDueCount());
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex max-w-lg items-center justify-around py-2">
         {tabs.map(({ path, label, icon: Icon }) => {
           const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
+          const showBadge = path === '/flashcards' && dueCount > 0;
           return (
             <Link
               key={path}
               to={path}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium transition-colors ${
+              className={`relative flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium transition-colors ${
                 active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+              <div className="relative">
+                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+                {showBadge && (
+                  <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white">
+                    {dueCount > 9 ? '9+' : dueCount}
+                  </span>
+                )}
+              </div>
               {label}
               {active && (
                 <span className="mt-0.5 h-1 w-1 rounded-full bg-primary" />

@@ -26,11 +26,12 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [popup, setPopup] = useState<{ word: string; pos: { x: number; y: number } } | null>(null);
+  const [popupWord, setPopupWord] = useState<string | null>(null);
   
   const [preloaded, setPreloaded] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
+  const [activeSentence, setActiveSentence] = useState<number | null>(null);
   const articleRef = useRef<HTMLDivElement>(null);
   const restoredScroll = useRef(false);
 
@@ -46,9 +47,23 @@ export default function Reader() {
     return book.content[difficulty];
   }, [book, difficulty]);
 
+  // Split tokens into sentences for highlighting
+  const sentences = useMemo(() => {
+    const result: { tokens: typeof tokens; }[] = [];
+    let current: typeof tokens = [];
+    tokens.forEach((token) => {
+      current.push(token);
+      if (token.text.includes('。') || token.text.includes('！') || token.text.includes('？')) {
+        result.push({ tokens: [...current] });
+        current = [];
+      }
+    });
+    if (current.length > 0) result.push({ tokens: current });
+    return result;
+  }, [tokens]);
+
   useEffect(() => {
     restoredScroll.current = false;
-    // Seed cache from pre-baked data
     const dictData = id ? bookDictionary[id]?.[difficulty] : undefined;
     if (dictData) {
       seedCache(dictData);
@@ -106,7 +121,7 @@ export default function Reader() {
   return (
     <div className="min-h-screen bg-[hsl(36,33%,96%)] pb-36 dark:bg-background">
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
-        <button onClick={() => navigate(-1)} className="rounded p-1">
+        <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="text-center">
@@ -117,22 +132,21 @@ export default function Reader() {
           </p>
         </div>
         <div className="flex items-center gap-1">
-          {/* Furigana toggle - always visible */}
           <button
             onClick={() => setShowFurigana(!showFurigana)}
-            className={`rounded p-1 transition-colors ${showFurigana ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`rounded p-2 transition-colors active:scale-95 ${showFurigana ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
             title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
           >
             <Languages className="h-5 w-5" />
           </button>
           <button
             onClick={() => setShowGrammar(true)}
-            className="rounded p-1 text-muted-foreground hover:text-primary"
+            className="rounded p-2 text-muted-foreground active:scale-95"
             title="Grammar Notes"
           >
             <Sparkles className="h-5 w-5" />
           </button>
-          <button onClick={() => setShowSettings(!showSettings)} className="rounded p-1">
+          <button onClick={() => setShowSettings(!showSettings)} className="rounded p-2 active:scale-95">
             <Settings className="h-5 w-5" />
           </button>
         </div>
@@ -185,37 +199,48 @@ export default function Reader() {
         <>
           <Progress value={scrollPercent} className="h-0.5 rounded-none" />
           <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-            <p className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
-              {tokens.map((token, i) => {
-                if (!token.isJapanese) {
-                  return <span key={i}>{token.text}</span>;
-                }
+            <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
+              {sentences.map((sentence, sIdx) => (
+                <span
+                  key={sIdx}
+                  onClick={() => setActiveSentence(activeSentence === sIdx ? null : sIdx)}
+                  className={`transition-colors duration-200 ${
+                    activeSentence === sIdx ? 'bg-accent/10 rounded' : ''
+                  }`}
+                >
+                  {sentence.tokens.map((token, i) => {
+                    if (!token.isJapanese) {
+                      return <span key={i}>{token.text}</span>;
+                    }
 
-                const handleClick = (e: React.MouseEvent) => {
-                  setPopup({ word: token.text, pos: { x: e.clientX, y: e.clientY } });
-                };
+                    const handleClick = (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      setPopupWord(token.text);
+                    };
 
-                if (showFurigana) {
-                  return <FuriganaWord key={i} text={token.text} onClick={handleClick} />;
-                }
+                    if (showFurigana) {
+                      return <FuriganaWord key={i} text={token.text} onClick={handleClick} />;
+                    }
 
-                return (
-                  <span
-                    key={i}
-                    onClick={handleClick}
-                    className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-                  >
-                    {token.text}
-                  </span>
-                );
-              })}
-            </p>
+                    return (
+                      <span
+                        key={i}
+                        onClick={handleClick}
+                        className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                      >
+                        {token.text}
+                      </span>
+                    );
+                  })}
+                </span>
+              ))}
+            </div>
           </article>
         </>
       )}
 
-      {popup && (
-        <WordPopup word={popup.word} position={popup.pos} onClose={() => setPopup(null)} />
+      {popupWord && (
+        <WordPopup word={popupWord} onClose={() => setPopupWord(null)} />
       )}
 
       <GrammarPanel

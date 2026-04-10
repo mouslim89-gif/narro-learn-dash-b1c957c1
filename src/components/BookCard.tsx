@@ -10,9 +10,11 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
       className="group flex w-36 flex-shrink-0 flex-col gap-2 md:w-44"
     >
       <div
-        className="relative flex h-52 items-end overflow-hidden rounded p-3 shadow-md transition-transform group-hover:scale-[1.02] md:h-60"
+        className="book-cover relative flex h-52 items-end overflow-hidden rounded p-3 shadow-md transition-transform duration-200 group-active:scale-[0.97] group-hover:scale-[1.02] md:h-60"
         style={{ backgroundColor: book.coverColor }}
       >
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/10" />
         {/* Spine effect */}
         <div className="absolute inset-y-0 left-0 w-2 bg-black/15" />
         {book.hasAudio && (
@@ -20,7 +22,7 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
             <Headphones className="h-3 w-3 text-white" />
           </div>
         )}
-        <div className="w-full">
+        <div className="relative w-full">
           <p className="font-japanese text-lg font-bold leading-tight text-white drop-shadow-md">
             {book.titleJp}
           </p>
