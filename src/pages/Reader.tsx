@@ -27,7 +27,7 @@ export default function Reader() {
   );
   const [showSettings, setShowSettings] = useState(false);
   const [popup, setPopup] = useState<{ word: string; pos: { x: number; y: number } } | null>(null);
-  const [preloadProgress, setPreloadProgress] = useState(0);
+  
   const [preloaded, setPreloaded] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -181,13 +181,7 @@ export default function Reader() {
         </div>
       )}
 
-      {!preloaded ? (
-        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-          <p className="mb-3 text-sm text-muted-foreground">Loading dictionary…</p>
-          <Progress value={preloadProgress} className="h-1.5 rounded-full" />
-          <p className="mt-2 text-xs text-muted-foreground">{preloadProgress}%</p>
-        </div>
-      ) : (
+      {preloaded && (
         <>
           <Progress value={scrollPercent} className="h-0.5 rounded-none" />
           <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
@@ -226,6 +220,8 @@ export default function Reader() {
 
       <GrammarPanel
         text={bookText}
+        bookId={id || ''}
+        difficulty={difficulty}
         open={showGrammar}
         onClose={() => setShowGrammar(false)}
       />
