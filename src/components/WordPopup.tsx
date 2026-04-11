@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Star, Loader2 } from 'lucide-react';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { ConjugationTable } from '@/components/ConjugationTable';
 import {
   Drawer,
   DrawerContent,
@@ -15,22 +16,58 @@ interface WordPopupProps {
   onClose: () => void;
 }
 
-function getConjugationLabel(original: string, deinflected: string | null | undefined): string | null {
-  if (!deinflected || deinflected === original) return null;
+// Ordered longest-first to avoid short suffixes matching prematurely
+const CONJUGATION_PATTERNS: [string, string][] = [
+  ['ませんでした', 'Polite past negative (丁寧過去否定)'],
+  ['ておりました', 'Continuous polite past (ておりました)'],
+  ['ていました', 'Continuous past polite (ていました)'],
+  ['ています', 'Continuous polite (ています)'],
+  ['ましょう', 'Polite volitional (ましょう)'],
+  ['ました', 'Polite past (丁寧過去形)'],
+  ['ません', 'Polite negative (丁寧否定形)'],
+  ['ている', 'Continuous (ている形)'],
+  ['ていた', 'Continuous past (ていた)'],
+  ['ておる', 'Continuous (ておる)'],
+  ['ており', 'Continuous (ており)'],
+  ['られる', 'Passive / Potential (受身/可能形)'],
+  ['られた', 'Passive past (受身過去形)'],
+  ['させる', 'Causative (使役形)'],
+  ['させた', 'Causative past (使役過去形)'],
+  ['くなかった', 'Neg. past adj. (い形否定過去)'],
+  ['かった', 'Past adjective (い形過去)'],
+  ['くない', 'Negative adjective (い形否定)'],
+  ['くて', 'Te-form adjective (い形て)'],
+  ['ます', 'Polite (丁寧形)'],
+  ['ない', 'Negative (否定形)'],
+  ['たい', 'Want to~ (たい形)'],
+  ['った', 'Past tense (過去形)'],
+  ['んだ', 'Past tense (過去形)'],
+  ['いた', 'Past tense (過去形)'],
+  ['いだ', 'Past tense (過去形)'],
+  ['した', 'Past tense (過去形)'],
+  ['って', 'Te-form (て形)'],
+  ['んで', 'Te-form (て形)'],
+  ['いて', 'Te-form (て形)'],
+  ['いで', 'Te-form (て形)'],
+  ['して', 'Te-form (て形)'],
+  ['れば', 'Conditional (仮定形)'],
+  ['たら', 'Conditional (たら形)'],
+  ['よう', 'Volitional (意志形)'],
+  ['ろ', 'Imperative (命令形)'],
+  ['て', 'Te-form (て形)'],
+  ['た', 'Past tense (過去形)'],
+];
 
-  if (original.endsWith('ました') || original.endsWith('ます')) return 'Polite form (丁寧形)';
-  if (original.endsWith('ている') || original.endsWith('ていた') || original.endsWith('ておる') || original.endsWith('ており') || original.endsWith('ておりました')) return 'Continuous (ている形)';
-  if (original.endsWith('ない') || original.endsWith('ません')) return 'Negative (否定形)';
-  if (original.endsWith('た') || original.endsWith('だ')) return 'Past tense (過去形)';
-  if (original.endsWith('て') || original.endsWith('で')) return 'Te-form (て形)';
-  if (original.endsWith('たい')) return 'Want to~ (たい形)';
-  if (original.endsWith('られる') || original.endsWith('られた')) return 'Passive (受身形)';
-  if (original.endsWith('させる') || original.endsWith('させた')) return 'Causative (使役形)';
-  if (original.endsWith('かった')) return 'Past adjective';
-  if (original.endsWith('くない')) return 'Negative adjective';
-  if (original.endsWith('くて')) return 'Te-form adjective';
+function getConjugationLabel(original: string, deinflected: string | null | undefined, dictWord?: string): string | null {
+  // If the word differs from the dictionary form (either via deinflection or Jisho's own match)
+  const baseForm = deinflected || dictWord;
+  if (!baseForm || baseForm === original) return null;
 
-  return `Dictionary form: ${deinflected}`;
+  for (const [suffix, label] of CONJUGATION_PATTERNS) {
+    if (original.endsWith(suffix)) return label;
+  }
+
+  return `Dictionary form: ${baseForm}`;
 }
 
 export function WordPopup({ word, onClose }: WordPopupProps) {
@@ -80,7 +117,12 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
     return () => { cancelled = true; };
   }, [word, cached]);
 
-  const conjugationLabel = getConjugationLabel(word, deinflected);
+  const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
+
+  // Determine dict form for conjugation table
+  const dictForm = result?.japanese[0]?.word || deinflected || word;
+  const allPartsOfSpeech = result?.senses?.flatMap(s => s.parts_of_speech) || [];
+  const isVerb = allPartsOfSpeech.some(p => p.toLowerCase().includes('verb'));
 
   const handleSave = () => {
     if (!result) return;
@@ -108,7 +150,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="px-4 pb-6 space-y-3">
+        <div className="px-4 pb-6 space-y-3 overflow-y-auto">
           {loading && (
             <div className="flex items-center gap-2 py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -125,9 +167,9 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
               {conjugationLabel && (
                 <div className="rounded-lg bg-primary/10 px-3 py-2">
                   <p className="text-xs font-semibold text-primary">{conjugationLabel}</p>
-                  {deinflected && deinflected !== word && (
+                  {(deinflected || result?.japanese[0]?.word) && (deinflected || result?.japanese[0]?.word) !== word && (
                     <p className="font-japanese text-xs text-muted-foreground mt-0.5">
-                      Original text: {word}
+                      {word} → {deinflected || result?.japanese[0]?.word}
                     </p>
                   )}
                 </div>
@@ -153,6 +195,10 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
                   </p>
                 ))}
               </div>
+
+              {isVerb && (
+                <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
+              )}
 
               <button
                 onClick={handleSave}
