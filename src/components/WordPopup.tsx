@@ -167,9 +167,9 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
               {conjugationLabel && (
                 <div className="rounded-lg bg-primary/10 px-3 py-2">
                   <p className="text-xs font-semibold text-primary">{conjugationLabel}</p>
-                  {deinflected && deinflected !== word && (
+                  {(deinflected || result?.japanese[0]?.word) && (deinflected || result?.japanese[0]?.word) !== word && (
                     <p className="font-japanese text-xs text-muted-foreground mt-0.5">
-                      Original text: {word} → {deinflected}
+                      {word} → {deinflected || result?.japanese[0]?.word}
                     </p>
                   )}
                 </div>
