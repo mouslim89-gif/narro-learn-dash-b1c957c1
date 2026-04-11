@@ -5,22 +5,36 @@ const PARTICLES = new Set([
   'ので', 'のに', 'ても', 'でも', 'しか', 'だけ', 'ばかり', 'こそ',
 ]);
 
+// Auxiliary/suffix patterns that should be split from the preceding verb te-form
+// e.g. 食べている → 食べて + いる, 走っていました → 走って + いました
+const TE_SUFFIXES = [
+  'おりました', 'いました', 'ありました',
+  'おります', 'います', 'あります',
+  'おった', 'いった',
+  'おる', 'いる', 'ある',
+  'おり', 'いた', 'あった',
+  'いく', 'くる', 'みる', 'しまう', 'しまった', 'しまいました',
+  'ください', 'くださった',
+  'ほしい', 'もらう', 'もらった', 'もらいました',
+  'あげる', 'あげた', 'くれる', 'くれた',
+];
+const SORTED_TE_SUFFIXES = TE_SUFFIXES.sort((a, b) => b.length - a.length);
+
 // Common verb/adj endings to include with kanji
 const VERB_ENDINGS = [
-  'しました', 'ました', 'ません', 'ている', 'ていた', 'ていました',
-  'ておる', 'ており', 'ておりました', 'てきました', 'てきた',
-  'ている', 'ていた', 'てくる', 'てきた', 'てある', 'てあった',
+  'しました', 'ました', 'ません',
   'られる', 'られた', 'させる', 'させた',
   'れました', 'りました', 'きました', 'しまう', 'しまった',
   'なければ', 'なかった', 'ないで', 'なくて',
   'そうです', 'ようです', 'みたいです', 'らしい',
-  'った', 'った', 'んだ', 'んで',
+  'んでいました', 'んでいる', 'んでいた', 'んでしまう', 'んでしまった',
+  'っている', 'っていた', 'っていました', 'ってしまう', 'ってしまった',
+  'いている', 'いていた',
+  'った', 'んだ', 'んで', 'って', 'いて', 'いだ', 'して',
   'ます', 'ない', 'たい', 'よう',
-  'える', 'める', 'れる', 'せる', 'てる', 'ける', 'ねる', 'べる', 'える',
-  'いた', 'した', 'った', 'んだ',
-  'える', 'おる', 'ある',
-  'って', 'して', 'いて', 'んで', 'ちて',
-  'った', 'いた', 'った',
+  'える', 'める', 'れる', 'せる', 'てる', 'ける', 'ねる', 'べる',
+  'いた', 'した', 'った',
+  'おる', 'ある',
   'まる', 'める', 'みる', 'もる',
   'がる', 'さる', 'ざる',
   'く', 'ぐ', 'す', 'つ', 'ぬ', 'ぶ', 'む', 'る', 'う',
@@ -32,7 +46,7 @@ const VERB_ENDINGS = [
 const SORTED_VERB_ENDINGS = VERB_ENDINGS.sort((a, b) => b.length - a.length);
 const SORTED_PARTICLES = Array.from(PARTICLES).sort((a, b) => b.length - a.length);
 
-const OKURIGANA_MAX = 8; // increased to handle longer conjugations
+const OKURIGANA_MAX = 8;
 
 function isKanji(ch: string): boolean {
   const code = ch.charCodeAt(0);
@@ -59,8 +73,33 @@ export interface TextToken {
 }
 
 /**
+ * Try to split a token at a て-form boundary.
+ * e.g. "食べている" → ["食べて", "いる"]
+ * e.g. "走っていました" → ["走って", "いました"]
+ */
+function trySplitTeForm(token: string): string[] | null {
+  // Look for て or で in the token (te-form markers)
+  const tePositions: number[] = [];
+  for (let j = 1; j < token.length; j++) {
+    if (token[j] === 'て' || token[j] === 'で') {
+      tePositions.push(j);
+    }
+  }
+
+  for (const tePos of tePositions) {
+    const afterTe = token.slice(tePos + 1);
+    for (const suffix of SORTED_TE_SUFFIXES) {
+      if (afterTe === suffix) {
+        return [token.slice(0, tePos + 1), suffix];
+      }
+    }
+  }
+  return null;
+}
+
+/**
  * Tokenize Japanese text into clickable word-like chunks.
- * Improved: better handling of verb conjugation endings attached to kanji.
+ * Splits particles aggressively and handles て-form compound verbs.
  */
 export function tokenize(text: string): TextToken[] {
   const tokens: TextToken[] = [];
@@ -80,15 +119,11 @@ export function tokenize(text: string): TextToken[] {
       let end = i + 1;
       while (end < text.length && isKanji(text[end])) end++;
 
-      const kanjiEnd = end;
-
       // Try matching known verb endings first (greedy, longest match)
       const remaining = text.slice(end);
       let bestEnding = '';
       for (const ending of SORTED_VERB_ENDINGS) {
         if (remaining.startsWith(ending)) {
-          // Make sure the ending isn't followed by more of the same type
-          // and check it's not actually a particle at the start
           bestEnding = ending;
           break;
         }
@@ -98,29 +133,43 @@ export function tokenize(text: string): TextToken[] {
         end += bestEnding.length;
       } else {
         // Fallback: add trailing hiragana up to a particle or limit
+        // を is ALWAYS a particle (never okurigana), split even at position 0
+        const ALWAYS_PARTICLE = new Set(['を']);
+        const SINGLE_PARTICLES = new Set(['は', 'が', 'を', 'に', 'へ', 'で', 'と', 'も', 'の', 'か', 'よ', 'ね']);
         let hiraCount = 0;
         while (end < text.length && isHiragana(text[end]) && hiraCount < OKURIGANA_MAX) {
+          if (ALWAYS_PARTICLE.has(text[end])) break;
+          if (SINGLE_PARTICLES.has(text[end]) && hiraCount > 0) break;
           const rem = text.slice(end);
-          let isParticle = false;
+          let isMultiParticle = false;
           for (const p of SORTED_PARTICLES) {
-            if (rem.startsWith(p) && (end + p.length >= text.length || !isHiragana(text[end + p.length]) || PARTICLES.has(text[end + p.length]))) {
-              isParticle = true;
-              break;
-            }
+            if (p.length > 1 && rem.startsWith(p)) { isMultiParticle = true; break; }
           }
-          if (isParticle) break;
+          if (isMultiParticle && hiraCount > 0) break;
           end++;
           hiraCount++;
         }
       }
 
-      tokens.push({ text: text.slice(i, end), isJapanese: true });
+      const rawToken = text.slice(i, end);
+
+      // Try splitting て-form compounds: 食べている → 食べて + いる
+      const teSplit = trySplitTeForm(rawToken);
+      if (teSplit) {
+        for (const part of teSplit) {
+          tokens.push({ text: part, isJapanese: true });
+        }
+      } else {
+        tokens.push({ text: rawToken, isJapanese: true });
+      }
+
       i = end;
       continue;
     }
 
     // Pure hiragana
     if (isHiragana(ch)) {
+      // Check for particle first
       let matched = false;
       for (const p of SORTED_PARTICLES) {
         if (text.startsWith(p, i)) {

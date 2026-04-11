@@ -3,6 +3,7 @@ import { Star, Loader2 } from 'lucide-react';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable } from '@/components/ConjugationTable';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Drawer,
   DrawerContent,
@@ -59,7 +60,6 @@ const CONJUGATION_PATTERNS: [string, string][] = [
 ];
 
 function getConjugationLabel(original: string, deinflected: string | null | undefined, dictWord?: string): string | null {
-  // If the word differs from the dictionary form (either via deinflection or Jisho's own match)
   const baseForm = deinflected || dictWord;
   if (!baseForm || baseForm === original) return null;
 
@@ -68,6 +68,19 @@ function getConjugationLabel(original: string, deinflected: string | null | unde
   }
 
   return `Dictionary form: ${baseForm}`;
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-3 py-2">
+      <Skeleton className="h-4 w-24" />
+      <div className="space-y-2">
+        <Skeleton className="h-5 w-full" />
+        <Skeleton className="h-5 w-3/4" />
+      </div>
+      <Skeleton className="h-10 w-full rounded-lg" />
+    </div>
+  );
 }
 
 export function WordPopup({ word, onClose }: WordPopupProps) {
@@ -119,10 +132,12 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
 
   const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
-  // Determine dict form for conjugation table
   const dictForm = result?.japanese[0]?.word || deinflected || word;
   const allPartsOfSpeech = result?.senses?.flatMap(s => s.parts_of_speech) || [];
-  const isVerb = allPartsOfSpeech.some(p => p.toLowerCase().includes('verb'));
+  const isVerb = allPartsOfSpeech.some(p => {
+    const lower = p.toLowerCase();
+    return lower.includes('verb') && !lower.includes('adverb');
+  });
 
   const handleSave = () => {
     if (!result) return;
@@ -151,12 +166,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
         </DrawerHeader>
 
         <div className="px-4 pb-6 space-y-3 overflow-y-auto">
-          {loading && (
-            <div className="flex items-center gap-2 py-6">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Looking up…</span>
-            </div>
-          )}
+          {loading && <LoadingSkeleton />}
 
           {error && !loading && (
             <p className="text-sm text-muted-foreground py-4">No definition found.</p>
