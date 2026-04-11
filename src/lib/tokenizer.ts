@@ -130,17 +130,22 @@ export function tokenize(text: string): TextToken[] {
         end += bestEnding.length;
       } else {
         // Fallback: add trailing hiragana up to a particle or limit
+        // Single-char particles (は, が, を, に, へ, で, と, も, の, か) should always split
+        const SINGLE_PARTICLES = new Set(['は', 'が', 'を', 'に', 'へ', 'で', 'と', 'も', 'の', 'か', 'よ', 'ね']);
         let hiraCount = 0;
         while (end < text.length && isHiragana(text[end]) && hiraCount < OKURIGANA_MAX) {
+          // If this char is a single-char particle, stop (don't consume it)
+          if (SINGLE_PARTICLES.has(text[end]) && hiraCount > 0) break;
+          // Also check multi-char particles
           const rem = text.slice(end);
-          let isParticle = false;
+          let isMultiParticle = false;
           for (const p of SORTED_PARTICLES) {
-            if (rem.startsWith(p) && (end + p.length >= text.length || !isHiragana(text[end + p.length]) || PARTICLES.has(text[end + p.length]))) {
-              isParticle = true;
+            if (p.length > 1 && rem.startsWith(p)) {
+              isMultiParticle = true;
               break;
             }
           }
-          if (isParticle) break;
+          if (isMultiParticle && hiraCount > 0) break;
           end++;
           hiraCount++;
         }
