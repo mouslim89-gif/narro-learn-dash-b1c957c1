@@ -28,7 +28,6 @@ export default function Reader() {
   const [showSettings, setShowSettings] = useState(false);
   const [popupWord, setPopupWord] = useState<string | null>(null);
   
-  const [preloaded, setPreloaded] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
@@ -64,15 +63,11 @@ export default function Reader() {
 
   useEffect(() => {
     restoredScroll.current = false;
-    const dictData = id ? bookDictionary[id]?.[difficulty] : undefined;
-    if (dictData) {
-      seedCache(dictData);
-    }
-    setPreloaded(true);
+    seedCache(bookDictionary);
   }, [id, difficulty]);
 
   useEffect(() => {
-    if (!preloaded || restoredScroll.current || !saved?.progressPercent) return;
+    if (restoredScroll.current || !saved?.progressPercent) return;
     restoredScroll.current = true;
     requestAnimationFrame(() => {
       const scrollH = document.documentElement.scrollHeight - window.innerHeight;
@@ -80,7 +75,7 @@ export default function Reader() {
         window.scrollTo(0, (saved.progressPercent / 100) * scrollH);
       }
     });
-  }, [preloaded, saved?.progressPercent]);
+  }, [saved?.progressPercent]);
 
   const rafRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
@@ -96,10 +91,9 @@ export default function Reader() {
   }, [id, difficulty, updateProgress]);
 
   useEffect(() => {
-    if (!preloaded) return;
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [preloaded, handleScroll]);
+  }, [handleScroll]);
 
   useEffect(() => {
     if (readerDarkMode) {
@@ -195,49 +189,45 @@ export default function Reader() {
         </div>
       )}
 
-      {preloaded && (
-        <>
-          <Progress value={scrollPercent} className="h-0.5 rounded-none" />
-          <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-            <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
-              {sentences.map((sentence, sIdx) => (
-                <span
-                  key={sIdx}
-                  onClick={() => setActiveSentence(activeSentence === sIdx ? null : sIdx)}
-                  className={`transition-colors duration-200 ${
-                    activeSentence === sIdx ? 'bg-accent/10 rounded' : ''
-                  }`}
-                >
-                  {sentence.tokens.map((token, i) => {
-                    if (!token.isJapanese) {
-                      return <span key={i}>{token.text}</span>;
-                    }
+      <Progress value={scrollPercent} className="h-0.5 rounded-none" />
+      <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
+        <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
+          {sentences.map((sentence, sIdx) => (
+            <span
+              key={sIdx}
+              onClick={() => setActiveSentence(activeSentence === sIdx ? null : sIdx)}
+              className={`transition-colors duration-200 ${
+                activeSentence === sIdx ? 'bg-accent/10 rounded' : ''
+              }`}
+            >
+              {sentence.tokens.map((token, i) => {
+                if (!token.isJapanese) {
+                  return <span key={i}>{token.text}</span>;
+                }
 
-                    const handleClick = (e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      setPopupWord(token.text);
-                    };
+                const handleClick = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setPopupWord(token.text);
+                };
 
-                    if (showFurigana) {
-                      return <FuriganaWord key={i} text={token.text} onClick={handleClick} />;
-                    }
+                if (showFurigana) {
+                  return <FuriganaWord key={i} text={token.text} onClick={handleClick} />;
+                }
 
-                    return (
-                      <span
-                        key={i}
-                        onClick={handleClick}
-                        className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
-                      >
-                        {token.text}
-                      </span>
-                    );
-                  })}
-                </span>
-              ))}
-            </div>
-          </article>
-        </>
-      )}
+                return (
+                  <span
+                    key={i}
+                    onClick={handleClick}
+                    className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                  >
+                    {token.text}
+                  </span>
+                );
+              })}
+            </span>
+          ))}
+        </div>
+      </article>
 
       {popupWord && (
         <WordPopup word={popupWord} onClose={() => setPopupWord(null)} />
