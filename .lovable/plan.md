@@ -1,55 +1,72 @@
 
 
-## Mobile-First App Improvements
+## Improved Verb Conjugation Detection & Conjugation Table
 
-Since this is a mobile app, the improvements focus on touch interactions, mobile UX patterns, and proper mobile viewport handling.
+### Problem
+1. The deinflection in the edge function is basic — e.g. `行きました` (polite past of `行く`) doesn't match because the rule `ました$` → `る` produces `行きる`, not `行く`. The godan verb masu-stem rules are incomplete.
+2. The conjugation label in WordPopup uses simple `endsWith` checks that miss many patterns (e.g. `行きました` ends in `ました` but the check order means it may match wrong).
+3. No conjugation table is shown.
 
-### 1. WordPopup → Bottom Sheet on Mobile
-The current popup uses absolute positioning which clips on small screens. Replace with a slide-up bottom sheet using Drawer component (vaul, already installed).
-- Tap word → bottom sheet slides up from bottom with drag handle
-- Swipe down to dismiss
-- Keep all existing content (definition, conjugation, JLPT badge, save button)
+### Plan
 
-**Files**: `src/components/WordPopup.tsx`, `src/pages/Reader.tsx`
+**1. Fix deinflection rules in the edge function** (`supabase/functions/jisho-lookup/index.ts`)
 
-### 2. Flashcards — Flip Animation + SRS Scheduling
-- Add 3D CSS flip animation on the review card (tap to flip)
-- Add `lastReviewedAt`, `nextReviewAt` to SavedWord for spaced repetition intervals (1d → 3d → 7d → 30d)
-- Show "X cards due" notification badge on the Cards tab in BottomNav
-- Add progress bar during review
+Expand `getDeinflections` with proper godan masu-stem → dictionary form mappings:
+- `きました` / `きます` → `く` (行きました → 行く)
+- `ぎました` / `ぎます` → `ぐ`
+- `しました` / `します` → `す`
+- `ちました` / `ちます` → `つ`
+- `にました` / `にます` → `ぬ`
+- `びました` / `びます` → `ぶ`
+- `みました` / `みます` → `む`
+- `りました` / `ります` → `る`
+- `いました` / `います` → `う`
 
-**Files**: `src/stores/flashcards.ts`, `src/pages/Flashcards.tsx`, `src/components/BottomNav.tsx`, `src/index.css`
+Also add polite negative (`ません`), polite past negative (`ませんでした`), volitional (`よう`, `ましょう`), imperative, conditional (`ば`, `たら`) forms.
 
-### 3. Mobile Meta Tags + PWA Setup
-- Update `index.html`: set title to "Yomimasu", add `apple-mobile-web-app-capable`, status bar color, theme-color meta tags
-- Add `viewport-fit=cover` for notched devices
-- Add safe-area padding to BottomNav for home indicator
+**2. Improve conjugation label detection** (`src/components/WordPopup.tsx`)
 
-**Files**: `index.html`, `src/components/BottomNav.tsx`
+Replace the simple `endsWith` chain with a structured approach that checks longer suffixes first and covers more forms:
+- Polite past: `ました`
+- Polite negative: `ません`
+- Continuous: `ている`, `ていた`, `ていました`
+- Past: `った`, `んだ`, `いた`, `いだ`, `した`, `た`
+- Te-form: `って`, `んで`, `いて`, `いで`, `して`, `て`
+- Negative: `ない`
+- Tai: `たい`
+- Passive: `られる`, `られた`
+- Causative: `させる`, `させた`
+- Conditional: `れば`, `たら`
+- Volitional: `よう`, `ましょう`
+- Potential: `える`, `ける`
 
-### 4. Reader Touch Improvements
-- Increase tap target size for Japanese words (slightly more padding)
-- Add haptic-style visual feedback on word tap (brief scale animation)
-- Sentence-level highlighting: tap a sentence to softly highlight it for tracking position
+**3. Add conjugation table component** (new `src/components/ConjugationTable.tsx`)
 
-**Files**: `src/pages/Reader.tsx`, `src/index.css`
+A collapsible section in the WordPopup that shows a full conjugation table for the verb. Generated client-side from the dictionary form and verb type (godan/ichidan detected from Jisho parts_of_speech data):
 
-### 5. My Books — Reading Stats Header
-- Stats row at top: total words saved, books in progress, estimated reading time
-- Streak counter based on `lastReadAt` timestamps (calculated at render)
+| Form | Japanese | Romaji hint |
+|------|----------|-------------|
+| Dictionary | 行く | iku |
+| Polite | 行きます | ikimasu |
+| Past | 行った | itta |
+| Polite past | 行きました | ikimashita |
+| Negative | 行かない | ikanai |
+| Te-form | 行って | itte |
+| Potential | 行ける | ikeru |
+| Passive | 行かれる | ikareru |
+| Causative | 行かせる | ikaseru |
+| Volitional | 行こう | ikou |
+| Conditional | 行けば | ikeba |
 
-**Files**: `src/pages/MyBooks.tsx`
+The table only appears when the word is a verb (checked via `parts_of_speech` containing "Verb"). Uses a `Collapsible` component (already in UI library) to keep the popup compact.
 
-### 6. Visual Polish
-- BookCard: subtle gradient overlay on covers for depth
-- Better empty state illustrations (emoji-based) for My Books and Flashcards
-- Smooth page transitions using framer-motion (already installed)
+**4. Regenerate book-dictionary data** (`src/data/book-dictionary.ts`)
 
-**Files**: `src/components/BookCard.tsx`, `src/pages/MyBooks.tsx`, `src/pages/Flashcards.tsx`, `src/App.tsx`
+After deploying the improved edge function, regenerate the pre-baked dictionary data so that conjugated forms in the books have correct `deinflected` values. This ensures instant lookup with proper conjugation info.
 
-### Technical notes
-- Bottom sheet uses the existing `vaul` Drawer component — no new dependencies
-- SRS intervals stored alongside existing mastery data in the flashcards Zustand store
-- Safe-area insets use `env(safe-area-inset-bottom)` CSS
-- All changes are client-side only, no backend modifications
+### Files to modify
+1. `supabase/functions/jisho-lookup/index.ts` — Expanded deinflection rules
+2. `src/components/WordPopup.tsx` — Better conjugation labels, integrate ConjugationTable
+3. `src/components/ConjugationTable.tsx` — New component for verb conjugation display
+4. `src/data/book-dictionary.ts` — Regenerated with improved deinflection data
 
