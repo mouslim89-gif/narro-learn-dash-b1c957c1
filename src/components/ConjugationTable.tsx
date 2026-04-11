@@ -9,10 +9,14 @@ interface ConjugationRow {
 }
 
 // Detect verb type from Jisho parts_of_speech
-function getVerbType(partsOfSpeech: string[]): 'godan' | 'ichidan' | 'suru' | 'kuru' | null {
+function getVerbType(dictForm: string, partsOfSpeech: string[]): 'godan' | 'ichidan' | 'suru' | 'kuru' | null {
   const pos = partsOfSpeech.join(' ').toLowerCase();
-  if (pos.includes('suru')) return 'suru';
-  if (pos.includes('kuru')) return 'kuru';
+  // Only show suru table for する itself, not compounds like 勉強する
+  if (pos.includes('suru')) {
+    if (dictForm === 'する') return 'suru';
+    return null;
+  }
+  if (pos.includes('kuru') || dictForm === '来る') return 'kuru';
   if (pos.includes('ichidan')) return 'ichidan';
   if (pos.includes('godan')) return 'godan';
   return null;
