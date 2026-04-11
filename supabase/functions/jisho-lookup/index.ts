@@ -136,6 +136,16 @@ async function fetchWord(keyword: string) {
     let results = (json.data || []).slice(0, 5).map(mapResult);
 
     let deinflectedForm: string | null = null;
+
+    // If Jisho found results but the matched word differs from keyword, mark as deinflected
+    if (results.length > 0) {
+      const matchedWord = results[0]?.japanese?.[0]?.word || results[0]?.japanese?.[0]?.reading;
+      if (matchedWord && matchedWord !== keyword) {
+        deinflectedForm = matchedWord;
+      }
+    }
+
+    // If no results, try deinflection
     if (results.length === 0) {
       const forms = getDeinflections(keyword);
       for (const form of forms) {
