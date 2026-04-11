@@ -117,7 +117,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
     return () => { cancelled = true; };
   }, [word, cached]);
 
-  const conjugationLabel = getConjugationLabel(word, deinflected);
+  const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
   // Determine dict form for conjugation table
   const dictForm = result?.japanese[0]?.word || deinflected || word;
