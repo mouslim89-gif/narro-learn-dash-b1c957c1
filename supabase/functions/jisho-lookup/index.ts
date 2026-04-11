@@ -115,8 +115,9 @@ function getDeinflections(word: string): string[] {
     [/ろ$/, 'る'], [/よ$/, 'る'],
 
     // ===== i-adjective =====
-    [/かった$/, 'い'], [/くない$/, 'い'], [/くて$/, 'い'],
     [/くなかった$/, 'い'],
+    [/かった$/, 'い'], [/くない$/, 'い'], [/くて$/, 'い'],
+    [/く$/, 'い'],
   ];
 
   for (const [pattern, replacement] of rules) {
