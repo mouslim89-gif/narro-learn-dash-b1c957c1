@@ -58,14 +58,16 @@ const CONJUGATION_PATTERNS: [string, string][] = [
   ['た', 'Past tense (過去形)'],
 ];
 
-function getConjugationLabel(original: string, deinflected: string | null | undefined): string | null {
-  if (!deinflected || deinflected === original) return null;
+function getConjugationLabel(original: string, deinflected: string | null | undefined, dictWord?: string): string | null {
+  // If the word differs from the dictionary form (either via deinflection or Jisho's own match)
+  const baseForm = deinflected || dictWord;
+  if (!baseForm || baseForm === original) return null;
 
   for (const [suffix, label] of CONJUGATION_PATTERNS) {
     if (original.endsWith(suffix)) return label;
   }
 
-  return `Dictionary form: ${deinflected}`;
+  return `Dictionary form: ${baseForm}`;
 }
 
 export function WordPopup({ word, onClose }: WordPopupProps) {
