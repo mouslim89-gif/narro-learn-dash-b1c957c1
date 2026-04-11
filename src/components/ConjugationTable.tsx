@@ -112,7 +112,7 @@ function conjugateKuru(): ConjugationRow[] {
 }
 
 export function getConjugations(dictForm: string, partsOfSpeech: string[]): ConjugationRow[] | null {
-  const verbType = getVerbType(partsOfSpeech);
+  const verbType = getVerbType(dictForm, partsOfSpeech);
   if (!verbType) return null;
 
   if (verbType === 'kuru') return conjugateKuru();
