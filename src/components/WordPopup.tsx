@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Star, Loader2 } from 'lucide-react';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
-import { ConjugationTable } from '@/components/ConjugationTable';
+import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Drawer,
@@ -134,10 +134,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
 
   const dictForm = result?.japanese[0]?.word || deinflected || word;
   const allPartsOfSpeech = result?.senses?.flatMap(s => s.parts_of_speech) || [];
-  const isVerb = allPartsOfSpeech.some(p => {
-    const lower = p.toLowerCase();
-    return lower.includes('verb') && !lower.includes('adverb');
-  });
+  const wordType = getWordType(allPartsOfSpeech);
 
   const handleSave = () => {
     if (!result) return;
@@ -206,7 +203,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
                 ))}
               </div>
 
-              {isVerb && (
+              {wordType && (
                 <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
               )}
 

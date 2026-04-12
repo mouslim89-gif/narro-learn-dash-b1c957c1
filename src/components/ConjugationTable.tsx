@@ -111,7 +111,40 @@ function conjugateKuru(): ConjugationRow[] {
   ];
 }
 
+function isIAdjective(partsOfSpeech: string[]): boolean {
+  return partsOfSpeech.some(p => p.toLowerCase().includes('i-adjective'));
+}
+
+function conjugateIAdj(stem: string): ConjugationRow[] {
+  return [
+    { label: 'Dictionary', labelJp: '辞書形', form: stem + 'い' },
+    { label: 'Negative', labelJp: '否定形', form: stem + 'くない' },
+    { label: 'Past', labelJp: '過去形', form: stem + 'かった' },
+    { label: 'Past negative', labelJp: '過去否定', form: stem + 'くなかった' },
+    { label: 'Te-form', labelJp: 'て形', form: stem + 'くて' },
+    { label: 'Adverbial', labelJp: '連用形', form: stem + 'く' },
+  ];
+}
+
+export type WordType = 'verb' | 'i-adjective' | null;
+
+export function getWordType(partsOfSpeech: string[]): WordType {
+  if (isIAdjective(partsOfSpeech)) return 'i-adjective';
+  const isVerb = partsOfSpeech.some(p => {
+    const lower = p.toLowerCase();
+    return lower.includes('verb') && !lower.includes('adverb');
+  });
+  if (isVerb) return 'verb';
+  return null;
+}
+
 export function getConjugations(dictForm: string, partsOfSpeech: string[]): ConjugationRow[] | null {
+  if (isIAdjective(partsOfSpeech)) {
+    const stem = dictForm.replace(/い$/, '');
+    if (!stem || stem === dictForm) return null;
+    return conjugateIAdj(stem);
+  }
+
   const verbType = getVerbType(dictForm, partsOfSpeech);
   if (!verbType) return null;
 
@@ -123,7 +156,7 @@ export function getConjugations(dictForm: string, partsOfSpeech: string[]): Conj
   }
 
   if (verbType === 'ichidan') {
-    const stem = dictForm.slice(0, -1); // remove る
+    const stem = dictForm.slice(0, -1);
     return conjugateIchidan(stem);
   }
 
@@ -144,13 +177,16 @@ interface ConjugationTableProps {
 export function ConjugationTable({ dictForm, partsOfSpeech }: ConjugationTableProps) {
   const [open, setOpen] = useState(false);
   const rows = getConjugations(dictForm, partsOfSpeech);
+  const wordType = getWordType(partsOfSpeech);
 
   if (!rows || rows.length === 0) return null;
+
+  const tableLabel = wordType === 'i-adjective' ? 'Declension table' : 'Conjugation table';
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5 text-sm font-semibold text-foreground transition-colors active:bg-muted">
-        <span>Conjugation table</span>
+        <span>{tableLabel}</span>
         <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
       </CollapsibleTrigger>
       <CollapsibleContent>
