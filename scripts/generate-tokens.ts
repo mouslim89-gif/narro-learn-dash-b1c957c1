@@ -2,7 +2,7 @@
  * Build-time script: tokenize all book texts with Kuromoji
  * Run: npx tsx scripts/generate-tokens.ts
  */
-import * as kuromoji from 'kuromoji';
+import kuromoji from 'kuromoji';
 import * as path from 'path';
 import * as fs from 'fs';
 
