@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles, Languages } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { seedCache } from '@/lib/jisho';
@@ -139,7 +139,7 @@ export default function Reader() {
             className="rounded p-2 text-muted-foreground active:scale-95"
             title="Grammar Notes"
           >
-            <Sparkles className="h-5 w-5" />
+            <BookType className="h-5 w-5" />
           </button>
           <button onClick={() => setShowSettings(!showSettings)} className="rounded p-2 active:scale-95">
             <Settings className="h-5 w-5" />
