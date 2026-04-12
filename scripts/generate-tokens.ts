@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 // We can't easily import TS with path aliases, so read books.ts and extract content
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const booksPath = path.resolve(__dirname, '../src/data/books.ts');
 const booksSource = fs.readFileSync(booksPath, 'utf-8');
 
