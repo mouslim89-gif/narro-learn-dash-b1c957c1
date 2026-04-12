@@ -3,6 +3,8 @@ import { getCached, type CacheEntry } from '@/lib/jisho';
 
 interface FuriganaWordProps {
   text: string;
+  /** Pre-computed reading from Kuromoji (hiragana) */
+  reading?: string;
   onClick: (e: MouseEvent<HTMLSpanElement>) => void;
 }
 
@@ -205,11 +207,79 @@ export function getFuriganaSegments(text: string, cache = getCached(text)) {
   return projectSegmentsToSurface(text, baseSegments);
 }
 
+/**
+ * Build furigana segments from a pre-computed Kuromoji reading.
+ * Pairs each kanji run in `text` with the corresponding slice of `reading`.
+ */
+function segmentsFromReading(text: string, reading: string): FuriganaSegment[] | null {
+  if (!hasKanji(text)) return null;
+
+  const chars = [...text];
+  const readChars = [...normalizeKana(reading)];
+  const segments: FuriganaSegment[] = [];
+  let ri = 0;
+
+  let i = 0;
+  while (i < chars.length) {
+    if (isKanjiChar(chars[i])) {
+      // Find kanji run
+      let kEnd = i;
+      while (kEnd < chars.length && isKanjiChar(chars[kEnd])) kEnd++;
+      const kanjiText = chars.slice(i, kEnd).join('');
+
+      // Find where the kana after this kanji run starts in the reading
+      let kanaAfter = '';
+      let kanaEnd = kEnd;
+      while (kanaEnd < chars.length && !isKanjiChar(chars[kanaEnd])) {
+        kanaAfter += normalizeKana(chars[kanaEnd]);
+        kanaEnd++;
+      }
+
+      if (kanaAfter && ri < readChars.length) {
+        // Find the kana suffix in the reading to determine where kanji reading ends
+        const readRemaining = readChars.slice(ri).join('');
+        const kanaPos = readRemaining.lastIndexOf(kanaAfter);
+        if (kanaPos > 0) {
+          segments.push({ text: kanjiText, reading: readChars.slice(ri, ri + kanaPos).join('') });
+          ri += kanaPos;
+          i = kEnd;
+          continue;
+        }
+      }
+
+      // No kana after, or at end: consume remaining reading up to next kana match
+      if (kEnd >= chars.length) {
+        // Last segment - take all remaining reading
+        segments.push({ text: kanjiText, reading: readChars.slice(ri).join('') });
+        ri = readChars.length;
+        i = kEnd;
+      } else {
+        // Fallback: try dictionary cache
+        return null;
+      }
+    } else {
+      // Kana character - add as plain text
+      segments.push({ text: chars[i] });
+      ri++;
+      i++;
+    }
+  }
+
+  return mergePlainSegments(segments);
+}
+
 export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(function FuriganaWord(
-  { text, onClick },
+  { text, reading, onClick },
   ref
 ) {
-  const segments = getFuriganaSegments(text);
+  // Try pre-computed reading first, then fall back to Jisho cache
+  let segments: FuriganaSegment[] | null = null;
+  if (reading && hasKanji(text)) {
+    segments = segmentsFromReading(text, reading);
+  }
+  if (!segments) {
+    segments = getFuriganaSegments(text);
+  }
 
   return (
     <span

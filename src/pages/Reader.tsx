@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, Sparkles, Languages } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
-import { tokenize } from '@/lib/tokenizer';
+import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { seedCache } from '@/lib/jisho';
 import { bookDictionary } from '@/data/book-dictionary';
 import { bookGrammar } from '@/data/book-grammar';
@@ -26,7 +26,7 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [popupWord, setPopupWord] = useState<string | null>(null);
+  const [popupWord, setPopupWord] = useState<{ text: string; baseForm?: string; pos?: string } | null>(null);
   
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -36,10 +36,11 @@ export default function Reader() {
 
   const book = books.find((b) => b.id === id);
 
+  // Use pre-baked Kuromoji tokens
   const tokens = useMemo(() => {
-    if (!book) return [];
-    return tokenize(book.content[difficulty]);
-  }, [book, difficulty]);
+    if (!id) return [];
+    return bookTokens[id]?.[difficulty] || [];
+  }, [id, difficulty]);
 
   const bookText = useMemo(() => {
     if (!book) return '';
@@ -48,11 +49,11 @@ export default function Reader() {
 
   // Split tokens into sentences for highlighting
   const sentences = useMemo(() => {
-    const result: { tokens: typeof tokens; }[] = [];
-    let current: typeof tokens = [];
+    const result: { tokens: BookToken[] }[] = [];
+    let current: BookToken[] = [];
     tokens.forEach((token) => {
       current.push(token);
-      if (token.text.includes('。') || token.text.includes('！') || token.text.includes('？')) {
+      if (token.t.includes('。') || token.t.includes('！') || token.t.includes('？')) {
         result.push({ tokens: [...current] });
         current = [];
       }
@@ -201,17 +202,17 @@ export default function Reader() {
               }`}
             >
               {sentence.tokens.map((token, i) => {
-                if (!token.isJapanese) {
-                  return <span key={i}>{token.text}</span>;
+                if (!token.j) {
+                  return <span key={i}>{token.t}</span>;
                 }
 
                 const handleClick = (e: React.MouseEvent) => {
                   e.stopPropagation();
-                  setPopupWord(token.text);
+                  setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
                 };
 
                 if (showFurigana) {
-                  return <FuriganaWord key={i} text={token.text} onClick={handleClick} />;
+                  return <FuriganaWord key={i} text={token.t} reading={token.r} onClick={handleClick} />;
                 }
 
                 return (
@@ -220,7 +221,7 @@ export default function Reader() {
                     onClick={handleClick}
                     className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
                   >
-                    {token.text}
+                    {token.t}
                   </span>
                 );
               })}
@@ -230,7 +231,12 @@ export default function Reader() {
       </article>
 
       {popupWord && (
-        <WordPopup word={popupWord} onClose={() => setPopupWord(null)} />
+        <WordPopup
+          word={popupWord.text}
+          baseForm={popupWord.baseForm}
+          pos={popupWord.pos}
+          onClose={() => setPopupWord(null)}
+        />
       )}
 
       <GrammarPanel
