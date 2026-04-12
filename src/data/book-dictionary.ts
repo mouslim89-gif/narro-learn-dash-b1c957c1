@@ -64504,5 +64504,9150 @@ export const bookDictionary: Record<string, CacheEntry> = {
       }
     ],
     "deinflected": "脈動"
+  },
+  "帰る": {
+    "results": [
+      {
+        "slug": "帰る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani15"
+        ],
+        "japanese": [
+          {
+            "word": "帰る",
+            "reading": "かえる"
+          },
+          {
+            "word": "還る",
+            "reading": "かえる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to return",
+              "to come home",
+              "to go home",
+              "to go back"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to leave (of a guest, customer, etc.)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to get home",
+              "to get to home plate"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51869dfdd5dda7b2c607c066",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "帰る場所 (青山テルマの曲)",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Kaeru Basho"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "帰る"
+  },
+  "言いました": {
+    "results": [
+      {
+        "slug": "言う",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani5"
+        ],
+        "japanese": [
+          {
+            "word": "言う",
+            "reading": "いう"
+          },
+          {
+            "word": "言う",
+            "reading": "ゆう"
+          },
+          {
+            "word": "云う",
+            "reading": "いう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to say",
+              "to utter",
+              "to declare"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to name",
+              "to call"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to go (e.g. \"the alarm went ping\")",
+              "to make a noise"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言うまでもない",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言うまでもない",
+            "reading": "いうまでもない"
+          },
+          {
+            "word": "言うまでもない",
+            "reading": "ゆうまでもない"
+          },
+          {
+            "word": "言うまでも無い",
+            "reading": "いうまでもない"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "goes without saying",
+              "needless to say",
+              "obvious"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-adjective (keiyoushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言うまでもなく",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言うまでもなく",
+            "reading": "いうまでもなく"
+          },
+          {
+            "word": "言うまでもなく",
+            "reading": "ゆうまでもなく"
+          },
+          {
+            "word": "言うまでも無く",
+            "reading": "いうまでもなく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "obviously",
+              "as we all know",
+              "needless to say",
+              "of course",
+              "it goes without saying"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言う通り",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言う通り",
+            "reading": "いうとおり"
+          },
+          {
+            "word": "言うとおり",
+            "reading": "いうとおり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "as (someone) says"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言うなれば",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言うなれば",
+            "reading": "いうなれば"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "so to speak"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "行っ": {
+    "results": [
+      {
+        "slug": "行く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani5"
+        ],
+        "japanese": [
+          {
+            "word": "行く",
+            "reading": "いく"
+          },
+          {
+            "word": "行く",
+            "reading": "ゆく"
+          },
+          {
+            "word": "往く",
+            "reading": "いく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to go",
+              "to move (towards)",
+              "to head (towards)",
+              "to leave (for)"
+            ],
+            "parts_of_speech": [
+              "Godan verb - Iku/Yuku special class",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to move through",
+              "to travel across",
+              "to walk along (e.g. a road)"
+            ],
+            "parts_of_speech": [
+              "Godan verb - Iku/Yuku special class",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to go (well, badly, etc.)",
+              "to proceed",
+              "to turn out",
+              "to get along"
+            ],
+            "parts_of_speech": [
+              "Godan verb - Iku/Yuku special class",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "行方",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "行方",
+            "reading": "ゆくえ"
+          },
+          {
+            "word": "行衛",
+            "reading": "ゆくえ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "(one's) whereabouts"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "destination",
+              "where one is headed"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "outcome",
+              "course (of events)",
+              "development",
+              "direction",
+              "tide"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "行く手",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "行く手",
+            "reading": "ゆくて"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "one's way (ahead)",
+              "one's path"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "行末",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "行く末",
+            "reading": "ゆくすえ"
+          },
+          {
+            "word": "行末",
+            "reading": "ゆくすえ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "one's future",
+              "one's fate",
+              "prospects",
+              "promise"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "one's way",
+              "one's path"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "行く先",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "行く先",
+            "reading": "ゆくさき"
+          },
+          {
+            "word": "行く先",
+            "reading": "いくさき"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "destination"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "whereabouts"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "future",
+              "prospects"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "くる": {
+    "results": [
+      {
+        "slug": "木",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani2"
+        ],
+        "japanese": [
+          {
+            "word": "木",
+            "reading": "き"
+          },
+          {
+            "word": "樹",
+            "reading": "き"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "tree",
+              "shrub",
+              "bush"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "wood",
+              "timber"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "wooden clappers (signalling the beginning or end of a performance)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "気",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [
+          "wanikani4"
+        ],
+        "japanese": [
+          {
+            "word": "気",
+            "reading": "き"
+          },
+          {
+            "word": "氣",
+            "reading": "き"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "spirit",
+              "mind",
+              "heart"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "nature",
+              "disposition"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "intention",
+              "mind",
+              "will",
+              "motivation"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "期",
+        "is_common": false,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "期",
+            "reading": "き"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "period",
+              "time"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "opportunity",
+              "chance",
+              "occasion"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "age"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "機-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [
+          "wanikani20"
+        ],
+        "japanese": [
+          {
+            "word": "機",
+            "reading": "き"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "chance",
+              "opportunity"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "machine"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "aircraft"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "記",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "記",
+            "reading": "き"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "account",
+              "history",
+              "chronicle",
+              "annals",
+              "record"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "notice",
+              "note",
+              "as follows"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Kojiki (earliest historical record of Japan, compiled in 712 CE)",
+              "Records of Ancient Matters"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "木"
+  },
+  "ぶる": {
+    "results": [
+      {
+        "slug": "ブラコン",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "ブラコン"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "brother complex",
+              "excessive attachment to one's brother"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "black contemporary (music)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "ブラコン"
+  },
+  "ぶら": {
+    "results": [
+      {
+        "slug": "ブラコン",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "ブラコン"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "brother complex",
+              "excessive attachment to one's brother"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "black contemporary (music)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "ブラコン"
+  },
+  "育つ": {
+    "results": [
+      {
+        "slug": "育ち",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "育ち",
+            "reading": "そだち"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "growth",
+              "breeding"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "growing up (in, as)",
+              "upbringing"
+            ],
+            "parts_of_speech": [
+              "Noun, used as a suffix"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "育ち盛り",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "育ち盛り",
+            "reading": "そだちざかり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "growth period (in children)"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun which may take the genitive case particle 'no'"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "育ち過ぎる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "育ちすぎる",
+            "reading": "そだちすぎる"
+          },
+          {
+            "word": "育ち過ぎる",
+            "reading": "そだちすぎる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to be overgrown"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "育ちが良い",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "育ちがいい",
+            "reading": "そだちがいい"
+          },
+          {
+            "word": "育ちが良い",
+            "reading": "そだちがいい"
+          },
+          {
+            "word": "育ちが良い",
+            "reading": "そだちがよい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "well-bred",
+              "of good upbringing"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-Adjective (keiyoushi) - yoi/ii class"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "育ちの良い",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "育ちのいい",
+            "reading": "そだちのいい"
+          },
+          {
+            "word": "育ちの良い",
+            "reading": "そだちのいい"
+          },
+          {
+            "word": "育ちの良い",
+            "reading": "そだちのよい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "well-bred",
+              "of good upbringing"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-Adjective (keiyoushi) - yoi/ii class"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "しました": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "或": {
+    "results": [
+      {
+        "slug": "或",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "或る",
+            "reading": "ある"
+          },
+          {
+            "word": "或",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "a certain ...",
+              "some ..."
+            ],
+            "parts_of_speech": [
+              "Pre-noun adjectival (rentaishi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "或いは",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "或いは",
+            "reading": "あるいは"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "or",
+              "either ... or"
+            ],
+            "parts_of_speech": [
+              "Conjunction"
+            ]
+          },
+          {
+            "english_definitions": [
+              "maybe",
+              "perhaps",
+              "possibly"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "some ... and others ...",
+              "sometimes ... and at other times ..."
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "ある程度",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "ある程度",
+            "reading": "あるていど"
+          },
+          {
+            "word": "或る程度",
+            "reading": "あるていど"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to some extent",
+              "to a certain extent"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun which may take the genitive case particle 'no'",
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "ある日",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "ある日",
+            "reading": "あるひ"
+          },
+          {
+            "word": "或る日",
+            "reading": "あるひ"
+          },
+          {
+            "word": "或日",
+            "reading": "あるひ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "one day",
+              "(on) a certain day"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "ある種",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "ある種",
+            "reading": "あるしゅ"
+          },
+          {
+            "word": "或る種",
+            "reading": "あるしゅ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "certain",
+              "some kind of",
+              "some sort of",
+              "of sorts"
+            ],
+            "parts_of_speech": [
+              "Noun which may take the genitive case particle 'no'"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "参る": {
+    "results": [
+      {
+        "slug": "参る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [
+          "wanikani14"
+        ],
+        "japanese": [
+          {
+            "word": "参る",
+            "reading": "まいる"
+          },
+          {
+            "word": "詣る",
+            "reading": "まいる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to go",
+              "to come",
+              "to call"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be defeated",
+              "to collapse",
+              "to die"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be annoyed",
+              "to be nonplussed"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "参る"
+  },
+  "流れる": {
+    "results": [
+      {
+        "slug": "流れ",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ",
+            "reading": "ながれ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "flow (of a fluid or gas)",
+              "stream",
+              "current"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "flow (of people, things)",
+              "passage (of time)",
+              "tide",
+              "passing",
+              "(changing) trends",
+              "tendency"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "course (of events)",
+              "(step-by-step) procedure",
+              "process"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani14"
+        ],
+        "japanese": [
+          {
+            "word": "流れる",
+            "reading": "ながれる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to stream",
+              "to flow (liquid, time, etc.)",
+              "to run (ink)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be washed away",
+              "to be carried"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to drift",
+              "to float (e.g. clouds)",
+              "to wander",
+              "to stray"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れ星",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ星",
+            "reading": "ながれぼし"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "shooting star",
+              "falling star",
+              "meteor"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "blaze (wide white stripe down the face of a horse)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Nagareboshi"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れ込む",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ込む",
+            "reading": "ながれこむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to flow into",
+              "to pour into",
+              "to stream into"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れ出す",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ出す",
+            "reading": "ながれだす"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to flow out",
+              "to stream out",
+              "to pour out",
+              "to gush forth",
+              "to leak",
+              "to ooze out",
+              "to drift away"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "来": {
+    "results": [
+      {
+        "slug": "来る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani5"
+        ],
+        "japanese": [
+          {
+            "word": "来る",
+            "reading": "くる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to come (spatially or temporally)",
+              "to approach",
+              "to arrive"
+            ],
+            "parts_of_speech": [
+              "Kuru verb - special class",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to come back",
+              "to do ... and come back"
+            ],
+            "parts_of_speech": [
+              "Kuru verb - special class",
+              "Intransitive verb",
+              "Auxiliary verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to come to be",
+              "to become",
+              "to get",
+              "to grow",
+              "to continue"
+            ],
+            "parts_of_speech": [
+              "Kuru verb - special class",
+              "Intransitive verb",
+              "Auxiliary verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来る-1",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来る",
+            "reading": "きたる"
+          },
+          {
+            "word": "来たる",
+            "reading": "きたる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "next (e.g. \"next April\")",
+              "forthcoming",
+              "coming"
+            ],
+            "parts_of_speech": [
+              "Pre-noun adjectival (rentaishi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to come",
+              "to arrive",
+              "to be due to"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来るべき",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来るべき",
+            "reading": "きたるべき"
+          },
+          {
+            "word": "来たるべき",
+            "reading": "きたるべき"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "expected to arrive (occur) in the near future"
+            ],
+            "parts_of_speech": [
+              "Noun or verb acting prenominally"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来る日も来る日も",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来る日も来る日も",
+            "reading": "くるひもくるひも"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "day after day",
+              "day in and day out",
+              "every single day"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来る日",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来る日",
+            "reading": "くるひ"
+          },
+          {
+            "word": "くる日",
+            "reading": "くるひ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "the coming days"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "まし": {
+    "results": [
+      {
+        "slug": "増す",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani25"
+        ],
+        "japanese": [
+          {
+            "word": "増す",
+            "reading": "ます"
+          },
+          {
+            "word": "益す",
+            "reading": "ます"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to increase",
+              "to grow"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "升",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [
+          "wanikani60"
+        ],
+        "japanese": [
+          {
+            "word": "升",
+            "reading": "ます"
+          },
+          {
+            "word": "枡",
+            "reading": "ます"
+          },
+          {
+            "word": "桝",
+            "reading": "ます"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "measuring container",
+              "measuring box",
+              "measure"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "box (seating at a theatre, etc.)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "square on a grid",
+              "cell of a grid"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "鱒",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "鱒",
+            "reading": "ます"
+          },
+          {
+            "word": "",
+            "reading": "マス"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "trout",
+              "sea trout"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "マス",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "マス"
+          },
+          {
+            "word": "",
+            "reading": "マッス"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "mass"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "mass (media, production, etc.)"
+            ],
+            "parts_of_speech": [
+              "Noun or verb acting prenominally"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Trout"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "マス-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "マス"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "masturbation"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "増す"
+  },
+  "決意": {
+    "results": [
+      {
+        "slug": "決意",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "決意",
+            "reading": "けつい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "decision",
+              "determination",
+              "resolution"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Suru verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "決意が固い",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "決意が固い",
+            "reading": "けついがかたい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "firmly determined"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-adjective (keiyoushi)"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "決意"
+  },
+  "見ないでください": {
+    "results": [
+      {
+        "slug": "見る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani4",
+          "wanikani22"
+        ],
+        "japanese": [
+          {
+            "word": "見る",
+            "reading": "みる"
+          },
+          {
+            "word": "観る",
+            "reading": "みる"
+          },
+          {
+            "word": "視る",
+            "reading": "みる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to see",
+              "to look",
+              "to watch",
+              "to view",
+              "to observe"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to examine",
+              "to look over",
+              "to assess",
+              "to check",
+              "to judge"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to look after",
+              "to attend to",
+              "to take care of",
+              "to keep an eye on"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "見る見る",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "見る見る",
+            "reading": "みるみる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "very fast",
+              "in a twinkle",
+              "before one's eyes"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "見る目",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "見る目",
+            "reading": "みるめ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "discerning eye",
+              "an eye (for something)",
+              "good judgement"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "public eye",
+              "(in) the eyes of others",
+              "people watching",
+              "public opinion"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "appearance",
+              "sight",
+              "impression"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "見るも",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "見るも",
+            "reading": "みるも"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "patently",
+              "clearly at first glance"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "見る度に",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "見る度に",
+            "reading": "みるたびに"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "whenever (each time) one sees (it)"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "織る": {
+    "results": [
+      {
+        "slug": "織る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [
+          "wanikani27"
+        ],
+        "japanese": [
+          {
+            "word": "織る",
+            "reading": "おる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to weave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "織る"
+  },
+  "快い": {
+    "results": [
+      {
+        "slug": "快く",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "快く",
+            "reading": "こころよく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "comfortably",
+              "pleasantly",
+              "cheerfully"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "willingly",
+              "gladly",
+              "readily",
+              "with pleasure",
+              "with good grace"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "織り始め": {
+    "results": [
+      {
+        "slug": "織る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [
+          "wanikani27"
+        ],
+        "japanese": [
+          {
+            "word": "織る",
+            "reading": "おる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to weave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "織る"
+  },
+  "織っている": {
+    "results": [
+      {
+        "slug": "織る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [
+          "wanikani27"
+        ],
+        "japanese": [
+          {
+            "word": "織る",
+            "reading": "おる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to weave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "織る"
+  },
+  "させました": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "掛かる": {
+    "results": [
+      {
+        "slug": "掛かり",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掛かり",
+            "reading": "かかり"
+          },
+          {
+            "word": "掛り",
+            "reading": "かかり"
+          },
+          {
+            "word": "懸かり",
+            "reading": "かかり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "starting (e.g. of an engine)",
+              "engaging (e.g. of a lock)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "expenses",
+              "costs"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "attack (esp. a corner approach)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掛かり-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掛かり",
+            "reading": "がかり"
+          },
+          {
+            "word": "掛り",
+            "reading": "がかり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "taking a quantity (of time, people, etc.)"
+            ],
+            "parts_of_speech": [
+              "Suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "similar to ..."
+            ],
+            "parts_of_speech": [
+              "Suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "dependent on ...",
+              "reliant on ..."
+            ],
+            "parts_of_speech": [
+              "Suffix"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掛かりつけ",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掛かり付け",
+            "reading": "かかりつけ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "family (doctor, etc.)",
+              "(one's) regular (clinic)"
+            ],
+            "parts_of_speech": [
+              "Noun which may take the genitive case particle 'no'"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掛かり合う",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掛かり合う",
+            "reading": "かかりあう"
+          },
+          {
+            "word": "係り合う",
+            "reading": "かかりあう"
+          },
+          {
+            "word": "かかり合う",
+            "reading": "かかりあう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to have something to do with",
+              "to be concerned with",
+              "to have a connection with",
+              "to have relations with"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to become involved in (something negative)",
+              "to become entangled in",
+              "to get mixed up in"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掛かり切り",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掛かりきり",
+            "reading": "かかりきり"
+          },
+          {
+            "word": "掛かり切り",
+            "reading": "かかりきり"
+          },
+          {
+            "word": "掛り切り",
+            "reading": "かかりきり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "being devoted",
+              "spending all one's time and energy on"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "上げる": {
+    "results": [
+      {
+        "slug": "上げ",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [
+          "wanikani44"
+        ],
+        "japanese": [
+          {
+            "word": "上げ",
+            "reading": "あげ"
+          },
+          {
+            "word": "揚げ",
+            "reading": "あげ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "tuck (e.g. in a dress)"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "rise (e.g. in price)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Age"
+            ],
+            "parts_of_speech": [
+              "Place"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "上げる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n2",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani1",
+          "wanikani23",
+          "wanikani42"
+        ],
+        "japanese": [
+          {
+            "word": "上げる",
+            "reading": "あげる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to raise",
+              "to elevate"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to move something (to a higher place)",
+              "to put onto (e.g. a shelf)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to increase (price, quality, status, etc.)",
+              "to raise (a wage)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "揚げ足",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "揚げ足",
+            "reading": "あげあし"
+          },
+          {
+            "word": "挙げ足",
+            "reading": "あげあし"
+          },
+          {
+            "word": "上げ足",
+            "reading": "あげあし"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "raised leg",
+              "lifting a leg"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "upturn (in the market)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "sitting cross-legged"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "上げ底",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "上げ底",
+            "reading": "あげぞこ"
+          },
+          {
+            "word": "上げ底",
+            "reading": "あげそこ"
+          },
+          {
+            "word": "揚げ底",
+            "reading": "あげぞこ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "false bottom",
+              "fake bottom",
+              "raised bottom",
+              "platform (shoes)",
+              "kick (of a bottle)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "exaggeration",
+              "overstatement"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "上げ膳据え膳",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "上げ膳据え膳",
+            "reading": "あげぜんすえぜん"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "taking care of everything",
+              "no need to do anything"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "開くれ": {
+    "results": [
+      {
+        "slug": "開く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "開く",
+            "reading": "ひらく"
+          },
+          {
+            "word": "",
+            "reading": "ヒラく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to open",
+              "to undo",
+              "to unseal",
+              "to unpack"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to bloom",
+              "to unfold",
+              "to spread out"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to open (for business, e.g. in the morning)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "開く-1",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani12"
+        ],
+        "japanese": [
+          {
+            "word": "開く",
+            "reading": "あく"
+          },
+          {
+            "word": "空く",
+            "reading": "あく"
+          },
+          {
+            "word": "明く",
+            "reading": "あく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to open (e.g. doors)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to open (e.g. business, etc.)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be empty"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "働いています": {
+    "results": [
+      {
+        "slug": "働く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani11"
+        ],
+        "japanese": [
+          {
+            "word": "働く",
+            "reading": "はたらく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to work",
+              "to labor",
+              "to labour"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to function",
+              "to operate",
+              "to be effective",
+              "to work (i.e. ... works)",
+              "to come into play"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to commit (e.g. a crime)",
+              "to perpetrate",
+              "to do",
+              "to act",
+              "to practise",
+              "to practice"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "518698f5d5dda7b2c6055ea8",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "働く男 (PUFFYの曲)",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Hataraku Otoko"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "起きる": {
+    "results": [
+      {
+        "slug": "起きる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani10"
+        ],
+        "japanese": [
+          {
+            "word": "起きる",
+            "reading": "おきる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to get up",
+              "to rise",
+              "to blaze up (fire)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to wake up",
+              "to be awake",
+              "to stay awake"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to occur (usu. of unfavourable incidents)",
+              "to happen",
+              "to take place"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "起き上がる",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "起き上がる",
+            "reading": "おきあがる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rise",
+              "to get up",
+              "to stand up",
+              "to sit up"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "起き上がりこぼし",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "起き上がりこぼし",
+            "reading": "おきあがりこぼし"
+          },
+          {
+            "word": "起き上がり小法師",
+            "reading": "おきあがりこぼし"
+          },
+          {
+            "word": "起き上り小法師",
+            "reading": "おきあがりこぼし"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "tumbler",
+              "self-righting doll"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Okiagari-koboshi"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "起き出す",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "起き出す",
+            "reading": "おきだす"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to get out of bed",
+              "to show a leg"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Godan verb with 'su' ending"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "起き伏し",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "起き伏し",
+            "reading": "おきふし"
+          },
+          {
+            "word": "起伏し",
+            "reading": "おきふし"
+          },
+          {
+            "word": "起き臥し",
+            "reading": "おきふし"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "rising and going to bed",
+              "daily life"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Suru verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "all the time",
+              "constantly",
+              "whether awake or asleep"
+            ],
+            "parts_of_speech": [
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "起きる"
+  },
+  "言います": {
+    "results": [
+      {
+        "slug": "言う",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani5"
+        ],
+        "japanese": [
+          {
+            "word": "言う",
+            "reading": "いう"
+          },
+          {
+            "word": "言う",
+            "reading": "ゆう"
+          },
+          {
+            "word": "云う",
+            "reading": "いう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to say",
+              "to utter",
+              "to declare"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to name",
+              "to call"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to go (e.g. \"the alarm went ping\")",
+              "to make a noise"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言うまでもない",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言うまでもない",
+            "reading": "いうまでもない"
+          },
+          {
+            "word": "言うまでもない",
+            "reading": "ゆうまでもない"
+          },
+          {
+            "word": "言うまでも無い",
+            "reading": "いうまでもない"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "goes without saying",
+              "needless to say",
+              "obvious"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-adjective (keiyoushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言うまでもなく",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言うまでもなく",
+            "reading": "いうまでもなく"
+          },
+          {
+            "word": "言うまでもなく",
+            "reading": "ゆうまでもなく"
+          },
+          {
+            "word": "言うまでも無く",
+            "reading": "いうまでもなく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "obviously",
+              "as we all know",
+              "needless to say",
+              "of course",
+              "it goes without saying"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言う通り",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言う通り",
+            "reading": "いうとおり"
+          },
+          {
+            "word": "言うとおり",
+            "reading": "いうとおり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "as (someone) says"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "言うなれば",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "言うなれば",
+            "reading": "いうなれば"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "so to speak"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "していません": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "働き続けています": {
+    "results": [
+      {
+        "slug": "働く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani11"
+        ],
+        "japanese": [
+          {
+            "word": "働く",
+            "reading": "はたらく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to work",
+              "to labor",
+              "to labour"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to function",
+              "to operate",
+              "to be effective",
+              "to work (i.e. ... works)",
+              "to come into play"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to commit (e.g. a crime)",
+              "to perpetrate",
+              "to do",
+              "to act",
+              "to practise",
+              "to practice"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "518698f5d5dda7b2c6055ea8",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "働く男 (PUFFYの曲)",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Hataraku Otoko"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "出す": {
+    "results": [
+      {
+        "slug": "出し",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "出し",
+            "reading": "だし"
+          },
+          {
+            "word": "出汁",
+            "reading": "だし"
+          },
+          {
+            "word": "",
+            "reading": "ダシ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "dashi",
+              "Japanese soup stock made from fish and kelp"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "pretext",
+              "excuse",
+              "pretense (pretence)",
+              "dupe",
+              "front man"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Dashi"
+            ],
+            "parts_of_speech": [
+              "Place"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "出し合う",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "出し合う",
+            "reading": "だしあう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to contribute jointly"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "出し物",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "出し物",
+            "reading": "だしもの"
+          },
+          {
+            "word": "演し物",
+            "reading": "だしもの"
+          },
+          {
+            "word": "出物",
+            "reading": "だしもの"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "program (e.g. theatre, theater)",
+              "programme"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "(theatrical) piece",
+              "number",
+              "performance",
+              "feature"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "出しゃばる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "出しゃばる",
+            "reading": "でしゃばる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to intrude",
+              "to butt in",
+              "to meddle"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be forward",
+              "to be self-assertive",
+              "to show off",
+              "to be pushy"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "出し抜く",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "出し抜く",
+            "reading": "だしぬく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to outwit",
+              "to outmanoeuvre",
+              "to steal a march on",
+              "to get the jump on",
+              "to anticipate",
+              "to forestall"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "分かる": {
+    "results": [
+      {
+        "slug": "分かる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani3"
+        ],
+        "japanese": [
+          {
+            "word": "分かる",
+            "reading": "わかる"
+          },
+          {
+            "word": "解る",
+            "reading": "わかる"
+          },
+          {
+            "word": "判る",
+            "reading": "わかる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to understand",
+              "to comprehend",
+              "to grasp",
+              "to see",
+              "to get",
+              "to follow"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to become clear",
+              "to be known",
+              "to be discovered",
+              "to be realized (realised)",
+              "to be found out",
+              "to make sense"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "I know!",
+              "I think so too!"
+            ],
+            "parts_of_speech": []
+          }
+        ]
+      }
+    ],
+    "deinflected": "分かる"
+  },
+  "亘る": {
+    "results": [
+      {
+        "slug": "渡る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani25"
+        ],
+        "japanese": [
+          {
+            "word": "渡る",
+            "reading": "わたる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to cross over",
+              "to go across"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to extend",
+              "to cover",
+              "to range",
+              "to span"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "渡る"
+  },
+  "し続けている": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "され": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "し始める": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "働き続ける": {
+    "results": [
+      {
+        "slug": "働く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani11"
+        ],
+        "japanese": [
+          {
+            "word": "働く",
+            "reading": "はたらく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to work",
+              "to labor",
+              "to labour"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to function",
+              "to operate",
+              "to be effective",
+              "to work (i.e. ... works)",
+              "to come into play"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to commit (e.g. a crime)",
+              "to perpetrate",
+              "to do",
+              "to act",
+              "to practise",
+              "to practice"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "518698f5d5dda7b2c6055ea8",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "働く男 (PUFFYの曲)",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Hataraku Otoko"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "問う": {
+    "results": [
+      {
+        "slug": "問う",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "問う",
+            "reading": "とう"
+          },
+          {
+            "word": "訪う",
+            "reading": "とう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to ask",
+              "to inquire"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending (special class)",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to blame (someone) for",
+              "to accuse of",
+              "to pursue (question of responsibility)",
+              "to charge with"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending (special class)",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to care about",
+              "to regard as important"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending (special class)",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "問うに落ちず語るに落ちる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "問うに落ちず語るに落ちる",
+            "reading": "とうにおちずかたるにおちる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to keep a secret when asked about it, but let it slip inadvertently when chatting on another occasion"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Ichidan verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "問うは一旦の恥問わぬは末代の恥",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "問うは一旦の恥、問わぬは末代の恥",
+            "reading": "とうはいったんのはじ、とわぬはまつだいのはじ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "better to ask and be embarrassed than not ask and never know"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "問うは一度の恥、問わぬは末代の恥",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "問うは一度の恥、問わぬは末代の恥",
+            "reading": "とうはいちどのはじ、とわぬはまつだいのはじ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "better to ask and be embarrassed than not ask and never know"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "問う"
+  },
+  "光っていました": {
+    "results": [
+      {
+        "slug": "光る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [
+          "wanikani7"
+        ],
+        "japanese": [
+          {
+            "word": "光る",
+            "reading": "ひかる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shine",
+              "to glitter",
+              "to be bright"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "光る棒",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "光る棒",
+            "reading": "ひかるぼう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "glowstick",
+              "neon light stick"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51869557d5dda7b2c603a96d",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "光る眼",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Village of the Damned (1995 film)"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "乗る": {
+    "results": [
+      {
+        "slug": "乗る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani9"
+        ],
+        "japanese": [
+          {
+            "word": "乗る",
+            "reading": "のる"
+          },
+          {
+            "word": "",
+            "reading": "ノる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to get on (train, plane, bus, ship, etc.)",
+              "to get in",
+              "to board",
+              "to take",
+              "to embark"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to get on (e.g. a footstool)",
+              "to step on",
+              "to jump on",
+              "to sit on",
+              "to mount"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to reach",
+              "to go over",
+              "to pass"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "伸るか反るか",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "伸るか反るか",
+            "reading": "のるかそるか"
+          },
+          {
+            "word": "乗るか反るか",
+            "reading": "のるかそるか"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "win or lose",
+              "sink or swim",
+              "make or break",
+              "all or nothing"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Adverb (fukushi)",
+              "Noun which may take the genitive case particle 'no'"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "乗る"
+  },
+  "聞く": {
+    "results": [
+      {
+        "slug": "聞く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani10",
+          "wanikani37"
+        ],
+        "japanese": [
+          {
+            "word": "聞く",
+            "reading": "きく"
+          },
+          {
+            "word": "聴く",
+            "reading": "きく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to hear"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to listen (e.g. to music)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to ask",
+              "to enquire",
+              "to query"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "聞く耳を持たない",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "聞く耳を持たない",
+            "reading": "きくみみをもたない"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to turn a deaf ear to",
+              "to not listen to",
+              "to not get the message"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-adjective (keiyoushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "聞くも涙語るも涙",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "聞くも涙、語るも涙",
+            "reading": "きくもなみだ、かたるもなみだ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "(a story) so sad that both the speaker and the listener shed tears"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun which may take the genitive case particle 'no'"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "聞く耳",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "聞く耳",
+            "reading": "きくみみ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "acute ear",
+              "good ear"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "聞くに堪えない",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "聞くに堪えない",
+            "reading": "きくにたえない"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "painful to listen to",
+              "unbearable to hear"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "I-adjective (keiyoushi)"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "聞く"
+  },
+  "流れていました": {
+    "results": [
+      {
+        "slug": "流れ",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ",
+            "reading": "ながれ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "flow (of a fluid or gas)",
+              "stream",
+              "current"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "flow (of people, things)",
+              "passage (of time)",
+              "tide",
+              "passing",
+              "(changing) trends",
+              "tendency"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "course (of events)",
+              "(step-by-step) procedure",
+              "process"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani14"
+        ],
+        "japanese": [
+          {
+            "word": "流れる",
+            "reading": "ながれる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to stream",
+              "to flow (liquid, time, etc.)",
+              "to run (ink)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be washed away",
+              "to be carried"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to drift",
+              "to float (e.g. clouds)",
+              "to wander",
+              "to stray"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れ星",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ星",
+            "reading": "ながれぼし"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "shooting star",
+              "falling star",
+              "meteor"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "blaze (wide white stripe down the face of a horse)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Nagareboshi"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れ込む",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ込む",
+            "reading": "ながれこむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to flow into",
+              "to pour into",
+              "to stream into"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "流れ出す",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "流れ出す",
+            "reading": "ながれだす"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to flow out",
+              "to stream out",
+              "to pour out",
+              "to gush forth",
+              "to leak",
+              "to ooze out",
+              "to drift away"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "続けました": {
+    "results": [
+      {
+        "slug": "続ける",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [
+          "wanikani21"
+        ],
+        "japanese": [
+          {
+            "word": "続ける",
+            "reading": "つづける"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to continue",
+              "to keep up",
+              "to keep on"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to continue ...",
+              "to keep on ..."
+            ],
+            "parts_of_speech": [
+              "Auxiliary verb",
+              "Ichidan verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "現す": {
+    "results": [
+      {
+        "slug": "現す",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani9",
+          "wanikani25"
+        ],
+        "japanese": [
+          {
+            "word": "表す",
+            "reading": "あらわす"
+          },
+          {
+            "word": "現す",
+            "reading": "あらわす"
+          },
+          {
+            "word": "表わす",
+            "reading": "あらわす"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to represent",
+              "to signify",
+              "to stand for"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to reveal",
+              "to show",
+              "to display"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to express"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "表す"
+  },
+  "僕": {
+    "results": [
+      {
+        "slug": "僕達",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "僕たち",
+            "reading": "ぼくたち"
+          },
+          {
+            "word": "僕達",
+            "reading": "ぼくたち"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "we"
+            ],
+            "parts_of_speech": [
+              "Pronoun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51869167d5dda7b2c601db16",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "僕たちのアナ・バナナ",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Keeping the Faith"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "5186934dd5dda7b2c602b698",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "僕たちの行方 (高橋瞳の曲)",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Bokutachi no Yukue"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51869f3ed5dda7b2c60858d3",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "僕たちは世界を変えることができない。",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "We Can't Change the World. But, We Wanna Build a School in Cambodia."
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51869802d5dda7b2c604ec43",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "僕たちの時間",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "The Hours and Times"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "呟く": {
+    "results": [
+      {
+        "slug": "呟く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "呟く",
+            "reading": "つぶやく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to mutter",
+              "to murmur",
+              "to grumble"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Transitive verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to tweet",
+              "to post on Twitter"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Transitive verb",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "呟く"
+  },
+  "広がる": {
+    "results": [
+      {
+        "slug": "広がり",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "広がり",
+            "reading": "ひろがり"
+          },
+          {
+            "word": "拡がり",
+            "reading": "ひろがり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "spread",
+              "span",
+              "expanse",
+              "extent"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "横たえる": {
+    "results": [
+      {
+        "slug": "横たえる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "横たえる",
+            "reading": "よこたえる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to lay down"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to wear (a sword, etc.) at one's side"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "横たえる"
+  },
+  "しておりました": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "された": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "あろ": {
+    "results": [
+      {
+        "slug": "在る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n2",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "有る",
+            "reading": "ある"
+          },
+          {
+            "word": "在る",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to be",
+              "to exist",
+              "to live"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to have"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be located"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "或",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "或る",
+            "reading": "ある"
+          },
+          {
+            "word": "或",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "a certain ...",
+              "some ..."
+            ],
+            "parts_of_speech": [
+              "Pre-noun adjectival (rentaishi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "二-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "二",
+            "reading": "アル"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "two"
+            ],
+            "parts_of_speech": [
+              "Numeric"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "アル",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "アル"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "be",
+              "is"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "歩く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "歩く",
+            "reading": "あるく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to walk"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "有る"
+  },
+  "独語": {
+    "results": [
+      {
+        "slug": "独語",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "独語",
+            "reading": "どくご"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "monologue",
+              "soliloquy"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Suru verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "German (language)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "独語"
+  },
+  "十": {
+    "results": [
+      {
+        "slug": "１０時",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "１０時",
+            "reading": "じゅうじ"
+          },
+          {
+            "word": "十時",
+            "reading": "じゅうじ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "ten o'clock"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "１０時"
+  },
+  "三": {
+    "results": [
+      {
+        "slug": "三人",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [
+          "wanikani1"
+        ],
+        "japanese": [
+          {
+            "word": "三人",
+            "reading": "さんにん"
+          },
+          {
+            "word": "三人",
+            "reading": "みたり"
+          },
+          {
+            "word": "３人",
+            "reading": "さんにん"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "three people"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "三人組",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "三人組",
+            "reading": "さんにんぐみ"
+          },
+          {
+            "word": "３人組",
+            "reading": "さんにんぐみ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "trio",
+              "gang of three",
+              "threesome"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "三人寄れば文殊の知恵",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "三人寄れば文殊の知恵",
+            "reading": "さんにんよればもんじゅのちえ"
+          },
+          {
+            "word": "三人よれば文殊の知恵",
+            "reading": "さんにんよればもんじゅのちえ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "three heads are better than two",
+              "if three people gather; the wisdom of Manjushri"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "三人婚",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "３人婚",
+            "reading": "さんにんこん"
+          },
+          {
+            "word": "三人婚",
+            "reading": "さんにんこん"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "three-way sexual relationship",
+              "three-person marriage",
+              "ménage à trois",
+              "three-person domestic partnership"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Ménage à trois"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "三人遣い",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "三人遣い",
+            "reading": "さんにんづかい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "three-person operation of a puppet (bunraku)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "三人"
+  },
+  "読んでいます": {
+    "results": [
+      {
+        "slug": "読む",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani10"
+        ],
+        "japanese": [
+          {
+            "word": "読む",
+            "reading": "よむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to read"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to recite (e.g. a sutra)",
+              "to chant"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to predict",
+              "to guess",
+              "to forecast",
+              "to read (someone's thoughts)",
+              "to see (e.g. into someone's heart)",
+              "to divine"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "客": {
+    "results": [
+      {
+        "slug": "客",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "客",
+            "reading": "きゃく"
+          },
+          {
+            "word": "客",
+            "reading": "かく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "guest",
+              "visitor"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "customer",
+              "client",
+              "shopper",
+              "spectator",
+              "audience",
+              "tourist",
+              "sightseer",
+              "passenger"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "counter for containers used to entertain guests"
+            ],
+            "parts_of_speech": [
+              "Counter"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "稀人",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "客",
+            "reading": "まれびと"
+          },
+          {
+            "word": "賓",
+            "reading": "まれびと"
+          },
+          {
+            "word": "客人",
+            "reading": "まれびと"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "visitor from afar"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "joy-bringing spirit from the divine realms"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "客賓",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "客賓",
+            "reading": "まろうど"
+          },
+          {
+            "word": "客賓",
+            "reading": "まろうと"
+          },
+          {
+            "word": "客人",
+            "reading": "まろうど"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "visitor from afar",
+              "guest"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "客席",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "客席",
+            "reading": "きゃくせき"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "guest seating (e.g. theater, stadium)",
+              "passenger seat (e.g. taxi)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "audience"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "客間",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "客間",
+            "reading": "きゃくま"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "drawing room",
+              "parlor",
+              "parlour",
+              "guest room"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "客"
+  },
+  "掛けました": {
+    "results": [
+      {
+        "slug": "掛ける",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani25",
+          "wanikani38"
+        ],
+        "japanese": [
+          {
+            "word": "掛ける",
+            "reading": "かける"
+          },
+          {
+            "word": "懸ける",
+            "reading": "かける"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to hang up (e.g. a coat, a picture on the wall)",
+              "to let hang",
+              "to suspend (from)",
+              "to hoist (e.g. sail)",
+              "to raise (e.g. flag)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to put on (e.g. a blanket)",
+              "to put on top of",
+              "to cover",
+              "to lay",
+              "to spread"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to put on (glasses, etc.)",
+              "to wear (a necklace, etc.)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "包む": {
+    "results": [
+      {
+        "slug": "包む",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [
+          "wanikani41"
+        ],
+        "japanese": [
+          {
+            "word": "包む",
+            "reading": "つつむ"
+          },
+          {
+            "word": "裹む",
+            "reading": "つつむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to wrap up",
+              "to pack",
+              "to bundle",
+              "to do up"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cover",
+              "to envelop",
+              "to shroud",
+              "to engulf"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to conceal (a feeling)",
+              "to hide"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "包む-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "包む",
+            "reading": "くるむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to wrap up (in)",
+              "to roll up (in)",
+              "to tuck (up)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "包む"
+  },
+  "開いています": {
+    "results": [
+      {
+        "slug": "開く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "開く",
+            "reading": "ひらく"
+          },
+          {
+            "word": "",
+            "reading": "ヒラく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to open",
+              "to undo",
+              "to unseal",
+              "to unpack"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to bloom",
+              "to unfold",
+              "to spread out"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to open (for business, e.g. in the morning)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "開く-1",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani12"
+        ],
+        "japanese": [
+          {
+            "word": "開く",
+            "reading": "あく"
+          },
+          {
+            "word": "空く",
+            "reading": "あく"
+          },
+          {
+            "word": "明く",
+            "reading": "あく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to open (e.g. doors)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to open (e.g. business, etc.)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be empty"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "来ている": {
+    "results": [
+      {
+        "slug": "来る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani5"
+        ],
+        "japanese": [
+          {
+            "word": "来る",
+            "reading": "くる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to come (spatially or temporally)",
+              "to approach",
+              "to arrive"
+            ],
+            "parts_of_speech": [
+              "Kuru verb - special class",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to come back",
+              "to do ... and come back"
+            ],
+            "parts_of_speech": [
+              "Kuru verb - special class",
+              "Intransitive verb",
+              "Auxiliary verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to come to be",
+              "to become",
+              "to get",
+              "to grow",
+              "to continue"
+            ],
+            "parts_of_speech": [
+              "Kuru verb - special class",
+              "Intransitive verb",
+              "Auxiliary verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来る-1",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来る",
+            "reading": "きたる"
+          },
+          {
+            "word": "来たる",
+            "reading": "きたる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "next (e.g. \"next April\")",
+              "forthcoming",
+              "coming"
+            ],
+            "parts_of_speech": [
+              "Pre-noun adjectival (rentaishi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to come",
+              "to arrive",
+              "to be due to"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来るべき",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来るべき",
+            "reading": "きたるべき"
+          },
+          {
+            "word": "来たるべき",
+            "reading": "きたるべき"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "expected to arrive (occur) in the near future"
+            ],
+            "parts_of_speech": [
+              "Noun or verb acting prenominally"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来る日も来る日も",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来る日も来る日も",
+            "reading": "くるひもくるひも"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "day after day",
+              "day in and day out",
+              "every single day"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "来る日",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "来る日",
+            "reading": "くるひ"
+          },
+          {
+            "word": "くる日",
+            "reading": "くるひ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "the coming days"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "漂い始める": {
+    "results": [
+      {
+        "slug": "漂う",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [
+          "wanikani50"
+        ],
+        "japanese": [
+          {
+            "word": "漂う",
+            "reading": "ただよう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to drift",
+              "to float"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to waft (e.g. a scent)",
+              "to hang in the air"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be in the air (e.g. a feeling or mood)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "捲る": {
+    "results": [
+      {
+        "slug": "捲る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "捲る",
+            "reading": "まくる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to turn up",
+              "to roll up (e.g. sleeves)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to do over and over again",
+              "to do relentlessly",
+              "to do with reckless abandon",
+              "to do continuously"
+            ],
+            "parts_of_speech": [
+              "Auxiliary verb",
+              "Godan verb with 'ru' ending"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to stage a comeback (against) (in mahjong, horse racing, etc.)",
+              "to come from behind"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "捲る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "捲る",
+            "reading": "めくる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to turn over",
+              "to turn (pages)",
+              "to leaf through (a book, etc.)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to tear off",
+              "to strip off",
+              "to take off",
+              "to pull off (e.g. a blanket)",
+              "to pull up (e.g. floorboards)",
+              "to tear up"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "捲る"
+  },
+  "あり": {
+    "results": [
+      {
+        "slug": "在る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n2",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "有る",
+            "reading": "ある"
+          },
+          {
+            "word": "在る",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to be",
+              "to exist",
+              "to live"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to have"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be located"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "或",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "或る",
+            "reading": "ある"
+          },
+          {
+            "word": "或",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "a certain ...",
+              "some ..."
+            ],
+            "parts_of_speech": [
+              "Pre-noun adjectival (rentaishi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "二-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "二",
+            "reading": "アル"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "two"
+            ],
+            "parts_of_speech": [
+              "Numeric"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "アル",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "アル"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "be",
+              "is"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "歩く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "歩く",
+            "reading": "あるく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to walk"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "有る"
+  },
+  "ましょ": {
+    "results": [
+      {
+        "slug": "増す",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani25"
+        ],
+        "japanese": [
+          {
+            "word": "増す",
+            "reading": "ます"
+          },
+          {
+            "word": "益す",
+            "reading": "ます"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to increase",
+              "to grow"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Intransitive verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "升",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [
+          "wanikani60"
+        ],
+        "japanese": [
+          {
+            "word": "升",
+            "reading": "ます"
+          },
+          {
+            "word": "枡",
+            "reading": "ます"
+          },
+          {
+            "word": "桝",
+            "reading": "ます"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "measuring container",
+              "measuring box",
+              "measure"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "box (seating at a theatre, etc.)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "square on a grid",
+              "cell of a grid"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "鱒",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "鱒",
+            "reading": "ます"
+          },
+          {
+            "word": "",
+            "reading": "マス"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "trout",
+              "sea trout"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "マス",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "マス"
+          },
+          {
+            "word": "",
+            "reading": "マッス"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "mass"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "mass (media, production, etc.)"
+            ],
+            "parts_of_speech": [
+              "Noun or verb acting prenominally"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Trout"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "マス-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "マス"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "masturbation"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "増す"
+  },
+  "取る": {
+    "results": [
+      {
+        "slug": "取り",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "取り",
+            "reading": "とり"
+          },
+          {
+            "word": "取",
+            "reading": "とり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "taking",
+              "taker",
+              "collecting",
+              "collector",
+              "remover",
+              "removal"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "last performer of the day (usu. the star performer)",
+              "last performance of the day"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "active partner (e.g. in judo demonstration)"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "取り-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "取り",
+            "reading": "どり"
+          },
+          {
+            "word": "取",
+            "reading": "どり"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "samurai receiving this much rice as a fee"
+            ],
+            "parts_of_speech": [
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "offering of rice cake containing this much rice"
+            ],
+            "parts_of_speech": [
+              "Noun, used as a suffix"
+            ]
+          },
+          {
+            "english_definitions": [
+              "person receiving this amount of money as a salary"
+            ],
+            "parts_of_speech": [
+              "Noun, used as a suffix"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "取引",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "取引",
+            "reading": "とりひき"
+          },
+          {
+            "word": "取り引き",
+            "reading": "とりひき"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "transactions",
+              "dealings",
+              "business"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Suru verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Trade"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "取り替える",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [
+          "wanikani27"
+        ],
+        "japanese": [
+          {
+            "word": "取り替える",
+            "reading": "とりかえる"
+          },
+          {
+            "word": "取り換える",
+            "reading": "とりかえる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to exchange",
+              "to swap",
+              "to barter",
+              "to trade"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to replace",
+              "to substitute"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "取り上げる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "取り上げる",
+            "reading": "とりあげる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pick up"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to adopt (a proposal)",
+              "to take up (a topic)",
+              "to accept",
+              "to listen to"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to take issue with",
+              "to make a problem of",
+              "to bring up (as a point of criticism)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "向かう": {
+    "results": [
+      {
+        "slug": "向かう",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "向かう",
+            "reading": "むかう"
+          },
+          {
+            "word": "向う",
+            "reading": "むかう"
+          },
+          {
+            "word": "対う",
+            "reading": "むかう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to face"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to go towards",
+              "to head towards"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "向かうところ敵無し",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "向かうところ敵無し",
+            "reading": "むかうところてきなし"
+          },
+          {
+            "word": "向かう所敵無し",
+            "reading": "むかうところてきなし"
+          },
+          {
+            "word": "向かう所敵なし",
+            "reading": "むかうところてきなし"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "unbeatable",
+              "invincible",
+              "irresistible"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun which may take the genitive case particle 'no'"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "向かう"
+  },
+  "聞こえる": {
+    "results": [
+      {
+        "slug": "聞こえる",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4"
+        ],
+        "tags": [
+          "wanikani12"
+        ],
+        "japanese": [
+          {
+            "word": "聞こえる",
+            "reading": "きこえる"
+          },
+          {
+            "word": "聞える",
+            "reading": "きこえる"
+          },
+          {
+            "word": "聴こえる",
+            "reading": "きこえる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to be heard",
+              "to be audible",
+              "to reach one's ears"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to sound (like)",
+              "to come across (as)"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be well known",
+              "to be famous"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "聞こえる"
+  },
+  "助ける": {
+    "results": [
+      {
+        "slug": "助け",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "助け",
+            "reading": "たすけ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "assistance",
+              "help",
+              "aid",
+              "support",
+              "reinforcement"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "助ける",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani8"
+        ],
+        "japanese": [
+          {
+            "word": "助ける",
+            "reading": "たすける"
+          },
+          {
+            "word": "援ける",
+            "reading": "たすける"
+          },
+          {
+            "word": "救ける",
+            "reading": "たすける"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to save",
+              "to rescue",
+              "to spare"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to help",
+              "to assist"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to support (financially)",
+              "to contribute (to)",
+              "to provide aid"
+            ],
+            "parts_of_speech": [
+              "Ichidan verb",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "助け合う",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "助け合う",
+            "reading": "たすけあう"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to help each other",
+              "to cooperate"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'u' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "助け船",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "助け舟",
+            "reading": "たすけぶね"
+          },
+          {
+            "word": "助け船",
+            "reading": "たすけぶね"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "lifeboat"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "friend in need",
+              "helping hand",
+              "timely help"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "助け出す",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "助け出す",
+            "reading": "たすけだす"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to help (someone) out of trouble",
+              "to rescue",
+              "to save"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'su' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "暗くて": {
+    "results": [
+      {
+        "slug": "暗い",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani13"
+        ],
+        "japanese": [
+          {
+            "word": "暗い",
+            "reading": "くらい"
+          },
+          {
+            "word": "昏い",
+            "reading": "くらい"
+          },
+          {
+            "word": "冥い",
+            "reading": "くらい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "dark",
+              "gloomy",
+              "murky"
+            ],
+            "parts_of_speech": [
+              "I-adjective (keiyoushi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "depressed",
+              "dispirited",
+              "down in the dumps",
+              "dark (mood)"
+            ],
+            "parts_of_speech": [
+              "I-adjective (keiyoushi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "dark (in colour)",
+              "dull"
+            ],
+            "parts_of_speech": [
+              "I-adjective (keiyoushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "暗い過去",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "暗い過去",
+            "reading": "くらいかこ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "shadowy past",
+              "murky past"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "暗い気持になる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "暗い気持ちになる",
+            "reading": "くらいきもちになる"
+          },
+          {
+            "word": "暗い気持になる",
+            "reading": "くらいきもちになる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to feel gloomy",
+              "to feel blue",
+              "to feel melancholy"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Godan verb with 'ru' ending"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51868fa4d5dda7b2c6011ff9",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "暗い日曜日",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Gloomy Sunday"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "518695dfd5dda7b2c603e9ac",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "暗い日曜日 (映画)",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Ein Lied von Liebe und Tod"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ありませんでした": {
+    "results": [
+      {
+        "slug": "在る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n2",
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "有る",
+            "reading": "ある"
+          },
+          {
+            "word": "在る",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to be",
+              "to exist",
+              "to live"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to have"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be located"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending (irregular verb)",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "或",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "或る",
+            "reading": "ある"
+          },
+          {
+            "word": "或",
+            "reading": "ある"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "a certain ...",
+              "some ..."
+            ],
+            "parts_of_speech": [
+              "Pre-noun adjectival (rentaishi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "二-1",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "二",
+            "reading": "アル"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "two"
+            ],
+            "parts_of_speech": [
+              "Numeric"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "アル",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "",
+            "reading": "アル"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "be",
+              "is"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "歩く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n5"
+        ],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "歩く",
+            "reading": "あるく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to walk"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "有る"
+  },
+  "包まれていました": {
+    "results": [
+      {
+        "slug": "包む",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n4",
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [
+          "wanikani41"
+        ],
+        "japanese": [
+          {
+            "word": "包む",
+            "reading": "つつむ"
+          },
+          {
+            "word": "裹む",
+            "reading": "つつむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to wrap up",
+              "to pack",
+              "to bundle",
+              "to do up"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cover",
+              "to envelop",
+              "to shroud",
+              "to engulf"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to conceal (a feeling)",
+              "to hide"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "包む-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "包む",
+            "reading": "くるむ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to wrap up (in)",
+              "to roll up (in)",
+              "to tuck (up)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'mu' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "包む"
+  },
+  "重い": {
+    "results": [
+      {
+        "slug": "重く用いる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "重く用いる",
+            "reading": "おもくもちいる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to give an important position"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Ichidan verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "重く用いる"
+  },
+  "届く": {
+    "results": [
+      {
+        "slug": "届く",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3"
+        ],
+        "tags": [
+          "wanikani24"
+        ],
+        "japanese": [
+          {
+            "word": "届く",
+            "reading": "とどく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to reach",
+              "to touch",
+              "to get to",
+              "to carry (of sound)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be delivered",
+              "to arrive"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to be attentive",
+              "to be scrupulous",
+              "to be thorough"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ku' ending",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "届く"
+  },
+  "し始めました": {
+    "results": [
+      {
+        "slug": "為る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n3",
+          "jlpt-n5"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "為る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to do",
+              "to carry out",
+              "to perform"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to cause to become",
+              "to make (into)",
+              "to turn (into)"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to serve as",
+              "to act as",
+              "to work as"
+            ],
+            "parts_of_speech": [
+              "Suru verb - included"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "刷る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "刷る",
+            "reading": "する"
+          },
+          {
+            "word": "摺る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to print"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to color or pattern fabric using a wooden mold"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "擦る-1",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "擦る",
+            "reading": "する"
+          },
+          {
+            "word": "擂る",
+            "reading": "する"
+          },
+          {
+            "word": "摩る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to rub",
+              "to chafe",
+              "to strike (match)",
+              "to file",
+              "to frost (glass)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to squander (one's money)",
+              "to run through (one's fortune)",
+              "to lose money (e.g. by gambling)"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "掏る",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "掏る",
+            "reading": "する"
+          },
+          {
+            "word": "",
+            "reading": "スる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to pickpocket",
+              "to steal"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "剃る",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n2",
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "剃る",
+            "reading": "そる"
+          },
+          {
+            "word": "剃る",
+            "reading": "する"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to shave"
+            ],
+            "parts_of_speech": [
+              "Godan verb with 'ru' ending",
+              "Transitive verb"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "為る"
+  },
+  "一": {
+    "results": [
+      {
+        "slug": "一歩",
+        "is_common": true,
+        "jlpt": [],
+        "tags": [
+          "wanikani6"
+        ],
+        "japanese": [
+          {
+            "word": "一歩",
+            "reading": "いっぽ"
+          },
+          {
+            "word": "１歩",
+            "reading": "いっぽ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "(a) step",
+              "one step"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Adverb (fukushi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "level",
+              "stage",
+              "step"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Adverb (fukushi)"
+            ]
+          },
+          {
+            "english_definitions": [
+              "small degree",
+              "small amount"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Adverb (fukushi)"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "一歩一歩",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "一歩一歩",
+            "reading": "いっぽいっぽ"
+          },
+          {
+            "word": "１歩１歩",
+            "reading": "いっぽいっぽ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "step by step",
+              "by degrees"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "一歩退く",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "一歩引く",
+            "reading": "いっぽひく"
+          },
+          {
+            "word": "一歩退く",
+            "reading": "いっぽひく"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to take a step backward",
+              "to retreat a step",
+              "to back up"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Godan verb with 'ku' ending"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "一歩下がる",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "一歩下がる",
+            "reading": "いっぽさがる"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "to take a step backward"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Godan verb with 'ru' ending"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to step back (i.e. to re-think something)",
+              "to distance oneself (from)",
+              "to take a back seat"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Godan verb with 'ru' ending"
+            ]
+          },
+          {
+            "english_definitions": [
+              "to behave humbly"
+            ],
+            "parts_of_speech": [
+              "Expressions (phrases, clauses, etc.)",
+              "Godan verb with 'ru' ending"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "一分金",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "一分金",
+            "reading": "いちぶきん"
+          },
+          {
+            "word": "一歩金",
+            "reading": "いちぶきん"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "ichibukin",
+              "Edo-period rectangular gold coin worth a quarter ryō"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          },
+          {
+            "english_definitions": [
+              "Ichibuban"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "到達": {
+    "results": [
+      {
+        "slug": "到達",
+        "is_common": true,
+        "jlpt": [
+          "jlpt-n1"
+        ],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "到達",
+            "reading": "とうたつ"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "reaching",
+              "attaining",
+              "arrival"
+            ],
+            "parts_of_speech": [
+              "Noun",
+              "Suru verb",
+              "Intransitive verb"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "到達性",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "到達性",
+            "reading": "とうたつせい"
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "reachability"
+            ],
+            "parts_of_speech": [
+              "Noun"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "51869ab0d5dda7b2c6062e46",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "到達不能コード",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Unreachable code"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "518690aed5dda7b2c6018a8b",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "到達不能極",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Pole of inaccessibility"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      },
+      {
+        "slug": "5186a0e7d5dda7b2c60921de",
+        "is_common": false,
+        "jlpt": [],
+        "tags": [],
+        "japanese": [
+          {
+            "word": "到達不能基数",
+            "reading": ""
+          }
+        ],
+        "senses": [
+          {
+            "english_definitions": [
+              "Inaccessible cardinal"
+            ],
+            "parts_of_speech": [
+              "Wikipedia definition"
+            ]
+          }
+        ]
+      }
+    ],
+    "deinflected": "到達"
   }
 };
