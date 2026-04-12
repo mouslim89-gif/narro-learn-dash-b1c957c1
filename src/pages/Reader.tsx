@@ -139,7 +139,7 @@ export default function Reader() {
             className="rounded p-2 text-muted-foreground active:scale-95"
             title="Grammar Notes"
           >
-            <Sparkles className="h-5 w-5" />
+            <BookType className="h-5 w-5" />
           </button>
           <button onClick={() => setShowSettings(!showSettings)} className="rounded p-2 active:scale-95">
             <Settings className="h-5 w-5" />
