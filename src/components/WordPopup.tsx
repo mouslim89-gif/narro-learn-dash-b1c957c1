@@ -14,6 +14,10 @@ import {
 
 interface WordPopupProps {
   word: string;
+  /** Dictionary form from Kuromoji (e.g. 行く for 行きました) */
+  baseForm?: string;
+  /** Part of speech from Kuromoji (e.g. "動詞/自立") */
+  pos?: string;
   onClose: () => void;
 }
 
@@ -70,6 +74,14 @@ function getConjugationLabel(original: string, deinflected: string | null | unde
   return `Dictionary form: ${baseForm}`;
 }
 
+/** Map Kuromoji POS string to Jisho-style parts_of_speech for conjugation table */
+function kuromojiPosToJisho(pos: string): string[] {
+  if (pos.startsWith('動詞')) return ['Verb'];
+  if (pos.startsWith('形容詞')) return ['I-adjective'];
+  if (pos.startsWith('形容動詞')) return ['Na-adjective'];
+  return [];
+}
+
 function LoadingSkeleton() {
   return (
     <div className="space-y-3 py-2">
@@ -83,13 +95,15 @@ function LoadingSkeleton() {
   );
 }
 
-export function WordPopup({ word, onClose }: WordPopupProps) {
+export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onClose }: WordPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
 
-  const cached = getCached(word);
+  // Try looking up the base form first (more likely to have dictionary entries)
+  const lookupKey = kuromojiBase || word;
+  const cached = getCached(word) || (kuromojiBase ? getCached(kuromojiBase) : undefined);
   const [loading, setLoading] = useState(!cached);
   const [result, setResult] = useState<JishoResult | null>(cached?.results?.[0] ?? null);
-  const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? null);
+  const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? kuromojiBase ?? null);
   const [error, setError] = useState(false);
 
   const wordId = word;
@@ -99,7 +113,7 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
     if (cached) {
       if (cached.results.length > 0) {
         setResult(cached.results[0]);
-        setDeinflected(cached.deinflected ?? null);
+        setDeinflected(cached.deinflected ?? kuromojiBase ?? null);
       } else {
         setError(true);
       }
@@ -111,29 +125,44 @@ export function WordPopup({ word, onClose }: WordPopupProps) {
     setLoading(true);
     setError(false);
 
-    lookupWord(word)
-      .then((entry: CacheEntry) => {
+    // Try base form first, then surface form
+    const tryLookup = async () => {
+      try {
+        let entry: CacheEntry | null = null;
+        if (kuromojiBase && kuromojiBase !== word) {
+          entry = await lookupWord(kuromojiBase);
+          if (entry.results.length > 0) {
+            if (!cancelled) {
+              setResult(entry.results[0]);
+              setDeinflected(kuromojiBase);
+            }
+            return;
+          }
+        }
+        entry = await lookupWord(word);
         if (!cancelled && entry.results.length > 0) {
           setResult(entry.results[0]);
-          setDeinflected(entry.deinflected ?? null);
+          setDeinflected(entry.deinflected ?? kuromojiBase ?? null);
         } else if (!cancelled) {
           setError(true);
         }
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) setError(true);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    };
+    tryLookup();
 
     return () => { cancelled = true; };
-  }, [word, cached]);
+  }, [word, kuromojiBase, cached]);
 
   const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
   const dictForm = result?.japanese[0]?.word || deinflected || word;
-  const allPartsOfSpeech = result?.senses?.flatMap(s => s.parts_of_speech) || [];
+  // Use Kuromoji POS if available, otherwise fall back to Jisho POS
+  const allPartsOfSpeech = result?.senses?.flatMap(s => s.parts_of_speech) || 
+    (kuromojiPos ? kuromojiPosToJisho(kuromojiPos) : []);
   const wordType = getWordType(allPartsOfSpeech);
 
   const handleSave = () => {
