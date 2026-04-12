@@ -165,6 +165,14 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
           continue;
         }
         
+        // Merge te-form particle after adjective (嬉しくて → 嬉しい)
+        if (isTeFormParticle(next) && kt.pos === '形容詞') {
+          text += next.surface_form;
+          if (next.reading && next.reading !== '*') reading += next.reading;
+          j++;
+          continue;
+        }
+        
         // Merge suffix nouns (接尾)
         if (next.pos === '名詞' && next.pos_detail_1 === '接尾') {
           text += next.surface_form;
