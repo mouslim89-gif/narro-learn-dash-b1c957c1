@@ -1,24 +1,31 @@
 
 
-## Fix: Merge adjective te-forms (嬉しくて) into single tokens
+## Fix: Eliminate API calls by adding base-form keys to dictionary
 
-### Problem
-Kuromoji splits `嬉しくて` into two morphemes: `嬉しく` (形容詞) + `て` (接続助詞). The current merge logic only absorbs `て` when it's followed by a dependent verb or auxiliary (like `ている`). For adjective te-forms, `て` is left as a separate token.
+### Root cause
+The pre-baked dictionary (`book-dictionary.ts`) is keyed only by **surface forms** (e.g. `住んで`, `作って`, `大き`). But the WordPopup looks up words by both the **surface text** of the merged token (e.g. `住んでいました`) and the **base form** from Kuromoji (e.g. `住む`).
 
-This means:
-- `嬉しくて` appears as two clickable words instead of one
-- The base form `嬉しい` is harder to reach since only `嬉しく` is shown
+Neither matches:
+- The merged surface `住んでいました` doesn't exist as a key (only `住んで` does)
+- The base form `住む` doesn't exist as a key either
+
+So every click triggers an API call, causing the loading spinner.
 
 ### Fix
 
-**1. `scripts/generate-tokens.ts`** — Add a merge rule in `mergeTokens()`
-- After the existing te-form merge rule (line ~160), add: if the **head word** is an adjective (形容詞) and the next token is a te-form particle (`て`/`で`), merge it unconditionally
-- This produces `嬉しくて` as a single token with base form `嬉しい`
+**1. `scripts/generate-tokens.ts`** — When generating the dictionary, add entries for **both** the surface form AND the base form of every token. For merged tokens, also add the merged surface as a key.
 
-**2. Regenerate `src/data/book-tokens.ts`**
-- Re-run `npx tsx scripts/generate-tokens.ts` to produce updated tokens
+Specifically, for each token:
+- Keep the existing surface-form key (e.g. `住んで`)
+- Add the base form as a key too (e.g. `住む`) — looked up via Jisho at build time
+- Add the merged token surface as a key (e.g. `住んでいました`) pointing to the same entry
+
+**2. Regenerate `src/data/book-dictionary.ts`** with the expanded keys.
+
+### Result
+`getCached(word)` or `getCached(kuromojiBase)` will always hit, so WordPopup renders instantly with no loading state and zero API calls during reading.
 
 ### Files to modify
-1. `scripts/generate-tokens.ts` — Add adjective + て merge rule
-2. `src/data/book-tokens.ts` — Regenerated output
+1. `scripts/generate-tokens.ts` — Add base-form and merged-surface dictionary keys
+2. `src/data/book-dictionary.ts` — Regenerated output
 
