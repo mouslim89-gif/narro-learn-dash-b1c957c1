@@ -5,6 +5,8 @@ interface FuriganaWordProps {
   text: string;
   /** Pre-computed reading from Kuromoji (hiragana) */
   reading?: string;
+  /** Optional color class for grammar color mode */
+  colorClass?: string;
   onClick: (e: MouseEvent<HTMLSpanElement>) => void;
 }
 
@@ -269,7 +271,7 @@ function segmentsFromReading(text: string, reading: string): FuriganaSegment[] |
 }
 
 export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(function FuriganaWord(
-  { text, reading, onClick },
+  { text, reading, colorClass, onClick },
   ref
 ) {
   // Try pre-computed reading first, then fall back to Jisho cache
@@ -285,7 +287,7 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
     <span
       ref={ref}
       onClick={onClick}
-      className="cursor-pointer rounded px-px transition-colors active:bg-accent/10"
+      className={`cursor-pointer rounded px-px transition-colors active:bg-accent/10 ${colorClass || ''}`}
     >
       {segments
         ? segments.map((segment, index) =>
