@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { seedCache } from '@/lib/jisho';
@@ -11,7 +11,7 @@ import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, type FontSize } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode } from '@/stores/reading-progress';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
@@ -19,7 +19,7 @@ const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', larg
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
