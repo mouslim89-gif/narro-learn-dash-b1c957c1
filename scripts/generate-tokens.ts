@@ -207,6 +207,12 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
         break;
       }
       
+      // Apply reading overrides for merged surface form
+      const mergedOverride = READING_OVERRIDES[text];
+      if (mergedOverride) {
+        reading = mergedOverride;
+      }
+
       const token: OutputToken = {
         t: text,
         j: true,
