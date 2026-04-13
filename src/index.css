@@ -115,3 +115,10 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+/* Subtle tap feedback for reader words */
+@keyframes word-tap {
+  0% { background-color: transparent; }
+  50% { background-color: hsl(var(--accent) / 0.1); }
+  100% { background-color: transparent; }
+}
