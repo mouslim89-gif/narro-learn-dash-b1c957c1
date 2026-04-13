@@ -1,47 +1,39 @@
 
 
-## Improve Reader text presentation and fix furigana errors
+## Improve Reader text presentation for mobile
 
-### 1. Text presentation improvements
+### Current issues
+1. **Underline on every clickable word** — `underline decoration-accent/30 decoration-1 underline-offset-4` on both `FuriganaWord` and inline spans creates visual noise. Every single word is underlined, making it feel like a hyperlink farm instead of a reading experience.
+2. **No visual distinction between tapped and untapped** — the underline is always present regardless of interaction.
+3. **Padding/spacing too tight for mobile** — `px-6` on a 360px screen leaves little breathing room, and the warm background doesn't contrast enough with the card.
+4. **Active/hover states designed for desktop** — `hover:bg-accent/15` and `active:scale-95` feel off on mobile touch.
+5. **Article background blends with page** — no card-like container to frame the reading area on mobile.
 
-**Problem:** The entire story renders as a single block of text with no visual breaks, making it hard to read.
+### Plan
 
-**Changes to `src/pages/Reader.tsx`:**
-- Group sentences into visual paragraphs (every 3-4 sentences, or split on dialogue markers like 「」)
-- Add `mb-6` spacing between paragraph groups
-- Add first-line indent (`text-indent: 1em`) for Japanese typographic convention
-- Improve line height: use `leading-[2.8]` with furigana instead of `leading-[3.2]` (less wasted space)
-- Add subtle `text-justify` for even character distribution
-- Wrap the article in a warmer background card on mobile for a book-like feel
+**1. `src/components/FuriganaWord.tsx`** — Remove persistent underline
+- Replace `underline decoration-accent/30 decoration-1 underline-offset-4` with a subtle bottom border only on active tap: `border-b border-transparent active:border-accent/40`
+- Add a gentle `active:bg-accent/8` highlight instead of hover styles
+- Remove `hover:bg-accent/15 hover:text-accent` (not useful on mobile)
 
-**Changes to `src/components/FuriganaWord.tsx`:**
-- Reduce furigana font size from `text-[0.5em]` to `text-[0.45em]` for less visual noise
-- Adjust `rt` positioning to sit closer to the base text
+**2. `src/pages/Reader.tsx`** — Improve the non-furigana word spans
+- Same treatment: remove persistent underline, use `active:bg-accent/10 rounded-sm` for tap feedback
+- Reduce article padding on mobile: `px-5 sm:px-6`
+- Add a soft card wrapper around the article on mobile with slightly different background (`bg-white dark:bg-card rounded-2xl shadow-sm mx-3 my-4`)
+- Improve line height for non-furigana mode: add `leading-relaxed` (currently no leading class when furigana is off)
+- Remove `text-justify` — it creates uneven spacing with Japanese characters on narrow screens; use default alignment
 
-### 2. Fix incorrect furigana readings
+**3. `src/index.css`** — Add a subtle word-tap animation
+- Add a quick `@keyframes word-tap` pulse for tactile feedback on mobile
 
-**Changes to `scripts/generate-tokens.ts`:**
-- Add a reading override map for known Kuromoji mistakes:
-  - `二人` → `ふたり` (when used as a standalone word, not counter)
-  - `或る` → `ある`
-  - `翁` → `おきな`
-  - `処` (when POS is noun and context suggests `ところ`) → `ところ`
-- Fix `きび団子` tokenization: add merge rule for `き` + `び` when followed by `団子`, producing a single `きび団子` token
-
-**Regenerate `src/data/book-tokens.ts`** with corrected readings.
-
-### 3. Paragraph splitting logic
-
-In `Reader.tsx`, the sentence array will be grouped into paragraphs using these rules:
-- Start a new paragraph after a closing `」` (end of dialogue)
-- Start a new paragraph before an opening `「` (start of dialogue)
-- Otherwise, group every 3-4 sentences
-
-This produces natural paragraph breaks without modifying the underlying book data.
+### Result
+- Clean, book-like reading surface without visual clutter
+- Words are still tappable but don't scream "clickable" — tap feedback only appears on touch
+- Better mobile spacing and card framing
+- More readable line height in both furigana and non-furigana modes
 
 ### Files to modify
-1. `src/pages/Reader.tsx` — Paragraph grouping, spacing, typography
-2. `src/components/FuriganaWord.tsx` — Furigana sizing
-3. `scripts/generate-tokens.ts` — Reading overrides and きび merge rule
-4. `src/data/book-tokens.ts` — Regenerated with fixes
+1. `src/components/FuriganaWord.tsx` — Remove underline, add tap-only feedback
+2. `src/pages/Reader.tsx` — Card wrapper, spacing, remove underline from inline spans
+3. `src/index.css` — Optional tap animation keyframe
 
