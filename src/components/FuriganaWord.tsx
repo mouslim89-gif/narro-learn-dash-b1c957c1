@@ -293,7 +293,7 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
               <ruby key={`${segment.text}-${index}`}>
                 {segment.text}
                 <rp>(</rp>
-                <rt className="text-[0.5em] font-normal text-muted-foreground">{segment.reading}</rt>
+                <rt className="text-[0.45em] font-normal text-muted-foreground leading-none">{segment.reading}</rt>
                 <rp>)</rp>
               </ruby>
             ) : (

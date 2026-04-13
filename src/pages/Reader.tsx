@@ -62,6 +62,38 @@ export default function Reader() {
     return result;
   }, [tokens]);
 
+  // Group sentences into visual paragraphs
+  const paragraphs = useMemo(() => {
+    const groups: { tokens: BookToken[] }[][] = [];
+    let current: { tokens: BookToken[] }[] = [];
+
+    sentences.forEach((sentence) => {
+      const text = sentence.tokens.map((t) => t.t).join('');
+      const startsDialogue = text.startsWith('「') || text.startsWith('『');
+      const endsDialogue = text.includes('」') || text.includes('』');
+
+      // Start new paragraph before dialogue
+      if (startsDialogue && current.length > 0) {
+        groups.push(current);
+        current = [];
+      }
+
+      current.push(sentence);
+
+      // Start new paragraph after dialogue ends
+      if (endsDialogue) {
+        groups.push(current);
+        current = [];
+      } else if (current.length >= 3 && !startsDialogue) {
+        groups.push(current);
+        current = [];
+      }
+    });
+
+    if (current.length > 0) groups.push(current);
+    return groups;
+  }, [sentences]);
+
   useEffect(() => {
     restoredScroll.current = false;
     seedCache(bookDictionary);
