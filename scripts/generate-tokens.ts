@@ -62,6 +62,14 @@ function katakanaToHiragana(str: string): string {
   );
 }
 
+// Reading overrides for known Kuromoji mistakes
+const READING_OVERRIDES: Record<string, string> = {
+  '二人': 'ふたり',
+  '或る': 'ある',
+  '翁': 'おきな',
+  '処': 'ところ',
+};
+
 const CONTENT_POS = new Set(['名詞', '動詞', '形容詞', '形容動詞', '副詞', '連体詞', '接続詞', '感動詞', '接頭詞', 'フィラー']);
 
 function isContentWord(kt: KToken): boolean {
