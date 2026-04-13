@@ -140,8 +140,12 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
 
     // Content word (independent) → start a group, merge following dependents
     if (isContentWord(kt) && isIndependent(kt)) {
+      // Apply reading overrides for known Kuromoji mistakes
+      const overrideReading = READING_OVERRIDES[kt.surface_form];
       let text = kt.surface_form;
-      let reading = kt.reading && kt.reading !== '*' ? kt.reading : '';
+      let reading = overrideReading
+        ? katakanaToHiragana(overrideReading)
+        : (kt.reading && kt.reading !== '*' ? kt.reading : '');
       const baseForm = kt.basic_form && kt.basic_form !== '*' ? kt.basic_form : kt.surface_form;
       const pos = kt.pos + (kt.pos_detail_1 !== '*' ? '/' + kt.pos_detail_1 : '');
       
