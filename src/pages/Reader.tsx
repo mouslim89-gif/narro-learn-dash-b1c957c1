@@ -223,8 +223,8 @@ export default function Reader() {
       )}
 
       <Progress value={scrollPercent} className="h-0.5 rounded-none" />
-      <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-        <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : ''}`} style={{ textAlign: 'justify' }}>
+      <article ref={articleRef} className="mx-3 my-4 rounded-2xl bg-white shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl sm:rounded-none sm:bg-transparent sm:shadow-none sm:dark:bg-transparent">
+        <div className={`font-japanese tracking-wide px-5 py-8 sm:px-6 sm:py-10 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : 'leading-relaxed'}`}>
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6" style={{ textIndent: '1em' }}>
               {paragraph.map((sentence, sIdx) => {
@@ -255,7 +255,7 @@ export default function Reader() {
                         <span
                           key={i}
                           onClick={handleClick}
-                          className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                          className="cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10"
                         >
                           {token.t}
                         </span>

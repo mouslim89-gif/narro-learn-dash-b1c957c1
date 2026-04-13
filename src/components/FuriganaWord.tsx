@@ -285,7 +285,7 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
     <span
       ref={ref}
       onClick={onClick}
-      className="cursor-pointer rounded px-px transition-colors hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+      className="cursor-pointer rounded px-px transition-colors active:bg-accent/10"
     >
       {segments
         ? segments.map((segment, index) =>
