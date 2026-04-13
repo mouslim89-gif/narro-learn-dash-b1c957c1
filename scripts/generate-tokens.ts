@@ -192,6 +192,17 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
           j++;
           continue;
         }
+
+        // Merge compound nouns like きび+団子
+        if (next.pos === '名詞' && next.pos_detail_1 === '一般' && kt.pos === '名詞' && text.length <= 3) {
+          const compound = text + next.surface_form;
+          if (compound === 'きび団子') {
+            text = compound;
+            if (next.reading && next.reading !== '*') reading += next.reading;
+            j++;
+            continue;
+          }
+        }
         
         break;
       }
