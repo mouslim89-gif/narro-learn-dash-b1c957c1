@@ -252,6 +252,37 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
     i++;
   }
 
+  // Post-process: merge known compound words that Kuromoji splits incorrectly
+  return postMergeCompounds(result);
+}
+
+/** Merge adjacent tokens that form known compound words */
+function postMergeCompounds(tokens: OutputToken[]): OutputToken[] {
+  const COMPOUNDS: Record<string, { reading: string; pos: string }> = {
+    'きび団子': { reading: 'きびだんご', pos: '名詞/一般' },
+  };
+
+  const result: OutputToken[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    let merged = false;
+    // Try merging 2-3 consecutive tokens
+    for (let len = 3; len >= 2; len--) {
+      if (i + len > tokens.length) continue;
+      const combined = tokens.slice(i, i + len).map(t => t.t).join('');
+      if (COMPOUNDS[combined]) {
+        const { reading, pos } = COMPOUNDS[combined];
+        result.push({ t: combined, j: true, r: reading, p: pos });
+        i += len;
+        merged = true;
+        break;
+      }
+    }
+    if (!merged) {
+      result.push(tokens[i]);
+      i++;
+    }
+  }
   return result;
 }
 
