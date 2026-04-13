@@ -1,49 +1,47 @@
 
 
-## Text presentation modes for the Reader
+## Ajouter la lecture audio TTS pour les mots japonais
 
-### Idea
+### Approche
 
-Add a "Display Mode" selector in the reader settings with these modes:
+Créer une edge function `tts-japanese` qui appelle l'API Google Cloud Text-to-Speech, et un composant `PlayWordButton` réutilisable affiché dans la WordPopup, la page Dictionnaire et les Flashcards.
 
-1. **Normal** (default) — Current clean, book-like presentation. No color coding.
-2. **Grammar Colors** — Color-code each word by its grammatical role using the existing POS data (`token.p`):
-   - **Verbs** (動詞) → teal/primary
-   - **Nouns** (名詞) → coral/accent  
-   - **Adjectives** (形容詞) → purple/secondary
-   - **Particles** (助詞) → muted gray with slight opacity
-   - **Adverbs** (副詞) → amber/warm
-   - **Other** → default text color
-   
-   A small legend appears at the top of the reading area showing the color mapping.
+### Prérequis
 
-3. **JLPT Focus** — (future idea, would require JLPT level data per word — skip for now unless you want it)
+Une clé API Google Cloud avec l'API Text-to-Speech activée. Tu devras la fournir via l'interface Lovable.
 
-### Why it works
+### Plan technique
 
-Every token already carries `p` (part of speech from Kuromoji), e.g. `"動詞/自立"`, `"名詞/固有名詞"`, `"助詞/格助詞"`. We just need to map the first segment to a color class.
+**1. Secret API (`GOOGLE_TTS_API_KEY`)**
+- Demander la clé via l'outil `add_secret` avant de coder
 
-### Technical plan
+**2. Edge function `supabase/functions/tts-japanese/index.ts`**
+- Accepte `{ text: string }` en POST (le mot ou sa lecture en kana)
+- Appelle `https://texttospeech.googleapis.com/v1/text:synthesize` avec voix `ja-JP-Neural2-B` (femme naturelle)
+- Retourne l'audio en base64 (`audioContent`) avec CORS
+- Validation Zod du body, limite text à 100 caractères max
+- Cache-Control header pour éviter les appels répétés côté navigateur
 
-**1. New type and store update (`src/stores/reading-progress.ts`)**
-- Add `DisplayMode = 'normal' | 'grammar'` type
-- Add `displayMode` state + `setDisplayMode` action (persisted, default `'normal'`)
+**3. Composant `src/components/PlayWordButton.tsx`**
+- Bouton icône `Volume2` compact (24x24)
+- Au tap : appelle l'edge function, décode le base64, joue via `Audio()` API
+- États : idle → loading (spinner) → playing (icône animée)
+- Cache en mémoire (Map) pour ne pas re-fetcher un mot déjà joué
 
-**2. Color mapping utility (new file `src/lib/pos-colors.ts`)**
-- Function `getPosColorClass(pos?: string): string` that maps POS prefix to a Tailwind text color class
-- Mapping: 動詞 → `text-teal-600 dark:text-teal-400`, 名詞 → `text-rose-500 dark:text-rose-400`, 形容詞 → `text-violet-500 dark:text-violet-400`, 助詞 → `text-slate-400`, 副詞 → `text-amber-600 dark:text-amber-400`
+**4. Intégration dans `src/components/WordPopup.tsx`**
+- Ajouter `PlayWordButton` à côté du titre du mot (reading en kana)
 
-**3. Reader UI (`src/pages/Reader.tsx`)**
-- Add a "Display Mode" toggle in the settings panel (Normal / Grammar Colors)
-- When `grammar` mode is active, pass POS to token spans and apply color classes
-- Show a compact color legend below the settings or at the top of the article
+**5. Intégration dans `src/pages/Dictionary.tsx`**
+- Ajouter `PlayWordButton` sur chaque résultat, à côté du mot
 
-**4. FuriganaWord (`src/components/FuriganaWord.tsx`)**
-- Accept an optional `colorClass` prop and apply it to the rendered text
+**6. Intégration dans `src/pages/Flashcards.tsx`**
+- Liste : `PlayWordButton` à côté de chaque mot sauvegardé
+- Mode review : `PlayWordButton` sur la face avant de la carte
 
-### Files to create/modify
-1. `src/lib/pos-colors.ts` — New: POS-to-color mapping
-2. `src/stores/reading-progress.ts` — Add `displayMode` state
-3. `src/pages/Reader.tsx` — Display mode toggle + apply colors + legend
-4. `src/components/FuriganaWord.tsx` — Accept and apply `colorClass` prop
+### Fichiers à créer/modifier
+1. `supabase/functions/tts-japanese/index.ts` — Nouvelle edge function
+2. `src/components/PlayWordButton.tsx` — Nouveau composant réutilisable
+3. `src/components/WordPopup.tsx` — Ajout du bouton play
+4. `src/pages/Dictionary.tsx` — Ajout du bouton play par résultat
+5. `src/pages/Flashcards.tsx` — Ajout du bouton play dans liste et review
 
