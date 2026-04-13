@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { Difficulty } from '@/data/books';
 
 export type FontSize = 'small' | 'medium' | 'large';
+export type WritingMode = 'horizontal' | 'vertical';
 
 export interface ReadingProgress {
   difficulty: Difficulty;
@@ -15,11 +16,13 @@ interface ReadingProgressState {
   fontSize: FontSize;
   readerDarkMode: boolean;
   showFurigana: boolean;
+  writingMode: WritingMode;
   updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
   getProgress: (bookId: string) => ReadingProgress | undefined;
   setFontSize: (size: FontSize) => void;
   setReaderDarkMode: (dark: boolean) => void;
   setShowFurigana: (show: boolean) => void;
+  setWritingMode: (mode: WritingMode) => void;
 }
 
 export const fontSizeMap: Record<FontSize, string> = {
@@ -35,6 +38,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       fontSize: 'medium',
       readerDarkMode: false,
       showFurigana: false,
+      writingMode: 'horizontal' as WritingMode,
       updateProgress: (bookId, difficulty, percent) =>
         set((state) => ({
           progress: {
@@ -50,6 +54,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setFontSize: (fontSize) => set({ fontSize }),
       setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
       setShowFurigana: (showFurigana) => set({ showFurigana }),
+      setWritingMode: (writingMode) => set({ writingMode }),
     }),
     { name: 'reading-progress' }
   )
