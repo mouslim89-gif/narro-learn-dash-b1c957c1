@@ -224,40 +224,47 @@ export default function Reader() {
 
       <Progress value={scrollPercent} className="h-0.5 rounded-none" />
       <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-        <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
-          {sentences.map((sentence, sIdx) => (
-            <span
-              key={sIdx}
-              onClick={() => setActiveSentence(activeSentence === sIdx ? null : sIdx)}
-              className={`transition-colors duration-200 ${
-                activeSentence === sIdx ? 'bg-accent/10 rounded' : ''
-              }`}
-            >
-              {sentence.tokens.map((token, i) => {
-                if (!token.j) {
-                  return <span key={i}>{token.t}</span>;
-                }
-
-                const handleClick = (e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
-                };
-
-                if (showFurigana) {
-                  return <FuriganaWord key={i} text={token.t} reading={token.r} onClick={handleClick} />;
-                }
-
+        <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : ''}`} style={{ textAlign: 'justify' }}>
+          {paragraphs.map((paragraph, pIdx) => (
+            <p key={pIdx} className="mb-6" style={{ textIndent: '1em' }}>
+              {paragraph.map((sentence, sIdx) => {
+                const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 return (
                   <span
-                    key={i}
-                    onClick={handleClick}
-                    className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                    key={sIdx}
+                    onClick={() => setActiveSentence(activeSentence === globalIdx ? null : globalIdx)}
+                    className={`transition-colors duration-200 ${
+                      activeSentence === globalIdx ? 'bg-accent/10 rounded' : ''
+                    }`}
                   >
-                    {token.t}
+                    {sentence.tokens.map((token, i) => {
+                      if (!token.j) {
+                        return <span key={i}>{token.t}</span>;
+                      }
+
+                      const handleClick = (e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
+                      };
+
+                      if (showFurigana) {
+                        return <FuriganaWord key={i} text={token.t} reading={token.r} onClick={handleClick} />;
+                      }
+
+                      return (
+                        <span
+                          key={i}
+                          onClick={handleClick}
+                          className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                        >
+                          {token.t}
+                        </span>
+                      );
+                    })}
                   </span>
                 );
               })}
-            </span>
+            </p>
           ))}
         </div>
       </article>
