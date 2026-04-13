@@ -62,6 +62,38 @@ export default function Reader() {
     return result;
   }, [tokens]);
 
+  // Group sentences into visual paragraphs
+  const paragraphs = useMemo(() => {
+    const groups: { tokens: BookToken[] }[][] = [];
+    let current: { tokens: BookToken[] }[] = [];
+
+    sentences.forEach((sentence) => {
+      const text = sentence.tokens.map((t) => t.t).join('');
+      const startsDialogue = text.startsWith('「') || text.startsWith('『');
+      const endsDialogue = text.includes('」') || text.includes('』');
+
+      // Start new paragraph before dialogue
+      if (startsDialogue && current.length > 0) {
+        groups.push(current);
+        current = [];
+      }
+
+      current.push(sentence);
+
+      // Start new paragraph after dialogue ends
+      if (endsDialogue) {
+        groups.push(current);
+        current = [];
+      } else if (current.length >= 3 && !startsDialogue) {
+        groups.push(current);
+        current = [];
+      }
+    });
+
+    if (current.length > 0) groups.push(current);
+    return groups;
+  }, [sentences]);
+
   useEffect(() => {
     restoredScroll.current = false;
     seedCache(bookDictionary);
@@ -192,40 +224,47 @@ export default function Reader() {
 
       <Progress value={scrollPercent} className="h-0.5 rounded-none" />
       <article ref={articleRef} className="mx-auto max-w-2xl px-6 py-10">
-        <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[3.2]' : ''}`}>
-          {sentences.map((sentence, sIdx) => (
-            <span
-              key={sIdx}
-              onClick={() => setActiveSentence(activeSentence === sIdx ? null : sIdx)}
-              className={`transition-colors duration-200 ${
-                activeSentence === sIdx ? 'bg-accent/10 rounded' : ''
-              }`}
-            >
-              {sentence.tokens.map((token, i) => {
-                if (!token.j) {
-                  return <span key={i}>{token.t}</span>;
-                }
-
-                const handleClick = (e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
-                };
-
-                if (showFurigana) {
-                  return <FuriganaWord key={i} text={token.t} reading={token.r} onClick={handleClick} />;
-                }
-
+        <div className={`font-japanese tracking-wide ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : ''}`} style={{ textAlign: 'justify' }}>
+          {paragraphs.map((paragraph, pIdx) => (
+            <p key={pIdx} className="mb-6" style={{ textIndent: '1em' }}>
+              {paragraph.map((sentence, sIdx) => {
+                const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 return (
                   <span
-                    key={i}
-                    onClick={handleClick}
-                    className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                    key={sIdx}
+                    onClick={() => setActiveSentence(activeSentence === globalIdx ? null : globalIdx)}
+                    className={`transition-colors duration-200 ${
+                      activeSentence === globalIdx ? 'bg-accent/10 rounded' : ''
+                    }`}
                   >
-                    {token.t}
+                    {sentence.tokens.map((token, i) => {
+                      if (!token.j) {
+                        return <span key={i}>{token.t}</span>;
+                      }
+
+                      const handleClick = (e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
+                      };
+
+                      if (showFurigana) {
+                        return <FuriganaWord key={i} text={token.t} reading={token.r} onClick={handleClick} />;
+                      }
+
+                      return (
+                        <span
+                          key={i}
+                          onClick={handleClick}
+                          className="cursor-pointer rounded px-0.5 py-1 transition-all active:scale-95 active:bg-accent/20 hover:bg-accent/15 hover:text-accent underline decoration-accent/30 decoration-1 underline-offset-4"
+                        >
+                          {token.t}
+                        </span>
+                      );
+                    })}
                   </span>
                 );
               })}
-            </span>
+            </p>
           ))}
         </div>
       </article>

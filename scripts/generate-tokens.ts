@@ -62,6 +62,14 @@ function katakanaToHiragana(str: string): string {
   );
 }
 
+// Reading overrides for known Kuromoji mistakes
+const READING_OVERRIDES: Record<string, string> = {
+  '二人': 'ふたり',
+  '或る': 'ある',
+  '翁': 'おきな',
+  '処': 'ところ',
+};
+
 const CONTENT_POS = new Set(['名詞', '動詞', '形容詞', '形容動詞', '副詞', '連体詞', '接続詞', '感動詞', '接頭詞', 'フィラー']);
 
 function isContentWord(kt: KToken): boolean {
@@ -132,8 +140,12 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
 
     // Content word (independent) → start a group, merge following dependents
     if (isContentWord(kt) && isIndependent(kt)) {
+      // Apply reading overrides for known Kuromoji mistakes
+      const overrideReading = READING_OVERRIDES[kt.surface_form];
       let text = kt.surface_form;
-      let reading = kt.reading && kt.reading !== '*' ? kt.reading : '';
+      let reading = overrideReading
+        ? katakanaToHiragana(overrideReading)
+        : (kt.reading && kt.reading !== '*' ? kt.reading : '');
       const baseForm = kt.basic_form && kt.basic_form !== '*' ? kt.basic_form : kt.surface_form;
       const pos = kt.pos + (kt.pos_detail_1 !== '*' ? '/' + kt.pos_detail_1 : '');
       
@@ -180,10 +192,27 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
           j++;
           continue;
         }
+
+        // Merge compound nouns like きび+団子
+        if (next.pos === '名詞' && next.pos_detail_1 === '一般' && kt.pos === '名詞' && text.length <= 3) {
+          const compound = text + next.surface_form;
+          if (compound === 'きび団子') {
+            text = compound;
+            if (next.reading && next.reading !== '*') reading += next.reading;
+            j++;
+            continue;
+          }
+        }
         
         break;
       }
       
+      // Apply reading overrides for merged surface form
+      const mergedOverride = READING_OVERRIDES[text];
+      if (mergedOverride) {
+        reading = mergedOverride;
+      }
+
       const token: OutputToken = {
         t: text,
         j: true,
@@ -223,6 +252,37 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
     i++;
   }
 
+  // Post-process: merge known compound words that Kuromoji splits incorrectly
+  return postMergeCompounds(result);
+}
+
+/** Merge adjacent tokens that form known compound words */
+function postMergeCompounds(tokens: OutputToken[]): OutputToken[] {
+  const COMPOUNDS: Record<string, { reading: string; pos: string }> = {
+    'きび団子': { reading: 'きびだんご', pos: '名詞/一般' },
+  };
+
+  const result: OutputToken[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    let merged = false;
+    // Try merging 2-3 consecutive tokens
+    for (let len = 3; len >= 2; len--) {
+      if (i + len > tokens.length) continue;
+      const combined = tokens.slice(i, i + len).map(t => t.t).join('');
+      if (COMPOUNDS[combined]) {
+        const { reading, pos } = COMPOUNDS[combined];
+        result.push({ t: combined, j: true, r: reading, p: pos });
+        i += len;
+        merged = true;
+        break;
+      }
+    }
+    if (!merged) {
+      result.push(tokens[i]);
+      i++;
+    }
+  }
   return result;
 }
 
