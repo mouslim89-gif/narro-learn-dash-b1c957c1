@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PlayWordButton } from '@/components/PlayWordButton';
 import { Progress } from '@/components/ui/progress';
 
 export default function Flashcards() {
@@ -54,6 +55,7 @@ export default function Flashcards() {
             <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg">
               <p className="font-japanese text-5xl font-bold">{card.word}</p>
               <p className="font-japanese mt-2 text-lg text-muted-foreground">{card.reading}</p>
+              <PlayWordButton text={card.reading || card.word} size="md" className="mt-2" />
               <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
             </div>
             {/* Back */}
@@ -167,7 +169,10 @@ export default function Flashcards() {
                 <div className="flex items-center gap-3">
                   <div className={`h-2 w-2 rounded-full ${masteryColor}`} />
                   <div>
-                    <p className="font-japanese text-lg font-bold">{word.word}</p>
+                    <div className="flex items-center gap-1">
+                      <p className="font-japanese text-lg font-bold">{word.word}</p>
+                      <PlayWordButton text={word.reading || word.word} />
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {word.reading} — {word.meanings.join(', ')}
                     </p>

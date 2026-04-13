@@ -11,6 +11,7 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from '@/components/ui/drawer';
+import { PlayWordButton } from '@/components/PlayWordButton';
 
 interface WordPopupProps {
   word: string;
@@ -186,8 +187,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onCl
           <DrawerTitle className="font-japanese text-3xl font-bold">
             {result ? (result.japanese[0]?.word || word) : word}
           </DrawerTitle>
-          <DrawerDescription className="font-japanese text-base">
+          <DrawerDescription className="font-japanese text-base flex items-center gap-1">
             {result?.japanese[0]?.reading || ''}
+            {(result?.japanese[0]?.reading || result?.japanese[0]?.word || word) && (
+              <PlayWordButton text={result?.japanese[0]?.reading || result?.japanese[0]?.word || word} />
+            )}
           </DrawerDescription>
         </DrawerHeader>
 
