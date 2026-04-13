@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround, Palette } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { seedCache } from '@/lib/jisho';
@@ -11,7 +11,8 @@ import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode, type DisplayMode } from '@/stores/reading-progress';
+import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
@@ -19,7 +20,7 @@ const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', larg
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode, displayMode, setDisplayMode } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -235,10 +236,38 @@ export default function Reader() {
               </button>
             ))}
           </div>
+
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Display Mode</p>
+          <div className="flex gap-2">
+            {(['normal', 'grammar'] as DisplayMode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => setDisplayMode(m)}
+                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                  m === displayMode ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                }`}
+              >
+                {m === 'grammar' && <Palette className="h-3 w-3" />}
+                {m === 'normal' ? 'Normal' : 'Grammar'}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       <Progress value={scrollPercent} className="h-0.5 rounded-none" />
+
+      {displayMode === 'grammar' && (
+        <div className="mx-3 mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl">
+          {LEGEND.map((item) => (
+            <span key={item.category} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <span className={`inline-block h-2.5 w-2.5 rounded-full ${item.color}`} />
+              {item.label}
+            </span>
+          ))}
+        </div>
+      )}
+
       <article ref={articleRef} className={`mx-3 my-4 rounded-2xl bg-white shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl sm:rounded-none sm:bg-transparent sm:shadow-none sm:dark:bg-transparent ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
         <div className={`font-japanese tracking-wide px-5 py-8 sm:px-6 sm:py-10 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : 'leading-relaxed'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
           {paragraphs.map((paragraph, pIdx) => (
@@ -263,15 +292,17 @@ export default function Reader() {
                         setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
                       };
 
+                      const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
+
                       if (showFurigana) {
-                        return <FuriganaWord key={i} text={token.t} reading={token.r} onClick={handleClick} />;
+                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={colorClass} onClick={handleClick} />;
                       }
 
                       return (
                         <span
                           key={i}
                           onClick={handleClick}
-                          className="cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10"
+                          className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass}`}
                         >
                           {token.t}
                         </span>
