@@ -5,7 +5,6 @@ import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, type JishoResult } from '@/lib/jisho';
 import { Search, Star, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { PlayWordButton } from '@/components/PlayWordButton';
 
 export default function DictionaryPage() {
   const [searchParams] = useSearchParams();
@@ -78,12 +77,9 @@ export default function DictionaryPage() {
             <div key={idx} className="rounded-lg border bg-card p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-center gap-1">
-                    <p className="font-japanese text-xl font-bold">
-                      {result.japanese[0]?.word || result.slug}
-                    </p>
-                    <PlayWordButton text={result.japanese[0]?.reading || result.japanese[0]?.word || result.slug} />
-                  </div>
+                  <p className="font-japanese text-xl font-bold">
+                    {result.japanese[0]?.word || result.slug}
+                  </p>
                   <p className="font-japanese text-sm text-muted-foreground">
                     {result.japanese[0]?.reading}
                   </p>
