@@ -219,12 +219,28 @@ export default function Reader() {
             {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
+
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Writing Direction</p>
+          <div className="flex gap-2">
+            {(['horizontal', 'vertical'] as WritingMode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => setWritingMode(m)}
+                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                  m === writingMode ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                }`}
+              >
+                {m === 'vertical' && <AlignVerticalSpaceAround className="h-3 w-3" />}
+                {m === 'horizontal' ? 'Normal' : '縦書き'}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       <Progress value={scrollPercent} className="h-0.5 rounded-none" />
-      <article ref={articleRef} className="mx-3 my-4 rounded-2xl bg-white shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl sm:rounded-none sm:bg-transparent sm:shadow-none sm:dark:bg-transparent">
-        <div className={`font-japanese tracking-wide px-5 py-8 sm:px-6 sm:py-10 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : 'leading-relaxed'}`}>
+      <article ref={articleRef} className={`mx-3 my-4 rounded-2xl bg-white shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl sm:rounded-none sm:bg-transparent sm:shadow-none sm:dark:bg-transparent ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
+        <div className={`font-japanese tracking-wide px-5 py-8 sm:px-6 sm:py-10 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : 'leading-relaxed'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6" style={{ textIndent: '1em' }}>
               {paragraph.map((sentence, sIdx) => {
