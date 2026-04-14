@@ -5,6 +5,7 @@ import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, type JishoResult } from '@/lib/jisho';
 import { Search, Star, Loader2 } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { ExampleSentence } from '@/components/ExampleSentence';
 import { Input } from '@/components/ui/input';
 
 export default function DictionaryPage() {
@@ -108,6 +109,7 @@ export default function DictionaryPage() {
                       {result.senses[0].parts_of_speech.join(', ')}
                     </p>
                   )}
+                  <ExampleSentence word={result.japanese[0]?.word || result.slug} />
                 </div>
                 <button
                   onClick={() => handleSave(result)}

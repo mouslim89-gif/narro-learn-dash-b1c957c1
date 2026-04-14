@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
