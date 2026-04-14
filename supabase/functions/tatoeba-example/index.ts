@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const url = `https://api.tatoeba.org/unstable/sentences?lang=jpn&q=${encodeURIComponent(word)}&trans=eng&limit=1`;
+    const url = `https://api.tatoeba.org/unstable/sentences?lang=jpn&q=${encodeURIComponent(word)}&trans=eng&limit=1&sort=relevance`;
 
     const res = await fetch(url);
     if (!res.ok) {
