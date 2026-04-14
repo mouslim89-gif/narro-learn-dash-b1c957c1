@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   try {
     const { text } = await req.json();
 
-    if (!text || typeof text !== "string" || text.length > 100) {
+    if (!text || typeof text !== "string" || text.length > 200) {
       return new Response(
         JSON.stringify({ error: "text is required (max 100 chars)" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
