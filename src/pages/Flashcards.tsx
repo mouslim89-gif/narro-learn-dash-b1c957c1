@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
@@ -59,7 +60,7 @@ export default function Flashcards() {
               <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
             </div>
             {/* Back */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-4">
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-4 overflow-y-auto">
               <p className="font-japanese text-2xl font-bold mb-2">{card.word}</p>
               {card.meanings.map((m, i) => (
                 <p key={i} className="text-lg font-semibold text-accent text-center">{m}</p>
@@ -69,6 +70,7 @@ export default function Flashcards() {
                   {card.jlpt[0]?.replace('jlpt-', 'JLPT ')}
                 </span>
               )}
+              <ExampleSentence word={card.word} className="w-full mt-2" />
             </div>
           </div>
         </div>
@@ -165,20 +167,23 @@ export default function Flashcards() {
             const mastery = word.mastery || 0;
             const masteryColor = mastery >= 3 ? 'bg-green-500' : mastery > 0 ? 'bg-amber-400' : 'bg-muted';
             return (
-              <div key={word.id} className="flex items-center justify-between rounded-lg border bg-card p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`h-2 w-2 rounded-full ${masteryColor}`} />
-                  <PlayWordButton word={word.word} reading={word.reading} size={16} />
-                  <div>
-                    <p className="font-japanese text-lg font-bold">{word.word}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {word.reading} — {word.meanings.join(', ')}
-                    </p>
+              <div key={word.id} className="rounded-lg border bg-card p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`h-2 w-2 rounded-full ${masteryColor}`} />
+                    <PlayWordButton word={word.word} reading={word.reading} size={16} />
+                    <div>
+                      <p className="font-japanese text-lg font-bold">{word.word}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {word.reading} — {word.meanings.join(', ')}
+                      </p>
+                    </div>
                   </div>
+                  <button onClick={() => removeWord(word.id)} className="rounded p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
-                <button onClick={() => removeWord(word.id)} className="rounded p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <ExampleSentence word={word.word} />
               </div>
             );
           })}
