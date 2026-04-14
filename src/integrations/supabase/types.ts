@@ -14,7 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      example_sentences: {
+        Row: {
+          created_at: string
+          english: string
+          japanese: string
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          english?: string
+          japanese: string
+          word: string
+        }
+        Update: {
+          created_at?: string
+          english?: string
+          japanese?: string
+          word?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
