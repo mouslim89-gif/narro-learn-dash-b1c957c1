@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const url = `https://api.tatoeba.org/unstable/sentences?lang=jpn&q=${encodeURIComponent(word)}&trans=eng&limit=1`;
+    const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(word)}&limit=1`;
 
     const res = await fetch(url);
     if (!res.ok) {
@@ -30,33 +30,37 @@ Deno.serve(async (req) => {
     }
 
     const data = await res.json();
-    const sentences = data.data || data.results || data;
+    const results = data.results;
 
-    if (!Array.isArray(sentences) || sentences.length === 0) {
+    if (!Array.isArray(results) || results.length === 0) {
       return new Response(
         JSON.stringify({ japanese: null, english: null }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
       );
     }
 
-    const sentence = sentences[0];
-    const japaneseText = sentence.text || null;
+    // Pick a sentence that has a direct English translation and is reasonably long
+    let bestJapanese: string | null = null;
+    let bestEnglish: string | null = null;
 
-    let englishText: string | null = null;
-    const translations = sentence.translations || [];
-    for (const group of translations) {
-      const arr = Array.isArray(group) ? group : [group];
-      for (const t of arr) {
-        if (t && t.lang === 'eng' && t.text) {
-          englishText = t.text;
+    for (const sentence of results) {
+      const jpText = sentence.text;
+      if (!jpText) continue;
+
+      // translations is [[direct...], [indirect...]]
+      const directTranslations = sentence.translations?.[0] || [];
+      for (const t of directTranslations) {
+        if (t?.lang === 'eng' && t?.text) {
+          bestJapanese = jpText;
+          bestEnglish = t.text;
           break;
         }
       }
-      if (englishText) break;
+      if (bestEnglish) break;
     }
 
     return new Response(
-      JSON.stringify({ japanese: japaneseText, english: englishText }),
+      JSON.stringify({ japanese: bestJapanese, english: bestEnglish }),
       {
         headers: {
           ...corsHeaders,
