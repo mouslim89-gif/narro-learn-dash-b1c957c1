@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Star, Loader2 } from 'lucide-react';
+import { Star, Loader2, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
@@ -98,6 +99,7 @@ function LoadingSkeleton() {
 
 export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onClose }: WordPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
+  const navigate = useNavigate();
 
   // Try looking up the base form first (more likely to have dictionary entries)
   const lookupKey = kuromojiBase || word;
@@ -244,17 +246,28 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onCl
                 <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
               )}
 
-              <button
-                onClick={handleSave}
-                disabled={saved}
-                className={`mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition-all active:scale-[0.97] ${
-                  saved
-                    ? 'bg-muted text-muted-foreground'
-                    : 'bg-accent text-accent-foreground'
-                }`}
-              >
-                <Star className="h-4 w-4" /> {saved ? 'Saved to Flashcards' : 'Save to Flashcards'}
-              </button>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={handleSave}
+                  disabled={saved}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition-all active:scale-[0.97] ${
+                    saved
+                      ? 'bg-muted text-muted-foreground'
+                      : 'bg-accent text-accent-foreground'
+                  }`}
+                >
+                  <Star className="h-4 w-4" /> {saved ? 'Saved' : 'Save'}
+                </button>
+                <button
+                  onClick={() => {
+                    onClose();
+                    navigate(`/dictionary?q=${encodeURIComponent(dictForm)}`);
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
+                >
+                  <BookOpen className="h-4 w-4" /> Dictionary
+                </button>
+              </div>
             </>
           )}
         </div>
