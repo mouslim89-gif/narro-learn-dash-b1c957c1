@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Star, Loader2 } from 'lucide-react';
+import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
@@ -183,9 +184,16 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onCl
     <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="text-left pb-2">
-          <DrawerTitle className="font-japanese text-3xl font-bold">
-            {result ? (result.japanese[0]?.word || word) : word}
-          </DrawerTitle>
+          <div className="flex items-center gap-2">
+            <DrawerTitle className="font-japanese text-3xl font-bold">
+              {result ? (result.japanese[0]?.word || word) : word}
+            </DrawerTitle>
+            <PlayWordButton
+              word={result?.japanese[0]?.word || word}
+              reading={result?.japanese[0]?.reading}
+              size={22}
+            />
+          </div>
           <DrawerDescription className="font-japanese text-base">
             {result?.japanese[0]?.reading || ''}
           </DrawerDescription>
