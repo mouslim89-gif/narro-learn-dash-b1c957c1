@@ -1,7 +1,14 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+);
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -18,56 +25,66 @@ Deno.serve(async (req) => {
       );
     }
 
-    const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(word)}&limit=1`;
+    // 1. Check DB cache first
+    const { data: cached } = await supabase
+      .from('example_sentences')
+      .select('japanese, english')
+      .eq('word', word)
+      .maybeSingle();
 
+    if (cached) {
+      return new Response(
+        JSON.stringify({ japanese: cached.japanese, english: cached.english }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
+      );
+    }
+
+    // 2. Fetch from Tatoeba
+    const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(word)}&limit=3`;
     const res = await fetch(url);
+
     if (!res.ok) {
-      console.error('Tatoeba API error:', res.status, await res.text());
+      console.error('Tatoeba API error:', res.status);
       return new Response(
         JSON.stringify({ japanese: null, english: null }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const data = await res.json();
     const results = data.results;
 
-    if (!Array.isArray(results) || results.length === 0) {
-      return new Response(
-        JSON.stringify({ japanese: null, english: null }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
-      );
-    }
-
-    // Pick a sentence that has a direct English translation and is reasonably long
     let bestJapanese: string | null = null;
     let bestEnglish: string | null = null;
 
-    for (const sentence of results) {
-      const jpText = sentence.text;
-      if (!jpText) continue;
-
-      // translations is [[direct...], [indirect...]]
-      const directTranslations = sentence.translations?.[0] || [];
-      for (const t of directTranslations) {
-        if (t?.lang === 'eng' && t?.text) {
-          bestJapanese = jpText;
-          bestEnglish = t.text;
-          break;
+    if (Array.isArray(results)) {
+      for (const sentence of results) {
+        const jpText = sentence.text;
+        if (!jpText) continue;
+        const directTranslations = sentence.translations?.[0] || [];
+        for (const t of directTranslations) {
+          if (t?.lang === 'eng' && t?.text) {
+            bestJapanese = jpText;
+            bestEnglish = t.text;
+            break;
+          }
         }
+        if (bestEnglish) break;
       }
-      if (bestEnglish) break;
+    }
+
+    // 3. Store in DB cache (even null results to avoid re-fetching)
+    if (bestJapanese) {
+      await supabase.from('example_sentences').upsert({
+        word,
+        japanese: bestJapanese,
+        english: bestEnglish || '',
+      });
     }
 
     return new Response(
       JSON.stringify({ japanese: bestJapanese, english: bestEnglish }),
-      {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, max-age=86400',
-        },
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
     );
   } catch (err) {
     console.error('Tatoeba function error:', err);
