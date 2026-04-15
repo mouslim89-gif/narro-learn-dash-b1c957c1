@@ -59,7 +59,14 @@ export default function DictionaryPage() {
 
   return (
     <div className="pb-20 px-6 pt-8">
-      <h1 className="text-2xl font-bold">Dictionary</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Dictionary</h1>
+        <Link to="/settings">
+          <Button variant="ghost" size="icon">
+            <Settings className="h-5 w-5" />
+          </Button>
+        </Link>
+      </div>
 
       <div className="relative mt-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

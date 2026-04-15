@@ -15,6 +15,7 @@ import DictionaryPage from "./pages/Dictionary";
 import BookDetail from "./pages/BookDetail";
 import Reader from "./pages/Reader";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { books, genreLabels, type Genre, jlptColors, difficultyConfig } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { Link } from 'react-router-dom';
-import { Clock, Headphones, Search, BookOpen, Moon, Sun } from 'lucide-react';
+import { Clock, Headphones, Search, BookOpen, Moon, Sun, Settings } from 'lucide-react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
