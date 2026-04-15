@@ -145,8 +145,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
             {/* Front face */}
             <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-5">
               <p className="font-japanese text-5xl font-bold">{card.word}</p>
-              <PlayWordButton word={card.word} reading={card.reading} size={24} className="mt-1" />
               <p className="font-japanese mt-1 text-lg text-muted-foreground">{card.reading}</p>
+              <PlayWordButton word={card.word} reading={card.reading} size={24} className="mt-2" />
               <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
             </div>
 
