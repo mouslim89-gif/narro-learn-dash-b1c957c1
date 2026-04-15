@@ -30,6 +30,7 @@ interface FlashcardStore {
   hasWord: (id: string) => boolean;
   incrementMastery: (id: string) => void;
   resetMastery: (id: string) => void;
+  adjustMastery: (id: string, quality: 'again' | 'hard' | 'good') => void;
   getDueCount: () => number;
   getDueWords: () => SavedWord[];
 }
