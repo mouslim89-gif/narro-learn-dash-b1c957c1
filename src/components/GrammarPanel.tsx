@@ -126,7 +126,9 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
                           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
                             Example from text
                           </p>
-                          <p className="font-japanese text-sm">{note.example}</p>
+                          <p className="font-japanese text-sm">
+                            <HighlightPattern text={note.example} pattern={note.pattern} />
+                          </p>
                         </div>
                         <div className="rounded bg-primary/5 p-3">
                           <p className="text-[10px] font-semibold uppercase tracking-widest text-primary mb-1">
