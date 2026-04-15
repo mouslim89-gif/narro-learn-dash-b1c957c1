@@ -112,7 +112,7 @@ export default function Flashcards() {
             >
               <Shuffle className="h-4 w-4" />
             </Button>
-            <Button onClick={() => setReviewMode(true)} size="sm" className="font-semibold">
+            <Button onClick={enterReview} size="sm" className="font-semibold">
               <RotateCcw className="mr-1 h-4 w-4" /> Review
               {dueCount > 0 && (
                 <span className="ml-1.5 rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
