@@ -33,7 +33,8 @@ function DarkModeSync() {
 
 function AnimatedRoutes() {
   const location = useLocation();
-  const hideNav = location.pathname.startsWith('/reader/');
+  const isReviewing = useFlashcardStore(s => s.isReviewing);
+  const hideNav = location.pathname.startsWith('/reader/') || isReviewing;
 
   return (
     <>

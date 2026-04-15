@@ -41,6 +41,8 @@ export const useFlashcardStore = create<FlashcardStore>()(
   persist(
     (set, get) => ({
       savedWords: [],
+      isReviewing: false,
+      setIsReviewing: (v) => set({ isReviewing: v }),
       addWord: (entry) => {
         if (!get().savedWords.find(w => w.id === entry.id)) {
           set({
