@@ -6,6 +6,9 @@ import { useFlashcardStore } from '@/stores/flashcards';
 import { difficultyConfig } from '@/data/books';
 import { formatDistanceToNow, differenceInCalendarDays, startOfDay, subDays, format } from 'date-fns';
 import { bookTokens } from '@/data/book-tokens';
+import { Link } from 'react-router-dom';
+import { Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function StreakCalendar({ readDatesSet }: { readDatesSet: Set<string> }) {
   const today = new Date();

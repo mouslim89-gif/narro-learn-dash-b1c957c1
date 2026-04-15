@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown } from 'lucide-react';
+import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

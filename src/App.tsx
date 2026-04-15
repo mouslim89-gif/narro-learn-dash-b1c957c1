@@ -56,6 +56,7 @@ function AnimatedRoutes() {
             <Route path="/dictionary" element={<DictionaryPage />} />
             <Route path="/book/:id" element={<BookDetail />} />
             <Route path="/reader/:id/:difficulty" element={<Reader />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </motion.div>
