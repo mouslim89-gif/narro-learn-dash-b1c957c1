@@ -25,6 +25,8 @@ function getNextReviewDate(mastery: number): string {
 
 interface FlashcardStore {
   savedWords: SavedWord[];
+  isReviewing: boolean;
+  setIsReviewing: (v: boolean) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
   removeWord: (id: string) => void;
   hasWord: (id: string) => boolean;
@@ -39,6 +41,8 @@ export const useFlashcardStore = create<FlashcardStore>()(
   persist(
     (set, get) => ({
       savedWords: [],
+      isReviewing: false,
+      setIsReviewing: (v) => set({ isReviewing: v }),
       addWord: (entry) => {
         if (!get().savedWords.find(w => w.id === entry.id)) {
           set({

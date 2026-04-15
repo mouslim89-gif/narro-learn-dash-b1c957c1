@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
 import { useReadingProgressStore } from "@/stores/reading-progress";
+import { useFlashcardStore } from "@/stores/flashcards";
 import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
@@ -33,7 +34,8 @@ function DarkModeSync() {
 
 function AnimatedRoutes() {
   const location = useLocation();
-  const hideNav = location.pathname.startsWith('/reader/');
+  const isReviewing = useFlashcardStore(s => s.isReviewing);
+  const hideNav = location.pathname.startsWith('/reader/') || isReviewing;
 
   return (
     <>
