@@ -10,6 +10,7 @@ export interface SavedWord {
   meanings: string[];
   jlpt?: string[];
   partsOfSpeech?: string[];
+  contextSentence?: string;
   mastery: number; // 0 = new, 1-2 = learning, 3+ = known
   lastReviewedAt?: string;
   nextReviewAt?: string;
