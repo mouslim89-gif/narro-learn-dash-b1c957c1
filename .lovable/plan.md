@@ -1,30 +1,19 @@
 
 
-## Mettre en évidence le mot dans toutes les phrases (contexte + exemple) avec une couleur orangée
+## Fix: boutons de review poussés hors écran
 
 ### Problème
-- La mise en évidence ne concerne que l'exemple Tatoeba dans `ExampleSentence.tsx`
-- La phrase de contexte ("From your reading") dans `FlashcardReview.tsx` n'a aucune mise en évidence
-- La couleur actuelle (`text-primary`) ne ressort pas assez — il faut une couleur plus orangée/chaude
+Le conteneur invisible (ligne 141) qui contient `backContent` pour dimensionner la carte peut devenir très grand (meanings, context sentence, example sentence...). Comme il est dans le flux normal du `flex-1`, il pousse les boutons d'action (Again/Hard/Good/Skip) en dehors du viewport `h-screen overflow-hidden` — ils sont rendus mais invisibles.
 
-### Changements
+### Solution
+Contraindre la zone de la carte avec `max-h` et `overflow-hidden` sur le conteneur invisible, puis `overflow-y-auto` sur les faces visibles. Concrètement :
 
-**1. `src/components/ExampleSentence.tsx`**
-- Changer `text-primary font-bold` → `text-amber-500 font-bold` (orange chaud)
+1. **Conteneur de la carte** (ligne 130) : ajouter `min-h-0` (déjà là) — OK
+2. **Invisible sizing div** (ligne 141) : ajouter `max-h-[50vh]` pour limiter la hauteur du ghost qui drive le layout, empêchant de pousser les boutons hors écran
+3. **Back face** (ligne 154) : garde `overflow-y-auto` pour scroller le contenu long dans la carte
 
-**2. `src/components/FlashcardReview.tsx`**
-- Dans la section "From your reading" (ligne 87), ajouter une fonction `highlightInContext` qui cherche `card.word` dans `card.contextSentence` et l'entoure d'un `<span className="text-amber-500 font-bold">`
-- Remplacer `{card.contextSentence}` par `{highlightInContext(card.contextSentence, card.word)}`
-
-**3. `src/pages/Dictionary.tsx`** (si applicable)
-- Vérifier si les phrases d'exemple dans la page dictionnaire utilisent aussi `ExampleSentence` → oui, donc le changement dans `ExampleSentence.tsx` s'appliquera automatiquement
-
-### Couleur
-`text-amber-500` en clair, `text-amber-400` en dark — une teinte orangée visible sur les deux thèmes.
-
-### Fichiers modifiés
+### Fichier modifié
 | Fichier | Changement |
 |---------|-----------|
-| `src/components/ExampleSentence.tsx` | Couleur amber au lieu de primary |
-| `src/components/FlashcardReview.tsx` | Highlight du mot dans contextSentence |
+| `src/components/FlashcardReview.tsx` | Ajouter `max-h-[50vh] overflow-hidden` sur le div invisible (ligne 141) |
 
