@@ -167,14 +167,6 @@ export function FlashcardReview({ deck, onExit }: Props) {
           Skip →
         </Button>
       )}
-
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
-          <Trash2 className="mr-1 h-4 w-4" /> Delete
-        </Button>
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          Exit Review
-        </Button>
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
