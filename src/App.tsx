@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -5,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
+import { useReadingProgressStore } from "@/stores/reading-progress";
 import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
@@ -20,6 +22,14 @@ const pageVariants = {
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -8 },
 };
+
+function DarkModeSync() {
+  const darkMode = useReadingProgressStore((s) => s.darkMode);
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
+  return null;
+}
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -58,6 +68,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <DarkModeSync />
         <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>

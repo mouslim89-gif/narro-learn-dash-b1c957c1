@@ -1,40 +1,32 @@
-## Conjugation Table in Dictionary + Global Dark Mode
+## Améliorations de l'application Yomimasu
 
-### 1. Conjugation table in Dictionary results
+Voici un ensemble d'améliorations UX et fonctionnelles cohérentes pour rendre l'app plus agréable et utile.
 
-The `ConjugationTable` component already supports both verbs and i-adjectives. It's used in `WordPopup` but not in `Dictionary.tsx`.
+---
 
-**File: `src/pages/Dictionary.tsx**`
+### 1. Recherche de mots depuis le Reader
 
-- Import `ConjugationTable` from `@/components/ConjugationTable`
-- After the example sentence in each result card, add:
-  ```tsx
-  <ConjugationTable
-    dictForm={result.japanese[0]?.word || result.slug}
-    partsOfSpeech={result.senses.flatMap(s => s.parts_of_speech)}
-  />
-  ```
-- The component already handles detecting verb type vs i-adjective and returns null for non-conjugable words
+Quand l'utilisateur tape un mot dans le Reader (WordPopup), ajouter un bouton "Search in Dictionary" qui navigue vers `/dictionary?q=mot`. Ça connecte mieux les deux features.
 
-### 2. Global Dark Mode
+**Fichier** : modifier `src/components/WordPopup.tsx` — ajouter un lien vers le dictionnaire.
 
-Currently dark mode only exists for the reader (`readerDarkMode`). Add a global toggle.
+---
 
-**File: `src/stores/reading-progress.ts**`
+### 2. Statistiques de lecture améliorées (My Books)
 
-- Add `darkMode: boolean` (default false) and `setDarkMode` action to the store
+Remplacer les stats basiques par des stats plus motivantes :
+- **Mots lus estimés** (basé sur le nombre de tokens × progression)
+- **Streak visuel** avec un calendrier de points (style GitHub contributions)
+- Animations des chiffres au chargement
 
-**File: `src/App.tsx**`
+---
 
-- Read `darkMode` from store, apply `dark` class to `<html>` element via `useEffect`
+### 3. Conjugation Table dans le Dictionary ✅
 
-**File: `src/pages/Library.tsx**`
+Ajout du composant `ConjugationTable` dans les résultats du dictionnaire pour afficher les conjugaisons des verbes et adjectifs.
 
-- Add a dark mode toggle button (Moon/Sun icon) in the header area
+---
 
-### Files to modify
+### 4. Dark Mode global ✅
 
-1. `src/pages/Dictionary.tsx` — add ConjugationTable to results
-2. `src/stores/reading-progress.ts` — add global darkMode state
-3. `src/App.tsx` — apply dark class to html
-4. `src/pages/Library.tsx` — add dark mode toggle button
+Toggle dark/light dans la Library, état persisté dans le store, classe `dark` appliquée sur `<html>`.

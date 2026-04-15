@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams } from 'react-router-dom';
 import { dictionary } from '@/data/dictionary';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
@@ -110,6 +111,10 @@ export default function DictionaryPage() {
                     </p>
                   )}
                   <ExampleSentence word={result.japanese[0]?.word || result.slug} />
+                  <ConjugationTable
+                    dictForm={result.japanese[0]?.word || result.slug}
+                    partsOfSpeech={result.senses.flatMap(s => s.parts_of_speech)}
+                  />
                 </div>
                 <button
                   onClick={() => handleSave(result)}

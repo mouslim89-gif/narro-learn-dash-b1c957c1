@@ -16,6 +16,7 @@ interface ReadingProgressState {
   progress: Record<string, ReadingProgress>;
   fontSize: FontSize;
   readerDarkMode: boolean;
+  darkMode: boolean;
   showFurigana: boolean;
   writingMode: WritingMode;
   displayMode: DisplayMode;
@@ -23,6 +24,7 @@ interface ReadingProgressState {
   getProgress: (bookId: string) => ReadingProgress | undefined;
   setFontSize: (size: FontSize) => void;
   setReaderDarkMode: (dark: boolean) => void;
+  setDarkMode: (dark: boolean) => void;
   setShowFurigana: (show: boolean) => void;
   setWritingMode: (mode: WritingMode) => void;
   setDisplayMode: (mode: DisplayMode) => void;
@@ -40,6 +42,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       progress: {},
       fontSize: 'medium',
       readerDarkMode: false,
+      darkMode: false,
       showFurigana: false,
       writingMode: 'horizontal' as WritingMode,
       displayMode: 'normal' as DisplayMode,
@@ -57,6 +60,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       getProgress: (bookId) => get().progress[bookId],
       setFontSize: (fontSize) => set({ fontSize }),
       setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
+      setDarkMode: (darkMode) => set({ darkMode }),
       setShowFurigana: (showFurigana) => set({ showFurigana }),
       setWritingMode: (writingMode) => set({ writingMode }),
       setDisplayMode: (displayMode) => set({ displayMode }),
