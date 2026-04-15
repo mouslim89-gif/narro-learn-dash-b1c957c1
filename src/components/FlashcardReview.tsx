@@ -15,8 +15,11 @@ interface Props {
 }
 
 export function FlashcardReview({ deck, onExit }: Props) {
-  const { adjustMastery } = useFlashcardStore();
+  const { adjustMastery, removeWord } = useFlashcardStore();
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [animClass, setAnimClass] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
 
