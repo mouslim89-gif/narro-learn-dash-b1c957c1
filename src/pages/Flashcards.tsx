@@ -80,7 +80,7 @@ export default function Flashcards() {
     return (
       <FlashcardReview
         deck={reviewDeck}
-        onExit={() => setReviewMode(false)}
+        onExit={exitReview}
       />
     );
   }
