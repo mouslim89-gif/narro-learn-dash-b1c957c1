@@ -5,8 +5,9 @@ import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { X, AlertTriangle, Check, BookOpen } from 'lucide-react';
+import { X, AlertTriangle, Check, BookOpen, Trash2 } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
@@ -14,10 +15,13 @@ interface Props {
 }
 
 export function FlashcardReview({ deck, onExit }: Props) {
-  const { adjustMastery } = useFlashcardStore();
+  const { adjustMastery, removeWord } = useFlashcardStore();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+
 
   const advance = useCallback((action?: () => void) => {
     action?.();
@@ -151,9 +155,38 @@ export function FlashcardReview({ deck, onExit }: Props) {
         </Button>
       )}
 
-      <Button variant="ghost" size="sm" onClick={onExit}>
-        Exit Review
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
+          <Trash2 className="mr-1 h-4 w-4" /> Delete
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onExit}>
+          Exit Review
+        </Button>
+      </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete flashcard?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This card will be permanently removed from your collection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                removeWord(card.id);
+                setShowDeleteDialog(false);
+                advance();
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
