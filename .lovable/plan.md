@@ -1,19 +1,27 @@
 
 
-## Fix: boutons de review poussés hors écran
+## Page Paramètres — Plan simplifié
 
-### Problème
-Le conteneur invisible (ligne 141) qui contient `backContent` pour dimensionner la carte peut devenir très grand (meanings, context sentence, example sentence...). Comme il est dans le flux normal du `flex-1`, il pousse les boutons d'action (Again/Hard/Good/Skip) en dehors du viewport `h-screen overflow-hidden` — ils sont rendus mais invisibles.
+### Ce qu'on va faire
+Créer une page **Settings** accessible via une icône ⚙️ dans le header, avec une seule section :
 
-### Solution
-Contraindre la zone de la carte avec `max-h` et `overflow-hidden` sur le conteneur invisible, puis `overflow-y-auto` sur les faces visibles. Concrètement :
+**Apparence**
+- Dark mode (toggle switch)
+- Taille de police par défaut (S / M / L)
+- Furigana par défaut (toggle)
 
-1. **Conteneur de la carte** (ligne 130) : ajouter `min-h-0` (déjà là) — OK
-2. **Invisible sizing div** (ligne 141) : ajouter `max-h-[50vh]` pour limiter la hauteur du ghost qui drive le layout, empêchant de pousser les boutons hors écran
-3. **Back face** (ligne 154) : garde `overflow-y-auto` pour scroller le contenu long dans la carte
+### Navigation
+- Icône `Settings` (gear) ajoutée en haut à droite des pages Library, My Books, Flashcards, Dictionary
+- Lien vers la route `/settings`
 
-### Fichier modifié
-| Fichier | Changement |
-|---------|-----------|
-| `src/components/FlashcardReview.tsx` | Ajouter `max-h-[50vh] overflow-hidden` sur le div invisible (ligne 141) |
+### Fichiers à créer / modifier
+
+| Fichier | Action |
+|---------|--------|
+| `src/pages/Settings.tsx` | **Créer** — page avec section Apparence uniquement |
+| `src/App.tsx` | Ajouter route `/settings` |
+| `src/pages/Library.tsx` | Ajouter icône gear dans le header |
+| `src/pages/MyBooks.tsx` | Ajouter icône gear dans le header |
+| `src/pages/Flashcards.tsx` | Ajouter icône gear dans le header |
+| `src/pages/Dictionary.tsx` | Ajouter icône gear dans le header |
 
