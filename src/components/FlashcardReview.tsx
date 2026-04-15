@@ -5,8 +5,9 @@ import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { X, AlertTriangle, Check, BookOpen } from 'lucide-react';
+import { X, AlertTriangle, Check, BookOpen, Trash2 } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
