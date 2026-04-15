@@ -123,6 +123,21 @@
   100% { background-color: transparent; }
 }
 
+@keyframes card-slide-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-60px); }
+}
+@keyframes card-slide-in {
+  0% { opacity: 0; transform: translateX(60px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-card-out {
+  animation: card-slide-out 0.2s ease-in forwards;
+}
+.animate-card-in {
+  animation: card-slide-in 0.25s ease-out forwards;
+}
+
 /* Tategaki (vertical writing) mode */
 .writing-vertical {
   writing-mode: vertical-rl;
