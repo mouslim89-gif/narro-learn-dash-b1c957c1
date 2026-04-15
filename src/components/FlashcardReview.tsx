@@ -84,7 +84,19 @@ export function FlashcardReview({ deck, onExit }: Props) {
               <BookOpen className="h-3 w-3 text-primary" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
             </div>
-            <p className="font-japanese text-sm leading-relaxed text-foreground">{card.contextSentence}</p>
+            <p className="font-japanese text-sm leading-relaxed text-foreground">
+              {(() => {
+                const idx = card.contextSentence!.indexOf(card.word);
+                if (idx === -1) return card.contextSentence;
+                return (
+                  <>
+                    {card.contextSentence!.slice(0, idx)}
+                    <span className="text-amber-500 dark:text-amber-400 font-bold">{card.word}</span>
+                    {card.contextSentence!.slice(idx + card.word.length)}
+                  </>
+                );
+              })()}
+            </p>
           </div>
         </>
       )}
