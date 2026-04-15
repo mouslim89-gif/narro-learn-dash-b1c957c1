@@ -62,17 +62,39 @@ export default function Flashcards() {
               <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
             </div>
             {/* Back */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-4 overflow-y-auto">
-              <p className="font-japanese text-2xl font-bold mb-2">{card.word}</p>
-              {card.meanings.map((m, i) => (
-                <p key={i} className="text-lg font-semibold text-accent text-center">{m}</p>
-              ))}
-              {card.jlpt && card.jlpt.length > 0 && (
-                <span className="mt-3 rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-bold uppercase text-accent">
-                  {card.jlpt[0]?.replace('jlpt-', 'JLPT ')}
-                </span>
-              )}
-              <ExampleSentence word={card.word} className="w-full mt-2" />
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-start rounded-xl border bg-card shadow-lg p-5 overflow-y-auto">
+              {/* Header: word + reading + romaji + audio */}
+              <div className="flex items-center gap-2 w-full">
+                <p className="font-japanese text-2xl font-bold">{card.word}</p>
+                <span className="font-japanese text-sm text-muted-foreground">{card.reading}</span>
+                <span className="text-xs text-muted-foreground/70 italic">{toRomaji(card.reading || card.word)}</span>
+                <PlayWordButton word={card.word} reading={card.reading} size={16} className="ml-auto" />
+              </div>
+
+              {/* Definitions numbered */}
+              <ol className="mt-3 list-decimal list-inside space-y-0.5 w-full">
+                {card.meanings.map((m, i) => (
+                  <li key={i} className="text-sm font-medium text-foreground">{m}</li>
+                ))}
+              </ol>
+
+              {/* Badges: JLPT + POS */}
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {card.jlpt && card.jlpt.length > 0 && (
+                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
+                    {card.jlpt[0]?.replace('jlpt-', 'JLPT ')}
+                  </span>
+                )}
+                {card.partsOfSpeech?.map((p, i) => (
+                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                    {p}
+                  </span>
+                ))}
+              </div>
+
+              {/* Separator + Example */}
+              <Separator className="mt-3" />
+              <ExampleSentence word={card.word} className="w-full mt-3" />
             </div>
           </div>
         </div>
