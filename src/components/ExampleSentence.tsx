@@ -42,7 +42,7 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
     return (
       <>
         {text.slice(0, index)}
-        <span className="text-amber-500 dark:text-amber-400 font-bold">{word}</span>
+        <span className="text-accent font-bold">{word}</span>
         {text.slice(index + word.length)}
       </>
     );
