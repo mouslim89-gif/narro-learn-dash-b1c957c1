@@ -107,7 +107,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex min-h-[100dvh] flex-col overflow-hidden bg-background">
+    <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden bg-background">
       {/* Header */}
       <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
         <Button variant="ghost" size="icon" onClick={onExit}>
