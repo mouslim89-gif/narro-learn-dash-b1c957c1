@@ -1,44 +1,27 @@
 
+## Plan : Ajouter suppression de flashcard avec confirmation
 
-## Améliorer le mode Flashcards
+### Contexte
+Actuellement, il n'y a aucun moyen de supprimer une flashcard pendant le mode review. Le bouton de suppression existe seulement dans la liste (`src/pages/Flashcards.tsx`).
 
-### 1. Review mode : 3 niveaux de difficulté
+### Solution
+Ajouter un bouton **Trash** (icône poubelle) en mode review qui ouvre un dialog de confirmation avant de supprimer la carte.
 
-**Store (`src/stores/flashcards.ts`)**
-- Ajouter `adjustMastery(id, quality: 'again' | 'hard' | 'good')` :
-  - `again` → reset mastery à 0
-  - `hard` → mastery reste pareil, mais reschedule à demain
-  - `good` → mastery +1 (comportement actuel)
-- Adapter les intervalles SRS en conséquence
+### Changements
 
-**Review UI (`src/pages/Flashcards.tsx`)**
-- Remplacer les 2 boutons par 3 : Again (rouge), Hard (orange), Good (vert)
-- Icônes : X, AlertTriangle, Check
+**1. `src/components/FlashcardReview.tsx`**
+- Importer `AlertDialog` et ses composants depuis `@/components/ui/alert-dialog`
+- Importer icône `Trash2` de lucide-react
+- Ajouter state `[showDeleteDialog, setShowDeleteDialog]`
+- Ajouter un bouton "Delete" (icône Trash2, variant ghost/destructive) en bas à gauche (opposé au bouton "Exit Review")
+- Ouvrir le dialog de confirmation au clic
+- Dans le dialog : titre "Delete flashcard?", description "This card will be permanently removed", boutons Cancel + Delete (destructive)
+- Au clic sur Delete : appeler `removeWord(card.id)`, fermer dialog, et avancer à la carte suivante
 
-### 2. Review mode : animation de transition
-
-- Quand on passe à la carte suivante, animer la carte sortante en slide-out + fade, et la nouvelle en slide-in + fade
-- Utiliser un state `animating` pour déclencher les classes CSS `animate-slide-out-right` puis `animate-slide-in-right`
-- Ajouter les keyframes nécessaires dans `src/index.css` (slide-left variantes)
-
-### 3. Section flashcards : filtres, tri, recherche
-
-**Filtres par statut**
-- Row de chips cliquables : All / New / Learning / Known
-- Filtrer `savedWords` selon le mastery
-
-**Recherche**
-- Input de recherche en haut, filtre par mot, reading, ou meanings
-
-**Options de tri**
-- Petit dropdown ou toggle : Date ajoutée (défaut), JLPT, Mastery
-- Tri ascendant/descendant
+**2. Import du store**
+- Le `removeWord` existe déjà dans `useFlashcardStore`, pas besoin de le modifier
 
 ### Fichiers modifiés
-
 | Fichier | Changement |
 |---------|-----------|
-| `src/stores/flashcards.ts` | Ajouter `adjustMastery` avec 3 niveaux |
-| `src/pages/Flashcards.tsx` | 3 boutons, animation transition, filtres/tri/recherche |
-| `src/index.css` | Keyframes slide-left pour animation cartes |
-
+| `src/components/FlashcardReview.tsx` | Bouton delete + AlertDialog confirmation |
