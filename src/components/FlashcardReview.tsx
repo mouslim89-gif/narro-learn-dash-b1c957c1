@@ -71,25 +71,23 @@ export function FlashcardReview({ deck, onExit }: Props) {
         {currentIdx + 1} / {deck.length}
       </p>
 
-      {/* 3D Flip Card */}
+      {/* Card */}
       <div
-        className={`perspective-800 w-full max-w-sm ${animClass}`}
+        className={`w-full max-w-sm ${animClass}`}
         onClick={() => setFlipped(!flipped)}
       >
-        <div
-          className={`relative h-64 w-full transition-transform duration-500 transform-style-3d ${
-            flipped ? 'rotate-y-180' : ''
-          }`}
-        >
-          {/* Front */}
-          <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg">
+        {/* Front */}
+        {!flipped && (
+          <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-5">
             <p className="font-japanese text-5xl font-bold">{card.word}</p>
             <PlayWordButton word={card.word} reading={card.reading} size={24} className="mt-1" />
             <p className="font-japanese mt-1 text-lg text-muted-foreground">{card.reading}</p>
             <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
           </div>
-          {/* Back */}
-          <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-start rounded-xl border bg-card shadow-lg p-5 overflow-y-auto">
+        )}
+        {/* Back */}
+        {flipped && (
+          <div className="flex min-h-64 flex-col items-start rounded-xl border bg-card shadow-lg p-5">
             <div className="flex items-center gap-2 w-full">
               <p className="font-japanese text-2xl font-bold">{card.word}</p>
               <span className="font-japanese text-sm text-muted-foreground">{card.reading}</span>
@@ -132,7 +130,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             <Separator className="mt-3" />
             <ExampleSentence word={card.word} className="w-full mt-3" />
           </div>
-        </div>
+        )}
       </div>
 
       {flipped ? (
