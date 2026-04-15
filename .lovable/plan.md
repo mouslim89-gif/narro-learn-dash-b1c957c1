@@ -1,24 +1,21 @@
 
 
-## Dictionary Page — Cards Redesign + Clear Button
+## Améliorer le verso des flashcards
 
-### Changes to `src/pages/Dictionary.tsx`
+Le verso actuel est basique : mot, définitions empilées, badge JLPT, et une phrase d'exemple. On va le restructurer pour qu'il soit plus lisible et informatif.
 
-**Clear search button**
-- Import `X` from lucide-react
-- Add an `X` button inside the search input container (right side), visible only when query is non-empty
-- Clicking it clears the query and focuses the input
+### Changements dans `src/pages/Flashcards.tsx`
 
-**Cards redesign**
-- Word + reading on same line: `食べる（たべる）` style, with PlayWordButton inline
-- Tag row below: JLPT badge + "Common" green badge when `result.is_common` is true + parts of speech as subtle muted chips
-- Save star as a small absolute-positioned icon at top-right of card
-- Meanings with slightly larger text and better spacing
-- Card gets a subtle left border accent (teal `border-l-4 border-primary` for common words)
-- Better padding and section spacing throughout
+**Structure du verso redessinée :**
+- **En haut** : mot + reading + romaji (via `wanakana.toRomaji`) + bouton audio, sur une ligne compacte
+- **Section définitions** : numérotées (1. 2. 3.), avec une meilleure hiérarchie visuelle, couleur `text-foreground` au lieu de `text-accent`
+- **Badges** : ligne de tags — JLPT badge + parts of speech en chips mutés, alignés horizontalement
+- **Séparateur** fin avant la phrase d'exemple
+- **Phrase d'exemple** : en bas, avec plus d'espace
+- Meilleur padding et espacement global, texte aligné à gauche (plus naturel qu'un centrage)
 
-### Files to modify
-| File | Change |
-|------|--------|
-| `src/pages/Dictionary.tsx` | Cards redesign + clear button |
+### Fichier à modifier
+| Fichier | Changement |
+|---------|-----------|
+| `src/pages/Flashcards.tsx` | Redesign du verso de la carte (lignes 62-74) |
 
