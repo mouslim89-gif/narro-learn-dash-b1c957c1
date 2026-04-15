@@ -120,14 +120,14 @@ export default function DictionaryPage() {
 
               {/* Tags row */}
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {isCommon && (
+                  <span className="rounded-full bg-primary/20 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/30">
+                    ✦ Common
+                  </span>
+                )}
                 {result.jlpt.length > 0 && (
                   <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
                     {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
-                  </span>
-                )}
-                {isCommon && (
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                    Common
                   </span>
                 )}
                 {result.senses[0]?.parts_of_speech?.map((pos, i) => (
