@@ -25,6 +25,8 @@ function getNextReviewDate(mastery: number): string {
 
 interface FlashcardStore {
   savedWords: SavedWord[];
+  isReviewing: boolean;
+  setIsReviewing: (v: boolean) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
   removeWord: (id: string) => void;
   hasWord: (id: string) => boolean;
