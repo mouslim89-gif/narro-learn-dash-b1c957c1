@@ -20,6 +20,8 @@ interface WordPopupProps {
   baseForm?: string;
   /** Part of speech from Kuromoji (e.g. "動詞/自立") */
   pos?: string;
+  /** Sentence from the story where the word was encountered */
+  contextSentence?: string;
   onClose: () => void;
 }
 
@@ -97,7 +99,7 @@ function LoadingSkeleton() {
   );
 }
 
-export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onClose }: WordPopupProps) {
+export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, contextSentence, onClose }: WordPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
   const navigate = useNavigate();
 
@@ -177,6 +179,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onCl
       meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
+      contextSentence,
       mastery: 0,
     };
     addWord(entry);
@@ -256,7 +259,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, onCl
                       : 'bg-accent text-accent-foreground'
                   }`}
                 >
-                  <Star className="h-4 w-4" /> {saved ? 'Saved' : 'Save'}
+                  <Star className="h-4 w-4" /> {saved ? 'Added to Flashcards' : 'Add to Flashcards'}
                 </button>
                 <button
                   onClick={() => {
