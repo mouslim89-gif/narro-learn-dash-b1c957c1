@@ -71,23 +71,62 @@ export function FlashcardReview({ deck, onExit }: Props) {
         {currentIdx + 1} / {deck.length}
       </p>
 
-      {/* Card */}
+      {/* 3D Flip Card */}
       <div
-        className={`w-full max-w-sm ${animClass}`}
+        className={`perspective-800 w-full max-w-sm cursor-pointer ${animClass}`}
         onClick={() => setFlipped(!flipped)}
       >
-        {/* Front */}
-        {!flipped && (
-          <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-5">
+        <div
+          className={`relative w-full transition-transform duration-500 transform-style-3d ${
+            flipped ? 'rotate-y-180' : ''
+          }`}
+        >
+          {/* Invisible back copy to drive container height */}
+          <div className="invisible min-h-64 flex flex-col items-start rounded-xl border p-5" aria-hidden="true">
+            <div className="flex items-center gap-2 w-full">
+              <p className="font-japanese text-2xl font-bold">{card.word}</p>
+              <span className="font-japanese text-sm">{card.reading}</span>
+              <span className="text-xs italic">{toRomaji(card.reading || card.word)}</span>
+            </div>
+            <ol className="mt-3 list-decimal list-inside space-y-0.5 w-full">
+              {card.meanings.map((m, i) => (
+                <li key={i} className="text-sm font-medium">{m}</li>
+              ))}
+            </ol>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {card.jlpt && card.jlpt.length > 0 && (
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-bold">{card.jlpt[0]?.replace('jlpt-', 'JLPT ')}</span>
+              )}
+              {card.partsOfSpeech?.map((p, i) => (
+                <span key={i} className="rounded-full px-2 py-0.5 text-[10px]">{p}</span>
+              ))}
+            </div>
+            {card.contextSentence && (
+              <>
+                <Separator className="mt-3" />
+                <div className="mt-3 w-full rounded-lg p-3">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <BookOpen className="h-3 w-3" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider">From your reading</span>
+                  </div>
+                  <p className="font-japanese text-sm leading-relaxed">{card.contextSentence}</p>
+                </div>
+              </>
+            )}
+            <Separator className="mt-3" />
+            <ExampleSentence word={card.word} className="w-full mt-3" />
+          </div>
+
+          {/* Front face */}
+          <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-5">
             <p className="font-japanese text-5xl font-bold">{card.word}</p>
             <PlayWordButton word={card.word} reading={card.reading} size={24} className="mt-1" />
             <p className="font-japanese mt-1 text-lg text-muted-foreground">{card.reading}</p>
             <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
           </div>
-        )}
-        {/* Back */}
-        {flipped && (
-          <div className="flex min-h-64 flex-col items-start rounded-xl border bg-card shadow-lg p-5">
+
+          {/* Back face */}
+          <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-start rounded-xl border bg-card shadow-lg p-5 overflow-y-auto">
             <div className="flex items-center gap-2 w-full">
               <p className="font-japanese text-2xl font-bold">{card.word}</p>
               <span className="font-japanese text-sm text-muted-foreground">{card.reading}</span>
@@ -130,7 +169,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             <Separator className="mt-3" />
             <ExampleSentence word={card.word} className="w-full mt-3" />
           </div>
-        )}
+        </div>
       </div>
 
       {flipped ? (
