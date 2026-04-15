@@ -91,7 +91,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 return (
                   <>
                     {card.contextSentence!.slice(0, idx)}
-                    <span className="text-amber-500 dark:text-amber-400 font-bold">{card.word}</span>
+                    <span className="text-accent font-bold">{card.word}</span>
                     {card.contextSentence!.slice(idx + card.word.length)}
                   </>
                 );
