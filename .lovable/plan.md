@@ -1,22 +1,33 @@
 
 
-## Carte verso auto-height
+## Page de review non-scrollable, carte scrollable
 
-### Problème
-La carte a une hauteur fixe (`h-64` = 16rem) qui force le scroll quand le verso contient beaucoup de contenu.
+### Changements dans `src/components/FlashcardReview.tsx`
 
-### Solution
-Remplacer la hauteur fixe par une hauteur automatique. Comme le flip 3D nécessite que recto et verso soient superposés (`absolute inset-0`), il faut adapter l'approche :
+1. **Bloquer le scroll de la page** : remplacer le conteneur principal par `h-screen overflow-hidden` au lieu de `min-h-screen`
+2. **Layout en flexbox vertical fixe** : header (boutons retour/delete + progress) en haut, carte au centre avec `flex-1 overflow-hidden`, boutons de réponse en bas
+3. **Carte scrollable** : le verso garde `overflow-y-auto` avec une hauteur contrainte par le flex parent, pas de scroll sur le recto
+4. **Retirer `pb-20`** et `min-h-screen` internes qui causent le débordement
 
-- Retirer `h-64` du conteneur de la carte
-- Utiliser `min-h-64` pour garder une taille minimum (le recto reste joli)
-- Le verso passe de `absolute inset-0` à `relative` quand flippé, avec auto-height
-- Alterner l'affichage recto/verso avec un simple `hidden`/`block` au lieu de l'animation 3D pure, tout en gardant l'animation de transition
+### Structure finale
 
-**Alternative plus simple** : garder le flip 3D mais passer le conteneur en `h-auto` avec un `min-h-64`. Le recto garde `absolute inset-0` et le verso utilise `relative` + `invisible`/`visible` pour piloter la hauteur.
+```text
+┌─────────────────────────┐  h-screen overflow-hidden
+│  ← Back        🗑 Delete │  flex-none
+│  ═══════════ 3/10 ══════ │  flex-none (progress)
+│                          │
+│  ┌──────────────────┐    │
+│  │                  │    │  flex-1 overflow-hidden
+│  │   CARD CONTENT   │    │  carte: overflow-y-auto (verso only)
+│  │                  │    │
+│  └──────────────────┘    │
+│                          │
+│   [Again] [Hard] [Good]  │  flex-none
+└─────────────────────────┘
+```
 
 ### Fichier modifié
 | Fichier | Changement |
 |---------|-----------|
-| `src/components/FlashcardReview.tsx` | Retirer `h-64`, ajouter `min-h-64`, adapter le positionnement recto/verso pour auto-height |
+| `src/components/FlashcardReview.tsx` | Layout fixe viewport, carte scrollable |
 
