@@ -1,19 +1,27 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles, BookOpen } from 'lucide-react';
+import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
-import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { toRomaji } from 'wanakana';
-import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { FlashcardReview } from '@/components/FlashcardReview';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+type StatusFilter = 'all' | 'new' | 'learning' | 'known';
+type SortOption = 'added' | 'mastery' | 'jlpt';
 
 export default function Flashcards() {
-  const { savedWords, removeWord, incrementMastery, resetMastery, getDueWords } = useFlashcardStore();
+  const { savedWords, removeWord, getDueWords } = useFlashcardStore();
   const [reviewMode, setReviewMode] = useState(false);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
   const [shuffled, setShuffled] = useState(false);
+  const [filter, setFilter] = useState<StatusFilter>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('added');
+  const [search, setSearch] = useState('');
 
   const reviewDeck = useMemo(() => {
     const due = getDueWords();
@@ -28,122 +36,64 @@ export default function Flashcards() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedWords, shuffled, reviewMode]);
 
+  const filteredWords = useMemo(() => {
+    let words = [...savedWords];
+
+    // Filter
+    if (filter === 'new') words = words.filter(w => !(w.mastery || 0));
+    else if (filter === 'learning') words = words.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3);
+    else if (filter === 'known') words = words.filter(w => (w.mastery || 0) >= 3);
+
+    // Search
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      words = words.filter(w =>
+        w.word.toLowerCase().includes(q) ||
+        w.reading.toLowerCase().includes(q) ||
+        w.meanings.some(m => m.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort
+    if (sortBy === 'mastery') words.sort((a, b) => (b.mastery || 0) - (a.mastery || 0));
+    else if (sortBy === 'jlpt') {
+      const jlptOrder = (w: typeof words[0]) => {
+        const j = w.jlpt?.[0];
+        if (!j) return 99;
+        return parseInt(j.replace('jlpt-n', ''));
+      };
+      words.sort((a, b) => jlptOrder(a) - jlptOrder(b));
+    }
+
+    return words;
+  }, [savedWords, filter, search, sortBy]);
+
   const knownCount = savedWords.filter(w => (w.mastery || 0) >= 3).length;
   const learningCount = savedWords.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3).length;
   const newCount = savedWords.filter(w => !(w.mastery || 0)).length;
   const dueCount = getDueWords().length;
 
-  if (reviewMode && reviewDeck.length > 0) {
-    const idx = currentIdx % reviewDeck.length;
-    const card = reviewDeck[idx];
-    const progressPct = ((idx + 1) / reviewDeck.length) * 100;
+  if (reviewMode) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 pb-20">
-        <Progress value={progressPct} className="h-1 w-full max-w-sm" />
-        <p className="text-xs font-medium text-muted-foreground">
-          {idx + 1} / {reviewDeck.length}
-        </p>
-
-        {/* 3D Flip Card */}
-        <div
-          className="perspective-800 w-full max-w-sm"
-          onClick={() => setFlipped(!flipped)}
-        >
-          <div
-            className={`relative h-64 w-full transition-transform duration-500 transform-style-3d ${
-              flipped ? 'rotate-y-180' : ''
-            }`}
-          >
-            {/* Front */}
-            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg">
-              <p className="font-japanese text-5xl font-bold">{card.word}</p>
-              <PlayWordButton word={card.word} reading={card.reading} size={24} className="mt-1" />
-              <p className="font-japanese mt-1 text-lg text-muted-foreground">{card.reading}</p>
-              <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
-            </div>
-            {/* Back */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-start rounded-xl border bg-card shadow-lg p-5 overflow-y-auto">
-              {/* Header: word + reading + romaji + audio */}
-              <div className="flex items-center gap-2 w-full">
-                <p className="font-japanese text-2xl font-bold">{card.word}</p>
-                <span className="font-japanese text-sm text-muted-foreground">{card.reading}</span>
-                <span className="text-xs text-muted-foreground/70 italic">{toRomaji(card.reading || card.word)}</span>
-                <PlayWordButton word={card.word} reading={card.reading} size={16} className="ml-auto" />
-              </div>
-
-              {/* Definitions numbered */}
-              <ol className="mt-3 list-decimal list-inside space-y-0.5 w-full">
-                {card.meanings.map((m, i) => (
-                  <li key={i} className="text-sm font-medium text-foreground">{m}</li>
-                ))}
-              </ol>
-
-              {/* Badges: JLPT + POS */}
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {card.jlpt && card.jlpt.length > 0 && (
-                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-                    {card.jlpt[0]?.replace('jlpt-', 'JLPT ')}
-                  </span>
-                )}
-                {card.partsOfSpeech?.map((p, i) => (
-                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                    {p}
-                  </span>
-                ))}
-              </div>
-
-              {/* Context sentence from reading */}
-              {card.contextSentence && (
-                <>
-                  <Separator className="mt-3" />
-                  <div className="mt-3 w-full rounded-lg bg-primary/5 border border-primary/10 p-3">
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <BookOpen className="h-3 w-3 text-primary" />
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
-                    </div>
-                    <p className="font-japanese text-sm leading-relaxed text-foreground">{card.contextSentence}</p>
-                  </div>
-                </>
-              )}
-
-              {/* Tatoeba example */}
-              <Separator className="mt-3" />
-              <ExampleSentence word={card.word} className="w-full mt-3" />
-            </div>
-          </div>
-        </div>
-
-        {flipped ? (
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="border-destructive/30 text-destructive hover:bg-destructive/10"
-              onClick={() => { resetMastery(card.id); setFlipped(false); setCurrentIdx(currentIdx + 1); }}
-            >
-              <X className="mr-1 h-4 w-4" /> Again
-            </Button>
-            <Button
-              variant="outline"
-              className="border-green-300 text-green-600 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-950"
-              onClick={() => { incrementMastery(card.id); setFlipped(false); setCurrentIdx(currentIdx + 1); }}
-            >
-              <Check className="mr-1 h-4 w-4" /> Got it
-            </Button>
-          </div>
-        ) : (
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => { setFlipped(false); setCurrentIdx(currentIdx + 1); }}>
-              Skip →
-            </Button>
-          </div>
-        )}
-
-        <Button variant="ghost" size="sm" onClick={() => { setReviewMode(false); setCurrentIdx(0); setFlipped(false); }}>
-          Exit Review
-        </Button>
-      </div>
+      <FlashcardReview
+        deck={reviewDeck}
+        onExit={() => setReviewMode(false)}
+      />
     );
   }
+
+  const filters: { label: string; value: StatusFilter }[] = [
+    { label: 'All', value: 'all' },
+    { label: 'New', value: 'new' },
+    { label: 'Learning', value: 'learning' },
+    { label: 'Known', value: 'known' },
+  ];
+
+  const sortLabels: Record<SortOption, string> = {
+    added: 'Date added',
+    mastery: 'Mastery',
+    jlpt: 'JLPT',
+  };
 
   return (
     <div className="pb-20 px-6 pt-8">
@@ -172,24 +122,71 @@ export default function Flashcards() {
       </div>
 
       {savedWords.length > 0 && (
-        <div className="mt-3 flex gap-3">
-          <div className="flex-1 rounded-lg border bg-card p-3 text-center">
-            <p className="text-lg font-bold text-green-600">{knownCount}</p>
-            <p className="text-[10px] text-muted-foreground">Known</p>
+        <>
+          {/* Stats */}
+          <div className="mt-3 flex gap-3">
+            <div className="flex-1 rounded-lg border bg-card p-3 text-center">
+              <p className="text-lg font-bold text-green-600">{knownCount}</p>
+              <p className="text-[10px] text-muted-foreground">Known</p>
+            </div>
+            <div className="flex-1 rounded-lg border bg-card p-3 text-center">
+              <p className="text-lg font-bold text-amber-500">{learningCount}</p>
+              <p className="text-[10px] text-muted-foreground">Learning</p>
+            </div>
+            <div className="flex-1 rounded-lg border bg-card p-3 text-center">
+              <p className="text-lg font-bold text-muted-foreground">{newCount}</p>
+              <p className="text-[10px] text-muted-foreground">New</p>
+            </div>
           </div>
-          <div className="flex-1 rounded-lg border bg-card p-3 text-center">
-            <p className="text-lg font-bold text-amber-500">{learningCount}</p>
-            <p className="text-[10px] text-muted-foreground">Learning</p>
+
+          {/* Search */}
+          <div className="mt-3 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search words..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9 h-9"
+            />
           </div>
-          <div className="flex-1 rounded-lg border bg-card p-3 text-center">
-            <p className="text-lg font-bold text-muted-foreground">{newCount}</p>
-            <p className="text-[10px] text-muted-foreground">New</p>
+
+          {/* Filters + Sort */}
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex gap-1.5">
+              {filters.map(f => (
+                <button
+                  key={f.value}
+                  onClick={() => setFilter(f.value)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                    filter === f.value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-muted-foreground text-xs gap-1">
+                  <ArrowUpDown className="h-3 w-3" /> {sortLabels[sortBy]}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {(Object.keys(sortLabels) as SortOption[]).map(key => (
+                  <DropdownMenuItem key={key} onClick={() => setSortBy(key)}>
+                    {sortLabels[key]}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-        </div>
+        </>
       )}
 
       <p className="mt-3 text-sm text-muted-foreground">
-        {savedWords.length} words saved
+        {filteredWords.length} words{filter !== 'all' || search ? ` (of ${savedWords.length})` : ' saved'}
         {dueCount > 0 && <span className="text-accent font-semibold"> · {dueCount} due for review</span>}
       </p>
 
@@ -201,7 +198,7 @@ export default function Flashcards() {
         </div>
       ) : (
         <div className="mt-4 flex flex-col gap-2">
-          {savedWords.map((word) => {
+          {filteredWords.map((word) => {
             const mastery = word.mastery || 0;
             const masteryColor = mastery >= 3 ? 'bg-green-500' : mastery > 0 ? 'bg-amber-400' : 'bg-muted';
             return (
@@ -221,10 +218,12 @@ export default function Flashcards() {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                
               </div>
             );
           })}
+          {filteredWords.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground mt-8">No words match your filters.</p>
+          )}
         </div>
       )}
     </div>
