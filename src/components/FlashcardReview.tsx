@@ -20,8 +20,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [flipped, setFlipped] = useState(false);
-  const [animClass, setAnimClass] = useState('');
+
+
 
   const advance = useCallback((action?: () => void) => {
     action?.();
