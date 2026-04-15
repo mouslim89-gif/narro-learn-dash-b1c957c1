@@ -36,7 +36,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   if (currentIdx >= deck.length) {
     return (
-      <div className="fixed inset-0 z-50 flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-background px-6">
+      <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-background px-6">
         <span className="text-5xl">🎉</span>
         <p className="text-xl font-bold">Session terminée !</p>
         <p className="text-sm text-muted-foreground">{deck.length} cartes révisées</p>
