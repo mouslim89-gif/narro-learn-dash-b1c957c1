@@ -1,21 +1,36 @@
 
 
-## Améliorer le verso des flashcards
+## Plan : phrase de contexte + bouton flashcard explicite
 
-Le verso actuel est basique : mot, définitions empilées, badge JLPT, et une phrase d'exemple. On va le restructurer pour qu'il soit plus lisible et informatif.
+### Résumé
+1. Quand un mot est ajouté depuis le Reader (WordPopup), sauvegarder la phrase de l'histoire dans laquelle il apparaît
+2. Sur le verso de la flashcard, afficher cette phrase de contexte en plus de la phrase Tatoeba
+3. Rendre le bouton "Save" plus explicite → "Add to Flashcards"
 
-### Changements dans `src/pages/Flashcards.tsx`
+### Changements
 
-**Structure du verso redessinée :**
-- **En haut** : mot + reading + romaji (via `wanakana.toRomaji`) + bouton audio, sur une ligne compacte
-- **Section définitions** : numérotées (1. 2. 3.), avec une meilleure hiérarchie visuelle, couleur `text-foreground` au lieu de `text-accent`
-- **Badges** : ligne de tags — JLPT badge + parts of speech en chips mutés, alignés horizontalement
-- **Séparateur** fin avant la phrase d'exemple
-- **Phrase d'exemple** : en bas, avec plus d'espace
-- Meilleur padding et espacement global, texte aligné à gauche (plus naturel qu'un centrage)
+#### 1. `src/stores/flashcards.ts` — Ajouter le champ `contextSentence`
+- Ajouter `contextSentence?: string` à l'interface `SavedWord`
+- Aucun changement à `addWord`, le champ est simplement optionnel
 
-### Fichier à modifier
+#### 2. `src/pages/Reader.tsx` — Passer la phrase de contexte au WordPopup
+- Quand un mot est cliqué, trouver la phrase (`sentence.tokens`) qui contient ce token
+- Joindre les tokens de cette phrase en texte et le passer au WordPopup via une nouvelle prop `contextSentence`
+
+#### 3. `src/components/WordPopup.tsx` — Recevoir et sauvegarder le contexte
+- Ajouter prop `contextSentence?: string`
+- L'inclure dans l'objet `SavedWord` passé à `addWord`
+- Changer le bouton de `Save` / `Saved` → `Add to Flashcards` / `Added to Flashcards` (avec icône Star conservée)
+
+#### 4. `src/pages/Flashcards.tsx` — Afficher les deux phrases
+- Garder `<ExampleSentence word={card.word} />` (Tatoeba)
+- Si `card.contextSentence` existe, afficher au-dessus un bloc "From your reading" avec la phrase de l'histoire, stylé différemment (icône livre, fond légèrement teinté)
+
+### Fichiers modifiés
 | Fichier | Changement |
 |---------|-----------|
-| `src/pages/Flashcards.tsx` | Redesign du verso de la carte (lignes 62-74) |
+| `src/stores/flashcards.ts` | Ajouter `contextSentence?: string` |
+| `src/pages/Reader.tsx` | Extraire et passer la phrase de contexte |
+| `src/components/WordPopup.tsx` | Nouvelle prop + bouton renommé |
+| `src/pages/Flashcards.tsx` | Afficher phrase de contexte + Tatoeba |
 
