@@ -36,7 +36,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   if (currentIdx >= deck.length) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-6 px-6">
+      <div className="fixed inset-0 z-50 flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-background px-6">
         <span className="text-5xl">🎉</span>
         <p className="text-xl font-bold">Session terminée !</p>
         <p className="text-sm text-muted-foreground">{deck.length} cartes révisées</p>
@@ -79,8 +79,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
       {card.contextSentence && (
         <>
           <Separator className="mt-3" />
-          <div className="mt-3 w-full rounded-lg bg-primary/5 border border-primary/10 p-3">
-            <div className="flex items-center gap-1.5 mb-1.5">
+          <div className="mt-3 w-full rounded-lg border border-primary/10 bg-primary/5 p-3">
+            <div className="mb-1.5 flex items-center gap-1.5">
               <BookOpen className="h-3 w-3 text-primary" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
             </div>
@@ -102,12 +102,12 @@ export function FlashcardReview({ deck, onExit }: Props) {
       )}
 
       <Separator className="mt-3" />
-      <ExampleSentence word={card.word} className="w-full mt-3" />
+      <ExampleSentence word={card.word} className="mt-3 w-full" />
     </>
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex min-h-[100dvh] flex-col overflow-hidden bg-background">
       {/* Header */}
       <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
         <Button variant="ghost" size="icon" onClick={onExit}>
