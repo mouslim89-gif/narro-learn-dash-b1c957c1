@@ -6,6 +6,7 @@ import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, type JishoResult } from '@/lib/jisho';
 import { Search, Star, Loader2, X } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { toRomaji } from 'wanakana';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Input } from '@/components/ui/input';
 
@@ -113,7 +114,10 @@ export default function DictionaryPage() {
               <div className="flex items-center gap-1.5 pr-8">
                 <p className="font-japanese text-xl font-bold">{word}</p>
                 {reading && reading !== word && (
-                  <span className="font-japanese text-sm text-muted-foreground">（{reading}）</span>
+                  <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
+                )}
+                {reading && (
+                  <span className="text-xs text-muted-foreground/70 italic">{toRomaji(reading)}</span>
                 )}
                 <PlayWordButton word={word} reading={reading} size={16} />
               </div>
@@ -142,7 +146,7 @@ export default function DictionaryPage() {
                 {result.senses.slice(0, 3).map((sense, i) => (
                   <p key={i} className="text-sm leading-relaxed">
                     <span className="text-muted-foreground mr-1">{i + 1}.</span>
-                    <span className="font-medium text-accent">{sense.english_definitions.join('; ')}</span>
+                    <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
                   </p>
                 ))}
               </div>
