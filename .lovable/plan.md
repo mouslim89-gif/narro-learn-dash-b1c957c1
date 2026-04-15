@@ -1,32 +1,24 @@
-## Améliorations de l'application Yomimasu
 
-Voici un ensemble d'améliorations UX et fonctionnelles cohérentes pour rendre l'app plus agréable et utile.
 
----
+## Dictionary Page — Cards Redesign + Clear Button
 
-### 1. Recherche de mots depuis le Reader
+### Changes to `src/pages/Dictionary.tsx`
 
-Quand l'utilisateur tape un mot dans le Reader (WordPopup), ajouter un bouton "Search in Dictionary" qui navigue vers `/dictionary?q=mot`. Ça connecte mieux les deux features.
+**Clear search button**
+- Import `X` from lucide-react
+- Add an `X` button inside the search input container (right side), visible only when query is non-empty
+- Clicking it clears the query and focuses the input
 
-**Fichier** : modifier `src/components/WordPopup.tsx` — ajouter un lien vers le dictionnaire.
+**Cards redesign**
+- Word + reading on same line: `食べる（たべる）` style, with PlayWordButton inline
+- Tag row below: JLPT badge + "Common" green badge when `result.is_common` is true + parts of speech as subtle muted chips
+- Save star as a small absolute-positioned icon at top-right of card
+- Meanings with slightly larger text and better spacing
+- Card gets a subtle left border accent (teal `border-l-4 border-primary` for common words)
+- Better padding and section spacing throughout
 
----
+### Files to modify
+| File | Change |
+|------|--------|
+| `src/pages/Dictionary.tsx` | Cards redesign + clear button |
 
-### 2. Statistiques de lecture améliorées (My Books)
-
-Remplacer les stats basiques par des stats plus motivantes :
-- **Mots lus estimés** (basé sur le nombre de tokens × progression)
-- **Streak visuel** avec un calendrier de points (style GitHub contributions)
-- Animations des chiffres au chargement
-
----
-
-### 3. Conjugation Table dans le Dictionary ✅
-
-Ajout du composant `ConjugationTable` dans les résultats du dictionnaire pour afficher les conjugaisons des verbes et adjectifs.
-
----
-
-### 4. Dark Mode global ✅
-
-Toggle dark/light dans la Library, état persisté dans le store, classe `dark` appliquée sur `<html>`.
