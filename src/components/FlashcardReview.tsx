@@ -138,7 +138,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             }`}
           >
             {/* Invisible back copy to drive container height */}
-            <div className="invisible flex flex-col items-start rounded-xl border p-5" aria-hidden="true">
+            <div className="invisible max-h-[50vh] overflow-hidden flex flex-col items-start rounded-xl border p-5" aria-hidden="true">
               {backContent}
             </div>
 
