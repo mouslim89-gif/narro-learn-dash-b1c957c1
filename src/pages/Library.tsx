@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { books, genreLabels, type Genre, jlptColors, difficultyConfig } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { Link } from 'react-router-dom';
-import { Clock, Headphones, Search, BookOpen } from 'lucide-react';
+import { Clock, Headphones, Search, BookOpen, Moon, Sun } from 'lucide-react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ const genres = Object.keys(genreLabels) as Genre[];
 
 export default function Library() {
   const [search, setSearch] = useState('');
-  const { progress } = useReadingProgressStore();
+  const { progress, darkMode, setDarkMode } = useReadingProgressStore();
   const featured = books[0];
 
   // Find most recently read book
@@ -37,9 +37,14 @@ export default function Library() {
 
   return (
     <div className="pb-20">
-      <header className="px-6 pt-8 pb-2">
-        <h1 className="text-2xl font-bold tracking-tight">読みます</h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">Learn Japanese through reading</p>
+      <header className="px-6 pt-8 pb-2 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">読みます</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">Learn Japanese through reading</p>
+        </div>
+        <Button variant="ghost" size="icon" onClick={() => setDarkMode(!darkMode)} className="mt-1">
+          {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </Button>
       </header>
 
       {/* Search */}
