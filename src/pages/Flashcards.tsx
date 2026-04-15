@@ -4,6 +4,8 @@ import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { toRomaji } from 'wanakana';
 import { Progress } from '@/components/ui/progress';
 
 export default function Flashcards() {
