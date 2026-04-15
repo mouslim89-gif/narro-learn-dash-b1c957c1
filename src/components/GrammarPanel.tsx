@@ -5,24 +5,6 @@ import { jlptColors } from '@/data/books';
 import { bookGrammar, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 
-/** Highlights occurrences of a grammar pattern within example text */
-function HighlightPattern({ text, pattern }: { text: string; pattern: string }) {
-  // Strip leading/trailing ～ from pattern for matching
-  const cleaned = pattern.replace(/^～|～$/g, '');
-  if (!cleaned) return <>{text}</>;
-
-  const idx = text.indexOf(cleaned);
-  if (idx === -1) return <>{text}</>;
-
-  return (
-    <>
-      {text.slice(0, idx)}
-      <span className="rounded bg-primary/20 px-0.5 font-bold text-primary">{cleaned}</span>
-      {text.slice(idx + cleaned.length)}
-    </>
-  );
-}
-
 interface GrammarPanelProps {
   text: string;
   bookId: string;
@@ -144,9 +126,7 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
                           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
                             Example from text
                           </p>
-                          <p className="font-japanese text-sm">
-                            <HighlightPattern text={note.example} pattern={note.pattern} />
-                          </p>
+                          <p className="font-japanese text-sm">{note.example}</p>
                         </div>
                         <div className="rounded bg-primary/5 p-3">
                           <p className="text-[10px] font-semibold uppercase tracking-widest text-primary mb-1">
