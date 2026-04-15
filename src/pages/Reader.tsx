@@ -27,7 +27,7 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [popupWord, setPopupWord] = useState<{ text: string; baseForm?: string; pos?: string } | null>(null);
+  const [popupWord, setPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
   
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -287,10 +287,11 @@ export default function Reader() {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const handleClick = (e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        setPopupWord({ text: token.t, baseForm: token.b, pos: token.p });
-                      };
+                       const handleClick = (e: React.MouseEvent) => {
+                         e.stopPropagation();
+                         const contextSentence = sentence.tokens.map(t => t.t).join('');
+                         setPopupWord({ text: token.t, baseForm: token.b, pos: token.p, contextSentence });
+                       };
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
 
@@ -321,6 +322,7 @@ export default function Reader() {
           word={popupWord.text}
           baseForm={popupWord.baseForm}
           pos={popupWord.pos}
+          contextSentence={popupWord.contextSentence}
           onClose={() => setPopupWord(null)}
         />
       )}

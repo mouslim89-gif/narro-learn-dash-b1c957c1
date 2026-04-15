@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles } from 'lucide-react';
+import { Trash2, RotateCcw, Shuffle, Check, X, Sparkles, BookOpen } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
@@ -92,7 +92,21 @@ export default function Flashcards() {
                 ))}
               </div>
 
-              {/* Separator + Example */}
+              {/* Context sentence from reading */}
+              {card.contextSentence && (
+                <>
+                  <Separator className="mt-3" />
+                  <div className="mt-3 w-full rounded-lg bg-primary/5 border border-primary/10 p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <BookOpen className="h-3 w-3 text-primary" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
+                    </div>
+                    <p className="font-japanese text-sm leading-relaxed text-foreground">{card.contextSentence}</p>
+                  </div>
+                </>
+              )}
+
+              {/* Tatoeba example */}
               <Separator className="mt-3" />
               <ExampleSentence word={card.word} className="w-full mt-3" />
             </div>
