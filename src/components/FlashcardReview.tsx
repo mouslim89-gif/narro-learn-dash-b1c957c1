@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { X, AlertTriangle, Check, BookOpen, Trash2 } from 'lucide-react';
+import { X, AlertTriangle, Check, BookOpen, Trash2, ArrowLeft } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
@@ -52,7 +52,20 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const progressPct = ((currentIdx + 1) / deck.length) * 100;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 pb-20">
+    <div className="relative min-h-screen pb-20">
+      {/* Header */}
+      <div className="absolute top-4 left-4 z-10">
+        <Button variant="ghost" size="icon" onClick={onExit}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
+      <div className="absolute top-4 right-4 z-10">
+        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
+          <Trash2 className="h-5 w-5" />
+        </Button>
+      </div>
+
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6">
       <Progress value={progressPct} className="h-1 w-full max-w-sm" />
       <p className="text-xs font-medium text-muted-foreground">
         {currentIdx + 1} / {deck.length}
@@ -154,14 +167,6 @@ export function FlashcardReview({ deck, onExit }: Props) {
           Skip →
         </Button>
       )}
-
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
-          <Trash2 className="mr-1 h-4 w-4" /> Delete
-        </Button>
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          Exit Review
-        </Button>
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
