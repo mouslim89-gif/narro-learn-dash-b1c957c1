@@ -16,8 +16,11 @@ type StatusFilter = 'all' | 'new' | 'learning' | 'known';
 type SortOption = 'added' | 'mastery' | 'jlpt';
 
 export default function Flashcards() {
-  const { savedWords, removeWord, getDueWords } = useFlashcardStore();
+  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
   const [reviewMode, setReviewMode] = useState(false);
+
+  const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
+  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
   const [shuffled, setShuffled] = useState(false);
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('added');
