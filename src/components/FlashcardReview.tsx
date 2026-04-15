@@ -121,7 +121,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
       {/* Progress */}
       <div className="flex-none px-6 pb-2">
         <Progress value={progressPct} className="h-1 w-full" />
-        <p className="text-xs font-medium text-muted-foreground text-center mt-1">
+        <p className="text-xs font-medium text-muted-foreground text-center mt-[5px]">
           {currentIdx + 1} / {deck.length}
         </p>
       </div>
