@@ -6,6 +6,9 @@ import { useFlashcardStore } from '@/stores/flashcards';
 import { difficultyConfig } from '@/data/books';
 import { formatDistanceToNow, differenceInCalendarDays, startOfDay, subDays, format } from 'date-fns';
 import { bookTokens } from '@/data/book-tokens';
+import { Link } from 'react-router-dom';
+import { Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function StreakCalendar({ readDatesSet }: { readDatesSet: Set<string> }) {
   const today = new Date();
@@ -88,8 +91,17 @@ export default function MyBooks() {
 
   return (
     <div className="pb-20 px-6 pt-8">
-      <h1 className="text-2xl font-bold">My Books</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Continue where you left off</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">My Books</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Continue where you left off</p>
+        </div>
+        <Link to="/settings">
+          <Button variant="ghost" size="icon">
+            <Settings className="h-5 w-5" />
+          </Button>
+        </Link>
+      </div>
 
       {/* Stats */}
       {startedBooks.length > 0 && (

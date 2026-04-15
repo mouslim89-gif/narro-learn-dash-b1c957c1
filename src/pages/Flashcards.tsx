@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown } from 'lucide-react';
+import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,7 +102,14 @@ export default function Flashcards() {
   return (
     <div className="pb-20 px-6 pt-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Flashcards</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Flashcards</h1>
+          <Link to="/settings">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
         {savedWords.length > 0 && (
           <div className="flex items-center gap-2">
             <Button

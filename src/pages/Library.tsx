@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { books, genreLabels, type Genre, jlptColors, difficultyConfig } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { Link } from 'react-router-dom';
-import { Clock, Headphones, Search, BookOpen, Moon, Sun } from 'lucide-react';
+import { Clock, Headphones, Search, BookOpen, Moon, Sun, Settings } from 'lucide-react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
@@ -42,9 +42,16 @@ export default function Library() {
           <h1 className="text-2xl font-bold tracking-tight">読みます</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">Learn Japanese through reading</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setDarkMode(!darkMode)} className="mt-1">
-          {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-1 mt-1">
+          <Button variant="ghost" size="icon" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          <Link to="/settings">
+            <Button variant="ghost" size="icon">
+              <Settings className="h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
       </header>
 
       {/* Search */}
