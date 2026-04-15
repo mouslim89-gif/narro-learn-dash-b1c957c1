@@ -121,7 +121,7 @@ export default function DictionaryPage() {
               {/* Tags row */}
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 {isCommon && (
-                  <span className="rounded-full bg-primary/20 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/30">
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 border border-primary/15">
                     ✦ Common
                   </span>
                 )}
