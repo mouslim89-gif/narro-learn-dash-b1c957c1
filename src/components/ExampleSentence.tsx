@@ -35,11 +35,24 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
 
   if (!example) return null;
 
+  const highlightWord = (text: string) => {
+    const index = text.indexOf(word);
+    if (index === -1) return text;
+    
+    return (
+      <>
+        {text.slice(0, index)}
+        <span className="text-primary font-bold">{word}</span>
+        {text.slice(index + word.length)}
+      </>
+    );
+  };
+
   return (
     <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
       <div className="flex items-start gap-1">
         <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
-          {example.japanese}
+          {highlightWord(example.japanese)}
         </p>
         <PlayWordButton word={example.japanese} size={14} className="mt-0.5 shrink-0" />
       </div>
