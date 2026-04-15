@@ -82,6 +82,24 @@ export const useFlashcardStore = create<FlashcardStore>()(
           ),
         });
       },
+      adjustMastery: (id, quality) => {
+        set({
+          savedWords: get().savedWords.map(w => {
+            if (w.id !== id) return w;
+            const now = new Date().toISOString();
+            if (quality === 'again') {
+              return { ...w, mastery: 0, lastReviewedAt: now, nextReviewAt: now };
+            }
+            if (quality === 'hard') {
+              const d = new Date(); d.setDate(d.getDate() + 1);
+              return { ...w, lastReviewedAt: now, nextReviewAt: d.toISOString() };
+            }
+            // good
+            const newMastery = (w.mastery || 0) + 1;
+            return { ...w, mastery: newMastery, lastReviewedAt: now, nextReviewAt: getNextReviewDate(newMastery) };
+          }),
+        });
+      },
       getDueCount: () => {
         const now = new Date().toISOString();
         return get().savedWords.filter(w => !w.nextReviewAt || w.nextReviewAt <= now).length;
