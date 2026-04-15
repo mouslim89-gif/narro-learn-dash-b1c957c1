@@ -9,20 +9,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toRomaji } from 'wanakana';
 import { X, AlertTriangle, Check, BookOpen, Trash2, ArrowLeft } from 'lucide-react';
 
-function highlightWord(sentence: string, word: string): React.ReactNode {
-  const idx = sentence.indexOf(word);
-  if (idx === -1) return sentence;
-  const before = sentence.slice(0, idx);
-  const after = sentence.slice(idx + word.length);
-  return (
-    <>
-      {before}
-      <span className="bg-primary/20 text-primary font-bold rounded px-0.5">{word}</span>
-      {after}
-    </>
-  );
-}
-
 interface Props {
   deck: SavedWord[];
   onExit: () => void;
@@ -98,9 +84,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
               <BookOpen className="h-3 w-3 text-primary" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
             </div>
-            <p className="font-japanese text-sm leading-relaxed text-foreground">
-              {highlightWord(card.contextSentence, card.word)}
-            </p>
+            <p className="font-japanese text-sm leading-relaxed text-foreground">{card.contextSentence}</p>
           </div>
         </>
       )}
