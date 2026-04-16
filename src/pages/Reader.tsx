@@ -9,6 +9,7 @@ import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
+import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode, type DisplayMode } from '@/stores/reading-progress';
@@ -27,7 +28,8 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [popupWord, setPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
+  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string; anchorPos: { x: number; y: number }; sentenceIdx: number } | null>(null);
+  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
   
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -277,9 +279,8 @@ export default function Reader() {
                 return (
                   <span
                     key={sIdx}
-                    onClick={() => setActiveSentence(activeSentence === globalIdx ? null : globalIdx)}
-                    className={`transition-colors duration-200 ${
-                      activeSentence === globalIdx ? 'bg-accent/10 rounded' : ''
+                    className={`transition-opacity duration-200 ${
+                      miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-20' : ''
                     }`}
                   >
                     {sentence.tokens.map((token, i) => {
@@ -290,7 +291,7 @@ export default function Reader() {
                        const handleClick = (e: React.MouseEvent) => {
                          e.stopPropagation();
                          const contextSentence = sentence.tokens.map(t => t.t).join('');
-                         setPopupWord({ text: token.t, baseForm: token.b, pos: token.p, contextSentence });
+                         setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, anchorPos: { x: e.clientX, y: e.clientY }, sentenceIdx: globalIdx });
                        };
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
@@ -317,13 +318,29 @@ export default function Reader() {
         </div>
       </article>
 
-      {popupWord && (
+      {miniPopup && (
+        <WordMiniPopup
+          word={miniPopup.text}
+          baseForm={miniPopup.baseForm}
+          pos={miniPopup.pos}
+          contextSentence={miniPopup.contextSentence}
+          anchorPos={miniPopup.anchorPos}
+          onClose={() => setMiniPopup(null)}
+          onShowMore={() => {
+            const { text, baseForm, pos, contextSentence } = miniPopup;
+            setMiniPopup(null);
+            setFullPopupWord({ text, baseForm, pos, contextSentence });
+          }}
+        />
+      )}
+
+      {fullPopupWord && (
         <WordPopup
-          word={popupWord.text}
-          baseForm={popupWord.baseForm}
-          pos={popupWord.pos}
-          contextSentence={popupWord.contextSentence}
-          onClose={() => setPopupWord(null)}
+          word={fullPopupWord.text}
+          baseForm={fullPopupWord.baseForm}
+          pos={fullPopupWord.pos}
+          contextSentence={fullPopupWord.contextSentence}
+          onClose={() => setFullPopupWord(null)}
         />
       )}
 
