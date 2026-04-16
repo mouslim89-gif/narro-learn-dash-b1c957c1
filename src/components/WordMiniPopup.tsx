@@ -170,6 +170,11 @@ export function WordMiniPopup({
           </button>
         )}
         <div className="flex-1" />
+        {(result as any)?.is_common && (
+          <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary/80 border border-primary/15">
+            ✦
+          </span>
+        )}
         {result?.jlpt && result.jlpt.length > 0 && (
           <span className="shrink-0 rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent">
             {result.jlpt[0]?.replace('jlpt-', '')}
