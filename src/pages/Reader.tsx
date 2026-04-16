@@ -292,6 +292,11 @@ export default function Reader() {
 
                       const handleClick = (e: React.MouseEvent) => {
                         e.stopPropagation();
+                        // Toggle off if clicking the same word
+                        if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
+                          setMiniPopup(null);
+                          return;
+                        }
                         const contextSentence = sentence.tokens.map(t => t.t).join('');
                         const spanEl = sentenceRefs.current.get(globalIdx);
                         const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
