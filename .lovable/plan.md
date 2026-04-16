@@ -1,49 +1,50 @@
 
 
-## Mini Popup — Animation, drag-to-switch, toggle close
+## Mini Popup — Positionnement, surlignage & compactage
 
-### 1. Animation d'apparition
-Le popup utilise déjà `animate-in fade-in-0 zoom-in-95 duration-150` de tailwindcss-animate. Je vais l'améliorer avec une animation plus expressive : **slide depuis la phrase** (descend depuis le haut si popup en bas, monte depuis le bas si popup au-dessus) + fade + zoom subtil.
+### Problèmes actuels
+1. **Positionnement** basé sur `e.clientX/clientY` (le point de tap) — le popup flotte au mauvais endroit au lieu de s'ancrer au bord de la phrase
+2. **Pas de surlignage** du mot tappé
+3. **Popup trop grand** — bouton Save prend toute la largeur, padding excessif
 
-- Détecter la direction (popup au-dessus ou en-dessous de la phrase) et appliquer `slide-in-from-bottom-2` ou `slide-in-from-top-2`
-- Durée 180ms, easing `ease-out`
-- Origine du transform alignée vers la phrase pour un effet naturel
+### Ce qu'on va faire
 
-### 2. Drag pour changer de mot (maintenir + glisser)
-Comportement type "loupe glissante" :
-- Sur `pointerdown` d'un mot japonais → ouvre le mini popup ET active un mode "drag"
-- Pendant `pointermove` (sans relâcher) → on fait `document.elementFromPoint(x, y)` pour détecter le mot survolé
-- Si on survole un autre mot japonais (`data-word-token`), on met à jour `miniPopup` avec le nouveau mot/phrase/rect
-- Sur `pointerup` → fin du mode drag, le popup reste ouvert sur le dernier mot
+#### 1. Positionnement ancré à la phrase (Reader.tsx)
+- Au lieu de passer `{ x: e.clientX, y: e.clientY }`, on récupère le **boundingRect du `<span>` de la phrase** (le `<span key={sIdx}>`)
+- On passe `sentenceRect: { top, bottom, left, right }` au mini popup
+- Le popup se positionne :
+  - **Au-dessus** de `sentenceRect.top` si assez de place
+  - **En-dessous** de `sentenceRect.bottom` sinon
+  - Centré horizontalement sur la phrase
 
-**Implémentation** :
-- Ajouter `data-word-token`, `data-sentence-idx`, `data-token-idx`, `data-base-form`, `data-pos` sur chaque `<span>` de mot dans Reader.tsx
-- Handler global `pointermove` actif uniquement quand `isDragging` est true
-- Le popup ne se repositionne pas brutalement — on garde le même composant monté, juste les props changent (le `useEffect` de positionnement recalcule)
+#### 2. Surlignage du mot actif (Reader.tsx)
+- Ajouter une condition : si `miniPopup` est ouvert et que le token courant correspond au mot actif, appliquer `bg-accent/20 rounded-sm` (surlignage léger)
+- Comparer `token.t === miniPopup.text` + même `sentenceIdx`
 
-### 3. Tap sur mot déjà sélectionné = ferme
-Dans le `onClick` du mot Reader.tsx :
-```ts
-if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
-  setMiniPopup(null);
-  return;
-}
-```
+#### 3. Compacter le popup (WordMiniPopup.tsx)
+- **Bouton Save** → remplacé par une petite icône `Star` cliquable (16px), positionnée dans le header à côté du mot, pas un gros bouton
+- **Bouton More** → texte plus petit, inline dans le header aussi
+- Réduire les paddings : `px-3 pt-3 pb-1` → `px-2.5 pt-2 pb-1.5`
+- Reading + définitions plus compacts
+- Layout actions : une ligne horizontale avec ⭐ | 🔊 | More → alignés dans le header
 
-### Détails techniques
+### Fichiers modifiés
 
 | Fichier | Changement |
 |---------|-----------|
-| `src/pages/Reader.tsx` | Remplacer `onClick` par `onPointerDown`+`onPointerUp`+global `pointermove` ; ajouter data-attributes sur tokens ; toggle close si même mot |
-| `src/components/WordMiniPopup.tsx` | Animation directionnelle (slide depuis la phrase) ; transition douce sur le repositionnement quand on drag d'un mot à l'autre |
+| `src/pages/Reader.tsx` | Passer `sentenceRect` au lieu de `anchorPos` click, ajouter ref sur le span phrase, surligner le mot actif |
+| `src/components/WordMiniPopup.tsx` | Nouveau positionnement basé sur sentenceRect, UI compactée, Star en icône inline |
 
-### Subtilités UX
-- **Threshold de drag** : on n'active le drag-switch qu'après 8px de mouvement, sinon un simple tap reste un tap (pas de switch accidentel)
-- **Transition de position** : quand on switch de mot pendant le drag, ajouter `transition-[top,left] duration-150 ease-out` pour que le popup glisse vers la nouvelle position au lieu de sauter
-- **Highlight suit le drag** : le surlignage du mot actif suit naturellement puisqu'il est lié à `miniPopup.sentenceIdx/tokenIdx`
-- **Cleanup** : `pointercancel` et `pointerup` hors zone retirent les listeners globaux
+### Résultat visuel attendu
 
-### Question rapide
-
-Une seule chose à clarifier sur le drag :
+```text
+┌──────────────────────────┐
+│ 猫  ♪  ⭐  N5   More ▸  │  ← header compact, tout sur une ligne
+│ ねこ                      │  ← reading
+│ 1. cat  2. old cloth     │  ← définitions
+│ Noun                     │  ← POS
+└──────────────────────────┘
+     ▼ (phrase en dessous)
+ ...彼の[猫]は可愛いです...   ← 猫 surligné
+```
 

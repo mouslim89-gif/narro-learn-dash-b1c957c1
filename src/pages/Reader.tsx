@@ -28,9 +28,8 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number; placement?: 'above' | 'below' } | null>(null);
+  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
   const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
-  const dragStateRef = useRef<{ active: boolean; startX: number; startY: number; moved: boolean } | null>(null);
   const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
   
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
@@ -147,52 +146,6 @@ export default function Reader() {
     const remaining = book.readingTimeMin * ((100 - scrollPercent) / 100);
     return Math.max(1, Math.round(remaining));
   }, [book, scrollPercent]);
-
-  // Helper: build miniPopup state from a token DOM element
-  const openMiniPopupFromEl = useCallback((el: HTMLElement) => {
-    const text = el.dataset.tokenText;
-    const sIdxStr = el.dataset.sentenceIdx;
-    const tIdxStr = el.dataset.tokenIdx;
-    if (!text || sIdxStr == null || tIdxStr == null) return;
-    const sIdx = Number(sIdxStr);
-    const tIdx = Number(tIdxStr);
-    const baseForm = el.dataset.baseForm || undefined;
-    const pos = el.dataset.pos || undefined;
-    const contextSentence = el.dataset.context || undefined;
-    const spanEl = sentenceRefs.current.get(sIdx);
-    const rect = spanEl?.getBoundingClientRect();
-    if (!rect) return;
-    setMiniPopup((prev) => {
-      if (prev && prev.sentenceIdx === sIdx && prev.tokenIdx === tIdx) return prev;
-      return { text, baseForm, pos, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: sIdx, tokenIdx: tIdx };
-    });
-  }, []);
-
-  // Global pointermove / pointerup for drag-to-switch
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      const drag = dragStateRef.current;
-      if (!drag || !drag.active) return;
-      const dx = e.clientX - drag.startX;
-      const dy = e.clientY - drag.startY;
-      if (!drag.moved && Math.hypot(dx, dy) < 8) return;
-      drag.moved = true;
-      const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-      const tokenEl = target?.closest<HTMLElement>('[data-word-token="1"]');
-      if (tokenEl) openMiniPopupFromEl(tokenEl);
-    };
-    const onUp = () => {
-      if (dragStateRef.current) dragStateRef.current.active = false;
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-    };
-  }, [openMiniPopupFromEl]);
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -337,61 +290,26 @@ export default function Reader() {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const contextSentence = sentence.tokens.map(t => t.t).join('');
-                      const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
+                      const handleClick = (e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        const contextSentence = sentence.tokens.map(t => t.t).join('');
+                        const spanEl = sentenceRefs.current.get(globalIdx);
+                        const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
+                        setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
+                      };
+
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
-
-                      const handlePointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
-                        e.stopPropagation();
-                        dragStateRef.current = { active: true, startX: e.clientX, startY: e.clientY, moved: false };
-                      };
-                      const handlePointerUp = (e: React.PointerEvent<HTMLSpanElement>) => {
-                        e.stopPropagation();
-                        const drag = dragStateRef.current;
-                        const wasDrag = drag?.moved === true;
-                        dragStateRef.current = null;
-                        if (wasDrag) return; // dragged: keep current selection
-                        // Tap: toggle close if same word, else open
-                        if (isHighlighted) {
-                          setMiniPopup(null);
-                          return;
-                        }
-                        openMiniPopupFromEl(e.currentTarget);
-                      };
-
-                      const dataProps = {
-                        'data-word-token': '1',
-                        'data-token-text': token.t,
-                        'data-sentence-idx': String(globalIdx),
-                        'data-token-idx': String(i),
-                        'data-base-form': token.b || '',
-                        'data-pos': token.p || '',
-                        'data-context': contextSentence,
-                      } as Record<string, string>;
-
-                      const wrapperClass = `inline-block touch-none select-none rounded-sm transition-colors ${isHighlighted ? 'bg-accent/25' : ''}`;
+                      const isHighlighted = miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i;
 
                       if (showFurigana) {
-                        return (
-                          <span
-                            key={i}
-                            {...dataProps}
-                            onPointerDown={handlePointerDown}
-                            onPointerUp={handlePointerUp}
-                            className={wrapperClass}
-                          >
-                            <FuriganaWord text={token.t} reading={token.r} colorClass={colorClass} onClick={() => { /* handled by pointer */ }} />
-                          </span>
-                        );
+                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} />;
                       }
 
                       return (
                         <span
                           key={i}
-                          {...dataProps}
-                          onPointerDown={handlePointerDown}
-                          onPointerUp={handlePointerUp}
-                          className={`cursor-pointer rounded-sm px-0.5 touch-none select-none transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
+                          onClick={handleClick}
+                          className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
                         >
                           {token.t}
                         </span>

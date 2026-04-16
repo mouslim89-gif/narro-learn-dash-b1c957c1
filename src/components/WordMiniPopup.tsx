@@ -34,7 +34,7 @@ export function WordMiniPopup({
   const wordId = word;
   const saved = hasWord(wordId);
 
-  const [position, setPosition] = useState<{ top: number; left: number; placement: 'above' | 'below' } | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
     if (cached) {
@@ -81,21 +81,22 @@ export function WordMiniPopup({
     const PADDING = 8;
     const GAP = 6;
 
+    // Center horizontally on sentence, clamp to viewport
     const sentenceCenter = (sentenceRect.left + sentenceRect.right) / 2;
     let left = sentenceCenter - rect.width / 2;
     left = Math.max(PADDING, Math.min(left, vw - rect.width - PADDING));
 
-    let placement: 'above' | 'below' = 'above';
+    // Prefer above the sentence
     let top = sentenceRect.top - rect.height - GAP;
     if (top < PADDING + 56) {
+      // Not enough room above, place below
       top = sentenceRect.bottom + GAP;
-      placement = 'below';
     }
     if (top + rect.height > vh - PADDING) {
       top = vh - rect.height - PADDING;
     }
 
-    setPosition({ top, left, placement });
+    setPosition({ top, left });
   }, [sentenceRect, loading, result]);
 
   // Close on click outside
@@ -134,15 +135,11 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl transition-[top,left] duration-150 ease-out animate-in fade-in-0 zoom-in-95 ${
-        position?.placement === 'below' ? 'slide-in-from-top-2' : 'slide-in-from-bottom-2'
-      }`}
+      className="fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
       style={{
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
-        transformOrigin: position?.placement === 'below' ? 'top center' : 'bottom center',
-        animationDuration: '180ms',
       }}
     >
       {/* Header: word + actions inline */}
