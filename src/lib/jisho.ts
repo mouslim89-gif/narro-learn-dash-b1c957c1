@@ -13,9 +13,18 @@ export interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
+// Tracks keywords whose cached entry is empty but a live API attempt has already been made.
+// Prevents infinite retries while still allowing one live attempt past stale empty seeds.
+const liveAttempted = new Set<string>();
+
+function isUsable(entry: CacheEntry | undefined): entry is CacheEntry {
+  return !!entry && Array.isArray(entry.results) && entry.results.length > 0;
+}
 
 export function getCached(keyword: string): CacheEntry | undefined {
-  return cache.get(keyword);
+  const entry = cache.get(keyword);
+  // Treat empty cached entries as a miss so callers fall back to a live lookup.
+  return isUsable(entry) ? entry : undefined;
 }
 
 export function seedCache(entries: Record<string, CacheEntry>): void {
@@ -25,7 +34,12 @@ export function seedCache(entries: Record<string, CacheEntry>): void {
 }
 
 export async function lookupWord(keyword: string): Promise<CacheEntry> {
-  if (cache.has(keyword)) return cache.get(keyword)!;
+  const existing = cache.get(keyword);
+  // Use cache only if the entry actually has results, OR if we've already
+  // attempted a live lookup for this keyword (to avoid hammering the API).
+  if (isUsable(existing) || (existing && liveAttempted.has(keyword))) {
+    return existing;
+  }
 
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
   const response = await fetch(url, {
