@@ -1,4 +1,4 @@
-import { forwardRef, type MouseEvent } from 'react';
+import { forwardRef, type MouseEvent, type TouchEvent } from 'react';
 import { getCached, type CacheEntry } from '@/lib/jisho';
 
 interface FuriganaWordProps {
@@ -8,6 +8,8 @@ interface FuriganaWordProps {
   /** Optional color class for grammar color mode */
   colorClass?: string;
   onClick: (e: MouseEvent<HTMLSpanElement>) => void;
+  onMouseDown?: (e: MouseEvent<HTMLSpanElement>) => void;
+  onTouchStart?: (e: TouchEvent<HTMLSpanElement>) => void;
 }
 
 export interface FuriganaSegment {
