@@ -68,9 +68,35 @@ const CONJUGATION_PATTERNS: [string, string][] = [
   ['た', 'Past tense (過去形)'],
 ];
 
+// Map godan stem (う-row) → あ-row for passive/causative detection
+const GODAN_A_ROW: Record<string, string> = {
+  'う': 'わ', 'く': 'か', 'ぐ': 'が', 'す': 'さ', 'つ': 'た',
+  'ぬ': 'な', 'ぶ': 'ば', 'む': 'ま', 'る': 'ら',
+};
+
+function detectGodanDerived(original: string, baseForm: string): string | null {
+  const lastBase = baseForm.slice(-1);
+  const stem = baseForm.slice(0, -1);
+  const aRow = GODAN_A_ROW[lastBase];
+  if (!aRow) return null;
+  const aStem = stem + aRow;
+  if (original === aStem + 'れる') return 'Passive (受身形)';
+  if (original === aStem + 'れた') return 'Passive past (受身過去形)';
+  if (original === aStem + 'せる') return 'Causative (使役形)';
+  if (original === aStem + 'せた') return 'Causative past (使役過去形)';
+  if (original === aStem + 'される') return 'Causative-passive (使役受身形)';
+  if (original === aStem + 'ない') return 'Negative (否定形)';
+  if (original === aStem + 'なかった') return 'Negative past (否定過去形)';
+  return null;
+}
+
 function getConjugationLabel(original: string, deinflected: string | null | undefined, dictWord?: string): string | null {
   const baseForm = deinflected || dictWord;
   if (!baseForm || baseForm === original) return null;
+
+  // Detect godan-derived passive/causative first (more specific than generic suffix match)
+  const godanDerived = detectGodanDerived(original, baseForm);
+  if (godanDerived) return godanDerived;
 
   for (const [suffix, label] of CONJUGATION_PATTERNS) {
     if (original.endsWith(suffix)) return label;
