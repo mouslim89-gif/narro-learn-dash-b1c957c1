@@ -9,6 +9,7 @@ import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
+import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode, type DisplayMode } from '@/stores/reading-progress';
