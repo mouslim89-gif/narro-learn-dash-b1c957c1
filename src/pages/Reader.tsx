@@ -13,7 +13,7 @@ import { WordPopup } from '@/components/WordPopup';
 import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode, type DisplayMode } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type WritingMode, type DisplayMode, type JapaneseFont } from '@/stores/reading-progress';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
