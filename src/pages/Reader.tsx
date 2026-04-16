@@ -318,13 +318,29 @@ export default function Reader() {
         </div>
       </article>
 
-      {popupWord && (
+      {miniPopup && (
+        <WordMiniPopup
+          word={miniPopup.text}
+          baseForm={miniPopup.baseForm}
+          pos={miniPopup.pos}
+          contextSentence={miniPopup.contextSentence}
+          anchorPos={miniPopup.anchorPos}
+          onClose={() => setMiniPopup(null)}
+          onShowMore={() => {
+            const { text, baseForm, pos, contextSentence } = miniPopup;
+            setMiniPopup(null);
+            setFullPopupWord({ text, baseForm, pos, contextSentence });
+          }}
+        />
+      )}
+
+      {fullPopupWord && (
         <WordPopup
-          word={popupWord.text}
-          baseForm={popupWord.baseForm}
-          pos={popupWord.pos}
-          contextSentence={popupWord.contextSentence}
-          onClose={() => setPopupWord(null)}
+          word={fullPopupWord.text}
+          baseForm={fullPopupWord.baseForm}
+          pos={fullPopupWord.pos}
+          contextSentence={fullPopupWord.contextSentence}
+          onClose={() => setFullPopupWord(null)}
         />
       )}
 
