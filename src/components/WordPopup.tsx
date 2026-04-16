@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Star, Loader2, BookOpen } from 'lucide-react';
+import { Star, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { ExampleSentence } from '@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
@@ -11,7 +13,6 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription,
 } from '@/components/ui/drawer';
 
 interface WordPopupProps {
@@ -185,23 +186,15 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
     addWord(entry);
   };
 
+  const displayWord = result?.japanese[0]?.word || word;
+  const displayReading = result?.japanese[0]?.reading;
+  const isCommon = (result as any)?.is_common;
+
   return (
     <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="text-left pb-2">
-          <div className="flex items-center gap-2">
-            <DrawerTitle className="font-japanese text-3xl font-bold">
-              {result ? (result.japanese[0]?.word || word) : word}
-            </DrawerTitle>
-            <PlayWordButton
-              word={result?.japanese[0]?.word || word}
-              reading={result?.japanese[0]?.reading}
-              size={22}
-            />
-          </div>
-          <DrawerDescription className="font-japanese text-base">
-            {result?.japanese[0]?.reading || ''}
-          </DrawerDescription>
+        <DrawerHeader className="text-left pb-2 sr-only">
+          <DrawerTitle>{displayWord}</DrawerTitle>
         </DrawerHeader>
 
         <div className="px-4 pb-6 space-y-3 overflow-y-auto">
@@ -224,26 +217,48 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
                 </div>
               )}
 
-              <div className="flex items-center gap-2">
+              {/* Word + reading + romaji + audio */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="font-japanese text-2xl font-bold">{displayWord}</p>
+                {displayReading && displayReading !== displayWord && (
+                  <span className="font-japanese text-base text-muted-foreground">{displayReading}</span>
+                )}
+                {displayReading && (
+                  <span className="text-xs text-muted-foreground/70 italic">{toRomaji(displayReading)}</span>
+                )}
+                <PlayWordButton word={displayWord} reading={displayReading} size={18} />
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                {isCommon && (
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 border border-primary/15">
+                    ✦ Common
+                  </span>
+                )}
                 {result.jlpt.length > 0 && (
-                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-bold uppercase text-accent">
+                  <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
                     {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
                   </span>
                 )}
-                {result.senses[0]?.parts_of_speech && (
-                  <span className="text-[11px] text-muted-foreground italic">
-                    {result.senses[0].parts_of_speech.join(', ')}
+                {result.senses[0]?.parts_of_speech?.map((pos, i) => (
+                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                    {pos}
                   </span>
-                )}
+                ))}
               </div>
 
-              <div className="space-y-1.5">
-                {result.senses.slice(0, 4).map((sense, i) => (
-                  <p key={i} className="text-sm font-semibold text-accent">
-                    {i + 1}. {sense.english_definitions.join('; ')}
+              {/* Meanings */}
+              <div className="space-y-1">
+                {result.senses.slice(0, 3).map((sense, i) => (
+                  <p key={i} className="text-sm leading-relaxed">
+                    <span className="text-muted-foreground mr-1">{i + 1}.</span>
+                    <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
                   </p>
                 ))}
               </div>
+
+              <ExampleSentence word={displayWord} />
 
               {wordType && (
                 <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
