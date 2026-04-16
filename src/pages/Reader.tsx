@@ -302,18 +302,22 @@ export default function Reader() {
                         const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
                         setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
                       };
+                      // Prevent the popup's outside-click handler from firing before our click toggle
+                      const stopDown = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
                       const isHighlighted = miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i;
 
                       if (showFurigana) {
-                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} />;
+                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} onMouseDown={stopDown} onTouchStart={stopDown} />;
                       }
 
                       return (
                         <span
                           key={i}
                           onClick={handleClick}
+                          onMouseDown={stopDown}
+                          onTouchStart={stopDown}
                           className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
                         >
                           {token.t}
