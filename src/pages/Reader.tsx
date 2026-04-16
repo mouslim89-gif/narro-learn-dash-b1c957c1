@@ -296,7 +296,7 @@ export default function Reader() {
       )}
 
       <article ref={articleRef} className={`mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12 ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
-        <div className={`font-japanese text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
+        <div className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6 indent-[1em]">
               {paragraph.map((sentence, sIdx) => {
