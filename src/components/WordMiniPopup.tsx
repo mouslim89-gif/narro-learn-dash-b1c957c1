@@ -9,10 +9,8 @@ interface WordMiniPopupProps {
   baseForm?: string;
   pos?: string;
   contextSentence?: string;
-  /** Click coordinates to position the popup near the word */
-  anchorPos: { x: number; y: number };
+  sentenceRect: { top: number; bottom: number; left: number; right: number };
   onClose: () => void;
-  /** Opens the full drawer popup with all details */
   onShowMore: () => void;
 }
 
@@ -21,14 +19,13 @@ export function WordMiniPopup({
   baseForm,
   pos,
   contextSentence,
-  anchorPos,
+  sentenceRect,
   onClose,
   onShowMore,
 }: WordMiniPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
   const popupRef = useRef<HTMLDivElement>(null);
 
-  const lookupKey = baseForm || word;
   const cached = getCached(word) || (baseForm ? getCached(baseForm) : undefined);
   const [loading, setLoading] = useState(!cached);
   const [result, setResult] = useState<JishoResult | null>(cached?.results?.[0] ?? null);
@@ -37,16 +34,12 @@ export function WordMiniPopup({
   const wordId = word;
   const saved = hasWord(wordId);
 
-  // Position state
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
     if (cached) {
-      if (cached.results.length > 0) {
-        setResult(cached.results[0]);
-      } else {
-        setError(true);
-      }
+      if (cached.results.length > 0) setResult(cached.results[0]);
+      else setError(true);
       setLoading(false);
       return;
     }
@@ -66,11 +59,8 @@ export function WordMiniPopup({
           }
         }
         entry = await lookupWord(word);
-        if (!cancelled && entry.results.length > 0) {
-          setResult(entry.results[0]);
-        } else if (!cancelled) {
-          setError(true);
-        }
+        if (!cancelled && entry.results.length > 0) setResult(entry.results[0]);
+        else if (!cancelled) setError(true);
       } catch {
         if (!cancelled) setError(true);
       } finally {
@@ -81,34 +71,33 @@ export function WordMiniPopup({
     return () => { cancelled = true; };
   }, [word, baseForm, cached]);
 
-  // Calculate position after mount
+  // Position based on sentence rect
   useEffect(() => {
     if (!popupRef.current) return;
     const popup = popupRef.current;
     const rect = popup.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-
     const PADDING = 8;
-    const POPUP_WIDTH = Math.min(320, vw - PADDING * 2);
+    const GAP = 6;
 
-    // Horizontal: center on click, clamp to viewport
-    let left = anchorPos.x - POPUP_WIDTH / 2;
-    left = Math.max(PADDING, Math.min(left, vw - POPUP_WIDTH - PADDING));
+    // Center horizontally on sentence, clamp to viewport
+    const sentenceCenter = (sentenceRect.left + sentenceRect.right) / 2;
+    let left = sentenceCenter - rect.width / 2;
+    left = Math.max(PADDING, Math.min(left, vw - rect.width - PADDING));
 
-    // Vertical: prefer above the click point, fall back below
-    let top = anchorPos.y - rect.height - 12;
+    // Prefer above the sentence
+    let top = sentenceRect.top - rect.height - GAP;
     if (top < PADDING + 56) {
-      // Not enough room above (56px for sticky header), place below
-      top = anchorPos.y + 16;
+      // Not enough room above, place below
+      top = sentenceRect.bottom + GAP;
     }
-    // Clamp bottom
     if (top + rect.height > vh - PADDING) {
       top = vh - rect.height - PADDING;
     }
 
     setPosition({ top, left });
-  }, [anchorPos, loading, result]);
+  }, [sentenceRect, loading, result]);
 
   // Close on click outside
   useEffect(() => {
@@ -117,7 +106,6 @@ export function WordMiniPopup({
         onClose();
       }
     };
-    // Use timeout so the current click doesn't immediately close
     const timer = setTimeout(() => {
       document.addEventListener('mousedown', handler);
       document.addEventListener('touchstart', handler as any);
@@ -147,95 +135,85 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className="fixed z-[60] w-[min(320px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
+      className="fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
       style={{
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 pt-3 pb-1">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="font-japanese text-xl font-bold truncate">
-            {result ? (result.japanese[0]?.word || word) : word}
-          </span>
-          <PlayWordButton
-            word={result?.japanese[0]?.word || word}
-            reading={result?.japanese[0]?.reading}
-            size={18}
-          />
-        </div>
+      {/* Header: word + actions inline */}
+      <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-0.5">
+        <span className="font-japanese text-lg font-bold truncate min-w-0">
+          {result ? (result.japanese[0]?.word || word) : word}
+        </span>
+        <PlayWordButton
+          word={result?.japanese[0]?.word || word}
+          reading={result?.japanese[0]?.reading}
+          size={16}
+        />
+        {result && !loading && (
+          <button
+            onClick={handleSave}
+            disabled={saved}
+            className={`p-0.5 transition-colors ${saved ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`}
+          >
+            <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
+          </button>
+        )}
+        <div className="flex-1" />
         {result?.jlpt && result.jlpt.length > 0 && (
-          <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-            {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
+          <span className="shrink-0 rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent">
+            {result.jlpt[0]?.replace('jlpt-', '')}
           </span>
+        )}
+        {result && !loading && (
+          <button
+            onClick={onShowMore}
+            className="flex items-center gap-0.5 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
+          >
+            More <ChevronRight className="h-3 w-3" />
+          </button>
         )}
       </div>
 
       {/* Reading */}
       {result?.japanese[0]?.reading && (
-        <p className="font-japanese text-sm text-muted-foreground px-3 -mt-0.5">
+        <p className="font-japanese text-xs text-muted-foreground px-2.5 -mt-0.5">
           {result.japanese[0].reading}
         </p>
       )}
 
       {/* Content */}
-      <div className="px-3 pt-1.5 pb-2">
+      <div className="px-2.5 pt-1 pb-1.5">
         {loading && (
-          <div className="flex items-center gap-2 py-3 text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-xs">Looking up…</span>
+          <div className="flex items-center gap-2 py-2 text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <span className="text-[11px]">Looking up…</span>
           </div>
         )}
 
         {error && !loading && (
-          <p className="text-xs text-muted-foreground py-2">No definition found.</p>
+          <p className="text-[11px] text-muted-foreground py-1">No definition found.</p>
         )}
 
         {result && !loading && (
           <>
-            {/* Show max 2 senses */}
             <div className="space-y-0.5">
               {result.senses.slice(0, 2).map((sense, i) => (
-                <p key={i} className="text-sm font-semibold text-accent">
+                <p key={i} className="text-[13px] font-semibold text-accent">
                   {i + 1}. {sense.english_definitions.join('; ')}
                 </p>
               ))}
             </div>
-
-            {/* POS */}
             {result.senses[0]?.parts_of_speech && (
-              <p className="text-[10px] text-muted-foreground italic mt-1">
+              <p className="text-[9px] text-muted-foreground italic mt-0.5">
                 {result.senses[0].parts_of_speech.join(', ')}
               </p>
             )}
           </>
         )}
       </div>
-
-      {/* Actions */}
-      {result && !loading && (
-        <div className="flex items-center gap-1.5 px-2 pb-2">
-          <button
-            onClick={handleSave}
-            disabled={saved}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all active:scale-[0.97] ${
-              saved
-                ? 'bg-muted text-muted-foreground'
-                : 'bg-accent text-accent-foreground'
-            }`}
-          >
-            <Star className="h-3.5 w-3.5" /> {saved ? 'Saved' : 'Save'}
-          </button>
-          <button
-            onClick={onShowMore}
-            className="flex items-center justify-center gap-1 rounded-lg py-2 px-3 text-xs font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
-          >
-            More <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }
