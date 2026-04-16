@@ -134,11 +134,15 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className="fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
+      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl transition-[top,left] duration-150 ease-out animate-in fade-in-0 zoom-in-95 ${
+        position?.placement === 'below' ? 'slide-in-from-top-2' : 'slide-in-from-bottom-2'
+      }`}
       style={{
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
+        transformOrigin: position?.placement === 'below' ? 'top center' : 'bottom center',
+        animationDuration: '180ms',
       }}
     >
       {/* Header: word + actions inline */}
