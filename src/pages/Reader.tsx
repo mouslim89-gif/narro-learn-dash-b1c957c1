@@ -28,7 +28,8 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [popupWord, setPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
+  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string; anchorPos: { x: number; y: number }; sentenceIdx: number } | null>(null);
+  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
   
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
