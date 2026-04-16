@@ -337,26 +337,61 @@ export default function Reader() {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const handleClick = (e: React.MouseEvent) => {
+                      const contextSentence = sentence.tokens.map(t => t.t).join('');
+                      const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
+                      const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
+
+                      const handlePointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
                         e.stopPropagation();
-                        const contextSentence = sentence.tokens.map(t => t.t).join('');
-                        const spanEl = sentenceRefs.current.get(globalIdx);
-                        const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
-                        setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
+                        dragStateRef.current = { active: true, startX: e.clientX, startY: e.clientY, moved: false };
+                      };
+                      const handlePointerUp = (e: React.PointerEvent<HTMLSpanElement>) => {
+                        e.stopPropagation();
+                        const drag = dragStateRef.current;
+                        const wasDrag = drag?.moved === true;
+                        dragStateRef.current = null;
+                        if (wasDrag) return; // dragged: keep current selection
+                        // Tap: toggle close if same word, else open
+                        if (isHighlighted) {
+                          setMiniPopup(null);
+                          return;
+                        }
+                        openMiniPopupFromEl(e.currentTarget);
                       };
 
-                      const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
-                      const isHighlighted = miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i;
+                      const dataProps = {
+                        'data-word-token': '1',
+                        'data-token-text': token.t,
+                        'data-sentence-idx': String(globalIdx),
+                        'data-token-idx': String(i),
+                        'data-base-form': token.b || '',
+                        'data-pos': token.p || '',
+                        'data-context': contextSentence,
+                      } as Record<string, string>;
+
+                      const wrapperClass = `inline-block touch-none select-none rounded-sm transition-colors ${isHighlighted ? 'bg-accent/25' : ''}`;
 
                       if (showFurigana) {
-                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} />;
+                        return (
+                          <span
+                            key={i}
+                            {...dataProps}
+                            onPointerDown={handlePointerDown}
+                            onPointerUp={handlePointerUp}
+                            className={wrapperClass}
+                          >
+                            <FuriganaWord text={token.t} reading={token.r} colorClass={colorClass} onClick={() => { /* handled by pointer */ }} />
+                          </span>
+                        );
                       }
 
                       return (
                         <span
                           key={i}
-                          onClick={handleClick}
-                          className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
+                          {...dataProps}
+                          onPointerDown={handlePointerDown}
+                          onPointerUp={handlePointerUp}
+                          className={`cursor-pointer rounded-sm px-0.5 touch-none select-none transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
                         >
                           {token.t}
                         </span>
