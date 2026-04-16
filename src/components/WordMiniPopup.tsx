@@ -34,7 +34,7 @@ export function WordMiniPopup({
   const wordId = word;
   const saved = hasWord(wordId);
 
-  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number; placement: 'above' | 'below' } | null>(null);
 
   useEffect(() => {
     if (cached) {
@@ -87,16 +87,18 @@ export function WordMiniPopup({
     left = Math.max(PADDING, Math.min(left, vw - rect.width - PADDING));
 
     // Prefer above the sentence
+    let placement: 'above' | 'below' = 'above';
     let top = sentenceRect.top - rect.height - GAP;
     if (top < PADDING + 56) {
       // Not enough room above, place below
+      placement = 'below';
       top = sentenceRect.bottom + GAP;
     }
     if (top + rect.height > vh - PADDING) {
       top = vh - rect.height - PADDING;
     }
 
-    setPosition({ top, left });
+    setPosition({ top, left, placement });
   }, [sentenceRect, loading, result]);
 
   // Close on click outside
@@ -135,7 +137,13 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className="fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
+      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl ${
+        position
+          ? position.placement === 'above'
+            ? 'animate-mini-slide-up'
+            : 'animate-mini-slide-down'
+          : ''
+      }`}
       style={{
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
