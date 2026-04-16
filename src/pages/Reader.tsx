@@ -18,6 +18,11 @@ import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
+const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = [
+  { value: 'sans', label: 'Sans', sample: 'あ' },
+  { value: 'serif', label: 'Serif', sample: 'あ' },
+  { value: 'handwriting', label: 'Hand', sample: 'あ' },
+];
 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
