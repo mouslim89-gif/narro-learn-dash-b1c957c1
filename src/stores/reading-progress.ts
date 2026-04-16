@@ -55,6 +55,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       showFurigana: false,
       writingMode: 'horizontal' as WritingMode,
       displayMode: 'normal' as DisplayMode,
+      japaneseFont: 'sans' as JapaneseFont,
       updateProgress: (bookId, difficulty, percent) =>
         set((state) => ({
           progress: {
@@ -73,6 +74,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setShowFurigana: (showFurigana) => set({ showFurigana }),
       setWritingMode: (writingMode) => set({ writingMode }),
       setDisplayMode: (displayMode) => set({ displayMode }),
+      setJapaneseFont: (japaneseFont) => set({ japaneseFont }),
     }),
     { name: 'reading-progress' }
   )
