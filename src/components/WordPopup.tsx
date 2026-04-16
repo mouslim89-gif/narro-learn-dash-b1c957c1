@@ -74,6 +74,27 @@ const GODAN_A_ROW: Record<string, string> = {
   'ぬ': 'な', 'ぶ': 'ば', 'む': 'ま', 'る': 'ら',
 };
 
+// Try to peel a polite/auxiliary suffix; return [stripped, label] or null
+const POLITE_STRIP: [string, string][] = [
+  ['ませんでした', 'polite past negative'],
+  ['ましょう', 'polite volitional'],
+  ['ました', 'polite past'],
+  ['ません', 'polite negative'],
+  ['ます', 'polite'],
+];
+
+function stripPolite(s: string): { stripped: string; suffix: string } | null {
+  for (const [suf, label] of POLITE_STRIP) {
+    if (s.endsWith(suf)) {
+      // Polite ます-stem replaces final い-row → う-row of base.
+      // We need to reconstruct an う-row form: drop suffix, append る (heuristic for ichidan-like) — but here we just return stripped + 'る' is wrong.
+      // Instead: caller will combine with detectGodanDerived using stripped + 'る' for ichidan-shaped passives like 包まれ + ます → 包まれる
+      return { stripped: s.slice(0, -suf.length) + 'る', suffix: label };
+    }
+  }
+  return null;
+}
+
 function detectGodanDerived(original: string, baseForm: string): string | null {
   const lastBase = baseForm.slice(-1);
   const stem = baseForm.slice(0, -1);
@@ -94,10 +115,18 @@ function getConjugationLabel(original: string, deinflected: string | null | unde
   const baseForm = deinflected || dictWord;
   if (!baseForm || baseForm === original) return null;
 
-  // Detect godan-derived passive/causative first (more specific than generic suffix match)
-  const godanDerived = detectGodanDerived(original, baseForm);
-  if (godanDerived) return godanDerived;
+  // 1. Direct godan-derived (passive/causative) match
+  const direct = detectGodanDerived(original, baseForm);
+  if (direct) return direct;
 
+  // 2. Strip polite suffix, then check godan-derived (e.g. 包まれます → 包まれる → passive)
+  const polite = stripPolite(original);
+  if (polite) {
+    const inner = detectGodanDerived(polite.stripped, baseForm);
+    if (inner) return `${inner} + ${polite.suffix}`;
+  }
+
+  // 3. Generic suffix patterns
   for (const [suffix, label] of CONJUGATION_PATTERNS) {
     if (original.endsWith(suffix)) return label;
   }
