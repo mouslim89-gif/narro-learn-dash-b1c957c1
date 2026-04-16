@@ -49,6 +49,7 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
     },
   });
 
+  liveAttempted.add(keyword);
   if (!response.ok) throw new Error(`Jisho lookup failed: ${response.status}`);
   const data = await response.json();
   const entry: CacheEntry = {
