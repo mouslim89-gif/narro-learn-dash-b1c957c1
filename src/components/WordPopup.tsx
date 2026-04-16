@@ -237,7 +237,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
                   <p className="text-xs font-semibold text-primary">{conjugationLabel}</p>
                   {(deinflected || result?.japanese[0]?.word) && (deinflected || result?.japanese[0]?.word) !== word && (
                     <p className="font-japanese text-xs text-muted-foreground mt-0.5">
-                      {word} → {deinflected || result?.japanese[0]?.word}
+                      {deinflected || result?.japanese[0]?.word} → {word}
                     </p>
                   )}
                 </div>
