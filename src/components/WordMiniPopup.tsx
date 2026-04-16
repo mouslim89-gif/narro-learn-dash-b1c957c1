@@ -137,7 +137,13 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className="fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
+      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl ${
+        position
+          ? position.placement === 'above'
+            ? 'animate-mini-slide-up'
+            : 'animate-mini-slide-down'
+          : ''
+      }`}
       style={{
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
