@@ -5,6 +5,13 @@ import type { Difficulty } from '@/data/books';
 export type FontSize = 'small' | 'medium' | 'large';
 export type WritingMode = 'horizontal' | 'vertical';
 export type DisplayMode = 'normal' | 'grammar';
+export type JapaneseFont = 'sans' | 'serif' | 'handwriting';
+
+export const japaneseFontClassMap: Record<JapaneseFont, string> = {
+  sans: 'font-jp-sans',
+  serif: 'font-jp-serif',
+  handwriting: 'font-jp-hand',
+};
 
 export interface ReadingProgress {
   difficulty: Difficulty;
@@ -20,6 +27,7 @@ interface ReadingProgressState {
   showFurigana: boolean;
   writingMode: WritingMode;
   displayMode: DisplayMode;
+  japaneseFont: JapaneseFont;
   updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
   getProgress: (bookId: string) => ReadingProgress | undefined;
   setFontSize: (size: FontSize) => void;
@@ -28,6 +36,7 @@ interface ReadingProgressState {
   setShowFurigana: (show: boolean) => void;
   setWritingMode: (mode: WritingMode) => void;
   setDisplayMode: (mode: DisplayMode) => void;
+  setJapaneseFont: (font: JapaneseFont) => void;
 }
 
 export const fontSizeMap: Record<FontSize, string> = {
@@ -46,6 +55,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       showFurigana: false,
       writingMode: 'horizontal' as WritingMode,
       displayMode: 'normal' as DisplayMode,
+      japaneseFont: 'sans' as JapaneseFont,
       updateProgress: (bookId, difficulty, percent) =>
         set((state) => ({
           progress: {
@@ -64,6 +74,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setShowFurigana: (showFurigana) => set({ showFurigana }),
       setWritingMode: (writingMode) => set({ writingMode }),
       setDisplayMode: (displayMode) => set({ displayMode }),
+      setJapaneseFont: (japaneseFont) => set({ japaneseFont }),
     }),
     { name: 'reading-progress' }
   )

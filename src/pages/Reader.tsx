@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround, Palette, Eye, EyeClosed } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround, Palette, Eye, EyeClosed, CaseSensitive } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens } from '@/lib/merge-tokens';
@@ -13,16 +13,21 @@ import { WordPopup } from '@/components/WordPopup';
 import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, type FontSize, type WritingMode, type DisplayMode } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type WritingMode, type DisplayMode, type JapaneseFont } from '@/stores/reading-progress';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
+const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = [
+  { value: 'sans', label: 'Sans', sample: 'あ' },
+  { value: 'serif', label: 'Serif', sample: 'あ' },
+  { value: 'handwriting', label: 'Hand', sample: 'あ' },
+];
 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode, displayMode, setDisplayMode } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode, displayMode, setDisplayMode, japaneseFont, setJapaneseFont } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -218,6 +223,22 @@ export default function Reader() {
             ))}
           </div>
 
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Japanese Font</p>
+          <div className="flex gap-2">
+            {japaneseFonts.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setJapaneseFont(f.value)}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                  f.value === japaneseFont ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                }`}
+              >
+                <span className={`text-base leading-none ${japaneseFontClassMap[f.value]}`}>あ</span>
+                {f.label}
+              </button>
+            ))}
+          </div>
+
           <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
           <button
             onClick={() => setReaderDarkMode(!readerDarkMode)}
@@ -275,7 +296,7 @@ export default function Reader() {
       )}
 
       <article ref={articleRef} className={`mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12 ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
-        <div className={`font-japanese text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
+        <div className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6 indent-[1em]">
               {paragraph.map((sentence, sIdx) => {
