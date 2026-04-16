@@ -156,6 +156,21 @@
   transform-origin: top center;
 }
 
+/* Reader text — uniform character spacing, no justification artifacts */
+.reader-text {
+  letter-spacing: 0 !important;
+  word-spacing: 0 !important;
+  text-align: left;
+  font-feature-settings: "palt" 0; /* full-width metrics → even spacing */
+}
+.reader-text ruby {
+  ruby-align: center;
+}
+.reader-text rt {
+  letter-spacing: 0;
+  font-feature-settings: "palt" 0;
+}
+
 /* Tategaki (vertical writing) mode */
 .writing-vertical {
   writing-mode: vertical-rl;
