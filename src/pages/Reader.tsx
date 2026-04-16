@@ -153,7 +153,7 @@ export default function Reader() {
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
-    <div className="min-h-screen bg-[hsl(36,33%,96%)] pb-36 dark:bg-background">
+    <div className="min-h-screen bg-[hsl(40,30%,97%)] pb-36 dark:bg-background">
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
         <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
           <ArrowLeft className="h-5 w-5" />
@@ -274,10 +274,10 @@ export default function Reader() {
         </div>
       )}
 
-      <article ref={articleRef} className={`mx-3 my-4 rounded-2xl bg-white shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl sm:rounded-none sm:bg-transparent sm:shadow-none sm:dark:bg-transparent ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
-        <div className={`font-japanese tracking-wide px-5 py-8 sm:px-6 sm:py-10 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.8]' : 'leading-relaxed'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
+      <article ref={articleRef} className={`mx-auto my-6 max-w-prose px-6 sm:max-w-2xl sm:px-10 ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
+        <div className={`font-japanese text-foreground/90 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
           {paragraphs.map((paragraph, pIdx) => (
-            <p key={pIdx} className="mb-6" style={{ textIndent: '1em' }}>
+            <p key={pIdx} className="mb-7 indent-[1.5em] text-justify [text-justify:inter-character]">
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 return (
@@ -285,7 +285,7 @@ export default function Reader() {
                     key={sIdx}
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
                     className={`transition-opacity duration-200 ${
-                      miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-20' : ''
+                      miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-25' : ''
                     }`}
                   >
                     {sentence.tokens.map((token, i) => {
@@ -295,7 +295,6 @@ export default function Reader() {
 
                       const handleClick = (e: React.MouseEvent) => {
                         e.stopPropagation();
-                        // Toggle off if clicking the same word
                         if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
                           setMiniPopup(null);
                           return;
@@ -305,7 +304,6 @@ export default function Reader() {
                         const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
                         setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
                       };
-                      // Prevent the popup's outside-click handler from firing before our click toggle
                       const stopDown = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
@@ -321,7 +319,7 @@ export default function Reader() {
                           onClick={handleClick}
                           onMouseDown={stopDown}
                           onTouchStart={stopDown}
-                          className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
+                          className={`cursor-pointer transition-colors active:bg-accent/15 ${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`}
                         >
                           {token.t}
                         </span>
