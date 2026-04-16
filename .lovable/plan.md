@@ -1,50 +1,41 @@
 
 
-## Mini Popup — Positionnement, surlignage & compactage
+## Plan
 
-### Problèmes actuels
-1. **Positionnement** basé sur `e.clientX/clientY` (le point de tap) — le popup flotte au mauvais endroit au lieu de s'ancrer au bord de la phrase
-2. **Pas de surlignage** du mot tappé
-3. **Popup trop grand** — bouton Save prend toute la largeur, padding excessif
+Two fixes:
 
-### Ce qu'on va faire
+### 1. Add "Common" badge to WordMiniPopup
+Currently the mini popup shows JLPT badge but no Common badge. Add a small `✦` badge (very compact) next to JLPT in the header when `result.is_common` is true.
 
-#### 1. Positionnement ancré à la phrase (Reader.tsx)
-- Au lieu de passer `{ x: e.clientX, y: e.clientY }`, on récupère le **boundingRect du `<span>` de la phrase** (le `<span key={sIdx}>`)
-- On passe `sentenceRect: { top, bottom, left, right }` au mini popup
-- Le popup se positionne :
-  - **Au-dessus** de `sentenceRect.top` si assez de place
-  - **En-dessous** de `sentenceRect.bottom` sinon
-  - Centré horizontalement sur la phrase
+### 2. Fix conjugation label in WordPopup
 
-#### 2. Surlignage du mot actif (Reader.tsx)
-- Ajouter une condition : si `miniPopup` est ouvert et que le token courant correspond au mot actif, appliquer `bg-accent/20 rounded-sm` (surlignage léger)
-- Comparer `token.t === miniPopup.text` + même `sentenceIdx`
+**Problem A — wrong label for 包まれる:**
+The current `getConjugationLabel` in `WordPopup.tsx` iterates `CONJUGATION_PATTERNS` and matches the **first** suffix found. For 包まれる:
+- The list has `られる` (passive/potential) BEFORE `れる`, but `包まれる` ends in `まれる`, not `られる`. So it falls through to shorter patterns and matches `る`-less stuff... actually it ends up matching nothing specific and may hit `ます`-related fallback. Looking at the list, none of the patterns match `包まれる` cleanly except potentially nothing — meaning it returns `Dictionary form: 包む`.
 
-#### 3. Compacter le popup (WordMiniPopup.tsx)
-- **Bouton Save** → remplacé par une petite icône `Star` cliquable (16px), positionnée dans le header à côté du mot, pas un gros bouton
-- **Bouton More** → texte plus petit, inline dans le header aussi
-- Réduire les paddings : `px-3 pt-3 pb-1` → `px-2.5 pt-2 pb-1.5`
-- Reading + définitions plus compacts
-- Layout actions : une ligne horizontale avec ⭐ | 🔊 | More → alignés dans le header
+Wait — re-reading: user says it shows "polite form". That means it's matching `ます` somewhere... actually it must match because `包まれる` doesn't end in any of those. Let me check — patterns are checked with `original.endsWith(suffix)`. `包まれる` ends with `れる` — but `れる` isn't in the list as standalone. It DOES end with `る` — not in list. Hmm.
 
-### Fichiers modifiés
+Actually the issue: passive `〜れる` (godan passive, e.g. 包む→包まれる) is NOT in the patterns list. Only `られる` (ichidan passive) is. So `包まれる` falls through entirely and shows the generic "Dictionary form: 包む" — but user says it shows "polite form". 
 
-| Fichier | Changement |
-|---------|-----------|
-| `src/pages/Reader.tsx` | Passer `sentenceRect` au lieu de `anchorPos` click, ajouter ref sur le span phrase, surligner le mot actif |
-| `src/components/WordMiniPopup.tsx` | Nouveau positionnement basé sur sentenceRect, UI compactée, Star en icône inline |
+Either way, the fix is the same: **add proper detection for godan passive `〜れる`** and improve the heuristics by also using the POS/dictionary form comparison rather than blind suffix matching.
 
-### Résultat visuel attendu
+**Problem B — arrow direction reversed:**
+Currently shows `{word} → {deinflected}` (e.g. `包まれる → 包む`). User wants the dictionary form first: `包む → 包まれる` (dict → conjugated).
 
-```text
-┌──────────────────────────┐
-│ 猫  ♪  ⭐  N5   More ▸  │  ← header compact, tout sur une ligne
-│ ねこ                      │  ← reading
-│ 1. cat  2. old cloth     │  ← définitions
-│ Noun                     │  ← POS
-└──────────────────────────┘
-     ▼ (phrase en dessous)
- ...彼の[猫]は可愛いです...   ← 猫 surligné
-```
+### Changes
+
+**`src/components/WordMiniPopup.tsx`:**
+- Add small Common indicator (✦ icon or tiny badge) in header when `result.is_common` is true
+- Place it before/with the JLPT badge, very compact (text-[9px])
+
+**`src/components/WordPopup.tsx`:**
+- Add `〜れる` (godan passive) and `〜せる` (godan causative) patterns to `CONJUGATION_PATTERNS`, ordered properly (longer first)
+- Specifically: detect when surface ends in `あ-row + れる/せる` and base is godan → passive/causative
+- Reverse arrow display: `{deinflected} → {word}` instead of `{word} → {deinflected}`
+
+### Files modified
+| File | Change |
+|------|--------|
+| `src/components/WordMiniPopup.tsx` | Add Common badge in header |
+| `src/components/WordPopup.tsx` | Add passive/causative patterns, fix arrow direction |
 
