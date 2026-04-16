@@ -223,6 +223,22 @@ export default function Reader() {
             ))}
           </div>
 
+          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Japanese Font</p>
+          <div className="flex gap-2">
+            {japaneseFonts.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setJapaneseFont(f.value)}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                  f.value === japaneseFont ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                }`}
+              >
+                <span className={`text-base leading-none ${japaneseFontClassMap[f.value]}`}>あ</span>
+                {f.label}
+              </button>
+            ))}
+          </div>
+
           <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
           <button
             onClick={() => setReaderDarkMode(!readerDarkMode)}
