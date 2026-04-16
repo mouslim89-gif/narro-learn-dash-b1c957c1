@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround, Palette, Eye, EyeClosed } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
+import { mergeConjugatedTokens } from '@/lib/merge-tokens';
 import { seedCache } from '@/lib/jisho';
 import { bookDictionary } from '@/data/book-dictionary';
 import { bookGrammar } from '@/data/book-grammar';
@@ -40,10 +41,12 @@ export default function Reader() {
 
   const book = books.find((b) => b.id === id);
 
-  // Use pre-baked Kuromoji tokens
+  // Use pre-baked Kuromoji tokens, then aggressively merge conjugated forms
+  // (verb + auxiliaries + て-compound auxiliaries) into single clickable units.
   const tokens = useMemo(() => {
     if (!id) return [];
-    return bookTokens[id]?.[difficulty] || [];
+    const raw = bookTokens[id]?.[difficulty] || [];
+    return mergeConjugatedTokens(raw);
   }, [id, difficulty]);
 
   const bookText = useMemo(() => {
