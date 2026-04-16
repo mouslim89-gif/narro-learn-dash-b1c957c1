@@ -273,7 +273,7 @@ function segmentsFromReading(text: string, reading: string): FuriganaSegment[] |
 }
 
 export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(function FuriganaWord(
-  { text, reading, colorClass, onClick },
+  { text, reading, colorClass, onClick, onMouseDown, onTouchStart },
   ref
 ) {
   // Try pre-computed reading first, then fall back to Jisho cache
@@ -289,6 +289,8 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
     <span
       ref={ref}
       onClick={onClick}
+      onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
       className={`cursor-pointer rounded px-px transition-colors active:bg-accent/10 ${colorClass || ''}`}
     >
       {segments
