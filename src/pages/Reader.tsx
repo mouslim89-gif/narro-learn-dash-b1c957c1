@@ -279,9 +279,8 @@ export default function Reader() {
                 return (
                   <span
                     key={sIdx}
-                    onClick={() => setActiveSentence(activeSentence === globalIdx ? null : globalIdx)}
-                    className={`transition-colors duration-200 ${
-                      activeSentence === globalIdx ? 'bg-accent/10 rounded' : ''
+                    className={`transition-opacity duration-200 ${
+                      miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-20' : ''
                     }`}
                   >
                     {sentence.tokens.map((token, i) => {
