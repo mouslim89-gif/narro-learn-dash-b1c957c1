@@ -100,6 +100,16 @@
   .font-japanese {
     font-family: 'Noto Sans JP', sans-serif;
   }
+
+  .font-jp-sans {
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .font-jp-serif {
+    font-family: 'Noto Serif JP', 'Noto Sans JP', serif;
+  }
+  .font-jp-hand {
+    font-family: 'Klee One', 'Noto Sans JP', sans-serif;
+  }
 }
 
 /* 3D Flip Card */
