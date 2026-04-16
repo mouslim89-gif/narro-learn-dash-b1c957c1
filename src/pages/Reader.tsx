@@ -274,10 +274,10 @@ export default function Reader() {
         </div>
       )}
 
-      <article ref={articleRef} className={`mx-auto my-6 max-w-prose px-6 sm:max-w-2xl sm:px-10 ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
-        <div className={`font-japanese text-foreground/90 ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
+      <article ref={articleRef} className={`mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12 ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
+        <div className={`font-japanese text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
           {paragraphs.map((paragraph, pIdx) => (
-            <p key={pIdx} className="mb-7 indent-[1.5em] text-justify [text-justify:inter-character]">
+            <p key={pIdx} className="mb-6 indent-[1em]">
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 return (
