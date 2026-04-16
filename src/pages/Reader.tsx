@@ -148,6 +148,52 @@ export default function Reader() {
     return Math.max(1, Math.round(remaining));
   }, [book, scrollPercent]);
 
+  // Helper: build miniPopup state from a token DOM element
+  const openMiniPopupFromEl = useCallback((el: HTMLElement) => {
+    const text = el.dataset.tokenText;
+    const sIdxStr = el.dataset.sentenceIdx;
+    const tIdxStr = el.dataset.tokenIdx;
+    if (!text || sIdxStr == null || tIdxStr == null) return;
+    const sIdx = Number(sIdxStr);
+    const tIdx = Number(tIdxStr);
+    const baseForm = el.dataset.baseForm || undefined;
+    const pos = el.dataset.pos || undefined;
+    const contextSentence = el.dataset.context || undefined;
+    const spanEl = sentenceRefs.current.get(sIdx);
+    const rect = spanEl?.getBoundingClientRect();
+    if (!rect) return;
+    setMiniPopup((prev) => {
+      if (prev && prev.sentenceIdx === sIdx && prev.tokenIdx === tIdx) return prev;
+      return { text, baseForm, pos, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: sIdx, tokenIdx: tIdx };
+    });
+  }, []);
+
+  // Global pointermove / pointerup for drag-to-switch
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      const drag = dragStateRef.current;
+      if (!drag || !drag.active) return;
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      if (!drag.moved && Math.hypot(dx, dy) < 8) return;
+      drag.moved = true;
+      const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      const tokenEl = target?.closest<HTMLElement>('[data-word-token="1"]');
+      if (tokenEl) openMiniPopupFromEl(tokenEl);
+    };
+    const onUp = () => {
+      if (dragStateRef.current) dragStateRef.current.active = false;
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [openMiniPopupFromEl]);
+
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
