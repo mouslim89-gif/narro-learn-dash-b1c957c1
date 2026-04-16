@@ -280,6 +280,7 @@ export default function Reader() {
                 return (
                   <span
                     key={sIdx}
+                    ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
                     className={`transition-opacity duration-200 ${
                       miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-20' : ''
                     }`}
@@ -289,23 +290,26 @@ export default function Reader() {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                       const handleClick = (e: React.MouseEvent) => {
-                         e.stopPropagation();
-                         const contextSentence = sentence.tokens.map(t => t.t).join('');
-                         setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, anchorPos: { x: e.clientX, y: e.clientY }, sentenceIdx: globalIdx });
-                       };
+                      const handleClick = (e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        const contextSentence = sentence.tokens.map(t => t.t).join('');
+                        const spanEl = sentenceRefs.current.get(globalIdx);
+                        const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
+                        setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
+                      };
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
+                      const isHighlighted = miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i;
 
                       if (showFurigana) {
-                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={colorClass} onClick={handleClick} />;
+                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} />;
                       }
 
                       return (
                         <span
                           key={i}
                           onClick={handleClick}
-                          className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass}`}
+                          className={`cursor-pointer rounded-sm px-0.5 transition-colors active:bg-accent/10 ${colorClass} ${isHighlighted ? 'bg-accent/25' : ''}`}
                         >
                           {token.t}
                         </span>
@@ -325,7 +329,7 @@ export default function Reader() {
           baseForm={miniPopup.baseForm}
           pos={miniPopup.pos}
           contextSentence={miniPopup.contextSentence}
-          anchorPos={miniPopup.anchorPos}
+          sentenceRect={miniPopup.sentenceRect}
           onClose={() => setMiniPopup(null)}
           onShowMore={() => {
             const { text, baseForm, pos, contextSentence } = miniPopup;
