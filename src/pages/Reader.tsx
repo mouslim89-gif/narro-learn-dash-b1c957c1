@@ -291,7 +291,7 @@ export default function Reader() {
                        const handleClick = (e: React.MouseEvent) => {
                          e.stopPropagation();
                          const contextSentence = sentence.tokens.map(t => t.t).join('');
-                         setPopupWord({ text: token.t, baseForm: token.b, pos: token.p, contextSentence });
+                         setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, anchorPos: { x: e.clientX, y: e.clientY }, sentenceIdx: globalIdx });
                        };
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
