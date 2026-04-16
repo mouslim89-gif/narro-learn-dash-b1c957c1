@@ -27,6 +27,7 @@ interface ReadingProgressState {
   showFurigana: boolean;
   writingMode: WritingMode;
   displayMode: DisplayMode;
+  japaneseFont: JapaneseFont;
   updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
   getProgress: (bookId: string) => ReadingProgress | undefined;
   setFontSize: (size: FontSize) => void;
@@ -35,6 +36,7 @@ interface ReadingProgressState {
   setShowFurigana: (show: boolean) => void;
   setWritingMode: (mode: WritingMode) => void;
   setDisplayMode: (mode: DisplayMode) => void;
+  setJapaneseFont: (font: JapaneseFont) => void;
 }
 
 export const fontSizeMap: Record<FontSize, string> = {
