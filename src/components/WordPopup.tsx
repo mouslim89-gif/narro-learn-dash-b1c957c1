@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Star, Loader2, BookOpen } from 'lucide-react';
+import { Star, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { ExampleSentence } from '@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
@@ -11,7 +13,6 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription,
 } from '@/components/ui/drawer';
 
 interface WordPopupProps {
