@@ -27,7 +27,7 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode, displayMode, setDisplayMode } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode, displayMode, setDisplayMode, japaneseFont, setJapaneseFont } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
