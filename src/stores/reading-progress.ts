@@ -5,6 +5,13 @@ import type { Difficulty } from '@/data/books';
 export type FontSize = 'small' | 'medium' | 'large';
 export type WritingMode = 'horizontal' | 'vertical';
 export type DisplayMode = 'normal' | 'grammar';
+export type JapaneseFont = 'sans' | 'serif' | 'handwriting';
+
+export const japaneseFontClassMap: Record<JapaneseFont, string> = {
+  sans: 'font-jp-sans',
+  serif: 'font-jp-serif',
+  handwriting: 'font-jp-hand',
+};
 
 export interface ReadingProgress {
   difficulty: Difficulty;
