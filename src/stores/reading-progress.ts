@@ -26,6 +26,7 @@ interface ReadingProgressState {
   showFurigana: boolean;
   displayMode: DisplayMode;
   japaneseFont: JapaneseFont;
+  hasSeenLongPressHint: boolean;
   updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
   getProgress: (bookId: string) => ReadingProgress | undefined;
   setFontSize: (size: FontSize) => void;
@@ -34,6 +35,7 @@ interface ReadingProgressState {
   setShowFurigana: (show: boolean) => void;
   setDisplayMode: (mode: DisplayMode) => void;
   setJapaneseFont: (font: JapaneseFont) => void;
+  setHasSeenLongPressHint: (seen: boolean) => void;
 }
 
 export const fontSizeMap: Record<FontSize, string> = {
@@ -52,6 +54,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       showFurigana: false,
       displayMode: 'normal' as DisplayMode,
       japaneseFont: 'sans' as JapaneseFont,
+      hasSeenLongPressHint: false,
       updateProgress: (bookId, difficulty, percent) =>
         set((state) => ({
           progress: {
@@ -70,6 +73,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setShowFurigana: (showFurigana) => set({ showFurigana }),
       setDisplayMode: (displayMode) => set({ displayMode }),
       setJapaneseFont: (japaneseFont) => set({ japaneseFont }),
+      setHasSeenLongPressHint: (hasSeenLongPressHint) => set({ hasSeenLongPressHint }),
     }),
     { name: 'reading-progress' }
   )
