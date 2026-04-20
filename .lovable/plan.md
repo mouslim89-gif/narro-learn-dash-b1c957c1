@@ -1,41 +1,59 @@
 
 
-## Plan
+## Améliorations Reader
 
-Two fixes:
+### 1. Furigana — vérification & robustesse
+**Problème potentiel** : la fonction `segmentsFromReading` (dans `FuriganaWord.tsx`) utilise `lastIndexOf` pour aligner kanji/kana, ce qui peut mal aligner les mots avec kana répétés (ex: 食べている où い apparaît plusieurs fois).
 
-### 1. Add "Common" badge to WordMiniPopup
-Currently the mini popup shows JLPT badge but no Common badge. Add a small `✦` badge (very compact) next to JLPT in the header when `result.is_common` is true.
+**Fix** :
+- Utiliser `indexOf` (premier match) au lieu de `lastIndexOf` — c'est sémantiquement plus correct car on cherche la fin de la lecture du kanji **immédiatement** après lui.
+- Ajouter un fallback : si l'alignement basé sur la lecture Kuromoji échoue, retomber proprement sur `getFuriganaSegments` (cache Jisho) au lieu de retourner `null` silencieusement.
+- Gérer le cas où `reading` est en katakana mais le texte attend hiragana (déjà fait via `normalizeKana`, OK).
+- Ajouter un test unitaire dans `furigana.test.ts` couvrant : 食べている, 大きな, 持っていく, 行きました.
 
-### 2. Fix conjugation label in WordPopup
+### 2. Suppression du mode tategaki (vertical)
+- Retirer le bloc "Writing Direction" du panneau Settings dans `Reader.tsx`.
+- Retirer `writingMode` / `setWritingMode` de l'usage dans `Reader.tsx` (className conditionnel `writing-vertical`, `h-full`).
+- Retirer les styles `.writing-vertical` de `src/index.css`.
+- Retirer `writingMode` / `setWritingMode` / type `WritingMode` du store `reading-progress.ts`.
+- Retirer l'import `AlignVerticalSpaceAround` de lucide-react.
 
-**Problem A — wrong label for 包まれる:**
-The current `getConjugationLabel` in `WordPopup.tsx` iterates `CONJUGATION_PATTERNS` and matches the **first** suffix found. For 包まれる:
-- The list has `られる` (passive/potential) BEFORE `れる`, but `包まれる` ends in `まれる`, not `られる`. So it falls through to shorter patterns and matches `る`-less stuff... actually it ends up matching nothing specific and may hit `ます`-related fallback. Looking at the list, none of the patterns match `包まれる` cleanly except potentially nothing — meaning it returns `Dictionary form: 包む`.
+### 3. Mode couleur grammaticale — légende en anglais + amélioration
+- Dans `src/lib/pos-colors.ts`, traduire `LEGEND` :
+  - 動詞 → **Verb**
+  - 名詞 → **Noun**
+  - 形容詞 → **Adjective**
+  - 助詞 → **Particle**
+  - 副詞 → **Adverb**
+- Améliorer la lisibilité de la barre de légende :
+  - Layout plus aéré (gap-4), centré, avec un petit titre `Color guide`.
+  - Pastilles de couleur légèrement plus grandes (h-3 w-3) + texte en `text-foreground` (pas muted) pour meilleur contraste.
+  - Coller la légende juste en dessous du header, position sticky sous la barre de progression pour rester visible pendant le scroll.
+- Améliorer le mapping POS pour être plus précis :
+  - Distinguer `助動詞` (auxiliary) d'une vraie particule — lui donner une couleur dédiée (ex: ambre clair) ou le grouper avec verb selon préférence (à choisir ci-dessous).
+  - S'assurer que les tokens fusionnés (verbe + auxiliaire poli です/ます) reçoivent la couleur du **head verb** (déjà géré par `mergeConjugatedTokens` qui préserve le POS de la tête, à confirmer).
 
-Wait — re-reading: user says it shows "polite form". That means it's matching `ます` somewhere... actually it must match because `包まれる` doesn't end in any of those. Let me check — patterns are checked with `original.endsWith(suffix)`. `包まれる` ends with `れる` — but `れる` isn't in the list as standalone. It DOES end with `る` — not in list. Hmm.
+### 4. Fix lecteur audio — vide en bas
+**Problème** : `AudioPlayer` est `fixed bottom-[60px]` (au-dessus de la BottomNav). Le Reader ajoute `pb-36` pour réserver l'espace, mais :
+- Le Reader **n'affiche pas la BottomNav** (route reader plein écran), donc le `bottom-[60px]` crée un vide visible où le texte continue de défiler derrière.
+- Le `pb-36` est trop grand pour cette config.
 
-Actually the issue: passive `〜れる` (godan passive, e.g. 包む→包まれる) is NOT in the patterns list. Only `られる` (ichidan passive) is. So `包まれる` falls through entirely and shows the generic "Dictionary form: 包む" — but user says it shows "polite form". 
+**Fix** :
+- Détecter dans `AudioPlayer` si on est sur la route Reader (ou passer une prop `floating` / `bottom`) → coller le player tout en bas (`bottom-0`) quand pas de BottomNav.
+- Solution propre : passer une prop `bottomOffset` à `AudioPlayer` depuis Reader = `0`, et garder `60px` ailleurs si réutilisé. Ou simplement : dans Reader, rendre le player avec `bottom-0` (le Reader masque déjà la BottomNav).
+- Ajuster le `pb-36` du conteneur Reader → `pb-20` (juste assez pour la hauteur du player ~56px) quand `book.hasAudio`, sinon `pb-8`.
 
-Either way, the fix is the same: **add proper detection for godan passive `〜れる`** and improve the heuristics by also using the POS/dictionary form comparison rather than blind suffix matching.
+### Questions techniques
 
-**Problem B — arrow direction reversed:**
-Currently shows `{word} → {deinflected}` (e.g. `包まれる → 包む`). User wants the dictionary form first: `包む → 包まれる` (dict → conjugated).
+- **助動詞 (auxiliaires)** : couleur dédiée ou groupé avec verbe ? → je propose **groupé avec verbe** (cohérent avec la fusion des tokens conjugués).
+- **Légende grammaire sticky** : sticky sous le header, ou juste affichée en haut une fois ? → sticky pour rester utile pendant la lecture.
 
-### Changes
-
-**`src/components/WordMiniPopup.tsx`:**
-- Add small Common indicator (✦ icon or tiny badge) in header when `result.is_common` is true
-- Place it before/with the JLPT badge, very compact (text-[9px])
-
-**`src/components/WordPopup.tsx`:**
-- Add `〜れる` (godan passive) and `〜せる` (godan causative) patterns to `CONJUGATION_PATTERNS`, ordered properly (longer first)
-- Specifically: detect when surface ends in `あ-row + れる/せる` and base is godan → passive/causative
-- Reverse arrow display: `{deinflected} → {word}` instead of `{word} → {deinflected}`
-
-### Files modified
-| File | Change |
-|------|--------|
-| `src/components/WordMiniPopup.tsx` | Add Common badge in header |
-| `src/components/WordPopup.tsx` | Add passive/causative patterns, fix arrow direction |
+### Fichiers modifiés
+- `src/components/FuriganaWord.tsx` (alignement furigana + fallback)
+- `src/test/furigana.test.ts` (nouveaux cas de test)
+- `src/pages/Reader.tsx` (suppression tategaki, légende améliorée, padding audio)
+- `src/components/AudioPlayer.tsx` (positionnement bottom-0 dans Reader)
+- `src/stores/reading-progress.ts` (suppression `writingMode`)
+- `src/lib/pos-colors.ts` (légende anglaise, mapping affiné)
+- `src/index.css` (suppression styles `.writing-vertical`)
 
