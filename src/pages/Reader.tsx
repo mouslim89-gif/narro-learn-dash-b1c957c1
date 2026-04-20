@@ -321,49 +321,53 @@ export default function Reader() {
             <p key={pIdx} className="mb-6 indent-[1em]">
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
+                const sentenceText = sentence.tokens.map(t => t.t).join('');
+                const dimmed =
+                  (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
+                  (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
+                const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
                 return (
                   <span
                     key={sIdx}
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
-                    className={`transition-opacity duration-200 ${
-                      miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-25' : ''
-                    }`}
+                    className={`transition-opacity duration-200 ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5 rounded' : ''}`}
                   >
                     {sentence.tokens.map((token, i) => {
                       if (!token.j) {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const handleClick = (e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
-                          setMiniPopup(null);
-                          return;
-                        }
-                        const contextSentence = sentence.tokens.map(t => t.t).join('');
-                        const spanEl = sentenceRefs.current.get(globalIdx);
-                        const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
-                        setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
-                      };
-                      const stopDown = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
-
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
-                      const isHighlighted = miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i;
-
-                      if (showFurigana) {
-                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} onMouseDown={stopDown} onTouchStart={stopDown} />;
-                      }
+                      const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
 
                       return (
-                        <span
+                        <ReaderToken
                           key={i}
-                          onClick={handleClick}
-                          onMouseDown={stopDown}
-                          onTouchStart={stopDown}
-                          className={`cursor-pointer transition-colors active:bg-accent/15 ${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`}
-                        >
-                          {token.t}
-                        </span>
+                          token={token}
+                          showFurigana={showFurigana}
+                          colorClass={colorClass}
+                          isHighlighted={isHighlighted}
+                          onTap={() => {
+                            if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
+                              setMiniPopup(null);
+                              return;
+                            }
+                            const spanEl = sentenceRefs.current.get(globalIdx);
+                            const rect = spanEl?.getBoundingClientRect();
+                            if (!rect) return;
+                            setSentenceTranslation(null);
+                            setMiniPopup({
+                              text: token.t,
+                              baseForm: token.b,
+                              pos: token.p,
+                              contextSentence: sentenceText,
+                              sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+                              sentenceIdx: globalIdx,
+                              tokenIdx: i,
+                            });
+                          }}
+                          onLongPress={() => triggerSentenceTranslation(globalIdx, sentenceText)}
+                        />
                       );
                     })}
                   </span>
@@ -387,6 +391,19 @@ export default function Reader() {
             setMiniPopup(null);
             setFullPopupWord({ text, baseForm, pos, contextSentence });
           }}
+          onTranslateSentence={() => {
+            const idx = miniPopup.sentenceIdx;
+            const jp = miniPopup.contextSentence || '';
+            triggerSentenceTranslation(idx, jp);
+          }}
+        />
+      )}
+
+      {sentenceTranslation && (
+        <SentenceTranslationPopup
+          japanese={sentenceTranslation.japanese}
+          sentenceRect={sentenceTranslation.sentenceRect}
+          onClose={() => setSentenceTranslation(null)}
         />
       )}
 
