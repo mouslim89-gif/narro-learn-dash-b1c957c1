@@ -2,12 +2,12 @@ export type PosCategory = 'verb' | 'noun' | 'adjective' | 'particle' | 'adverb' 
 
 const POS_MAP: [string, PosCategory][] = [
   ['動詞', 'verb'],
+  ['助動詞', 'verb'], // group auxiliaries with verbs (consistent with token merging)
   ['形容詞', 'adjective'],
   ['形容動詞', 'adjective'],
   ['副詞', 'adverb'],
   ['名詞', 'noun'],
   ['助詞', 'particle'],
-  ['助動詞', 'particle'],
 ];
 
 const COLOR_CLASSES: Record<PosCategory, string> = {
@@ -20,11 +20,11 @@ const COLOR_CLASSES: Record<PosCategory, string> = {
 };
 
 export const LEGEND: { label: string; category: PosCategory; color: string }[] = [
-  { label: '動詞', category: 'verb', color: 'bg-teal-500' },
-  { label: '名詞', category: 'noun', color: 'bg-rose-500' },
-  { label: '形容詞', category: 'adjective', color: 'bg-violet-500' },
-  { label: '助詞', category: 'particle', color: 'bg-slate-400' },
-  { label: '副詞', category: 'adverb', color: 'bg-amber-500' },
+  { label: 'Verb', category: 'verb', color: 'bg-teal-500' },
+  { label: 'Noun', category: 'noun', color: 'bg-rose-500' },
+  { label: 'Adjective', category: 'adjective', color: 'bg-violet-500' },
+  { label: 'Particle', category: 'particle', color: 'bg-slate-400' },
+  { label: 'Adverb', category: 'adverb', color: 'bg-amber-500' },
 ];
 
 export function getPosCategory(pos?: string): PosCategory {

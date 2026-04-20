@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
-export function AudioPlayer() {
+interface AudioPlayerProps {
+  /** Distance in px from viewport bottom. Defaults to 60 (above BottomNav). Use 0 in fullscreen reader. */
+  bottomOffset?: number;
+}
+
+export function AudioPlayer({ bottomOffset = 60 }: AudioPlayerProps = {}) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState([0]);
   const [speed, setSpeed] = useState(1);
@@ -14,7 +19,10 @@ export function AudioPlayer() {
   };
 
   return (
-    <div className="fixed bottom-[60px] left-0 right-0 z-40 border-t bg-card/95 px-4 py-2.5 backdrop-blur-lg">
+    <div
+      style={{ bottom: `${bottomOffset}px` }}
+      className="fixed left-0 right-0 z-40 border-t bg-card/95 px-4 py-2.5 backdrop-blur-lg"
+    >
       <div className="mx-auto flex max-w-lg items-center gap-3">
         <button
           onClick={() => setPlaying(!playing)}

@@ -181,21 +181,3 @@
   font-feature-settings: "palt" 0;
 }
 
-/* Tategaki (vertical writing) mode */
-.writing-vertical {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: calc(100vh - 8rem);
-}
-
-.writing-vertical p {
-  text-indent: 0 !important;
-  margin-bottom: 0;
-  margin-left: 1.5rem;
-}
-
-.writing-vertical ruby rt {
-  text-orientation: upright;
-}

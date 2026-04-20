@@ -3,7 +3,6 @@ import { persist } from 'zustand/middleware';
 import type { Difficulty } from '@/data/books';
 
 export type FontSize = 'small' | 'medium' | 'large';
-export type WritingMode = 'horizontal' | 'vertical';
 export type DisplayMode = 'normal' | 'grammar';
 export type JapaneseFont = 'sans' | 'serif' | 'handwriting';
 
@@ -25,7 +24,6 @@ interface ReadingProgressState {
   readerDarkMode: boolean;
   darkMode: boolean;
   showFurigana: boolean;
-  writingMode: WritingMode;
   displayMode: DisplayMode;
   japaneseFont: JapaneseFont;
   updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
@@ -34,7 +32,6 @@ interface ReadingProgressState {
   setReaderDarkMode: (dark: boolean) => void;
   setDarkMode: (dark: boolean) => void;
   setShowFurigana: (show: boolean) => void;
-  setWritingMode: (mode: WritingMode) => void;
   setDisplayMode: (mode: DisplayMode) => void;
   setJapaneseFont: (font: JapaneseFont) => void;
 }
@@ -53,7 +50,6 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       readerDarkMode: false,
       darkMode: false,
       showFurigana: false,
-      writingMode: 'horizontal' as WritingMode,
       displayMode: 'normal' as DisplayMode,
       japaneseFont: 'sans' as JapaneseFont,
       updateProgress: (bookId, difficulty, percent) =>
@@ -72,7 +68,6 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
       setDarkMode: (darkMode) => set({ darkMode }),
       setShowFurigana: (showFurigana) => set({ showFurigana }),
-      setWritingMode: (writingMode) => set({ writingMode }),
       setDisplayMode: (displayMode) => set({ displayMode }),
       setJapaneseFont: (japaneseFont) => set({ japaneseFont }),
     }),
