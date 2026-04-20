@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, ChevronRight, Loader2 } from 'lucide-react';
+import { Star, ChevronRight, Loader2, Languages } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
@@ -12,6 +12,7 @@ interface WordMiniPopupProps {
   sentenceRect: { top: number; bottom: number; left: number; right: number };
   onClose: () => void;
   onShowMore: () => void;
+  onTranslateSentence?: () => void;
 }
 
 export function WordMiniPopup({
@@ -22,6 +23,7 @@ export function WordMiniPopup({
   sentenceRect,
   onClose,
   onShowMore,
+  onTranslateSentence,
 }: WordMiniPopupProps) {
   const { addWord, hasWord } = useFlashcardStore();
   const popupRef = useRef<HTMLDivElement>(null);
@@ -179,6 +181,15 @@ export function WordMiniPopup({
           <span className="shrink-0 rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent">
             {result.jlpt[0]?.replace('jlpt-', '')}
           </span>
+        )}
+        {result && !loading && onTranslateSentence && contextSentence && (
+          <button
+            onClick={onTranslateSentence}
+            className="flex items-center gap-0.5 text-[11px] font-semibold text-muted-foreground hover:text-primary transition-colors"
+            title="Translate sentence"
+          >
+            <Languages className="h-3 w-3" />
+          </button>
         )}
         {result && !loading && (
           <button
