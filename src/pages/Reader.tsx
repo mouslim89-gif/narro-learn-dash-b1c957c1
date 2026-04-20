@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Languages, AlignVerticalSpaceAround, Palette, Eye, EyeClosed, CaseSensitive } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens } from '@/lib/merge-tokens';
@@ -13,7 +13,7 @@ import { WordPopup } from '@/components/WordPopup';
 import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type WritingMode, type DisplayMode, type JapaneseFont } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type DisplayMode, type JapaneseFont } from '@/stores/reading-progress';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
@@ -27,7 +27,7 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, writingMode, setWritingMode, displayMode, setDisplayMode, japaneseFont, setJapaneseFont } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -158,7 +158,7 @@ export default function Reader() {
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
-    <div className="min-h-screen bg-[hsl(40,30%,97%)] pb-36 dark:bg-background">
+    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${book.hasAudio ? 'pb-20' : 'pb-8'} dark:bg-background`}>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
         <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
           <ArrowLeft className="h-5 w-5" />
@@ -248,22 +248,6 @@ export default function Reader() {
             {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
 
-          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Writing Direction</p>
-          <div className="flex gap-2">
-            {(['horizontal', 'vertical'] as WritingMode[]).map((m) => (
-              <button
-                key={m}
-                onClick={() => setWritingMode(m)}
-                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                  m === writingMode ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
-                }`}
-              >
-                {m === 'vertical' && <AlignVerticalSpaceAround className="h-3 w-3" />}
-                {m === 'horizontal' ? 'Normal' : '縦書き'}
-              </button>
-            ))}
-          </div>
-
           <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Display Mode</p>
           <div className="flex gap-2">
             {(['normal', 'grammar'] as DisplayMode[]).map((m) => (
@@ -285,18 +269,23 @@ export default function Reader() {
       <Progress value={scrollPercent} className="h-0.5 rounded-none" />
 
       {displayMode === 'grammar' && (
-        <div className="mx-3 mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm dark:bg-card sm:mx-auto sm:max-w-2xl">
-          {LEGEND.map((item) => (
-            <span key={item.category} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <span className={`inline-block h-2.5 w-2.5 rounded-full ${item.color}`} />
-              {item.label}
+        <div className="sticky top-14 z-10 border-b bg-card/95 px-3 py-2.5 backdrop-blur-lg">
+          <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Color guide
             </span>
-          ))}
+            {LEGEND.map((item) => (
+              <span key={item.category} className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                <span className={`inline-block h-3 w-3 rounded-full ${item.color}`} />
+                {item.label}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
-      <article ref={articleRef} className={`mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12 ${writingMode === 'vertical' ? 'writing-vertical' : ''}`}>
-        <div className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'} ${writingMode === 'vertical' ? 'h-full' : ''}`}>
+      <article ref={articleRef} className="mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12">
+        <div className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]} ${showFurigana ? 'leading-[2.6]' : 'leading-[2]'}`}>
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6 indent-[1em]">
               {paragraph.map((sentence, sIdx) => {
@@ -388,7 +377,7 @@ export default function Reader() {
         onClose={() => setShowGrammar(false)}
       />
 
-      {book.hasAudio && <AudioPlayer />}
+      {book.hasAudio && <AudioPlayer bottomOffset={0} />}
     </div>
   );
 }

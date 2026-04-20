@@ -41,4 +41,18 @@ describe('getFuriganaSegments', () => {
       { text: 'んだ' },
     ]);
   });
+
+  it('handles 大きな via dictionary cache', () => {
+    expect(getFuriganaSegments('大きな', createCache('大きな', 'おおきな'))).toEqual([
+      { text: '大', reading: 'おお' },
+      { text: 'きな' },
+    ]);
+  });
+
+  it('handles 行きました via deinflection', () => {
+    expect(getFuriganaSegments('行きました', createCache('行く', 'いく', '行く'))).toEqual([
+      { text: '行', reading: 'い' },
+      { text: 'きました' },
+    ]);
+  });
 });

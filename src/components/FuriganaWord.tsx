@@ -240,9 +240,11 @@ function segmentsFromReading(text: string, reading: string): FuriganaSegment[] |
       }
 
       if (kanaAfter && ri < readChars.length) {
-        // Find the kana suffix in the reading to determine where kanji reading ends
+        // Find the kana suffix in the reading to determine where kanji reading ends.
+        // Use indexOf (first match) — the kana following the kanji should be the
+        // earliest occurrence after the kanji's reading.
         const readRemaining = readChars.slice(ri).join('');
-        const kanaPos = readRemaining.lastIndexOf(kanaAfter);
+        const kanaPos = readRemaining.indexOf(kanaAfter);
         if (kanaPos > 0) {
           segments.push({ text: kanjiText, reading: readChars.slice(ri, ri + kanaPos).join('') });
           ri += kanaPos;
