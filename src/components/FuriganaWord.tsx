@@ -9,7 +9,13 @@ interface FuriganaWordProps {
   colorClass?: string;
   onClick: (e: MouseEvent<HTMLSpanElement>) => void;
   onMouseDown?: (e: MouseEvent<HTMLSpanElement>) => void;
+  onMouseMove?: (e: MouseEvent<HTMLSpanElement>) => void;
+  onMouseUp?: (e: MouseEvent<HTMLSpanElement>) => void;
+  onMouseLeave?: (e: MouseEvent<HTMLSpanElement>) => void;
   onTouchStart?: (e: TouchEvent<HTMLSpanElement>) => void;
+  onTouchMove?: (e: TouchEvent<HTMLSpanElement>) => void;
+  onTouchEnd?: (e: TouchEvent<HTMLSpanElement>) => void;
+  onTouchCancel?: (e: TouchEvent<HTMLSpanElement>) => void;
 }
 
 export interface FuriganaSegment {
@@ -275,7 +281,7 @@ function segmentsFromReading(text: string, reading: string): FuriganaSegment[] |
 }
 
 export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(function FuriganaWord(
-  { text, reading, colorClass, onClick, onMouseDown, onTouchStart },
+  { text, reading, colorClass, onClick, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onTouchStart, onTouchMove, onTouchEnd, onTouchCancel },
   ref
 ) {
   // Try pre-computed reading first, then fall back to Jisho cache
@@ -292,7 +298,13 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
       ref={ref}
       onClick={onClick}
       onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
       onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchCancel}
       className={`cursor-pointer rounded px-px transition-colors active:bg-accent/10 ${colorClass || ''}`}
     >
       {segments

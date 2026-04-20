@@ -11,9 +11,13 @@ import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
 import { WordMiniPopup } from '@/components/WordMiniPopup';
+import { ReaderToken } from '@/components/ReaderToken';
+import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type DisplayMode, type JapaneseFont } from '@/stores/reading-progress';
+import { useLongPress } from '@/hooks/use-long-press';
+import { toast } from '@/hooks/use-toast';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
@@ -27,7 +31,7 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint } = useReadingProgressStore();
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -35,9 +39,10 @@ export default function Reader() {
   );
   const [showSettings, setShowSettings] = useState(false);
   const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
+  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
   const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
   const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
-  
+
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
@@ -154,6 +159,33 @@ export default function Reader() {
     const remaining = book.readingTimeMin * ((100 - scrollPercent) / 100);
     return Math.max(1, Math.round(remaining));
   }, [book, scrollPercent]);
+
+  // Discoverability hint (once per user)
+  useEffect(() => {
+    if (!hasSeenLongPressHint && book) {
+      const t = setTimeout(() => {
+        toast({
+          title: 'Tip',
+          description: 'Long-press a word to translate the whole sentence.',
+        });
+        setHasSeenLongPressHint(true);
+      }, 1200);
+      return () => clearTimeout(t);
+    }
+  }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
+
+  // Trigger sentence translation for a given sentence
+  const triggerSentenceTranslation = useCallback((sentenceIdx: number, japanese: string) => {
+    const spanEl = sentenceRefs.current.get(sentenceIdx);
+    if (!spanEl) return;
+    const rect = spanEl.getBoundingClientRect();
+    setMiniPopup(null);
+    setSentenceTranslation({
+      sentenceIdx,
+      japanese,
+      sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+    });
+  }, []);
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -290,49 +322,53 @@ export default function Reader() {
             <p key={pIdx} className="mb-6 indent-[1em]">
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
+                const sentenceText = sentence.tokens.map(t => t.t).join('');
+                const dimmed =
+                  (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
+                  (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
+                const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
                 return (
                   <span
                     key={sIdx}
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
-                    className={`transition-opacity duration-200 ${
-                      miniPopup && miniPopup.sentenceIdx !== globalIdx ? 'opacity-25' : ''
-                    }`}
+                    className={`transition-opacity duration-200 ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5 rounded' : ''}`}
                   >
                     {sentence.tokens.map((token, i) => {
                       if (!token.j) {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const handleClick = (e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
-                          setMiniPopup(null);
-                          return;
-                        }
-                        const contextSentence = sentence.tokens.map(t => t.t).join('');
-                        const spanEl = sentenceRefs.current.get(globalIdx);
-                        const rect = spanEl?.getBoundingClientRect() || { top: e.clientY, bottom: e.clientY, left: e.clientX, right: e.clientX };
-                        setMiniPopup({ text: token.t, baseForm: token.b, pos: token.p, contextSentence, sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }, sentenceIdx: globalIdx, tokenIdx: i });
-                      };
-                      const stopDown = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
-
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
-                      const isHighlighted = miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i;
-
-                      if (showFurigana) {
-                        return <FuriganaWord key={i} text={token.t} reading={token.r} colorClass={`${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`} onClick={handleClick} onMouseDown={stopDown} onTouchStart={stopDown} />;
-                      }
+                      const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
 
                       return (
-                        <span
+                        <ReaderToken
                           key={i}
-                          onClick={handleClick}
-                          onMouseDown={stopDown}
-                          onTouchStart={stopDown}
-                          className={`cursor-pointer transition-colors active:bg-accent/15 ${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`}
-                        >
-                          {token.t}
-                        </span>
+                          token={token}
+                          showFurigana={showFurigana}
+                          colorClass={colorClass}
+                          isHighlighted={isHighlighted}
+                          onTap={() => {
+                            if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
+                              setMiniPopup(null);
+                              return;
+                            }
+                            const spanEl = sentenceRefs.current.get(globalIdx);
+                            const rect = spanEl?.getBoundingClientRect();
+                            if (!rect) return;
+                            setSentenceTranslation(null);
+                            setMiniPopup({
+                              text: token.t,
+                              baseForm: token.b,
+                              pos: token.p,
+                              contextSentence: sentenceText,
+                              sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+                              sentenceIdx: globalIdx,
+                              tokenIdx: i,
+                            });
+                          }}
+                          onLongPress={() => triggerSentenceTranslation(globalIdx, sentenceText)}
+                        />
                       );
                     })}
                   </span>
@@ -356,6 +392,19 @@ export default function Reader() {
             setMiniPopup(null);
             setFullPopupWord({ text, baseForm, pos, contextSentence });
           }}
+          onTranslateSentence={() => {
+            const idx = miniPopup.sentenceIdx;
+            const jp = miniPopup.contextSentence || '';
+            triggerSentenceTranslation(idx, jp);
+          }}
+        />
+      )}
+
+      {sentenceTranslation && (
+        <SentenceTranslationPopup
+          japanese={sentenceTranslation.japanese}
+          sentenceRect={sentenceTranslation.sentenceRect}
+          onClose={() => setSentenceTranslation(null)}
         />
       )}
 

@@ -35,6 +35,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sentence_translations: {
+        Row: {
+          created_at: string
+          english: string
+          hash: string
+          id: string
+          japanese: string
+        }
+        Insert: {
+          created_at?: string
+          english: string
+          hash: string
+          id?: string
+          japanese: string
+        }
+        Update: {
+          created_at?: string
+          english?: string
+          hash?: string
+          id?: string
+          japanese?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
