@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      dictionary: {
+        Row: {
+          created_at: string
+          entry: Json
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          entry: Json
+          word: string
+        }
+        Update: {
+          created_at?: string
+          entry?: Json
+          word?: string
+        }
+        Relationships: []
+      }
       example_sentences: {
         Row: {
           created_at: string

@@ -4,8 +4,7 @@ import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed
 import { books, difficultyConfig, type Difficulty } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens } from '@/lib/merge-tokens';
-import { seedCache } from '@/lib/jisho';
-import { bookDictionary } from '@/data/book-dictionary';
+import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
@@ -113,7 +112,7 @@ export default function Reader() {
 
   useEffect(() => {
     restoredScroll.current = false;
-    seedCache(bookDictionary);
+    if (id) hydrateDictionaryForBook(id);
   }, [id, difficulty]);
 
   useEffect(() => {
