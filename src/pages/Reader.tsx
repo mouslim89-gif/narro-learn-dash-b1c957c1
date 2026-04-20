@@ -159,6 +159,33 @@ export default function Reader() {
     return Math.max(1, Math.round(remaining));
   }, [book, scrollPercent]);
 
+  // Discoverability hint (once per user)
+  useEffect(() => {
+    if (!hasSeenLongPressHint && book) {
+      const t = setTimeout(() => {
+        toast({
+          title: 'Tip',
+          description: 'Long-press a word to translate the whole sentence.',
+        });
+        setHasSeenLongPressHint(true);
+      }, 1200);
+      return () => clearTimeout(t);
+    }
+  }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
+
+  // Trigger sentence translation for a given sentence
+  const triggerSentenceTranslation = useCallback((sentenceIdx: number, japanese: string) => {
+    const spanEl = sentenceRefs.current.get(sentenceIdx);
+    if (!spanEl) return;
+    const rect = spanEl.getBoundingClientRect();
+    setMiniPopup(null);
+    setSentenceTranslation({
+      sentenceIdx,
+      japanese,
+      sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+    });
+  }, []);
+
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
