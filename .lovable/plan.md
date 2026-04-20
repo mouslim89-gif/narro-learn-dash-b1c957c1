@@ -1,66 +1,90 @@
 
 
-## Ajout du livre 「ア、秋」 de 太宰治
+## Plan : nettoyage librairie + traduction de phrase
 
-Court essai/notes contemplatives sur l'automne. Texte original très littéraire (vocabulaire rare, style classique). Sera ajouté avec 3 versions selon tes choix.
+### 1. Nettoyage des livres d'exemple
 
-### 1. Trois versions du texte
+`src/data/books.ts` :
+- **Supprimer** : momotaro, tsuru-no-ongaeshi, konbini-ningen, ginga-tetsudo, yoru-cafe, yami-no-koe (et toutes leurs constantes `*Simplified/Intermediate/Original`).
+- **Garder** : uniquement `a-aki` (太宰治).
 
-**Original** (proche du texte de Dazai, légèrement nettoyé des marqueurs ruby `《》` qui seront gérés par le tokenizer/dictionnaire) :
-- Garde la structure en notes décousues : "トンボ、スキトオル", "秋ハ夏ノ焼ケ残リサ", "コスモス、無残", etc.
-- Conserve les passages narratifs entre les notes (souvenir du tremblement de terre, plage abandonnée…)
-- Vocabulaire/grammaire du texte original préservés (蜻蛉, 燈籠, 炯眼, 跋渉…)
-- ~900-1100 caractères
+Nettoyer en cascade les caches associés pour garder le repo léger :
+- `src/data/book-tokens.ts` — retirer toutes les entrées sauf `a-aki`.
+- `src/data/book-grammar.ts` — retirer toutes les entrées sauf `a-aki`.
+- `src/data/book-dictionary.ts` — **garder tel quel** (le dico est mutualisé entre livres, supprimer des entrées casserait potentiellement `a-aki` et créerait du travail inutile lors de l'ajout de nouveaux livres).
+- `src/stores/reading-progress.ts` — pas de modif (les progressions des anciens livres deviendront orphelines, sans effet).
 
-**Intermédiaire** = notes simplifiées :
-- Garde le format mémo/notes du poète, l'esprit du texte
-- Simplifie le vocabulaire rare (蜻蛉→とんぼ, 炯眼→鋭い目, 跋渉→歩く…)
-- Remplace katakana stylistique par hiragana/kanji standard quand utile
-- Grammaire intermédiaire (N3/N2), garde des constructions comme ～ようだ, ～らしい
-- ~800-1000 caractères
+Vérifier aussi que `Library.tsx`, `MyBooks.tsx`, `BookDetail.tsx` ne référencent pas en dur ces IDs (ils itèrent juste sur `books`, donc rien à toucher).
 
-**Simplifié** = récit linéaire :
-- Réécrit en un petit essai cohérent : "Un poète note ses idées sur l'automne. Il dit que les libellules en automne semblent transparentes. Il dit que l'automne se cache déjà dans l'été…"
-- Phrases courtes (SOV simples), grammaire N5/N4
-- Garde les images fortes (libellule transparente, plage abandonnée, papillon laid sur la terre noire)
-- ~700-900 caractères
+### 2. Fonctionnalité « Traduction de phrase »
 
-### 2. Métadonnées du livre
+#### Backend — nouvelle edge function `translate-sentence`
+- Input : `{ japanese: string, bookId?: string, difficulty?: string }`
+- Validation Zod (max 500 chars, japonais requis).
+- **Cache DB** : nouvelle table `sentence_translations` (clé = hash sha256 du japonais, colonnes `japanese`, `english`, `created_at`). RLS public read, insert via service role uniquement.
+- Lookup cache → si miss → appel Lovable AI (`google/gemini-3-flash-preview`) via tool calling pour forcer un JSON `{ english: string }`.
+- Prompt système : « Translate the following Japanese sentence into natural, fluent English. Preserve the literary tone if present. Return only the translation. »
+- Gérer 429 / 402 explicitement et les renvoyer au client.
 
-```ts
-{
-  id: 'a-aki',
-  titleJp: 'ア、秋',
-  titleEn: 'A, Autumn',
-  author: 'Dazai Osamu',
-  genre: 'fiction',
-  jlptLevel: 'N1',
-  coverColor: '#B85C2A',  // rouille / orange automne
-  readingTimeMin: 12,
-  synopsis: "A poet flips through his notebook of autumn impressions — a transparent dragonfly, an abandoned beach, a stubborn butterfly crawling on black earth. Dazai's brief, melancholic meditation on a season that 'hides inside summer'.",
-  hasAudio: true,
-  content: { simplified, intermediate, original },
-}
+#### Frontend
+- **Nouveau lib** : `src/lib/translate.ts` avec `translateSentence(japanese)` + cache mémoire (Map) + dédupe des requêtes en vol.
+- **Nouveau composant** : `src/components/SentenceTranslationPopup.tsx`
+  - Même look & positionnement que `WordMiniPopup` (calcule `top/left` via `sentenceRect`, animation `mini-slide-up/down`, padding identique).
+  - Header : icône 🌐 + label « Translation » + bouton fermer.
+  - Body : phrase japonaise (font-japanese, petite) + traduction anglaise (font normale, semi-bold accent).
+  - États : loading (spinner), erreur (« Translation unavailable »), succès.
+  - Le reste de l'écran est dimmed (même mécanisme que la mini popup mot, ré-utiliser la logique d'opacity sur les sentence spans).
+- **Reader.tsx** :
+  - Nouvel état `sentenceTranslation: { sentenceIdx, japanese, sentenceRect } | null`.
+  - **Long-press handler** sur chaque token (~400 ms, seuil de mouvement < 8 px pour ne pas confondre avec scroll) : déclenche la traduction de la phrase contenant le token, ferme la mini popup mot.
+  - Implémentation : helper `useLongPress(onLongPress, { delay: 400, moveThreshold: 8 })` dans `src/hooks/use-long-press.ts` retournant les handlers `onTouchStart/onTouchMove/onTouchEnd/onMouseDown/onMouseUp/onMouseLeave`. Compat tactile + souris desktop.
+  - Empêcher le déclenchement du `onClick` (mini popup mot) si long-press a fired (flag `triggered.current`).
+  - **Ajout dans la mini popup mot** : nouveau bouton « Translate sentence » (icône Languages de lucide) à côté du bouton « More », appelle le même flow que le long-press.
+  - Quand `sentenceTranslation` actif : dim toutes les autres sentences (réutiliser la condition d'opacity actuelle), highlight subtil sur la sentence active.
+
+#### Indicateur de découvrabilité
+- Première fois qu'un user ouvre le Reader (flag `hasSeenLongPressHint` dans le store) : petit toast discret « Tip: long-press a word to translate the whole sentence ».
+
+### 3. Migration DB
+
+```sql
+create table public.sentence_translations (
+  id uuid primary key default gen_random_uuid(),
+  hash text not null unique,
+  japanese text not null,
+  english text not null,
+  created_at timestamptz not null default now()
+);
+alter table public.sentence_translations enable row level security;
+create policy "Anyone can read sentence translations"
+  on public.sentence_translations for select using (true);
+create index sentence_translations_hash_idx on public.sentence_translations (hash);
 ```
 
-### 3. Préchargement (selon project-knowledge)
+Insert via service role uniquement (pas de policy insert publique).
 
-Après ajout dans `src/data/books.ts`, exécuter dans l'ordre :
-1. `npx tsx scripts/generate-tokens.ts` → génère les tokens Kuromoji pour les 3 versions dans `book-tokens.ts`
-2. `npx tsx scripts/fetch-missing-dictionary.ts` → récupère via Jisho toutes les définitions des mots nouveaux et les stocke dans `book-dictionary.ts`
-3. `npx tsx scripts/expand-dictionary.ts` → ajoute les alias surface/baseForm pour maximiser les cache hits
-4. Invoquer la fonction edge `grammar-notes` (ou un petit script équivalent) pour pré-générer les notes de grammaire des 3 versions et les ajouter à `src/data/book-grammar.ts`
+### 4. Fichiers touchés
 
-### 4. Fichiers modifiés
+**Modifiés**
+- `src/data/books.ts` (suppression)
+- `src/data/book-tokens.ts` (suppression)
+- `src/data/book-grammar.ts` (suppression)
+- `src/components/WordMiniPopup.tsx` (bouton « Translate sentence »)
+- `src/pages/Reader.tsx` (long-press, état traduction, dim management)
+- `src/stores/reading-progress.ts` (flag `hasSeenLongPressHint`)
 
-- `src/data/books.ts` — ajout du livre + 3 constantes de contenu
-- `src/data/book-tokens.ts` — auto-régénéré
-- `src/data/book-dictionary.ts` — auto-enrichi
-- `src/data/book-grammar.ts` — notes de grammaire pour les 3 versions
+**Créés**
+- `supabase/functions/translate-sentence/index.ts`
+- `src/lib/translate.ts`
+- `src/components/SentenceTranslationPopup.tsx`
+- `src/hooks/use-long-press.ts`
+- Migration SQL pour `sentence_translations`
 
-### 5. Notes techniques
+### 5. Notes techniques & choix
 
-- Le texte original utilise des marqueurs ruby `《とんぼ》` après certains kanji. Je les retirerai (Kuromoji + nos furigana s'en chargent), mais je vérifierai les lectures non standard (蜻蛉, 桔梗, 炯眼, 提灯, 蚕…) et ajouterai des `READING_OVERRIDES` dans `generate-tokens.ts` si Kuromoji se trompe.
-- Les segments en katakana stylistique du type "秋ハ夏ノ焼ケ残リサ" risquent de mal se tokenizer → je vérifierai après génération et ajouterai des compounds dans `postMergeCompounds` si nécessaire.
-- Vu la longueur et le N1, le préchargement du dico fera probablement 200-400 mots nouveaux (quelques minutes via le script avec rate-limit).
+- **Pourquoi cache DB et pas seulement mémoire** : les phrases des livres sont fixes et lues par tous les users → rentabilise très vite les appels AI.
+- **Pourquoi long-press 400 ms et pas 500** : compromis bon entre intentionnalité et réactivité mobile (testé sur viewport 360×738).
+- **Conflit scroll** : `moveThreshold: 8 px` annule le long-press dès que le doigt bouge → pas de déclenchement accidentel pendant un swipe.
+- **Pourquoi ne PAS pré-générer toutes les traductions à l'ajout** : tu as choisi le live AI, et c'est pertinent : la traduction n'a besoin d'être faite qu'une fois par phrase (cache DB partagé), donc le coût se lisse naturellement avec les premiers lecteurs.
+- **Sécurité** : la fonction edge a `verify_jwt = false` (pas de données user-spécifiques) ; validation Zod stricte sur la longueur pour éviter abus.
 
