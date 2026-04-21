@@ -49,7 +49,20 @@ export default function Reader() {
   const articleRef = useRef<HTMLDivElement>(null);
   const restoredScroll = useRef(false);
 
+  // --- Audio sync state ---
+  const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioCurrentSentence, setAudioCurrentSentence] = useState<number | null>(null);
+  const audioSeekRef = useRef<((sec: number) => void) | null>(null);
+  // Tracks whether the user manually scrolled recently — disables auto-scroll briefly
+  const userScrolledAtRef = useRef<number>(0);
+
   const book = books.find((b) => b.id === id);
+  const audioVariant = book?.audio?.[difficulty];
+  const audioUrl = useMemo(
+    () => (id && audioVariant ? buildAudioUrl(id, difficulty) : null),
+    [id, difficulty, audioVariant]
+  );
 
   // Use pre-baked Kuromoji tokens, then aggressively merge conjugated forms
   // (verb + auxiliaries + て-compound auxiliaries) into single clickable units.
