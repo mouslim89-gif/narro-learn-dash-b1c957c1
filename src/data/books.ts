@@ -129,8 +129,8 @@ export const books: Book[] = [
     readingTimeMin: 12,
     synopsis: "A poet flips through his notebook of autumn impressions — a transparent dragonfly, an abandoned beach, a stubborn butterfly crawling on black earth. Dazai's brief, melancholic meditation on a season that 'hides inside summer'.",
     audio: {
-      // Upload the matching MP3 at: book-audio/a-aki/simplified.mp3
-      simplified: { durationSec: 0 },
+      // Stored at: book-audio/a-aki/simplified.mp3 (MP3 mono 24kHz, ~146s)
+      simplified: { durationSec: 146 },
     },
     content: { simplified: aAkiSimplified, intermediate: aAkiIntermediate, original: aAkiOriginal },
   },
