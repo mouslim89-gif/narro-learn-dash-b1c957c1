@@ -141,8 +141,15 @@ export default function Reader() {
   }, [saved?.progressPercent]);
 
   const rafRef = useRef<number>(0);
+  // When we trigger scrollIntoView programmatically (audio sync / scrub),
+  // we must not treat the resulting scroll event as "user scrolled".
+  const programmaticScrollUntilRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
-    userScrolledAtRef.current = Date.now();
+    if (Date.now() < programmaticScrollUntilRef.current) {
+      // Programmatic scroll in progress — ignore.
+    } else {
+      userScrolledAtRef.current = Date.now();
+    }
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
