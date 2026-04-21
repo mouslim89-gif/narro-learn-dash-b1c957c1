@@ -207,21 +207,35 @@ export default function Reader() {
     [audioSync]
   );
 
-  // While the user drags the audio slider: jump straight to the matching
-  // sentence (bypasses the manual-scroll cooldown so the page follows live).
+  // While the user drags the audio slider: scroll smoothly toward the
+  // sentence matching the previewed time. Debounced + native smooth-scroll
+  // so rapid scrub events don't restart the animation each frame.
+  const scrubDebounceRef = useRef<number | null>(null);
   const handleAudioScrub = useCallback(
     (timeSec: number) => {
       if (!audioSync) return;
       const idx = findSentenceAt(audioSync, timeSec);
       if (idx == null) return;
       setAudioCurrentSentence(idx);
-      const el = sentenceRefs.current.get(idx);
-      if (!el) return;
-      // Mark the upcoming scroll as programmatic so handleScroll doesn't
-      // start a 2.5s "user scrolled" cooldown.
-      programmaticScrollUntilRef.current = Date.now() + 800;
-      userScrolledAtRef.current = 0;
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      if (scrubDebounceRef.current != null) {
+        window.clearTimeout(scrubDebounceRef.current);
+      }
+      scrubDebounceRef.current = window.setTimeout(() => {
+        scrubDebounceRef.current = null;
+        const el = sentenceRefs.current.get(idx);
+        if (!el) return;
+        // Bypass the manual-scroll cooldown.
+        programmaticScrollUntilRef.current = Date.now() + 1200;
+        userScrolledAtRef.current = 0;
+
+        // Compute target scroll manually so we always scroll from the CURRENT
+        // position (avoids scrollIntoView restarting from scratch each call).
+        const rect = el.getBoundingClientRect();
+        const target =
+          window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
+        window.scrollTo({ top: target, behavior: 'smooth' });
+      }, 120);
     },
     [audioSync]
   );
