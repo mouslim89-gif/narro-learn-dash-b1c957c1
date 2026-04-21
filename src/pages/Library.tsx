@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { books, genreLabels, type Genre, jlptColors, difficultyConfig } from '@/data/books';
+import { books, genreLabels, type Genre, jlptColors, difficultyConfig, hasAnyAudio } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { Link } from 'react-router-dom';
 import { Clock, Headphones, Search, BookOpen, Moon, Sun, Settings } from 'lucide-react';
@@ -135,7 +135,7 @@ export default function Library() {
                       <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         <Clock className="h-3 w-3" /> {featured.readingTimeMin} min
                       </span>
-                      {featured.hasAudio && (
+                      {hasAnyAudio(featured) && (
                         <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <Headphones className="h-3 w-3" /> Audio
                         </span>

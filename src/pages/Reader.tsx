@@ -18,6 +18,7 @@ import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSi
 import { useLongPress } from '@/hooks/use-long-press';
 import { toast } from '@/hooks/use-toast';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
+import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
