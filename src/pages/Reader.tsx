@@ -18,6 +18,7 @@ import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSi
 import { useLongPress } from '@/hooks/use-long-press';
 import { toast } from '@/hooks/use-toast';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
+import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
@@ -48,7 +49,20 @@ export default function Reader() {
   const articleRef = useRef<HTMLDivElement>(null);
   const restoredScroll = useRef(false);
 
+  // --- Audio sync state ---
+  const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioCurrentSentence, setAudioCurrentSentence] = useState<number | null>(null);
+  const audioSeekRef = useRef<((sec: number) => void) | null>(null);
+  // Tracks whether the user manually scrolled recently — disables auto-scroll briefly
+  const userScrolledAtRef = useRef<number>(0);
+
   const book = books.find((b) => b.id === id);
+  const audioVariant = book?.audio?.[difficulty];
+  const audioUrl = useMemo(
+    () => (id && audioVariant ? buildAudioUrl(id, difficulty) : null),
+    [id, difficulty, audioVariant]
+  );
 
   // Use pre-baked Kuromoji tokens, then aggressively merge conjugated forms
   // (verb + auxiliaries + て-compound auxiliaries) into single clickable units.
@@ -128,6 +142,7 @@ export default function Reader() {
 
   const rafRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
+    userScrolledAtRef.current = Date.now();
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
@@ -143,6 +158,57 @@ export default function Reader() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  // --- Audio sync: load sentence timestamps when audio is available ---
+  // We need the canonical sentences (joined Japanese text) for the edge function alignment.
+  const sentenceTexts = useMemo(
+    () => sentences.map((s) => s.tokens.map((t) => t.t).join('')),
+    [sentences]
+  );
+
+  useEffect(() => {
+    if (!id || !audioUrl || sentenceTexts.length === 0) {
+      setAudioSync(null);
+      return;
+    }
+    let cancelled = false;
+    setAudioLoading(true);
+    loadAudioSync(id, difficulty, sentenceTexts)
+      .then((sync) => {
+        if (cancelled) return;
+        setAudioSync(sync);
+        if (!sync) {
+          // Sync failed but audio file is set: still let user play, just no highlight.
+          console.warn('[Reader] Audio sync unavailable; playback works without highlight.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setAudioLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, difficulty, audioUrl, sentenceTexts]);
+
+  // Update highlighted sentence when audio plays
+  const handleAudioTime = useCallback(
+    (timeSec: number) => {
+      if (!audioSync) return;
+      const idx = findSentenceAt(audioSync, timeSec);
+      setAudioCurrentSentence(idx);
+    },
+    [audioSync]
+  );
+
+  // Auto-scroll active sentence into view (skipped if user just scrolled manually)
+  useEffect(() => {
+    if (audioCurrentSentence == null) return;
+    const sinceScroll = Date.now() - userScrolledAtRef.current;
+    if (sinceScroll < 2500) return; // user is in control
+    const el = sentenceRefs.current.get(audioCurrentSentence);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [audioCurrentSentence]);
 
   useEffect(() => {
     if (readerDarkMode) {
@@ -189,7 +255,7 @@ export default function Reader() {
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
-    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${book.hasAudio ? 'pb-20' : 'pb-8'} dark:bg-background`}>
+    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-20' : 'pb-8'} dark:bg-background`}>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
         <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
           <ArrowLeft className="h-5 w-5" />
@@ -326,11 +392,20 @@ export default function Reader() {
                   (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
                   (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
                 const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
+                const activeAudio = audioCurrentSentence === globalIdx;
                 return (
                   <span
                     key={sIdx}
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
-                    className={`transition-opacity duration-200 ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5 rounded' : ''}`}
+                    onClick={(e) => {
+                      // Only seek if there's an audio sync AND user clicked on the span
+                      // background (not on a child token, which has its own onTap).
+                      if (!audioSync || !audioSeekRef.current) return;
+                      if (e.target !== e.currentTarget) return;
+                      const ts = audioSync.sentences[globalIdx];
+                      if (ts) audioSeekRef.current(ts.startSec);
+                    }}
+                    className={`transition-all duration-200 rounded ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5' : ''} ${activeAudio ? 'bg-primary/10 px-0.5' : ''}`}
                   >
                     {sentence.tokens.map((token, i) => {
                       if (!token.j) {
@@ -425,7 +500,14 @@ export default function Reader() {
         onClose={() => setShowGrammar(false)}
       />
 
-      {book.hasAudio && <AudioPlayer bottomOffset={0} />}
+      {audioUrl && (
+        <AudioPlayer
+          src={audioUrl}
+          bottomOffset={0}
+          onTimeUpdate={handleAudioTime}
+          seekRequestRef={audioSeekRef}
+        />
+      )}
     </div>
   );
 }

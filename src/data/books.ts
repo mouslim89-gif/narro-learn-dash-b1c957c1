@@ -1,6 +1,26 @@
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
 
+/**
+ * Per-difficulty audio metadata. A book can have audio for some difficulties only.
+ *
+ * To add audio for a book:
+ *  1. Convert your audio to MP3 192kbps:
+ *       ffmpeg -i input.wav -b:a 192k -ac 1 output.mp3
+ *  2. Upload to Cloud Storage at: book-audio/{bookId}/{difficulty}.mp3
+ *  3. Get the public URL and approximate duration (in seconds).
+ *  4. Add the entry below in the book's `audio` field, e.g.:
+ *       audio: { simplified: { durationSec: 920 } }
+ *  5. The first user to play it triggers automatic sentence-timestamp generation
+ *     via ElevenLabs Scribe (cached in DB + IndexedDB for everyone after that).
+ */
+export interface BookAudioVariant {
+  /** Approximate total duration in seconds (informational; real value comes from <audio> metadata). */
+  durationSec: number;
+}
+
+export type BookAudio = Partial<Record<Difficulty, BookAudioVariant>>;
+
 export interface Book {
   id: string;
   titleJp: string;
@@ -11,8 +31,13 @@ export interface Book {
   coverColor: string;
   readingTimeMin: number;
   synopsis: string;
-  hasAudio: boolean;
+  audio?: BookAudio;
   content: Record<Difficulty, string>;
+}
+
+/** True if the book has audio for at least one difficulty. */
+export function hasAnyAudio(book: Book): boolean {
+  return !!book.audio && Object.keys(book.audio).length > 0;
 }
 
 export const genreLabels: Record<Genre, string> = {
@@ -103,7 +128,10 @@ export const books: Book[] = [
     coverColor: '#B85C2A',
     readingTimeMin: 12,
     synopsis: "A poet flips through his notebook of autumn impressions — a transparent dragonfly, an abandoned beach, a stubborn butterfly crawling on black earth. Dazai's brief, melancholic meditation on a season that 'hides inside summer'.",
-    hasAudio: true,
+    audio: {
+      // Upload the matching MP3 at: book-audio/a-aki/simplified.mp3
+      simplified: { durationSec: 0 },
+    },
     content: { simplified: aAkiSimplified, intermediate: aAkiIntermediate, original: aAkiOriginal },
   },
 ];

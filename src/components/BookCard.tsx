@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Clock, Headphones } from 'lucide-react';
 import type { Book } from '@/data/books';
-import { jlptColors } from '@/data/books';
+import { jlptColors, hasAnyAudio } from '@/data/books';
 
 export function BookCard({ book, progress }: { book: Book; progress?: number }) {
   return (
@@ -17,7 +17,7 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/10" />
         {/* Spine effect */}
         <div className="absolute inset-y-0 left-0 w-2 bg-black/15" />
-        {book.hasAudio && (
+        {hasAnyAudio(book) && (
           <div className="absolute right-2 top-2 rounded bg-white/20 p-1 backdrop-blur-sm">
             <Headphones className="h-3 w-3 text-white" />
           </div>

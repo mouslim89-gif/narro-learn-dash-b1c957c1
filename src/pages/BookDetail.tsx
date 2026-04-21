@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { books, difficultyConfig, jlptColors, genreLabels, type Difficulty } from '@/data/books';
+import { books, difficultyConfig, jlptColors, genreLabels, hasAnyAudio, type Difficulty } from '@/data/books';
 import { useState } from 'react';
 import { ArrowLeft, Headphones, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,7 @@ export default function BookDetail() {
             </span>
             <span className="text-xs text-muted-foreground">{genreLabels[book.genre]}</span>
             <span className="text-xs text-muted-foreground">{book.readingTimeMin} min</span>
-            {book.hasAudio && (
+            {hasAnyAudio(book) && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Headphones className="h-3 w-3" /> Audio
               </span>
