@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      book_audio_sync: {
+        Row: {
+          book_id: string
+          created_at: string
+          difficulty: string
+          duration_sec: number
+          sentences: Json
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          difficulty: string
+          duration_sec: number
+          sentences: Json
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          difficulty?: string
+          duration_sec?: number
+          sentences?: Json
+        }
+        Relationships: []
+      }
       dictionary: {
         Row: {
           created_at: string
