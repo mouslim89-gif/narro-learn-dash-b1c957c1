@@ -25,6 +25,7 @@ export function AudioPlayer({
   onTimeUpdate,
   onLoadedMetadata,
   seekRequestRef,
+  onScrub,
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
