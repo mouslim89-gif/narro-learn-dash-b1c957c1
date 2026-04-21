@@ -56,6 +56,9 @@ export default function Reader() {
   const audioSeekRef = useRef<((sec: number) => void) | null>(null);
   // Tracks whether the user manually scrolled recently — disables auto-scroll briefly
   const userScrolledAtRef = useRef<number>(0);
+  const programmaticScrollUntilRef = useRef<number>(0);
+  const scrollAnimationFrameRef = useRef<number | null>(null);
+  const scrollTargetRef = useRef<number | null>(null);
 
   const book = books.find((b) => b.id === id);
   const audioVariant = book?.audio?.[difficulty];
@@ -141,9 +144,8 @@ export default function Reader() {
   }, [saved?.progressPercent]);
 
   const rafRef = useRef<number>(0);
-  // When we trigger scrollIntoView programmatically (audio sync / scrub),
+  // When we trigger programmatic scrolling (audio sync / scrub),
   // we must not treat the resulting scroll event as "user scrolled".
-  const programmaticScrollUntilRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
     if (Date.now() < programmaticScrollUntilRef.current) {
       // Programmatic scroll in progress — ignore.
@@ -160,6 +162,57 @@ export default function Reader() {
       if (id) updateProgress(id, difficulty, pct);
     });
   }, [id, difficulty, updateProgress]);
+
+  const stopAnimatedScroll = useCallback(() => {
+    if (scrollAnimationFrameRef.current != null) {
+      cancelAnimationFrame(scrollAnimationFrameRef.current);
+      scrollAnimationFrameRef.current = null;
+    }
+  }, []);
+
+  const animateScrollToTarget = useCallback(() => {
+    if (scrollAnimationFrameRef.current != null) return;
+
+    const step = () => {
+      const target = scrollTargetRef.current;
+      if (target == null) {
+        scrollAnimationFrameRef.current = null;
+        return;
+      }
+
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const clampedTarget = Math.min(Math.max(target, 0), maxScroll);
+      const current = window.scrollY;
+      const distance = clampedTarget - current;
+
+      if (Math.abs(distance) < 1) {
+        window.scrollTo({ top: clampedTarget });
+        scrollAnimationFrameRef.current = null;
+        return;
+      }
+
+      const next = current + distance * 0.16;
+      programmaticScrollUntilRef.current = Date.now() + 150;
+      window.scrollTo({ top: next });
+      scrollAnimationFrameRef.current = requestAnimationFrame(step);
+    };
+
+    scrollAnimationFrameRef.current = requestAnimationFrame(step);
+  }, []);
+
+  const queueSentenceScroll = useCallback(
+    (sentenceIdx: number) => {
+      const el = sentenceRefs.current.get(sentenceIdx);
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const target = window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
+      userScrolledAtRef.current = 0;
+      programmaticScrollUntilRef.current = Date.now() + 300;
+      scrollTargetRef.current = target;
+      animateScrollToTarget();
+    },
+    [animateScrollToTarget]
+  );
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -207,37 +260,17 @@ export default function Reader() {
     [audioSync]
   );
 
-  // While the user drags the audio slider: scroll smoothly toward the
-  // sentence matching the previewed time. Debounced + native smooth-scroll
-  // so rapid scrub events don't restart the animation each frame.
-  const scrubDebounceRef = useRef<number | null>(null);
+  // While the user drags the audio slider, keep a single running animation
+  // and only update its destination when the target sentence changes.
   const handleAudioScrub = useCallback(
     (timeSec: number) => {
       if (!audioSync) return;
       const idx = findSentenceAt(audioSync, timeSec);
       if (idx == null) return;
       setAudioCurrentSentence(idx);
-
-      if (scrubDebounceRef.current != null) {
-        window.clearTimeout(scrubDebounceRef.current);
-      }
-      scrubDebounceRef.current = window.setTimeout(() => {
-        scrubDebounceRef.current = null;
-        const el = sentenceRefs.current.get(idx);
-        if (!el) return;
-        // Bypass the manual-scroll cooldown.
-        programmaticScrollUntilRef.current = Date.now() + 1200;
-        userScrolledAtRef.current = 0;
-
-        // Compute target scroll manually so we always scroll from the CURRENT
-        // position (avoids scrollIntoView restarting from scratch each call).
-        const rect = el.getBoundingClientRect();
-        const target =
-          window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
-        window.scrollTo({ top: target, behavior: 'smooth' });
-      }, 120);
+      queueSentenceScroll(idx);
     },
-    [audioSync]
+    [audioSync, queueSentenceScroll]
   );
 
   // Auto-scroll active sentence into view (skipped if user just scrolled manually)
@@ -245,11 +278,12 @@ export default function Reader() {
     if (audioCurrentSentence == null) return;
     const sinceScroll = Date.now() - userScrolledAtRef.current;
     if (sinceScroll < 2500) return; // user is in control
-    const el = sentenceRefs.current.get(audioCurrentSentence);
-    if (!el) return;
-    programmaticScrollUntilRef.current = Date.now() + 800;
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [audioCurrentSentence]);
+    queueSentenceScroll(audioCurrentSentence);
+  }, [audioCurrentSentence, queueSentenceScroll]);
+
+  useEffect(() => {
+    return () => stopAnimatedScroll();
+  }, [stopAnimatedScroll]);
 
   useEffect(() => {
     if (readerDarkMode) {
