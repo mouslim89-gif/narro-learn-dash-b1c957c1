@@ -142,6 +142,7 @@ export default function Reader() {
 
   const rafRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
+    userScrolledAtRef.current = Date.now();
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
@@ -157,6 +158,57 @@ export default function Reader() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  // --- Audio sync: load sentence timestamps when audio is available ---
+  // We need the canonical sentences (joined Japanese text) for the edge function alignment.
+  const sentenceTexts = useMemo(
+    () => sentences.map((s) => s.tokens.map((t) => t.t).join('')),
+    [sentences]
+  );
+
+  useEffect(() => {
+    if (!id || !audioUrl || sentenceTexts.length === 0) {
+      setAudioSync(null);
+      return;
+    }
+    let cancelled = false;
+    setAudioLoading(true);
+    loadAudioSync(id, difficulty, sentenceTexts)
+      .then((sync) => {
+        if (cancelled) return;
+        setAudioSync(sync);
+        if (!sync) {
+          // Sync failed but audio file is set: still let user play, just no highlight.
+          console.warn('[Reader] Audio sync unavailable; playback works without highlight.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setAudioLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, difficulty, audioUrl, sentenceTexts]);
+
+  // Update highlighted sentence when audio plays
+  const handleAudioTime = useCallback(
+    (timeSec: number) => {
+      if (!audioSync) return;
+      const idx = findSentenceAt(audioSync, timeSec);
+      setAudioCurrentSentence(idx);
+    },
+    [audioSync]
+  );
+
+  // Auto-scroll active sentence into view (skipped if user just scrolled manually)
+  useEffect(() => {
+    if (audioCurrentSentence == null) return;
+    const sinceScroll = Date.now() - userScrolledAtRef.current;
+    if (sinceScroll < 2500) return; // user is in control
+    const el = sentenceRefs.current.get(audioCurrentSentence);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [audioCurrentSentence]);
 
   useEffect(() => {
     if (readerDarkMode) {
