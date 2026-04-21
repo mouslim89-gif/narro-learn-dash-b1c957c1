@@ -79,6 +79,7 @@ export function AudioPlayer({
       audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
       onTimeUpdate?.(newTime);
+      onScrub?.(newTime);
     }
   };
 
