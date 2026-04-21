@@ -56,6 +56,9 @@ export default function Reader() {
   const audioSeekRef = useRef<((sec: number) => void) | null>(null);
   // Tracks whether the user manually scrolled recently — disables auto-scroll briefly
   const userScrolledAtRef = useRef<number>(0);
+  const programmaticScrollUntilRef = useRef<number>(0);
+  const scrollAnimationFrameRef = useRef<number | null>(null);
+  const scrollTargetRef = useRef<number | null>(null);
 
   const book = books.find((b) => b.id === id);
   const audioVariant = book?.audio?.[difficulty];
