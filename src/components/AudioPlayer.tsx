@@ -13,6 +13,8 @@ interface AudioPlayerProps {
   onLoadedMetadata?: (durationSec: number) => void;
   /** Imperative seek handle — caller can call seek(time) to jump. */
   seekRequestRef?: React.MutableRefObject<((sec: number) => void) | null>;
+  /** Called while user is dragging the slider — emits the previewed time in seconds. */
+  onScrub?: (timeSec: number) => void;
 }
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
@@ -23,6 +25,7 @@ export function AudioPlayer({
   onTimeUpdate,
   onLoadedMetadata,
   seekRequestRef,
+  onScrub,
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -76,6 +79,7 @@ export function AudioPlayer({
       audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
       onTimeUpdate?.(newTime);
+      onScrub?.(newTime);
     }
   };
 

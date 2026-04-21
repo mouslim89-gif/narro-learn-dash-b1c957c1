@@ -141,8 +141,15 @@ export default function Reader() {
   }, [saved?.progressPercent]);
 
   const rafRef = useRef<number>(0);
+  // When we trigger scrollIntoView programmatically (audio sync / scrub),
+  // we must not treat the resulting scroll event as "user scrolled".
+  const programmaticScrollUntilRef = useRef<number>(0);
   const handleScroll = useCallback(() => {
-    userScrolledAtRef.current = Date.now();
+    if (Date.now() < programmaticScrollUntilRef.current) {
+      // Programmatic scroll in progress — ignore.
+    } else {
+      userScrolledAtRef.current = Date.now();
+    }
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
@@ -200,6 +207,25 @@ export default function Reader() {
     [audioSync]
   );
 
+  // While the user drags the audio slider: jump straight to the matching
+  // sentence (bypasses the manual-scroll cooldown so the page follows live).
+  const handleAudioScrub = useCallback(
+    (timeSec: number) => {
+      if (!audioSync) return;
+      const idx = findSentenceAt(audioSync, timeSec);
+      if (idx == null) return;
+      setAudioCurrentSentence(idx);
+      const el = sentenceRefs.current.get(idx);
+      if (!el) return;
+      // Mark the upcoming scroll as programmatic so handleScroll doesn't
+      // start a 2.5s "user scrolled" cooldown.
+      programmaticScrollUntilRef.current = Date.now() + 800;
+      userScrolledAtRef.current = 0;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    },
+    [audioSync]
+  );
+
   // Auto-scroll active sentence into view (skipped if user just scrolled manually)
   useEffect(() => {
     if (audioCurrentSentence == null) return;
@@ -207,6 +233,7 @@ export default function Reader() {
     if (sinceScroll < 2500) return; // user is in control
     const el = sentenceRefs.current.get(audioCurrentSentence);
     if (!el) return;
+    programmaticScrollUntilRef.current = Date.now() + 800;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [audioCurrentSentence]);
 
@@ -505,6 +532,7 @@ export default function Reader() {
           src={audioUrl}
           bottomOffset={0}
           onTimeUpdate={handleAudioTime}
+          onScrub={handleAudioScrub}
           seekRequestRef={audioSeekRef}
         />
       )}
