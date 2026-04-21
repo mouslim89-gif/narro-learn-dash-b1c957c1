@@ -532,6 +532,7 @@ export default function Reader() {
           src={audioUrl}
           bottomOffset={0}
           onTimeUpdate={handleAudioTime}
+          onScrub={handleAudioScrub}
           seekRequestRef={audioSeekRef}
         />
       )}
