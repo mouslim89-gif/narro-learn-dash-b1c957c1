@@ -255,7 +255,7 @@ export default function Reader() {
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
-    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${book.hasAudio ? 'pb-20' : 'pb-8'} dark:bg-background`}>
+    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-20' : 'pb-8'} dark:bg-background`}>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
         <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
           <ArrowLeft className="h-5 w-5" />
@@ -392,11 +392,20 @@ export default function Reader() {
                   (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
                   (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
                 const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
+                const activeAudio = audioCurrentSentence === globalIdx;
                 return (
                   <span
                     key={sIdx}
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
-                    className={`transition-opacity duration-200 ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5 rounded' : ''}`}
+                    onClick={(e) => {
+                      // Only seek if there's an audio sync AND user clicked on the span
+                      // background (not on a child token, which has its own onTap).
+                      if (!audioSync || !audioSeekRef.current) return;
+                      if (e.target !== e.currentTarget) return;
+                      const ts = audioSync.sentences[globalIdx];
+                      if (ts) audioSeekRef.current(ts.startSec);
+                    }}
+                    className={`transition-all duration-200 rounded ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5' : ''} ${activeAudio ? 'bg-primary/10 px-0.5' : ''}`}
                   >
                     {sentence.tokens.map((token, i) => {
                       if (!token.j) {
@@ -491,7 +500,14 @@ export default function Reader() {
         onClose={() => setShowGrammar(false)}
       />
 
-      {book.hasAudio && <AudioPlayer bottomOffset={0} />}
+      {audioUrl && (
+        <AudioPlayer
+          src={audioUrl}
+          bottomOffset={0}
+          onTimeUpdate={handleAudioTime}
+          seekRequestRef={audioSeekRef}
+        />
+      )}
     </div>
   );
 }
