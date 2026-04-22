@@ -330,7 +330,7 @@ export default function Reader() {
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
-    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-20' : 'pb-8'} dark:bg-background`}>
+    <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-36' : 'pb-20'} dark:bg-background`}>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
         <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
           <ArrowLeft className="h-5 w-5" />
@@ -578,7 +578,7 @@ export default function Reader() {
       {audioUrl && (
         <AudioPlayer
           src={audioUrl}
-          bottomOffset={0}
+          bottomOffset={60}
           onTimeUpdate={handleAudioTime}
           onScrub={handleAudioScrub}
           seekRequestRef={audioSeekRef}
