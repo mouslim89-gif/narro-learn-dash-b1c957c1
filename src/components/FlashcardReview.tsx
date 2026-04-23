@@ -51,8 +51,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   const card = deck[currentIdx];
   const progressPct = ((currentIdx + 1) / deck.length) * 100;
-  const visibleMeanings = card.meanings.slice(0, MAX_MEANINGS_BACK);
-  const hiddenMeaningsCount = Math.max(0, card.meanings.length - MAX_MEANINGS_BACK);
+  const visibleMeanings = showAllMeanings ? card.meanings : card.meanings.slice(0, DEFAULT_MEANINGS);
+  const hiddenMeaningsCount = Math.max(0, card.meanings.length - DEFAULT_MEANINGS);
 
   const handleAnswer = (quality: SrsQualityLabel) => {
     advance(() => adjustMastery(card.id, quality));
@@ -78,11 +78,14 @@ export function FlashcardReview({ deck, onExit }: Props) {
         </p>
       </div>
 
-      {/* Card area — fixed height, no internal scroll */}
-      <div className="flex-1 min-h-0 flex items-center justify-center px-6 py-3 overflow-hidden">
+      {/* Card area — fills available space */}
+      <div className="flex-1 min-h-0 flex items-stretch justify-center px-4 py-3">
         <div
-          className={`perspective-800 w-full max-w-sm h-full ${animClass}`}
-          onClick={() => setFlipped(!flipped)}
+          className={`perspective-800 w-full max-w-md h-full ${animClass}`}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('[data-no-flip]')) return;
+            setFlipped(!flipped);
+          }}
         >
           <div
             className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
@@ -90,55 +93,75 @@ export function FlashcardReview({ deck, onExit }: Props) {
             }`}
           >
             {/* Front face */}
-            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-xl border bg-card shadow-lg p-5">
-              <p className="font-japanese text-5xl font-bold">{card.word}</p>
-              <p className="font-japanese text-lg text-muted-foreground mt-[10px] my-px mb-0">{card.reading}</p>
-              <PlayWordButton word={card.word} reading={card.reading} size={24} className="mt-2" />
-              <p className="mt-6 text-xs text-muted-foreground">Tap to flip</p>
+            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card shadow-lg p-6">
+              <p className="font-japanese text-6xl font-bold tracking-tight">{card.word}</p>
+              <p className="font-japanese text-xl text-muted-foreground mt-3">{card.reading}</p>
+              <PlayWordButton word={card.word} reading={card.reading} size={28} className="mt-4" />
+              <p className="mt-8 text-xs text-muted-foreground/70 uppercase tracking-wider">Tap to flip</p>
             </div>
 
-            {/* Back face — fully constrained, no scroll */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-start rounded-xl border bg-card shadow-lg p-4 overflow-hidden">
-              <div className="flex items-center gap-2 w-full">
-                <p className="font-japanese text-xl font-bold truncate">{card.word}</p>
-                <span className="font-japanese text-xs text-muted-foreground truncate">{card.reading}</span>
-                <span className="text-[10px] text-muted-foreground/70 italic truncate">{toRomaji(card.reading || card.word)}</span>
-                <PlayWordButton word={card.word} reading={card.reading} size={14} className="ml-auto shrink-0" />
+            {/* Back face — Anki-style: clean header + body */}
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-2xl border bg-card shadow-lg overflow-hidden">
+              {/* Header — word + reading + tags */}
+              <div className="flex-none px-5 pt-5 pb-3 border-b border-border/50">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <p className="font-japanese text-3xl font-bold">{card.word}</p>
+                  <span className="font-japanese text-base text-muted-foreground">{card.reading}</span>
+                  <div data-no-flip className="ml-auto shrink-0">
+                    <PlayWordButton word={card.word} reading={card.reading} size={18} />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground/70 italic mt-0.5">{toRomaji(card.reading || card.word)}</p>
+                {((card.jlpt && card.jlpt.length > 0) || (card.partsOfSpeech && card.partsOfSpeech.length > 0)) && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {card.jlpt?.[0] && (
+                      <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
+                        {card.jlpt[0].replace('jlpt-', 'JLPT ')}
+                      </span>
+                    )}
+                    {card.partsOfSpeech?.slice(0, 3).map((p, i) => (
+                      <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <ol className="mt-2 list-decimal list-inside space-y-0.5 w-full">
-                {visibleMeanings.map((m, i) => (
-                  <li key={i} className="text-sm font-medium text-foreground line-clamp-1">{m}</li>
-                ))}
-                {hiddenMeaningsCount > 0 && (
-                  <li className="text-[11px] text-muted-foreground list-none italic">
-                    +{hiddenMeaningsCount} more meaning{hiddenMeaningsCount > 1 ? 's' : ''}
-                  </li>
-                )}
-              </ol>
+              {/* Body — scrollable only when expanded */}
+              <div
+                data-no-flip
+                className={`flex-1 min-h-0 px-5 py-4 ${showAllMeanings ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Meanings */}
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Meanings</p>
+                  <ol className="list-decimal list-inside space-y-1.5">
+                    {visibleMeanings.map((m, i) => (
+                      <li key={i} className="text-base font-medium text-foreground leading-snug">{m}</li>
+                    ))}
+                  </ol>
+                  {hiddenMeaningsCount > 0 && !showAllMeanings && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setShowAllMeanings(true); }}
+                      className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                      Show {hiddenMeaningsCount} more
+                    </button>
+                  )}
+                </div>
 
-              <div className="mt-2 flex flex-wrap gap-1">
-                {card.jlpt && card.jlpt.length > 0 && (
-                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-                    {card.jlpt[0]?.replace('jlpt-', 'JLPT ')}
-                  </span>
-                )}
-                {card.partsOfSpeech?.slice(0, 2).map((p, i) => (
-                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground truncate max-w-[90px]">
-                    {p}
-                  </span>
-                ))}
-              </div>
-
-              {card.contextSentence && (
-                <>
-                  <Separator className="mt-2.5" />
-                  <div className="mt-2 w-full rounded-lg border border-primary/10 bg-primary/5 p-2.5">
-                    <div className="mb-1 flex items-center gap-1.5">
+                {/* Context sentence */}
+                {card.contextSentence && (
+                  <div className="mt-4 rounded-lg border border-primary/10 bg-primary/5 p-3">
+                    <div className="mb-1.5 flex items-center gap-1.5">
                       <BookOpen className="h-3 w-3 text-primary shrink-0" />
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
                     </div>
-                    <p className="font-japanese text-xs leading-relaxed text-foreground line-clamp-2">
+                    <p className="font-japanese text-sm leading-relaxed text-foreground">
                       {(() => {
                         const idx = card.contextSentence!.indexOf(card.word);
                         if (idx === -1) return card.contextSentence;
@@ -152,11 +175,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
                       })()}
                     </p>
                   </div>
-                </>
-              )}
+                )}
 
-              <div className="mt-2 w-full overflow-hidden">
-                <ExampleSentence word={card.word} className="w-full text-xs [&_*]:line-clamp-2" />
+                {/* Example sentence */}
+                <div className="mt-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Example</p>
+                  <ExampleSentence word={card.word} />
+                </div>
               </div>
             </div>
           </div>
