@@ -38,7 +38,9 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          soft: "hsl(var(--accent-soft))",
         },
+        sumi: "hsl(var(--sumi))",
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -59,7 +61,8 @@ export default {
         },
       },
       fontFamily: {
-        serif: ["Merriweather", "serif"],
+        serif: ["Fraunces", "serif"],
+        display: ["Fraunces", "serif"],
         sans: ["Inter", "sans-serif"],
         japanese: ["Noto Sans JP", "sans-serif"],
       },
