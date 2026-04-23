@@ -81,7 +81,7 @@ export default function MyBooks() {
       </div>
 
       {/* Stats */}
-      {startedBooks.length > 0 && (
+      {bookProgressList.length > 0 && (
         <>
           <div className="mt-4 grid grid-cols-4 gap-2">
             <div className="rounded-lg border bg-card p-2.5 text-center">
@@ -93,7 +93,7 @@ export default function MyBooks() {
               <p className="text-[9px] text-muted-foreground">Words read</p>
             </div>
             <div className="rounded-lg border bg-card p-2.5 text-center">
-              <p className="text-lg font-bold text-green-600">{stats.wordsSaved}</p>
+              <p className="text-lg font-bold text-primary">{stats.wordsSaved}</p>
               <p className="text-[9px] text-muted-foreground">Saved</p>
             </div>
             <div className="rounded-lg border bg-card p-2.5 text-center">
@@ -104,7 +104,7 @@ export default function MyBooks() {
         </>
       )}
 
-      {startedBooks.length === 0 ? (
+      {bookProgressList.length === 0 ? (
         <div className="mt-20 flex flex-col items-center text-center text-muted-foreground">
           <span className="text-5xl mb-4">📖</span>
           <p className="text-lg font-semibold">No books yet</p>
@@ -112,19 +112,16 @@ export default function MyBooks() {
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {startedBooks.map((book) => {
-            const p = progress[book.id];
-            return (
-              <div key={book.id} className="flex flex-col gap-1">
-                <BookCard book={book} progress={p.progressPercent} />
-                <div className="px-0.5">
-                  <p className="text-[10px] text-muted-foreground">
-                    {difficultyConfig[p.difficulty].label} · {formatDistanceToNow(new Date(p.lastReadAt), { addSuffix: true })}
-                  </p>
-                </div>
+          {bookProgressList.map(({ book, progress: p }) => (
+            <div key={book.id} className="flex flex-col gap-1">
+              <BookCard book={book} progress={p.progressPercent} />
+              <div className="px-0.5">
+                <p className="text-[10px] text-muted-foreground">
+                  {difficultyConfig[p.difficulty].label} · {formatDistanceToNow(new Date(p.lastReadAt), { addSuffix: true })}
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>
