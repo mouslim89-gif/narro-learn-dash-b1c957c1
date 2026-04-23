@@ -37,22 +37,24 @@ export default function Library() {
 
   return (
     <div className="pb-20">
-      <header className="px-6 pt-10 pb-3 flex items-end justify-between">
-        <div>
-          <h1 className="wordmark text-[28px] leading-none text-foreground">Tsundoku</h1>
+      <header className="library-header-bg relative px-6 pt-10 pb-4 flex items-end justify-between overflow-hidden">
+        <span className="library-kanji-watermark" aria-hidden="true">積</span>
+        <div className="relative z-10">
+          <h1 className="wordmark text-[30px] leading-none text-foreground">Tsundoku</h1>
           <p className="mt-2 text-[13px] text-muted-foreground">Learn Japanese through reading</p>
         </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => setDarkMode(!darkMode)}>
+        <div className="relative z-10 flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full transition-transform active:scale-90" onClick={() => setDarkMode(!darkMode)}>
             {darkMode ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
           </Button>
           <Link to="/settings">
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full transition-transform active:scale-90">
               <Settings className="h-[18px] w-[18px]" />
             </Button>
           </Link>
         </div>
       </header>
+      <div className="hairline-fade mx-6" />
 
       {/* Search */}
       <div className="px-6 py-2">
@@ -86,7 +88,7 @@ export default function Library() {
           {continueBook && (
             <section className="px-6 py-4">
               <Link to={`/reader/${continueBook.book.id}/${continueBook.progress.difficulty}`}>
-                <div className="elev-soft elev-soft-hover relative overflow-hidden rounded-xl border bg-card p-5 transition-all duration-200 active:scale-[0.99]">
+                <div className="card-refined elev-soft-hover relative overflow-hidden rounded-xl ring-1 ring-border/40 p-5 transition-all duration-200 active:scale-[0.99]">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Continue Reading</p>
                   <div className="flex items-center gap-4">
                     <div
@@ -116,7 +118,7 @@ export default function Library() {
           {/* Featured */}
           <section className="px-6 py-4">
             <Link to={`/book/${featured.id}`}>
-              <div className="elev-soft elev-soft-hover relative overflow-hidden rounded-xl border bg-card p-6 transition-all duration-200 active:scale-[0.99]">
+              <div className="card-refined elev-soft-hover relative overflow-hidden rounded-xl ring-1 ring-border/40 p-6 transition-all duration-200 active:scale-[0.99]">
                 <div className="flex items-start gap-5">
                   <div
                     className="book-paper relative flex h-32 w-24 flex-shrink-0 items-end overflow-hidden rounded p-3 shadow-md"
@@ -155,7 +157,8 @@ export default function Library() {
             if (genreBooks.length === 0) return null;
             return (
               <section key={genre} className="py-3">
-                <h3 className="px-6 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                <h3 className="px-6 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground flex items-center">
+                  <span className="section-bullet" />
                   {genreLabels[genre]}
                 </h3>
                 <div className="mt-3 flex gap-4 overflow-x-auto px-6 pb-2 scrollbar-none">
