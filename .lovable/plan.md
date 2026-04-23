@@ -1,90 +1,91 @@
 
 
-## Plan : nettoyage librairie + traduction de phrase
+# Système de comptes + sync cloud
 
-### 1. Nettoyage des livres d'exemple
+## Vue d'ensemble
 
-`src/data/books.ts` :
-- **Supprimer** : momotaro, tsuru-no-ongaeshi, konbini-ningen, ginga-tetsudo, yoru-cafe, yami-no-koe (et toutes leurs constantes `*Simplified/Intermediate/Original`).
-- **Garder** : uniquement `a-aki` (太宰治).
+L'app passera de "100% local" à "login obligatoire avec sync background". Les **flashcards** et la **progression de lecture** seront liées au compte. Les **préférences UI** (dark mode, font, furigana) restent locales par device.
 
-Nettoyer en cascade les caches associés pour garder le repo léger :
-- `src/data/book-tokens.ts` — retirer toutes les entrées sauf `a-aki`.
-- `src/data/book-grammar.ts` — retirer toutes les entrées sauf `a-aki`.
-- `src/data/book-dictionary.ts` — **garder tel quel** (le dico est mutualisé entre livres, supprimer des entrées casserait potentiellement `a-aki` et créerait du travail inutile lors de l'ajout de nouveaux livres).
-- `src/stores/reading-progress.ts` — pas de modif (les progressions des anciens livres deviendront orphelines, sans effet).
+Login proposé : **Apple + Google + Email/mot de passe**.
 
-Vérifier aussi que `Library.tsx`, `MyBooks.tsx`, `BookDetail.tsx` ne référencent pas en dur ces IDs (ils itèrent juste sur `books`, donc rien à toucher).
+## UX
 
-### 2. Fonctionnalité « Traduction de phrase »
+- **Écran de login** affiché dès le démarrage si non connecté (3 boutons : Apple, Google, Email).
+- **Email** : signup avec vérification + reset password (page dédiée `/reset-password`).
+- **Settings** : nouvelle section "Compte" avec email affiché + bouton "Sign out" + "Delete account".
+- **Indicateur de sync** discret dans la BottomNav (petit point qui clignote pendant la sync, croix rouge si erreur).
+- **Première connexion** : si des données locales existent déjà (cas où l'utilisateur a utilisé l'app avant), elles sont écrasées par les données cloud (cohérent avec "login obligatoire").
 
-#### Backend — nouvelle edge function `translate-sentence`
-- Input : `{ japanese: string, bookId?: string, difficulty?: string }`
-- Validation Zod (max 500 chars, japonais requis).
-- **Cache DB** : nouvelle table `sentence_translations` (clé = hash sha256 du japonais, colonnes `japanese`, `english`, `created_at`). RLS public read, insert via service role uniquement.
-- Lookup cache → si miss → appel Lovable AI (`google/gemini-3-flash-preview`) via tool calling pour forcer un JSON `{ english: string }`.
-- Prompt système : « Translate the following Japanese sentence into natural, fluent English. Preserve the literary tone if present. Return only the translation. »
-- Gérer 429 / 402 explicitement et les renvoyer au client.
+## Architecture sync : Local-first + background push
 
-#### Frontend
-- **Nouveau lib** : `src/lib/translate.ts` avec `translateSentence(japanese)` + cache mémoire (Map) + dédupe des requêtes en vol.
-- **Nouveau composant** : `src/components/SentenceTranslationPopup.tsx`
-  - Même look & positionnement que `WordMiniPopup` (calcule `top/left` via `sentenceRect`, animation `mini-slide-up/down`, padding identique).
-  - Header : icône 🌐 + label « Translation » + bouton fermer.
-  - Body : phrase japonaise (font-japanese, petite) + traduction anglaise (font normale, semi-bold accent).
-  - États : loading (spinner), erreur (« Translation unavailable »), succès.
-  - Le reste de l'écran est dimmed (même mécanisme que la mini popup mot, ré-utiliser la logique d'opacity sur les sentence spans).
-- **Reader.tsx** :
-  - Nouvel état `sentenceTranslation: { sentenceIdx, japanese, sentenceRect } | null`.
-  - **Long-press handler** sur chaque token (~400 ms, seuil de mouvement < 8 px pour ne pas confondre avec scroll) : déclenche la traduction de la phrase contenant le token, ferme la mini popup mot.
-  - Implémentation : helper `useLongPress(onLongPress, { delay: 400, moveThreshold: 8 })` dans `src/hooks/use-long-press.ts` retournant les handlers `onTouchStart/onTouchMove/onTouchEnd/onMouseDown/onMouseUp/onMouseLeave`. Compat tactile + souris desktop.
-  - Empêcher le déclenchement du `onClick` (mini popup mot) si long-press a fired (flag `triggered.current`).
-  - **Ajout dans la mini popup mot** : nouveau bouton « Translate sentence » (icône Languages de lucide) à côté du bouton « More », appelle le même flow que le long-press.
-  - Quand `sentenceTranslation` actif : dim toutes les autres sentences (réutiliser la condition d'opacity actuelle), highlight subtil sur la sentence active.
-
-#### Indicateur de découvrabilité
-- Première fois qu'un user ouvre le Reader (flag `hasSeenLongPressHint` dans le store) : petit toast discret « Tip: long-press a word to translate the whole sentence ».
-
-### 3. Migration DB
-
-```sql
-create table public.sentence_translations (
-  id uuid primary key default gen_random_uuid(),
-  hash text not null unique,
-  japanese text not null,
-  english text not null,
-  created_at timestamptz not null default now()
-);
-alter table public.sentence_translations enable row level security;
-create policy "Anyone can read sentence translations"
-  on public.sentence_translations for select using (true);
-create index sentence_translations_hash_idx on public.sentence_translations (hash);
+```text
+User action → Zustand (instant UI) → debounce 1.5s → push to Supabase
+                                                    ↓
+                                          Realtime channel ← autres devices
 ```
 
-Insert via service role uniquement (pas de policy insert publique).
+- **Lecture** : au login, on hydrate Zustand depuis Supabase (1 requête par store).
+- **Écriture** : Zustand reste source de vérité côté UI. Un middleware custom déclenche un push debouncé (1.5s) vers Supabase.
+- **Multi-device** : abonnement Realtime par user_id → réconciliation par `updated_at` (last-write-wins, suffisant pour ce use case mono-utilisateur multi-device).
+- **Offline** : Zustand persist conserve tout. Une queue d'opérations en attente est rejouée à la reconnexion.
 
-### 4. Fichiers touchés
+## Schéma DB
 
-**Modifiés**
-- `src/data/books.ts` (suppression)
-- `src/data/book-tokens.ts` (suppression)
-- `src/data/book-grammar.ts` (suppression)
-- `src/components/WordMiniPopup.tsx` (bouton « Translate sentence »)
-- `src/pages/Reader.tsx` (long-press, état traduction, dim management)
-- `src/stores/reading-progress.ts` (flag `hasSeenLongPressHint`)
+**Table `profiles`** (auto-créée par trigger sur signup) :
+- `id` (uuid, FK auth.users, PK)
+- `email`, `display_name`, `created_at`
 
-**Créés**
-- `supabase/functions/translate-sentence/index.ts`
-- `src/lib/translate.ts`
-- `src/components/SentenceTranslationPopup.tsx`
-- `src/hooks/use-long-press.ts`
-- Migration SQL pour `sentence_translations`
+**Table `flashcards`** :
+- `id` (text, PK composite avec user_id) — réutilise l'`id` Jisho actuel
+- `user_id` (uuid, FK auth.users)
+- `word`, `reading`, `meanings` (jsonb), `jlpt` (jsonb), `parts_of_speech` (jsonb), `context_sentence`
+- `mastery` (int), `last_reviewed_at`, `next_review_at`
+- `created_at`, `updated_at`
+- PK : `(user_id, id)`
 
-### 5. Notes techniques & choix
+**Table `reading_progress`** :
+- `user_id` (uuid, FK auth.users)
+- `book_id` (text), `difficulty` (text)
+- `progress_percent` (int), `last_read_at`
+- `created_at`, `updated_at`
+- PK : `(user_id, book_id)` — une seule progression par livre, même si l'utilisateur change de difficulté
 
-- **Pourquoi cache DB et pas seulement mémoire** : les phrases des livres sont fixes et lues par tous les users → rentabilise très vite les appels AI.
-- **Pourquoi long-press 400 ms et pas 500** : compromis bon entre intentionnalité et réactivité mobile (testé sur viewport 360×738).
-- **Conflit scroll** : `moveThreshold: 8 px` annule le long-press dès que le doigt bouge → pas de déclenchement accidentel pendant un swipe.
-- **Pourquoi ne PAS pré-générer toutes les traductions à l'ajout** : tu as choisi le live AI, et c'est pertinent : la traduction n'a besoin d'être faite qu'une fois par phrase (cache DB partagé), donc le coût se lisse naturellement avec les premiers lecteurs.
-- **Sécurité** : la fonction edge a `verify_jwt = false` (pas de données user-spécifiques) ; validation Zod stricte sur la longueur pour éviter abus.
+**RLS** : chaque table → `user_id = auth.uid()` pour SELECT/INSERT/UPDATE/DELETE.
+
+**Trigger** : `on_auth_user_created` → insère une ligne dans `profiles`.
+
+## Fichiers à créer
+
+- `src/contexts/AuthContext.tsx` — provider exposant `user`, `session`, `loading`, helpers `signOut()`. Setup de `onAuthStateChange` AVANT `getSession()`.
+- `src/pages/Auth.tsx` — UI avec 3 boutons OAuth + form email (toggle Sign in / Sign up) + lien "Forgot password".
+- `src/pages/ResetPassword.tsx` — page publique pour `updateUser({ password })`.
+- `src/components/ProtectedRoute.tsx` — wrapper qui redirige vers `/auth` si pas de session.
+- `src/lib/sync/cloud-sync.ts` — utilitaires `pullFlashcards`, `pushFlashcard`, `pullProgress`, `pushProgress` + abonnement Realtime.
+- `src/lib/sync/sync-middleware.ts` — middleware Zustand qui debounce les writes vers le cloud.
+
+## Fichiers à modifier
+
+- `src/stores/flashcards.ts` — ajouter `updatedAt` aux `SavedWord`, hook `hydrateFromCloud(userId)`, `clearLocal()` au logout. Brancher le middleware de sync.
+- `src/stores/reading-progress.ts` — séparer en deux : la partie **progression** (synced) et la partie **préférences UI** (local-only, inchangée). Ajouter `hydrateFromCloud` / `clearLocal`.
+- `src/App.tsx` — wrapper `<AuthProvider>`, route `/auth`, route `/reset-password`, `<ProtectedRoute>` autour des routes app.
+- `src/pages/Settings.tsx` — section "Compte" : email, sign out, delete account.
+- `src/components/BottomNav.tsx` — petit indicateur de sync.
+- `supabase/config.toml` — `site_url` + `additional_redirect_urls` pour OAuth.
+
+## Détails techniques
+
+- Auth Apple : utilise le BYOC géré par Lovable Cloud — recommandé si publication App Store. Si l'utilisateur n'a pas encore de compte Apple Developer, on peut activer Apple plus tard sans casser Google/Email.
+- `onAuthStateChange` : ne **jamais** faire d'appel Supabase async dans le callback (deadlock). Utiliser `setTimeout(..., 0)` pour différer les fetches.
+- Realtime : un seul channel par user, abonné aux 2 tables, filtré par `user_id`.
+- Migration data locale : à la 1re connexion, on **ignore** le local et on prend le cloud (vide pour un nouveau compte). Le local sera repeuplé par les futures actions.
+- Indicateur de sync : `useSyncStatus()` hook qui expose `'idle' | 'syncing' | 'error'` basé sur les promesses en cours.
+
+## Ordre d'implémentation
+
+1. Migration DB (profiles + flashcards + reading_progress + RLS + trigger)
+2. AuthContext + page `/auth` + page `/reset-password` + ProtectedRoute
+3. `cloud-sync.ts` + middleware
+4. Adaptation des 2 stores (hydrate + clear + sync hook)
+5. Section "Compte" dans Settings + indicateur sync
+6. Test multi-device via Realtime
 
