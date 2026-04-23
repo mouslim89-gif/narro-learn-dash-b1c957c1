@@ -152,6 +152,7 @@ export type Database = {
       reading_progress: {
         Row: {
           book_id: string
+          chapter_id: string
           created_at: string
           difficulty: string
           last_read_at: string
@@ -161,6 +162,7 @@ export type Database = {
         }
         Insert: {
           book_id: string
+          chapter_id?: string
           created_at?: string
           difficulty: string
           last_read_at?: string
@@ -170,6 +172,7 @@ export type Database = {
         }
         Update: {
           book_id?: string
+          chapter_id?: string
           created_at?: string
           difficulty?: string
           last_read_at?: string
