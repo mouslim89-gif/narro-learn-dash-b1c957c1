@@ -79,16 +79,18 @@ export default function Reader() {
 
   // Use pre-baked Kuromoji tokens, then aggressively merge conjugated forms
   // (verb + auxiliaries + て-compound auxiliaries) into single clickable units.
+  // Multi-chapter books are keyed by `${bookId}__${chapterId}`.
   const tokens = useMemo(() => {
     if (!id) return [];
-    const raw = bookTokens[id]?.[difficulty] || [];
+    const tokenKey = chapterKey(id, chapterId);
+    const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty] || [];
     return mergeConjugatedTokens(raw);
-  }, [id, difficulty]);
+  }, [id, chapterId, difficulty]);
 
   const bookText = useMemo(() => {
     if (!book) return '';
-    return book.content[difficulty];
-  }, [book, difficulty]);
+    return getChapterContent(book, chapterId, difficulty);
+  }, [book, chapterId, difficulty]);
 
   // Split tokens into sentences for highlighting
   const sentences = useMemo(() => {
@@ -164,9 +166,9 @@ export default function Reader() {
       if (scrollH <= 0) return;
       const pct = Math.min(100, (window.scrollY / scrollH) * 100);
       setScrollPercent(Math.round(pct));
-      if (id) updateProgress(id, difficulty, pct);
+      if (id) updateProgress(id, chapterId, difficulty, pct);
     });
-  }, [id, difficulty, updateProgress]);
+  }, [id, chapterId, difficulty, updateProgress]);
 
   // Detect *real* user-initiated scroll inputs and immediately disengage
   // auto-follow + cancel any in-flight programmatic scroll animation.
