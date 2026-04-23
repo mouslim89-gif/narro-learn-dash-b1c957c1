@@ -1,15 +1,23 @@
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { useLongPress } from '@/hooks/use-long-press';
 import type { BookToken } from '@/data/book-tokens';
+import type { KnownLevel } from '@/lib/known-words';
 
 interface Props {
   token: BookToken;
   showFurigana: boolean;
   colorClass: string;
   isHighlighted: boolean;
+  knownLevel?: KnownLevel | null;
   onTap: () => void;
   onLongPress: () => void;
 }
+
+const KNOWN_CLASS: Record<KnownLevel, string> = {
+  new: 'known-new',
+  learning: 'known-learning',
+  known: 'known-known',
+};
 
 /**
  * One clickable Japanese token. Encapsulates the long-press hook
@@ -20,6 +28,7 @@ export function ReaderToken({
   showFurigana,
   colorClass,
   isHighlighted,
+  knownLevel,
   onTap,
   onLongPress,
 }: Props) {
@@ -39,7 +48,8 @@ export function ReaderToken({
 
   const stopDown = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
-  const cls = `${colorClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`;
+  const knownClass = knownLevel ? KNOWN_CLASS[knownLevel] : '';
+  const cls = `${colorClass} ${knownClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`;
 
   if (showFurigana) {
     return (
