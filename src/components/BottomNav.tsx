@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Library, BookOpen, Layers, Search } from 'lucide-react';
 import { useFlashcardStore } from '@/stores/flashcards';
+import { useSyncStatus } from '@/lib/sync/sync-status';
 
 const tabs = [
   { path: '/', label: 'Library', icon: Library },
@@ -9,12 +10,26 @@ const tabs = [
   { path: '/dictionary', label: 'Dictionary', icon: Search },
 ];
 
+function SyncIndicator() {
+  const status = useSyncStatus(s => s.status);
+  if (status === 'idle') return null;
+  const color =
+    status === 'syncing' ? 'bg-primary animate-pulse' : 'bg-destructive';
+  return (
+    <span
+      aria-label={status === 'syncing' ? 'Syncing' : 'Sync error'}
+      className={`absolute right-3 top-1.5 h-1.5 w-1.5 rounded-full ${color}`}
+    />
+  );
+}
+
 export function BottomNav() {
   const { pathname } = useLocation();
   const dueCount = useFlashcardStore(s => s.getDueCount());
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
+      <SyncIndicator />
       <div className="mx-auto flex max-w-lg items-center justify-around py-2">
         {tabs.map(({ path, label, icon: Icon }) => {
           const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
