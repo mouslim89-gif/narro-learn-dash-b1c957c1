@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { SavedWord } from '@/stores/flashcards';
 import type { ReadingProgress } from '@/stores/reading-progress';
-import type { Difficulty } from '@/data/books';
+import { type Difficulty, DEFAULT_CHAPTER_ID, chapterKey } from '@/data/books';
 import { useSyncStatus } from './sync-status';
 
 // ============ FLASHCARDS ============
@@ -74,13 +74,6 @@ function rowToSavedWord(row: any): SavedWord {
 
 // ============ READING PROGRESS ============
 
-export interface ProgressRow {
-  bookId: string;
-  difficulty: Difficulty;
-  progressPercent: number;
-  lastReadAt: string;
-}
-
 export async function pullProgress(userId: string): Promise<Record<string, ReadingProgress>> {
   const { data, error } = await supabase
     .from('reading_progress')
@@ -89,10 +82,13 @@ export async function pullProgress(userId: string): Promise<Record<string, Readi
   if (error) throw error;
   const out: Record<string, ReadingProgress> = {};
   for (const row of data ?? []) {
-    out[row.book_id] = {
+    const cid = row.chapter_id ?? DEFAULT_CHAPTER_ID;
+    const key = chapterKey(row.book_id, cid);
+    out[key] = {
       difficulty: row.difficulty as Difficulty,
       progressPercent: row.progress_percent ?? 0,
       lastReadAt: row.last_read_at ?? new Date().toISOString(),
+      chapterId: cid,
     };
   }
   return out;
@@ -108,6 +104,7 @@ export async function pushProgress(
     const { error } = await supabase.from('reading_progress').upsert({
       user_id: userId,
       book_id: bookId,
+      chapter_id: progress.chapterId ?? DEFAULT_CHAPTER_ID,
       difficulty: progress.difficulty,
       progress_percent: progress.progressPercent,
       last_read_at: progress.lastReadAt,
