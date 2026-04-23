@@ -1,0 +1,63 @@
+import { useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useFlashcardStore } from '@/stores/flashcards';
+import { useReadingProgressStore } from '@/stores/reading-progress';
+import { pullFlashcards, pullProgress, subscribeRealtime } from '@/lib/sync/cloud-sync';
+
+/**
+ * Hydrates the local Zustand stores from the cloud whenever the user changes,
+ * and subscribes to realtime updates for multi-device sync.
+ */
+export function useCloudSync() {
+  const { user } = useAuth();
+  const hydrateWords = useFlashcardStore(s => s.hydrateWords);
+  const clearWords = useFlashcardStore(s => s.clearWords);
+  const hydrateProgress = useReadingProgressStore(s => s.hydrateProgress);
+  const clearProgress = useReadingProgressStore(s => s.clearProgress);
+
+  useEffect(() => {
+    if (!user) {
+      clearWords();
+      clearProgress();
+      return;
+    }
+
+    const userId = user.id;
+    let cancelled = false;
+
+    const hydrate = async () => {
+      try {
+        const [words, progress] = await Promise.all([
+          pullFlashcards(userId),
+          pullProgress(userId),
+        ]);
+        if (cancelled) return;
+        hydrateWords(words, userId);
+        hydrateProgress(progress, userId);
+      } catch (e) {
+        console.error('Cloud hydrate failed', e);
+      }
+    };
+
+    hydrate();
+
+    const unsubscribe = subscribeRealtime(userId, {
+      onFlashcardChange: () => {
+        // Re-pull on any remote change (debounced naturally by realtime batching)
+        pullFlashcards(userId).then(words => {
+          if (!cancelled) hydrateWords(words, userId);
+        }).catch(() => {});
+      },
+      onProgressChange: () => {
+        pullProgress(userId).then(progress => {
+          if (!cancelled) hydrateProgress(progress, userId);
+        }).catch(() => {});
+      },
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [user?.id]);
+}

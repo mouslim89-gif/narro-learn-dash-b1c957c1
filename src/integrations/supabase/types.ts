@@ -77,6 +77,108 @@ export type Database = {
         }
         Relationships: []
       }
+      flashcards: {
+        Row: {
+          context_sentence: string | null
+          created_at: string
+          id: string
+          jlpt: Json | null
+          last_reviewed_at: string | null
+          mastery: number
+          meanings: Json
+          next_review_at: string | null
+          parts_of_speech: Json | null
+          reading: string
+          updated_at: string
+          user_id: string
+          word: string
+        }
+        Insert: {
+          context_sentence?: string | null
+          created_at?: string
+          id: string
+          jlpt?: Json | null
+          last_reviewed_at?: string | null
+          mastery?: number
+          meanings?: Json
+          next_review_at?: string | null
+          parts_of_speech?: Json | null
+          reading?: string
+          updated_at?: string
+          user_id: string
+          word: string
+        }
+        Update: {
+          context_sentence?: string | null
+          created_at?: string
+          id?: string
+          jlpt?: Json | null
+          last_reviewed_at?: string | null
+          mastery?: number
+          meanings?: Json
+          next_review_at?: string | null
+          parts_of_speech?: Json | null
+          reading?: string
+          updated_at?: string
+          user_id?: string
+          word?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reading_progress: {
+        Row: {
+          book_id: string
+          created_at: string
+          difficulty: string
+          last_read_at: string
+          progress_percent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          difficulty: string
+          last_read_at?: string
+          progress_percent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          difficulty?: string
+          last_read_at?: string
+          progress_percent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sentence_translations: {
         Row: {
           created_at: string
