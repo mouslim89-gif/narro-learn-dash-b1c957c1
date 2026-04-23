@@ -40,12 +40,41 @@ export interface Book {
   readingTimeMin: number;
   synopsis: string;
   audio?: BookAudio;
+  /**
+   * Single-chapter content. Required for books WITHOUT a `chapters` array.
+   * For multi-chapter books this is auto-derived from the first chapter (used as fallback).
+   */
   content: Record<Difficulty, string>;
+  /** Optional list of chapters. Presence of this field switches the BookDetail UI to chapter mode. */
+  chapters?: Chapter[];
 }
 
 /** True if the book has audio for at least one difficulty. */
 export function hasAnyAudio(book: Book): boolean {
   return !!book.audio && Object.keys(book.audio).length > 0;
+}
+
+/** True if the book is split into multiple chapters. */
+export function hasChapters(book: Book): boolean {
+  return Array.isArray(book.chapters) && book.chapters.length > 0;
+}
+
+/** Default chapter id used for single-chapter books (mirrors DB default). */
+export const DEFAULT_CHAPTER_ID = 'main';
+
+/** Get the content for a given chapter (or main content for single-chapter books). */
+export function getChapterContent(book: Book, chapterId: string | undefined, difficulty: Difficulty): string {
+  if (book.chapters && chapterId && chapterId !== DEFAULT_CHAPTER_ID) {
+    const ch = book.chapters.find((c) => c.id === chapterId);
+    if (ch) return ch.content[difficulty];
+  }
+  return book.content[difficulty];
+}
+
+/** Build the (bookId, chapterId) lookup key used for tokens / grammar / progress. */
+export function chapterKey(bookId: string, chapterId?: string): string {
+  if (!chapterId || chapterId === DEFAULT_CHAPTER_ID) return bookId;
+  return `${bookId}__${chapterId}`;
 }
 
 export const genreLabels: Record<Genre, string> = {
@@ -125,6 +154,9 @@ const aAkiOriginal = `本職の詩人ともなれば、いつどんな注文が�
 　ちっとも秋に関係ない、そんな言葉まで、書かれてあるが、或いはこれも、「季節の思想」といったようなわけのものかも知れない。
 　その他、農家。絵本。秋ト兵隊。秋ノ蚕。火事。ケムリ。オ寺。ごたごた一ぱい書かれてある。`;
 
+// --- Konbini Ningen — derive book-level content from chapter 1 (used as fallback) ---
+const konbiniCh1 = konbiniChapters[0];
+
 export const books: Book[] = [
   {
     id: 'a-aki',
@@ -141,5 +173,18 @@ export const books: Book[] = [
       simplified: { durationSec: 146 },
     },
     content: { simplified: aAkiSimplified, intermediate: aAkiIntermediate, original: aAkiOriginal },
+  },
+  {
+    id: 'konbini-ningen',
+    titleJp: 'コンビニ人間',
+    titleEn: 'Convenience Store Woman',
+    author: 'Sayaka Murata',
+    genre: 'slice-of-life',
+    jlptLevel: 'N1',
+    coverColor: '#2A8C5F',
+    readingTimeMin: 90,
+    synopsis: "Keiko Furukura has worked at the Smile Mart for eighteen years. While society pressures her to pursue 'normal' goals — marriage, a career — she finds her sense of self only in the rhythms of the convenience store. A sharp, deadpan novel about conformity, identity, and the quiet defiance of choosing your own way of being human.",
+    content: konbiniCh1.content, // Fallback content = chapter 1
+    chapters: konbiniChapters,
   },
 ];

@@ -11,26 +11,34 @@ import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function MyBooks() {
-  const { progress } = useReadingProgressStore();
+  const { progress, getBookProgress } = useReadingProgressStore();
   const savedWords = useFlashcardStore(s => s.savedWords);
 
-  const startedBooks = books
-    .filter((b) => progress[b.id])
-    .sort((a, b) => new Date(progress[b.id].lastReadAt).getTime() - new Date(progress[a.id].lastReadAt).getTime());
+  // Build per-book aggregated progress (most-recently-read across chapters).
+  const bookProgressList = useMemo(() => {
+    const list: { book: typeof books[number]; progress: NonNullable<ReturnType<typeof getBookProgress>> }[] = [];
+    for (const b of books) {
+      const p = getBookProgress(b.id);
+      if (p) list.push({ book: b, progress: p });
+    }
+    list.sort((a, b) => new Date(b.progress.lastReadAt).getTime() - new Date(a.progress.lastReadAt).getTime());
+    return list;
+  }, [progress]);
 
   const stats = useMemo(() => {
     const entries = Object.entries(progress);
     const booksInProgress = entries.filter(([, p]) => p.progressPercent > 0 && p.progressPercent < 100).length;
     const booksCompleted = entries.filter(([, p]) => p.progressPercent >= 100).length;
-    
-    // Estimate words read from tokens
+
+    // Estimate words read from tokens (per-chapter aware)
     let wordsRead = 0;
     let totalMinutes = 0;
-    for (const [bookId, p] of entries) {
+    for (const [key, p] of entries) {
+      const bookId = key.includes('__') ? key.split('__')[0] : key;
       const book = books.find(b => b.id === bookId);
       if (!book) continue;
       totalMinutes += Math.round(book.readingTimeMin * (p.progressPercent / 100));
-      const tokens = bookTokens[bookId as keyof typeof bookTokens]?.[p.difficulty as keyof (typeof bookTokens)[keyof typeof bookTokens]];
+      const tokens = (bookTokens as any)[key]?.[p.difficulty] ?? (bookTokens as any)[bookId]?.[p.difficulty];
       if (tokens) {
         const japaneseTokens = (tokens as any[]).filter((t: any) => t.j).length;
         wordsRead += Math.round(japaneseTokens * (p.progressPercent / 100));
@@ -73,7 +81,7 @@ export default function MyBooks() {
       </div>
 
       {/* Stats */}
-      {startedBooks.length > 0 && (
+      {bookProgressList.length > 0 && (
         <>
           <div className="mt-4 grid grid-cols-4 gap-2">
             <div className="rounded-lg border bg-card p-2.5 text-center">
@@ -85,7 +93,7 @@ export default function MyBooks() {
               <p className="text-[9px] text-muted-foreground">Words read</p>
             </div>
             <div className="rounded-lg border bg-card p-2.5 text-center">
-              <p className="text-lg font-bold text-green-600">{stats.wordsSaved}</p>
+              <p className="text-lg font-bold text-primary">{stats.wordsSaved}</p>
               <p className="text-[9px] text-muted-foreground">Saved</p>
             </div>
             <div className="rounded-lg border bg-card p-2.5 text-center">
@@ -96,7 +104,7 @@ export default function MyBooks() {
         </>
       )}
 
-      {startedBooks.length === 0 ? (
+      {bookProgressList.length === 0 ? (
         <div className="mt-20 flex flex-col items-center text-center text-muted-foreground">
           <span className="text-5xl mb-4">📖</span>
           <p className="text-lg font-semibold">No books yet</p>
@@ -104,19 +112,16 @@ export default function MyBooks() {
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {startedBooks.map((book) => {
-            const p = progress[book.id];
-            return (
-              <div key={book.id} className="flex flex-col gap-1">
-                <BookCard book={book} progress={p.progressPercent} />
-                <div className="px-0.5">
-                  <p className="text-[10px] text-muted-foreground">
-                    {difficultyConfig[p.difficulty].label} · {formatDistanceToNow(new Date(p.lastReadAt), { addSuffix: true })}
-                  </p>
-                </div>
+          {bookProgressList.map(({ book, progress: p }) => (
+            <div key={book.id} className="flex flex-col gap-1">
+              <BookCard book={book} progress={p.progressPercent} />
+              <div className="px-0.5">
+                <p className="text-[10px] text-muted-foreground">
+                  {difficultyConfig[p.difficulty].label} · {formatDistanceToNow(new Date(p.lastReadAt), { addSuffix: true })}
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>

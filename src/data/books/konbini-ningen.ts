@@ -385,19 +385,13 @@ const ch6Simplified = `白羽さんが私の前を歩いています。私は白
 
 白羽さんは「あなたはへんです」「ふつうの人間になってください」と言いました。でも、その言葉の意味は、私にわかりませんでした。雨の音や、遠くの車の音と同じでした。ただの音に聞こえました。白羽さんが、だんだん見えなくなる感じがしました。私はドアの外を見ました。駅には人がたくさんいます。駅の向こうに、べつのコンビニが見えます。私には、この店の音も、あの店の音も聞こえます。町のたくさんのコンビニから来る、小さい音も聞こえます。私は一人じゃない、と思いました。私は、世界のコンビニとつながっているのだと思いました。もう白羽さんはいません。私の前には、きれいで、かんぺきな「仕事」だけがありました。`;
 
-export interface ChapterContent {
-  id: string;
-  title: string;
-  simplified: string;
-  intermediate: string;
-  original: string;
-}
+import type { Chapter } from '../books';
 
-export const konbiniChapters: ChapterContent[] = [
-  { id: 'ch1', title: 'Chapter 1 — Birth of a Convenience Store Worker', simplified: ch1Simplified, intermediate: ch1Intermediate, original: ch1Original },
-  { id: 'ch2', title: 'Chapter 2 — Eighteen Years of Routine', simplified: ch2Simplified, intermediate: ch2Intermediate, original: ch2Original },
-  { id: 'ch3', title: 'Chapter 3 — Shiraha Arrives', simplified: ch3Simplified, intermediate: ch3Intermediate, original: ch3Original },
-  { id: 'ch4', title: 'Chapter 4 — A Strange Cohabitation', simplified: ch4Simplified, intermediate: ch4Intermediate, original: ch4Original },
-  { id: 'ch5', title: 'Chapter 5 — Leaving the Store', simplified: ch5Simplified, intermediate: ch5Intermediate, original: ch5Original },
-  { id: 'ch6', title: 'Chapter 6 — Back Where I Belong', simplified: ch6Simplified, intermediate: ch6Intermediate, original: ch6Original },
+export const konbiniChapters: Chapter[] = [
+  { id: 'ch1', title: 'Chapter 1 — Birth of a Convenience Store Worker', content: { simplified: ch1Simplified, intermediate: ch1Intermediate, original: ch1Original } },
+  { id: 'ch2', title: 'Chapter 2 — Eighteen Years of Routine', content: { simplified: ch2Simplified, intermediate: ch2Intermediate, original: ch2Original } },
+  { id: 'ch3', title: 'Chapter 3 — Shiraha Arrives', content: { simplified: ch3Simplified, intermediate: ch3Intermediate, original: ch3Original } },
+  { id: 'ch4', title: 'Chapter 4 — A Strange Cohabitation', content: { simplified: ch4Simplified, intermediate: ch4Intermediate, original: ch4Original } },
+  { id: 'ch5', title: 'Chapter 5 — Leaving the Store', content: { simplified: ch5Simplified, intermediate: ch5Intermediate, original: ch5Original } },
+  { id: 'ch6', title: 'Chapter 6 — Back Where I Belong', content: { simplified: ch6Simplified, intermediate: ch6Intermediate, original: ch6Original } },
 ];

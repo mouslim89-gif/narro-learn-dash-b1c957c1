@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Difficulty } from '@/data/books';
+import { type Difficulty, DEFAULT_CHAPTER_ID, chapterKey } from '@/data/books';
 import { pushProgress, deleteFlashcard as cloudDeleteFlashcard } from '@/lib/sync/cloud-sync';
 
 // ============================================================
@@ -31,10 +31,16 @@ export interface ReadingProgress {
   difficulty: Difficulty;
   progressPercent: number;
   lastReadAt: string;
+  /** Chapter id; defaults to 'main' for single-chapter books. */
+  chapterId?: string;
 }
 
 interface ReadingProgressState {
-  // Synced data
+  /**
+   * Synced data. Key = chapterKey(bookId, chapterId).
+   *  - Single-chapter book: key = bookId (chapterId='main')
+   *  - Multi-chapter book:  key = `${bookId}__${chapterId}`
+   */
   progress: Record<string, ReadingProgress>;
   // UI preferences (local-only)
   fontSize: FontSize;
@@ -52,8 +58,13 @@ interface ReadingProgressState {
   // Auth-synced user
   syncUserId: string | null;
   // Actions
-  updateProgress: (bookId: string, difficulty: Difficulty, percent: number) => void;
-  getProgress: (bookId: string) => ReadingProgress | undefined;
+  updateProgress: (bookId: string, chapterId: string | undefined, difficulty: Difficulty, percent: number) => void;
+  /** Get progress for a specific chapter (defaults to 'main'). */
+  getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
+  /** Get the most recently read progress entry for a book (across chapters). */
+  getBookProgress: (bookId: string) => ReadingProgress | undefined;
+  /** Get all per-chapter progress for a book. Returns map keyed by chapterId. */
+  getChapterProgress: (bookId: string) => Record<string, ReadingProgress>;
   setFontSize: (size: FontSize) => void;
   setReaderDarkMode: (dark: boolean) => void;
   setDarkMode: (dark: boolean) => void;
@@ -70,16 +81,17 @@ interface ReadingProgressState {
   clearProgress: () => void;
 }
 
-// Debounce per book
+// Debounce per (book, chapter)
 const pushTimers = new Map<string, number>();
 function schedulePush(userId: string, bookId: string, progress: ReadingProgress) {
-  const existing = pushTimers.get(bookId);
+  const key = chapterKey(bookId, progress.chapterId);
+  const existing = pushTimers.get(key);
   if (existing) clearTimeout(existing);
   const t = window.setTimeout(() => {
     pushProgress(userId, bookId, progress).catch(() => {});
-    pushTimers.delete(bookId);
+    pushTimers.delete(key);
   }, 1500);
-  pushTimers.set(bookId, t);
+  pushTimers.set(key, t);
 }
 
 export const useReadingProgressStore = create<ReadingProgressState>()(
@@ -98,19 +110,50 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       highlightLearning: true,
       highlightKnown: false,
       syncUserId: null,
-      updateProgress: (bookId, difficulty, percent) => {
+      updateProgress: (bookId, chapterId, difficulty, percent) => {
+        const cid = chapterId || DEFAULT_CHAPTER_ID;
         const next: ReadingProgress = {
           difficulty,
           progressPercent: Math.round(percent),
           lastReadAt: new Date().toISOString(),
+          chapterId: cid,
         };
+        const key = chapterKey(bookId, cid);
         set((state) => ({
-          progress: { ...state.progress, [bookId]: next },
+          progress: { ...state.progress, [key]: next },
         }));
         const userId = get().syncUserId;
         if (userId) schedulePush(userId, bookId, next);
       },
-      getProgress: (bookId) => get().progress[bookId],
+      getProgress: (bookId, chapterId) => {
+        const key = chapterKey(bookId, chapterId);
+        return get().progress[key];
+      },
+      getBookProgress: (bookId) => {
+        const all = get().progress;
+        let best: ReadingProgress | undefined;
+        for (const [key, p] of Object.entries(all)) {
+          if (key === bookId || key.startsWith(`${bookId}__`)) {
+            if (!best || new Date(p.lastReadAt).getTime() > new Date(best.lastReadAt).getTime()) {
+              best = p;
+            }
+          }
+        }
+        return best;
+      },
+      getChapterProgress: (bookId) => {
+        const all = get().progress;
+        const out: Record<string, ReadingProgress> = {};
+        for (const [key, p] of Object.entries(all)) {
+          if (key === bookId) {
+            out[DEFAULT_CHAPTER_ID] = p;
+          } else if (key.startsWith(`${bookId}__`)) {
+            const cid = key.slice(bookId.length + 2);
+            out[cid] = p;
+          }
+        }
+        return out;
+      },
       setFontSize: (fontSize) => set({ fontSize }),
       setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
       setDarkMode: (darkMode) => set({ darkMode }),

@@ -1,24 +1,34 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { books, difficultyConfig, jlptColors, genreLabels, hasAnyAudio, type Difficulty } from '@/data/books';
+import { books, difficultyConfig, jlptColors, genreLabels, hasAnyAudio, hasChapters, DEFAULT_CHAPTER_ID, type Difficulty } from '@/data/books';
 import { useState } from 'react';
-import { ArrowLeft, Headphones, BookOpen } from 'lucide-react';
+import { ArrowLeft, Headphones, BookOpen, CheckCircle2, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore } from '@/stores/reading-progress';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function BookDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const book = books.find((b) => b.id === id);
-  const { getProgress } = useReadingProgressStore();
-  const saved = id ? getProgress(id) : undefined;
-  const hasProgress = saved && saved.progressPercent > 0;
+  const { getProgress, getBookProgress, getChapterProgress } = useReadingProgressStore();
+  const bookProgress = id ? getBookProgress(id) : undefined;
+  const hasProgress = bookProgress && bookProgress.progressPercent > 0;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
-    saved?.difficulty || 'simplified'
+    bookProgress?.difficulty || 'simplified'
   );
 
   if (!book) return <div className="p-8 text-center">Book not found.</div>;
+
+  const isMultiChapter = hasChapters(book);
+  const chapterProgressMap = id ? getChapterProgress(id) : {};
+
+  // Single-chapter "Continue Reading" target
+  const continueChapterId = bookProgress?.chapterId || DEFAULT_CHAPTER_ID;
+  const continueLink = isMultiChapter
+    ? `/reader/${book.id}/${difficulty}/${continueChapterId}`
+    : `/reader/${book.id}/${difficulty}`;
 
   return (
     <div className="pb-24">
@@ -48,11 +58,14 @@ export default function BookDetail() {
                 <Headphones className="h-3 w-3" /> Audio
               </span>
             )}
+            {isMultiChapter && (
+              <span className="text-xs text-muted-foreground">{book.chapters!.length} chapters</span>
+            )}
           </div>
           {hasProgress && (
             <div className="mt-3 flex items-center gap-2">
-              <Progress value={saved.progressPercent} className="h-1.5 flex-1" />
-              <span className="text-xs font-medium text-muted-foreground">{saved.progressPercent}% read</span>
+              <Progress value={bookProgress.progressPercent} className="h-1.5 flex-1" />
+              <span className="text-xs font-medium text-muted-foreground">{bookProgress.progressPercent}% read</span>
             </div>
           )}
         </div>
@@ -84,10 +97,61 @@ export default function BookDetail() {
           })}
         </div>
 
-        <Link to={`/reader/${book.id}/${difficulty}`}>
+        {isMultiChapter && (
+          <>
+            <h3 className="mt-8 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Chapters</h3>
+            <Accordion type="single" collapsible className="mt-2">
+              {book.chapters!.map((ch, idx) => {
+                const cp = chapterProgressMap[ch.id];
+                const pct = cp?.progressPercent ?? 0;
+                const done = pct >= 100;
+                const started = pct > 0;
+                return (
+                  <AccordionItem key={ch.id} value={ch.id} className="border-b border-border/60">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <div className="flex flex-1 items-center gap-3 pr-3">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
+                          {done ? <CheckCircle2 className="h-4 w-4 text-primary" /> : idx + 1}
+                        </span>
+                        <div className="flex-1 text-left">
+                          <p className="text-sm font-semibold leading-tight">{ch.title}</p>
+                          {started && !done && (
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <Progress value={pct} className="h-1 flex-1" />
+                              <span className="text-[10px] font-medium text-muted-foreground">{pct}%</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-3">
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                        {ch.content[difficulty].slice(0, 100)}…
+                      </p>
+                      <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`}>
+                        <Button size="sm" variant={started ? 'default' : 'outline'} className="w-full">
+                          <BookOpen className="mr-2 h-3.5 w-3.5" />
+                          {done ? 'Re-read chapter' : started ? 'Continue chapter' : 'Start chapter'}
+                        </Button>
+                      </Link>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </>
+        )}
+
+        <Link to={continueLink}>
           <Button className="mt-6 w-full py-6 text-sm font-semibold shadow-sm">
             <BookOpen className="mr-2 h-4 w-4" />
-            {hasProgress ? 'Continue Reading' : 'Start Reading'}
+            {hasProgress
+              ? isMultiChapter
+                ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
+                : 'Continue Reading'
+              : isMultiChapter
+                ? 'Start Chapter 1'
+                : 'Start Reading'}
           </Button>
         </Link>
       </div>
