@@ -69,6 +69,7 @@ function AnimatedRoutes() {
             <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
             <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
             <Route path="/reader/:id/:difficulty" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+            <Route path="/reader/:id/:difficulty/:chapterId" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
