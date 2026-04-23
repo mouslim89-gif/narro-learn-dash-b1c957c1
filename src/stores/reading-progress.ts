@@ -44,6 +44,11 @@ interface ReadingProgressState {
   displayMode: DisplayMode;
   japaneseFont: JapaneseFont;
   hasSeenLongPressHint: boolean;
+  // Known-word highlights (local-only)
+  showKnownHighlights: boolean;
+  highlightNew: boolean;
+  highlightLearning: boolean;
+  highlightKnown: boolean;
   // Auth-synced user
   syncUserId: string | null;
   // Actions
@@ -56,6 +61,10 @@ interface ReadingProgressState {
   setDisplayMode: (mode: DisplayMode) => void;
   setJapaneseFont: (font: JapaneseFont) => void;
   setHasSeenLongPressHint: (seen: boolean) => void;
+  setShowKnownHighlights: (show: boolean) => void;
+  setHighlightNew: (v: boolean) => void;
+  setHighlightLearning: (v: boolean) => void;
+  setHighlightKnown: (v: boolean) => void;
   // Sync helpers
   hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
   clearProgress: () => void;
@@ -84,6 +93,10 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       displayMode: 'normal' as DisplayMode,
       japaneseFont: 'sans' as JapaneseFont,
       hasSeenLongPressHint: false,
+      showKnownHighlights: true,
+      highlightNew: true,
+      highlightLearning: true,
+      highlightKnown: false,
       syncUserId: null,
       updateProgress: (bookId, difficulty, percent) => {
         const next: ReadingProgress = {
@@ -105,6 +118,10 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setDisplayMode: (displayMode) => set({ displayMode }),
       setJapaneseFont: (japaneseFont) => set({ japaneseFont }),
       setHasSeenLongPressHint: (hasSeenLongPressHint) => set({ hasSeenLongPressHint }),
+      setShowKnownHighlights: (showKnownHighlights) => set({ showKnownHighlights }),
+      setHighlightNew: (highlightNew) => set({ highlightNew }),
+      setHighlightLearning: (highlightLearning) => set({ highlightLearning }),
+      setHighlightKnown: (highlightKnown) => set({ highlightKnown }),
       hydrateProgress: (progress, userId) => set({ progress, syncUserId: userId }),
       clearProgress: () => {
         pushTimers.forEach((t) => clearTimeout(t));

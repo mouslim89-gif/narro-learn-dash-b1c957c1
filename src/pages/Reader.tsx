@@ -19,6 +19,8 @@ import { useLongPress } from '@/hooks/use-long-press';
 import { toast } from '@/hooks/use-toast';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
+import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from '@/lib/known-words';
+import { Switch } from '@/components/ui/switch';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
@@ -31,7 +33,13 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const knownIndex = useKnownWordsIndex();
+  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
+    new: highlightNew,
+    learning: highlightLearning,
+    known: highlightKnown,
+  };
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
@@ -331,8 +339,12 @@ export default function Reader() {
 
   return (
     <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-20' : 'pb-8'} dark:bg-background`}>
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur-lg">
-        <button onClick={() => navigate(-1)} className="rounded p-2 -ml-1 active:bg-muted">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/40 bg-card/80 px-3 py-2.5 backdrop-blur-xl">
+        <button
+          onClick={() => navigate(-1)}
+          className="reader-icon-btn"
+          aria-label="Back"
+        >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="text-center">
@@ -342,37 +354,43 @@ export default function Reader() {
             {timeRemaining && ` · ~${timeRemaining} min left`}
           </p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={() => setShowFurigana(!showFurigana)}
-            className={`rounded p-2 transition-colors active:scale-95 ${showFurigana ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
+            className="reader-icon-btn"
+            data-active={showFurigana ? 'true' : undefined}
             title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
           >
             {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
           </button>
           <button
             onClick={() => setShowGrammar(true)}
-            className="rounded p-2 text-muted-foreground active:scale-95"
+            className="reader-icon-btn"
             title="Grammar Notes"
           >
             <BookType className="h-5 w-5" />
           </button>
-          <button onClick={() => setShowSettings(!showSettings)} className="rounded p-2 active:scale-95">
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="reader-icon-btn"
+            data-active={showSettings ? 'true' : undefined}
+            title="Settings"
+          >
             <Settings className="h-5 w-5" />
           </button>
         </div>
       </header>
 
       {showSettings && (
-        <div className="sticky top-14 z-20 border-b bg-card p-4 shadow-sm animate-fade-in">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Reading Level</p>
+        <div className="reader-settings-panel sticky top-[3.25rem] z-20 border-b border-border/40 bg-card px-4 py-5 animate-fade-in">
+          <p className="reader-settings-section"><span className="reader-settings-bullet" />Reading Level</p>
           <div className="flex gap-2">
             {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
               <button
                 key={d}
                 onClick={() => { setDifficulty(d); }}
                 className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                  d === difficulty ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                  d === difficulty ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
                 }`}
               >
                 {difficultyConfig[d].label}
@@ -380,14 +398,14 @@ export default function Reader() {
             ))}
           </div>
 
-          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Font Size</p>
+          <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Font Size</p>
           <div className="flex gap-2">
             {fontSizes.map((s) => (
               <button
                 key={s}
                 onClick={() => setFontSize(s)}
                 className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                  s === fontSize ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                  s === fontSize ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
                 }`}
               >
                 <Type className="h-3 w-3" /> {fontSizeLabels[s]}
@@ -395,14 +413,14 @@ export default function Reader() {
             ))}
           </div>
 
-          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Japanese Font</p>
+          <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Japanese Font</p>
           <div className="flex gap-2">
             {japaneseFonts.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setJapaneseFont(f.value)}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                  f.value === japaneseFont ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                  f.value === japaneseFont ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
                 }`}
               >
                 <span className={`text-base leading-none ${japaneseFontClassMap[f.value]}`}>あ</span>
@@ -411,7 +429,7 @@ export default function Reader() {
             ))}
           </div>
 
-          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Theme</p>
+          <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Theme</p>
           <button
             onClick={() => setReaderDarkMode(!readerDarkMode)}
             className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
@@ -420,14 +438,14 @@ export default function Reader() {
             {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
 
-          <p className="mt-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Display Mode</p>
+          <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Display Mode</p>
           <div className="flex gap-2">
             {(['normal', 'grammar'] as DisplayMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setDisplayMode(m)}
                 className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                  m === displayMode ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'
+                  m === displayMode ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
                 }`}
               >
                 {m === 'grammar' && <Palette className="h-3 w-3" />}
@@ -435,10 +453,51 @@ export default function Reader() {
               </button>
             ))}
           </div>
+
+          {/* Highlights — saved words */}
+          <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Highlights</p>
+          <div className="space-y-2.5">
+            <label className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2">
+              <span className="text-xs font-semibold">Highlight saved words</span>
+              <Switch
+                checked={showKnownHighlights}
+                onCheckedChange={setShowKnownHighlights}
+                aria-label="Toggle saved-word highlights"
+              />
+            </label>
+            {showKnownHighlights && (
+              <div className="space-y-1.5 pl-1">
+                <label className="flex items-center justify-between gap-3 px-2 py-1">
+                  <span className="flex items-center gap-2 text-xs">
+                    <span className="color-dot color-dot-new" />
+                    New words
+                  </span>
+                  <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
+                </label>
+                <label className="flex items-center justify-between gap-3 px-2 py-1">
+                  <span className="flex items-center gap-2 text-xs">
+                    <span className="color-dot color-dot-learning" />
+                    Learning
+                  </span>
+                  <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
+                </label>
+                <label className="flex items-center justify-between gap-3 px-2 py-1">
+                  <span className="flex items-center gap-2 text-xs">
+                    <span className="color-dot color-dot-known" />
+                    Known
+                  </span>
+                  <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
+                </label>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      <Progress value={scrollPercent} className="h-0.5 rounded-none" />
+      {/* Slim gradient progress bar */}
+      <div className="reader-progress-track">
+        <div className="reader-progress-fill" style={{ width: `${scrollPercent}%` }} />
+      </div>
 
       {displayMode === 'grammar' && (
         <div className="sticky top-14 z-10 border-b bg-card/95 px-3 py-2.5 backdrop-blur-lg">
@@ -490,6 +549,13 @@ export default function Reader() {
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
                       const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
 
+                      // Known-word highlight: disabled in grammar mode (POS colors prevail).
+                      let knownLevel: KnownLevel | null = null;
+                      if (displayMode !== 'grammar' && showKnownHighlights) {
+                        const lvl = getKnownLevel(token, knownIndex);
+                        if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
+                      }
+
                       return (
                         <ReaderToken
                           key={i}
@@ -497,6 +563,7 @@ export default function Reader() {
                           showFurigana={showFurigana}
                           colorClass={colorClass}
                           isHighlighted={isHighlighted}
+                          knownLevel={knownLevel}
                           onTap={() => {
                             if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
                               setMiniPopup(null);
