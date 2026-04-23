@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed } from 'lucide-react';
-import { books, difficultyConfig, type Difficulty } from '@/data/books';
+import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens } from '@/lib/merge-tokens';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
@@ -31,7 +31,7 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 ];
 
 export default function Reader() {
-  const { id, difficulty: diffParam } = useParams();
+  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
   const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
   const knownIndex = useKnownWordsIndex();
@@ -40,7 +40,8 @@ export default function Reader() {
     learning: highlightLearning,
     known: highlightKnown,
   };
-  const saved = id ? getProgress(id) : undefined;
+  const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
+  const saved = id ? getProgress(id, chapterId) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
