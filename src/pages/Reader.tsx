@@ -142,7 +142,7 @@ export default function Reader() {
   useEffect(() => {
     restoredScroll.current = false;
     if (id) hydrateDictionaryForBook(id);
-  }, [id, difficulty]);
+  }, [id, chapterId, difficulty]);
 
   useEffect(() => {
     if (restoredScroll.current || !saved?.progressPercent) return;
