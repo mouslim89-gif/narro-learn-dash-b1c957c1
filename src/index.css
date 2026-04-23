@@ -221,3 +221,176 @@
   font-feature-settings: "palt" 0;
 }
 
+/* ──────────────────────────────────────────
+   Known-words highlights (saved flashcards)
+   3 mastery levels — soft tinted backgrounds
+   ────────────────────────────────────────── */
+.known-new,
+.known-learning,
+.known-known {
+  border-radius: 3px;
+  padding: 0 1.5px;
+  transition: background-color 0.15s ease;
+}
+/* New (mastery 0) — amber */
+.known-new {
+  background-color: hsl(38 92% 50% / 0.15);
+}
+.dark .known-new {
+  background-color: hsl(43 96% 56% / 0.20);
+}
+/* Learning (mastery 1–2) — sky */
+.known-learning {
+  background-color: hsl(199 89% 48% / 0.15);
+}
+.dark .known-learning {
+  background-color: hsl(198 93% 60% / 0.20);
+}
+/* Known (mastery 3+) — emerald */
+.known-known {
+  background-color: hsl(160 84% 39% / 0.15);
+}
+.dark .known-known {
+  background-color: hsl(158 64% 52% / 0.20);
+}
+
+/* ──────────────────────────────────────────
+   Library header — subtle decorative gradient
+   ────────────────────────────────────────── */
+.library-header-bg {
+  background:
+    radial-gradient(ellipse 60% 80% at 20% 0%, hsl(var(--accent) / 0.05), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 90% 20%, hsl(var(--primary) / 0.04), transparent 70%);
+}
+.library-kanji-watermark {
+  font-family: 'Noto Serif JP', serif;
+  position: absolute;
+  right: -0.15em;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 6.5rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+.dark .library-kanji-watermark {
+  opacity: 0.06;
+}
+
+/* Hairline divider with soft fade on both ends */
+.hairline-fade {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    hsl(var(--border)) 20%,
+    hsl(var(--border)) 80%,
+    transparent
+  );
+}
+
+/* Section header bullet (left accent bar) */
+.section-bullet {
+  display: inline-block;
+  width: 2px;
+  height: 0.7em;
+  background: hsl(var(--accent));
+  border-radius: 1px;
+  margin-right: 0.5em;
+  vertical-align: -1px;
+}
+
+/* Refined card with inner gradient + ring */
+.card-refined {
+  background:
+    linear-gradient(to bottom, hsl(var(--card)) 0%, hsl(var(--muted) / 0.3) 100%);
+  box-shadow:
+    0 1px 2px hsl(210 22% 15% / 0.04),
+    0 8px 24px -8px hsl(210 22% 15% / 0.10);
+}
+.dark .card-refined {
+  background:
+    linear-gradient(to bottom, hsl(var(--card)) 0%, hsl(var(--muted) / 0.4) 100%);
+}
+
+/* Reader chrome icon button — unified hover/active */
+.reader-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  color: hsl(var(--muted-foreground));
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+.reader-icon-btn:hover {
+  background-color: hsl(var(--muted) / 0.6);
+  color: hsl(var(--foreground));
+}
+.reader-icon-btn:active {
+  transform: scale(0.92);
+  background-color: hsl(var(--muted));
+}
+.reader-icon-btn[data-active="true"] {
+  color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.10);
+}
+
+/* Reader settings panel — drawer-style soft shadow */
+.reader-settings-panel {
+  box-shadow: 0 6px 20px -6px hsl(220 15% 8% / 0.10);
+}
+.reader-settings-section {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: hsl(var(--muted-foreground));
+}
+.reader-settings-bullet {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: hsl(var(--accent));
+}
+
+/* Reader progress — slim gradient bar */
+.reader-progress-track {
+  position: relative;
+  height: 2px;
+  background: hsl(var(--muted));
+  overflow: hidden;
+}
+.reader-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+  border-radius: 9999px;
+  transition: width 0.2s ease;
+}
+
+/* Primary button — subtle inner top highlight */
+.btn-primary-glow {
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.10);
+}
+
+/* Color swatch dot for legend */
+.color-dot {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.color-dot-new { background-color: hsl(38 92% 50% / 0.6); }
+.color-dot-learning { background-color: hsl(199 89% 48% / 0.6); }
+.color-dot-known { background-color: hsl(160 84% 39% / 0.6); }
+
