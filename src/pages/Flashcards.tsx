@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2 } from 'lucide-react';
+import { Trash2, RotateCcw, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,6 @@ export default function Flashcards() {
 
   const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
   const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
-  const [shuffled, setShuffled] = useState(false);
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('added');
   const [search, setSearch] = useState('');
@@ -55,15 +54,9 @@ export default function Flashcards() {
   const reviewDeck = useMemo(() => {
     const due = getDueWords();
     const deck = due.length > 0 ? [...due] : [...savedWords];
-    if (shuffled) {
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-      }
-    }
     return deck;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedWords, shuffled, reviewMode]);
+  }, [savedWords, reviewMode]);
 
   const dueWords = useMemo(() => getDueWords(), [savedWords]); // eslint-disable-line react-hooks/exhaustive-deps
   const dueIds = useMemo(() => new Set(dueWords.map(w => w.id)), [dueWords]);
@@ -147,16 +140,6 @@ export default function Flashcards() {
           </p>
         </div>
         <div className="flex items-center gap-1">
-          {savedWords.length > 0 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShuffled(!shuffled)}
-              className={`h-9 w-9 ${shuffled ? 'text-primary' : 'text-muted-foreground'}`}
-            >
-              <Shuffle className="h-4 w-4" />
-            </Button>
-          )}
           <Link to="/settings">
             <Button variant="ghost" size="icon" className="h-9 w-9">
               <Settings className="h-4 w-4" />
