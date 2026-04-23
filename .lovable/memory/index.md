@@ -1,14 +1,13 @@
 # Memory: index.md
-Updated: today
+Updated: now
 
 # Project Memory
 
 ## Core
-Yomimasu — Japanese reading app. Modern colorful Duolingo-like UI. Primary teal, accent coral, secondary purple.
+Tsundoku — Japanese reading app (mobile-first). Modern colorful Duolingo-like UI. Primary teal, accent coral, secondary purple.
 Nunito headings, Noto Sans JP for Japanese text. App is in English.
-No client-side auth (yet). Reading progress in localStorage via Zustand. Shared data (dictionary, audio sync, sentence translations) in Lovable Cloud DB.
+Login obligatoire (Apple + Google + Email). Flashcards & reading progress synced via Lovable Cloud (local-first + 1.5s debounced push, Realtime). UI prefs (dark mode, font, furigana) stay local.
+Internal storage keys keep the legacy `yomimasu-*` prefix to preserve existing local data — do NOT rename them.
 
 ## Memories
 - [App structure](mem://features/app-structure) — Pages, navigation, data model overview
-- [Dictionary](mem://features/dictionary) — Global DB table + IndexedDB hydration per book
-- [Audio pipeline](mem://features/audio-pipeline) — Storage bucket + ElevenLabs Scribe sync + Reader highlight & auto-scroll
