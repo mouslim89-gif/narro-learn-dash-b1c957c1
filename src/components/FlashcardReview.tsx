@@ -3,19 +3,18 @@ import { SavedWord, useFlashcardStore } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { SrsButtons, type SrsQualityLabel } from '@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { Trash2, ArrowLeft, BookOpen } from 'lucide-react';
+import { Trash2, ArrowLeft, BookOpen, ChevronDown } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
   onExit: () => void;
 }
 
-const MAX_MEANINGS_BACK = 3;
+const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
   const { adjustMastery, removeWord } = useFlashcardStore();
@@ -23,12 +22,14 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAllMeanings, setShowAllMeanings] = useState(false);
 
   const advance = useCallback((action?: () => void) => {
     action?.();
     setAnimClass('animate-card-out');
     setTimeout(() => {
       setFlipped(false);
+      setShowAllMeanings(false);
       setCurrentIdx(i => i + 1);
       setAnimClass('animate-card-in');
       setTimeout(() => setAnimClass(''), 260);
