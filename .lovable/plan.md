@@ -1,91 +1,68 @@
 
 
-# Système de comptes + sync cloud
+# Highlights mots connus + raffinement design (révisé)
 
-## Vue d'ensemble
+## 1. Highlights des mots sauvegardés
 
-L'app passera de "100% local" à "login obligatoire avec sync background". Les **flashcards** et la **progression de lecture** seront liées au compte. Les **préférences UI** (dark mode, font, furigana) restent locales par device.
+**3 niveaux de couleur** (fond teinté doux) :
+- **New** (mastery 0) → ambre `bg-amber-500/15 dark:bg-amber-400/20`
+- **Learning** (mastery 1–2) → bleu ciel `bg-sky-500/15 dark:bg-sky-400/20`
+- **Known** (mastery ≥ 3) → vert tendre `bg-emerald-500/15 dark:bg-emerald-400/20`
 
-Login proposé : **Apple + Google + Email/mot de passe**.
+Style : `rounded-sm`, padding horizontal 1.5px, transition douce.
 
-## UX
+**Matching** : `Map<string, mastery>` mémoïsé depuis `useFlashcardStore`, indexé par `word` + `reading` normalisés (NFC + katakana→hiragana). Lookup O(1) par token (`token.b ?? token.t`).
 
-- **Écran de login** affiché dès le démarrage si non connecté (3 boutons : Apple, Google, Email).
-- **Email** : signup avec vérification + reset password (page dédiée `/reset-password`).
-- **Settings** : nouvelle section "Compte" avec email affiché + bouton "Sign out" + "Delete account".
-- **Indicateur de sync** discret dans la BottomNav (petit point qui clignote pendant la sync, croix rouge si erreur).
-- **Première connexion** : si des données locales existent déjà (cas où l'utilisateur a utilisé l'app avant), elles sont écrasées par les données cloud (cohérent avec "login obligatoire").
+## 2. Toggles dans le panneau Settings du reader
 
-## Architecture sync : Local-first + background push
+Nouvelle section "Highlights" sous "Display Mode" :
 
-```text
-User action → Zustand (instant UI) → debounce 1.5s → push to Supabase
-                                                    ↓
-                                          Realtime channel ← autres devices
-```
+- **Master switch** : "Highlight saved words" (on/off global)
+- **Quand activé**, 3 sous-toggles individuels :
+  - ☑ Show **new** words (ambre)
+  - ☑ Show **learning** words (bleu)
+  - ☑ Show **known** words (vert)
 
-- **Lecture** : au login, on hydrate Zustand depuis Supabase (1 requête par store).
-- **Écriture** : Zustand reste source de vérité côté UI. Un middleware custom déclenche un push debouncé (1.5s) vers Supabase.
-- **Multi-device** : abonnement Realtime par user_id → réconciliation par `updated_at` (last-write-wins, suffisant pour ce use case mono-utilisateur multi-device).
-- **Offline** : Zustand persist conserve tout. Une queue d'opérations en attente est rejouée à la reconnexion.
+Chaque sous-toggle accompagné d'une pastille de couleur (mini légende intégrée). Tous les 4 persistés localement dans `reading-progress` store, defaults : master `true`, sous-toggles `true/true/false` (known masqués par défaut — moins utile une fois maîtrisés).
 
-## Schéma DB
+**Compatibilité** : désactivé automatiquement en mode grammar (couleurs POS prennent le dessus). Cohabite avec le highlight de phrase audio.
 
-**Table `profiles`** (auto-créée par trigger sur signup) :
-- `id` (uuid, FK auth.users, PK)
-- `email`, `display_name`, `created_at`
+## 3. Raffinement design (modéré)
 
-**Table `flashcards`** :
-- `id` (text, PK composite avec user_id) — réutilise l'`id` Jisho actuel
-- `user_id` (uuid, FK auth.users)
-- `word`, `reading`, `meanings` (jsonb), `jlpt` (jsonb), `parts_of_speech` (jsonb), `context_sentence`
-- `mastery` (int), `last_reviewed_at`, `next_review_at`
-- `created_at`, `updated_at`
-- PK : `(user_id, id)`
+### Library header + cartes
+- Gradient radial très léger derrière "Tsundoku" (`accent/4%`)
+- Kanji 「積」 en filigrane à droite du header (opacity 5%)
+- Hairline divider sous le header
+- Cartes Continue/Featured : `ring-border/40` + inner gradient top→bottom, ombre plus diffuse
+- Section headers : mini bordure gauche 2px accent
 
-**Table `reading_progress`** :
-- `user_id` (uuid, FK auth.users)
-- `book_id` (text), `difficulty` (text)
-- `progress_percent` (int), `last_read_at`
-- `created_at`, `updated_at`
-- PK : `(user_id, book_id)` — une seule progression par livre, même si l'utilisateur change de difficulté
+### Reader header + chrome
+- Header allégé : `bg-card/80` + `backdrop-blur-xl`, bordure `border-b/40`
+- Settings panel : style drawer (slide-down avec ombre douce), padding aéré, bullets colorés sur section headers
+- Barre de progression : 2px, gradient teal→accent, bouts arrondis
+- Boutons icon header : background `muted/0` → `muted/60` au hover/active, scale 0.95 sur tap
 
-**RLS** : chaque table → `user_id = auth.uid()` pour SELECT/INSERT/UPDATE/DELETE.
+### Switches & boutons
+- Switch (Radix) : track h-5, thumb avec ombre interne légère, transition cubic-bezier
+- Boutons primary : inner highlight subtil top edge (`inset 0 1px 0 white/10`)
 
-**Trigger** : `on_auth_user_created` → insère une ligne dans `profiles`.
+## Fichiers
 
-## Fichiers à créer
+**Nouveaux**
+- `src/lib/known-words.ts` → hook `useKnownWordsIndex()` retournant `Map<string, mastery>`. Utilitaire `getKnownLevel(token, index)` → `'new' | 'learning' | 'known' | null`.
 
-- `src/contexts/AuthContext.tsx` — provider exposant `user`, `session`, `loading`, helpers `signOut()`. Setup de `onAuthStateChange` AVANT `getSession()`.
-- `src/pages/Auth.tsx` — UI avec 3 boutons OAuth + form email (toggle Sign in / Sign up) + lien "Forgot password".
-- `src/pages/ResetPassword.tsx` — page publique pour `updateUser({ password })`.
-- `src/components/ProtectedRoute.tsx` — wrapper qui redirige vers `/auth` si pas de session.
-- `src/lib/sync/cloud-sync.ts` — utilitaires `pullFlashcards`, `pushFlashcard`, `pullProgress`, `pushProgress` + abonnement Realtime.
-- `src/lib/sync/sync-middleware.ts` — middleware Zustand qui debounce les writes vers le cloud.
-
-## Fichiers à modifier
-
-- `src/stores/flashcards.ts` — ajouter `updatedAt` aux `SavedWord`, hook `hydrateFromCloud(userId)`, `clearLocal()` au logout. Brancher le middleware de sync.
-- `src/stores/reading-progress.ts` — séparer en deux : la partie **progression** (synced) et la partie **préférences UI** (local-only, inchangée). Ajouter `hydrateFromCloud` / `clearLocal`.
-- `src/App.tsx` — wrapper `<AuthProvider>`, route `/auth`, route `/reset-password`, `<ProtectedRoute>` autour des routes app.
-- `src/pages/Settings.tsx` — section "Compte" : email, sign out, delete account.
-- `src/components/BottomNav.tsx` — petit indicateur de sync.
-- `supabase/config.toml` — `site_url` + `additional_redirect_urls` pour OAuth.
+**Modifiés**
+- `src/components/ReaderToken.tsx` → nouvelle prop `knownLevel`, applique la classe de fond.
+- `src/pages/Reader.tsx` → hook + passage de `knownLevel` filtré selon les toggles. Nouvelle section "Highlights" dans le settings panel (master + 3 sous-toggles avec pastilles).
+- `src/stores/reading-progress.ts` → ajout `showKnownHighlights`, `highlightNew`, `highlightLearning`, `highlightKnown` (defaults `true/true/true/false`) + setters. Local-only.
+- `src/components/ui/switch.tsx` → track h-5, ombre interne, transition affinée.
+- `src/index.css` → classes `.known-new` / `.known-learning` / `.known-known` (light + dark), gradient header library, helpers chrome reader.
+- `src/pages/Library.tsx` → gradient header, kanji filigrane, hairline divider, ring/gradient cartes, bullets section headers.
 
 ## Détails techniques
 
-- Auth Apple : utilise le BYOC géré par Lovable Cloud — recommandé si publication App Store. Si l'utilisateur n'a pas encore de compte Apple Developer, on peut activer Apple plus tard sans casser Google/Email.
-- `onAuthStateChange` : ne **jamais** faire d'appel Supabase async dans le callback (deadlock). Utiliser `setTimeout(..., 0)` pour différer les fetches.
-- Realtime : un seul channel par user, abonné aux 2 tables, filtré par `user_id`.
-- Migration data locale : à la 1re connexion, on **ignore** le local et on prend le cloud (vide pour un nouveau compte). Le local sera repeuplé par les futures actions.
-- Indicateur de sync : `useSyncStatus()` hook qui expose `'idle' | 'syncing' | 'error'` basé sur les promesses en cours.
-
-## Ordre d'implémentation
-
-1. Migration DB (profiles + flashcards + reading_progress + RLS + trigger)
-2. AuthContext + page `/auth` + page `/reset-password` + ProtectedRoute
-3. `cloud-sync.ts` + middleware
-4. Adaptation des 2 stores (hydrate + clear + sync hook)
-5. Section "Compte" dans Settings + indicateur sync
-6. Test multi-device via Realtime
+- **Filtrage** : dans `Reader.tsx`, `effectiveLevel = level && toggles[level] ? level : null` avant de passer à `ReaderToken`. Si master off → toujours `null`.
+- **Performance** : Map recalculé seulement quand `savedWords` change (selector Zustand + `useMemo`). Aucun coût visible même 1000+ flashcards.
+- **Matching strict** : on évite le matching kana-only pour ne pas highlighter les particules (の, は…). Match uniquement si `word` ou `reading` correspond exactement à `token.b` ou `token.t`.
+- **Pas de migration DB** : 100% UI + store local.
 
