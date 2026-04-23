@@ -153,16 +153,9 @@ export default function Reader() {
   }, [saved?.progressPercent]);
 
   const rafRef = useRef<number>(0);
-  // When we trigger programmatic scrolling (audio sync / scrub),
-  // we must not treat the resulting scroll event as "user scrolled".
+  // Plain scroll handler: only updates progress percent. We do NOT use it to
+  // detect "user scrolled", because programmatic scrolls also fire it.
   const handleScroll = useCallback(() => {
-    if (Date.now() < programmaticScrollUntilRef.current) {
-      // Programmatic scroll in progress — ignore.
-    } else {
-      // Any genuine user scroll disables auto-follow until they re-engage
-      // by pressing play/resume or scrubbing.
-      autoScrollRef.current = false;
-    }
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
@@ -173,6 +166,19 @@ export default function Reader() {
       if (id) updateProgress(id, difficulty, pct);
     });
   }, [id, difficulty, updateProgress]);
+
+  // Detect *real* user-initiated scroll inputs and immediately disengage
+  // auto-follow + cancel any in-flight programmatic scroll animation.
+  const disengageAutoScroll = useCallback(() => {
+    if (!autoScrollRef.current && scrollAnimationFrameRef.current == null) return;
+    autoScrollRef.current = false;
+    if (scrollAnimationFrameRef.current != null) {
+      cancelAnimationFrame(scrollAnimationFrameRef.current);
+      scrollAnimationFrameRef.current = null;
+    }
+    scrollTargetRef.current = null;
+    programmaticScrollUntilRef.current = 0;
+  }, []);
 
   const stopAnimatedScroll = useCallback(() => {
     if (scrollAnimationFrameRef.current != null) {
@@ -203,7 +209,6 @@ export default function Reader() {
       }
 
       const next = current + distance * 0.16;
-      programmaticScrollUntilRef.current = Date.now() + 150;
       window.scrollTo({ top: next });
       scrollAnimationFrameRef.current = requestAnimationFrame(step);
     };
@@ -217,7 +222,6 @@ export default function Reader() {
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const target = window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
-      programmaticScrollUntilRef.current = Date.now() + 300;
       scrollTargetRef.current = target;
       animateScrollToTarget();
     },
@@ -228,6 +232,25 @@ export default function Reader() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  // Listen for genuine user input that scrolls the page. These events fire
+  // ONLY for direct user interaction (never for programmatic scrollTo).
+  useEffect(() => {
+    const onWheel = () => disengageAutoScroll();
+    const onTouchMove = () => disengageAutoScroll();
+    const onKeyDown = (e: KeyboardEvent) => {
+      const keys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ', 'Spacebar'];
+      if (keys.includes(e.key)) disengageAutoScroll();
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [disengageAutoScroll]);
 
   // --- Audio sync: load sentence timestamps when audio is available ---
   // We need the canonical sentences (joined Japanese text) for the edge function alignment.
