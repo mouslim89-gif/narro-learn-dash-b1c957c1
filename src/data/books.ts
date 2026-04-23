@@ -1,5 +1,13 @@
+import { konbiniChapters } from './books/konbini-ningen';
+
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
+
+export interface Chapter {
+  id: string;
+  title: string;
+  content: Record<Difficulty, string>;
+}
 
 /**
  * Per-difficulty audio metadata. A book can have audio for some difficulties only.
