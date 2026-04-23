@@ -86,24 +86,25 @@ export default function Library() {
           {continueBook && (
             <section className="px-6 py-4">
               <Link to={`/reader/${continueBook.book.id}/${continueBook.progress.difficulty}`}>
-                <div className="relative overflow-hidden rounded-lg border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Continue Reading</p>
+                <div className="elev-soft elev-soft-hover relative overflow-hidden rounded-xl border bg-card p-5 transition-all duration-200 active:scale-[0.99]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Continue Reading</p>
                   <div className="flex items-center gap-4">
                     <div
-                      className="flex h-20 w-14 flex-shrink-0 items-end rounded p-2 shadow-md"
+                      className="book-paper relative flex h-20 w-14 flex-shrink-0 items-end overflow-hidden rounded p-2 shadow-md"
                       style={{ backgroundColor: continueBook.book.coverColor }}
                     >
-                      <p className="font-japanese text-[9px] font-bold leading-tight text-white">{continueBook.book.titleJp}</p>
+                      <div className="absolute inset-y-0 left-0 w-1.5 bg-black/15" />
+                      <p className="font-japanese relative text-[9px] font-bold leading-tight text-white drop-shadow-sm">{continueBook.book.titleJp}</p>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h2 className="font-serif text-base font-bold truncate">{continueBook.book.titleEn}</h2>
-                      <p className="text-xs text-muted-foreground">{difficultyConfig[continueBook.progress.difficulty].label}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{continueBook.book.author}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <Progress value={continueBook.progress.progressPercent} className="h-1 flex-1" />
-                        <span className="text-[10px] font-medium text-muted-foreground">{continueBook.progress.progressPercent}%</span>
+                        <span className="text-[10px] font-medium tabular-nums text-muted-foreground">{continueBook.progress.progressPercent}%</span>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" className="flex-shrink-0">
+                    <Button size="sm" variant="outline" className="flex-shrink-0 rounded-full">
                       <BookOpen className="mr-1 h-3.5 w-3.5" /> Resume
                     </Button>
                   </div>
@@ -115,17 +116,18 @@ export default function Library() {
           {/* Featured */}
           <section className="px-6 py-4">
             <Link to={`/book/${featured.id}`}>
-              <div className="relative overflow-hidden rounded-lg border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+              <div className="elev-soft elev-soft-hover relative overflow-hidden rounded-xl border bg-card p-6 transition-all duration-200 active:scale-[0.99]">
                 <div className="flex items-start gap-5">
                   <div
-                    className="flex h-32 w-24 flex-shrink-0 items-end rounded p-3 shadow-md"
+                    className="book-paper relative flex h-32 w-24 flex-shrink-0 items-end overflow-hidden rounded p-3 shadow-md"
                     style={{ backgroundColor: featured.coverColor }}
                   >
-                    <p className="font-japanese text-sm font-bold leading-tight text-white">{featured.titleJp}</p>
+                    <div className="absolute inset-y-0 left-0 w-2 bg-black/15" />
+                    <p className="font-japanese relative text-sm font-bold leading-tight text-white drop-shadow-sm">{featured.titleJp}</p>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Featured</p>
-                    <h2 className="mt-1 font-serif text-xl font-bold">{featured.titleEn}</h2>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Featured</p>
+                    <h2 className="mt-1 font-serif text-xl font-bold leading-tight">{featured.titleEn}</h2>
                     <p className="text-xs text-muted-foreground">{featured.author}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">{featured.synopsis}</p>
                     <div className="mt-3 flex items-center gap-2">
