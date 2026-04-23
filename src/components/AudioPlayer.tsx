@@ -9,6 +9,7 @@ interface AudioPlayerProps {
   onLoadedMetadata?: (durationSec: number) => void;
   seekRequestRef?: React.MutableRefObject<((sec: number) => void) | null>;
   onScrub?: (timeSec: number) => void;
+  onPlay?: () => void;
 }
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
@@ -27,6 +28,7 @@ export function AudioPlayer({
   onLoadedMetadata,
   seekRequestRef,
   onScrub,
+  onPlay,
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -106,7 +108,7 @@ export function AudioPlayer({
         }}
         onEnded={() => setPlaying(false)}
         onPause={() => setPlaying(false)}
-        onPlay={() => setPlaying(true)}
+        onPlay={() => { setPlaying(true); onPlay?.(); }}
       />
       <div
         style={{ bottom: `${bottomOffset}px` }}

@@ -414,6 +414,6 @@
   box-shadow: 0 1px 4px hsl(0 0% 0% / 0.18);
 }
 .audio-slider span[data-orientation="horizontal"] {
-  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+  background: hsl(var(--primary));
 }
 
