@@ -19,6 +19,8 @@ import { useLongPress } from '@/hooks/use-long-press';
 import { toast } from '@/hooks/use-toast';
 import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
+import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from '@/lib/known-words';
+import { Switch } from '@/components/ui/switch';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
@@ -31,7 +33,13 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 export default function Reader() {
   const { id, difficulty: diffParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const knownIndex = useKnownWordsIndex();
+  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
+    new: highlightNew,
+    learning: highlightLearning,
+    known: highlightKnown,
+  };
   const saved = id ? getProgress(id) : undefined;
 
   const [difficulty, setDifficulty] = useState<Difficulty>(
