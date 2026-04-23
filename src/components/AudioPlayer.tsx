@@ -1,23 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, Pause, Volume2 } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
 interface AudioPlayerProps {
-  /** Public URL of the MP3 file. */
   src: string;
-  /** Distance in px from viewport bottom. Defaults to 60 (above BottomNav). Use 0 in fullscreen reader. */
   bottomOffset?: number;
-  /** Called continuously while playing. */
   onTimeUpdate?: (timeSec: number) => void;
-  /** Called once when audio metadata loads (for total duration). */
   onLoadedMetadata?: (durationSec: number) => void;
-  /** Imperative seek handle — caller can call seek(time) to jump. */
   seekRequestRef?: React.MutableRefObject<((sec: number) => void) | null>;
-  /** Called while user is dragging the slider — emits the previewed time in seconds. */
   onScrub?: (timeSec: number) => void;
 }
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
+
+function formatTime(sec: number): string {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
 
 export function AudioPlayer({
   src,
@@ -32,8 +33,8 @@ export function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
+  const [showRemaining, setShowRemaining] = useState(false);
 
-  // Expose seek function to parent
   useEffect(() => {
     if (seekRequestRef) {
       seekRequestRef.current = (sec: number) => {
@@ -47,7 +48,6 @@ export function AudioPlayer({
     };
   }, [seekRequestRef]);
 
-  // Apply playback speed
   useEffect(() => {
     if (audioRef.current) audioRef.current.playbackRate = speed;
   }, [speed]);
@@ -84,6 +84,9 @@ export function AudioPlayer({
   };
 
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const rightTime = showRemaining
+    ? `-${formatTime(Math.max(0, duration - currentTime))}`
+    : formatTime(duration);
 
   return (
     <>
@@ -107,29 +110,37 @@ export function AudioPlayer({
       />
       <div
         style={{ bottom: `${bottomOffset}px` }}
-        className="fixed left-0 right-0 z-40 border-t bg-card/95 px-4 py-2.5 backdrop-blur-lg"
+        className="fixed left-0 right-0 z-40 border-t border-border/50 bg-card/85 px-4 py-3 backdrop-blur-2xl"
       >
-        <div className="mx-auto flex max-w-lg items-center gap-3">
+        <div className="mx-auto flex max-w-lg items-center gap-2.5">
           <button
             onClick={togglePlay}
-            className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground shadow-sm"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30 active:scale-95 transition-transform"
             aria-label={playing ? 'Pause' : 'Play'}
           >
-            {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="ml-0.5 h-3.5 w-3.5" />}
+            {playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
           </button>
+          <span className="shrink-0 text-[11px] font-mono font-medium tabular-nums text-muted-foreground w-9">
+            {formatTime(currentTime)}
+          </span>
           <Slider
             value={[progressPct]}
             onValueChange={handleSliderChange}
             max={100}
             step={0.1}
-            className="flex-1"
+            className="flex-1 audio-slider"
           />
-          <Volume2 className="h-4 w-4 text-muted-foreground" />
+          <button
+            onClick={() => setShowRemaining(v => !v)}
+            className="shrink-0 hidden xs:block text-[11px] font-mono font-medium tabular-nums text-muted-foreground w-10 text-right"
+          >
+            {rightTime}
+          </button>
           <button
             onClick={nextSpeed}
-            className="rounded bg-muted px-2 py-1 text-[11px] font-semibold text-foreground"
+            className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold text-foreground hover:bg-muted/80 active:scale-95 transition-transform"
           >
-            {speed}x
+            {speed}×
           </button>
         </div>
       </div>

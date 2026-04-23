@@ -4,42 +4,11 @@ import { BookCard } from '@/components/BookCard';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { difficultyConfig } from '@/data/books';
-import { formatDistanceToNow, differenceInCalendarDays, startOfDay, subDays, format } from 'date-fns';
+import { formatDistanceToNow, startOfDay, format } from 'date-fns';
 import { bookTokens } from '@/data/book-tokens';
 import { Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-function StreakCalendar({ readDatesSet }: { readDatesSet: Set<string> }) {
-  const today = new Date();
-  const days = Array.from({ length: 30 }, (_, i) => {
-    const date = subDays(today, 29 - i);
-    const key = format(date, 'yyyy-MM-dd');
-    const isActive = readDatesSet.has(key);
-    const dayLabel = format(date, 'EEE');
-    const isToday = i === 29;
-    return { key, isActive, dayLabel, date, isToday };
-  });
-
-  return (
-    <div className="mt-4">
-      <p className="text-xs font-semibold text-muted-foreground mb-2">Last 30 days</p>
-      <div className="flex gap-[3px] flex-wrap">
-        {days.map((d) => (
-          <div
-            key={d.key}
-            title={format(d.date, 'MMM d')}
-            className={`h-3.5 w-3.5 rounded-sm transition-colors ${
-              d.isActive
-                ? 'bg-primary'
-                : 'bg-muted'
-            } ${d.isToday ? 'ring-1 ring-primary/50' : ''}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function MyBooks() {
   const { progress } = useReadingProgressStore();
@@ -124,8 +93,6 @@ export default function MyBooks() {
               <p className="text-[9px] text-muted-foreground">Done</p>
             </div>
           </div>
-
-          <StreakCalendar readDatesSet={stats.readDateStrings} />
         </>
       )}
 
