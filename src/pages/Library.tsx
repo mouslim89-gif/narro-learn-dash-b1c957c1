@@ -155,7 +155,7 @@ export default function Library() {
             if (genreBooks.length === 0) return null;
             return (
               <section key={genre} className="py-3">
-                <h3 className="px-6 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                <h3 className="px-6 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                   {genreLabels[genre]}
                 </h3>
                 <div className="mt-3 flex gap-4 overflow-x-auto px-6 pb-2 scrollbar-none">
