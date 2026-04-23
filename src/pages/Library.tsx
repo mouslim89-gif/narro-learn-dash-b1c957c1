@@ -37,18 +37,18 @@ export default function Library() {
 
   return (
     <div className="pb-20">
-      <header className="px-6 pt-8 pb-2 flex items-start justify-between">
+      <header className="px-6 pt-10 pb-3 flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">読みます</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">Learn Japanese through reading</p>
+          <h1 className="wordmark text-[28px] leading-none text-foreground">Tsundoku</h1>
+          <p className="mt-2 text-[13px] text-muted-foreground">Learn Japanese through reading</p>
         </div>
-        <div className="flex items-center gap-1 mt-1">
-          <Button variant="ghost" size="icon" onClick={() => setDarkMode(!darkMode)}>
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
           </Button>
           <Link to="/settings">
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+              <Settings className="h-[18px] w-[18px]" />
             </Button>
           </Link>
         </div>
