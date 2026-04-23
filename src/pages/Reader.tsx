@@ -549,6 +549,13 @@ export default function Reader() {
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
                       const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
 
+                      // Known-word highlight: disabled in grammar mode (POS colors prevail).
+                      let knownLevel: KnownLevel | null = null;
+                      if (displayMode !== 'grammar' && showKnownHighlights) {
+                        const lvl = getKnownLevel(token, knownIndex);
+                        if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
+                      }
+
                       return (
                         <ReaderToken
                           key={i}
@@ -556,6 +563,7 @@ export default function Reader() {
                           showFurigana={showFurigana}
                           colorClass={colorClass}
                           isHighlighted={isHighlighted}
+                          knownLevel={knownLevel}
                           onTap={() => {
                             if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
                               setMiniPopup(null);
