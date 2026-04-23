@@ -82,7 +82,7 @@ export default function Auth() {
         className="w-full max-w-sm"
       >
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Yomimasu</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Tsundoku</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {mode === 'signup' ? 'Create your account' : mode === 'forgot' ? 'Reset your password' : 'Welcome back'}
           </p>
