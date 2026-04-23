@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown, Settings } from 'lucide-react';
+import { Trash2, RotateCcw, Shuffle, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FlashcardReview } from '@/components/FlashcardReview';
+import { formatInterval } from '@/lib/srs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +14,32 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-type StatusFilter = 'all' | 'new' | 'learning' | 'known';
+type StatusFilter = 'all' | 'due' | 'new' | 'learning' | 'known';
 type SortOption = 'added' | 'mastery' | 'jlpt';
+
+function masteryLevel(m: number): 'new' | 'learning' | 'known' {
+  if (m <= 0) return 'new';
+  if (m <= 2) return 'learning';
+  return 'known';
+}
+
+const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
+  new: 'bg-amber-500',
+  learning: 'bg-sky-500',
+  known: 'bg-emerald-500',
+};
+
+function nextReviewLabel(nextReviewAt?: string): string | null {
+  if (!nextReviewAt) return null;
+  const ms = new Date(nextReviewAt).getTime() - Date.now();
+  if (ms <= 0) return 'Due now';
+  const days = Math.round(ms / 86400000);
+  if (days < 1) {
+    const hours = Math.round(ms / 3600000);
+    return `in ${Math.max(1, hours)}h`;
+  }
+  return `in ${formatInterval(days)}`;
+}
 
 export default function Flashcards() {
   const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
@@ -40,15 +65,17 @@ export default function Flashcards() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedWords, shuffled, reviewMode]);
 
+  const dueWords = useMemo(() => getDueWords(), [savedWords]); // eslint-disable-line react-hooks/exhaustive-deps
+  const dueIds = useMemo(() => new Set(dueWords.map(w => w.id)), [dueWords]);
+
   const filteredWords = useMemo(() => {
     let words = [...savedWords];
 
-    // Filter
-    if (filter === 'new') words = words.filter(w => !(w.mastery || 0));
+    if (filter === 'due') words = words.filter(w => dueIds.has(w.id));
+    else if (filter === 'new') words = words.filter(w => !(w.mastery || 0));
     else if (filter === 'learning') words = words.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3);
     else if (filter === 'known') words = words.filter(w => (w.mastery || 0) >= 3);
 
-    // Search
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       words = words.filter(w =>
@@ -58,7 +85,6 @@ export default function Flashcards() {
       );
     }
 
-    // Sort
     if (sortBy === 'mastery') words.sort((a, b) => (b.mastery || 0) - (a.mastery || 0));
     else if (sortBy === 'jlpt') {
       const jlptOrder = (w: typeof words[0]) => {
@@ -70,12 +96,12 @@ export default function Flashcards() {
     }
 
     return words;
-  }, [savedWords, filter, search, sortBy]);
+  }, [savedWords, filter, search, sortBy, dueIds]);
 
   const knownCount = savedWords.filter(w => (w.mastery || 0) >= 3).length;
   const learningCount = savedWords.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3).length;
   const newCount = savedWords.filter(w => !(w.mastery || 0)).length;
-  const dueCount = getDueWords().length;
+  const dueCount = dueWords.length;
 
   if (reviewMode) {
     return (
@@ -86,68 +112,104 @@ export default function Flashcards() {
     );
   }
 
-  const filters: { label: string; value: StatusFilter }[] = [
-    { label: 'All', value: 'all' },
-    { label: 'New', value: 'new' },
-    { label: 'Learning', value: 'learning' },
-    { label: 'Known', value: 'known' },
-  ];
-
   const sortLabels: Record<SortOption, string> = {
     added: 'Date added',
     mastery: 'Mastery',
     jlpt: 'JLPT',
   };
 
+  const tiles: { key: StatusFilter; label: string; count: number; Icon: typeof Flame; gradient: string; text: string }[] = [
+    { key: 'due', label: 'Due', count: dueCount, Icon: Flame, gradient: 'from-accent/15 to-accent/5', text: 'text-accent' },
+    { key: 'new', label: 'New', count: newCount, Icon: Sparkles, gradient: 'from-amber-500/15 to-amber-500/5', text: 'text-amber-600 dark:text-amber-400' },
+    { key: 'learning', label: 'Learning', count: learningCount, Icon: GraduationCap, gradient: 'from-sky-500/15 to-sky-500/5', text: 'text-sky-600 dark:text-sky-400' },
+    { key: 'known', label: 'Known', count: knownCount, Icon: CheckCircle2, gradient: 'from-emerald-500/15 to-emerald-500/5', text: 'text-emerald-600 dark:text-emerald-400' },
+  ];
+
+  const filters: { label: string; value: StatusFilter }[] = [
+    { label: 'All', value: 'all' },
+    { label: 'Due', value: 'due' },
+    { label: 'New', value: 'new' },
+    { label: 'Learning', value: 'learning' },
+    { label: 'Known', value: 'known' },
+  ];
+
   return (
     <div className="pb-20 px-6 pt-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Flashcards</h1>
+      {/* Hero header */}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Flashcards</h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {savedWords.length} card{savedWords.length === 1 ? '' : 's'}
+            {dueCount > 0 && (
+              <> · <span className="font-semibold text-accent">{dueCount} due today</span></>
+            )}
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          {savedWords.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShuffled(!shuffled)}
+              className={`h-9 w-9 ${shuffled ? 'text-primary' : 'text-muted-foreground'}`}
+            >
+              <Shuffle className="h-4 w-4" />
+            </Button>
+          )}
           <Link to="/settings">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-9 w-9">
               <Settings className="h-4 w-4" />
             </Button>
           </Link>
         </div>
-        {savedWords.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShuffled(!shuffled)}
-              className={shuffled ? 'text-primary' : 'text-muted-foreground'}
-            >
-              <Shuffle className="h-4 w-4" />
-            </Button>
-            <Button onClick={enterReview} size="sm" className="font-semibold">
-              <RotateCcw className="mr-1 h-4 w-4" /> Review
-              {dueCount > 0 && (
-                <span className="ml-1.5 rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
-                  {dueCount}
-                </span>
-              )}
-            </Button>
-          </div>
-        )}
       </div>
 
       {savedWords.length > 0 && (
         <>
-          {/* Stats */}
-          <div className="mt-3 flex gap-3">
-            <div className="flex-1 rounded-lg border bg-card p-3 text-center">
-              <p className="text-lg font-bold text-green-600">{knownCount}</p>
-              <p className="text-[10px] text-muted-foreground">Known</p>
-            </div>
-            <div className="flex-1 rounded-lg border bg-card p-3 text-center">
-              <p className="text-lg font-bold text-amber-500">{learningCount}</p>
-              <p className="text-[10px] text-muted-foreground">Learning</p>
-            </div>
-            <div className="flex-1 rounded-lg border bg-card p-3 text-center">
-              <p className="text-lg font-bold text-muted-foreground">{newCount}</p>
-              <p className="text-[10px] text-muted-foreground">New</p>
-            </div>
+          {/* Hero review CTA */}
+          {dueCount > 0 ? (
+            <button
+              onClick={enterReview}
+              className="mt-4 w-full rounded-xl bg-gradient-to-r from-primary to-primary/85 px-5 py-3.5 text-primary-foreground shadow-lg shadow-primary/20 active:scale-[0.99] transition-transform flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="rounded-full bg-white/15 p-1.5">
+                  <RotateCcw className="h-4 w-4" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold leading-tight">Start review</p>
+                  <p className="text-[11px] opacity-85 leading-tight">{dueCount} card{dueCount > 1 ? 's' : ''} due</p>
+                </div>
+              </div>
+              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold">
+                {dueCount}
+              </span>
+            </button>
+          ) : (
+            <Button variant="outline" size="sm" onClick={enterReview} className="mt-4 w-full font-semibold">
+              <RotateCcw className="mr-1.5 h-4 w-4" /> Review all
+            </Button>
+          )}
+
+          {/* 4-tile stats */}
+          <div className="mt-3 grid grid-cols-4 gap-2">
+            {tiles.map(({ key, label, count, Icon, gradient, text }) => {
+              const active = filter === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setFilter(active ? 'all' : key)}
+                  className={`rounded-xl border bg-gradient-to-br ${gradient} p-2.5 text-center transition-all active:scale-[0.97] ${
+                    active ? 'border-primary/50 ring-1 ring-primary/30' : 'border-border/60'
+                  }`}
+                >
+                  <Icon className={`mx-auto h-3.5 w-3.5 ${text}`} />
+                  <p className={`mt-1 text-lg font-bold leading-none ${text}`}>{count}</p>
+                  <p className="mt-1 text-[9px] uppercase tracking-wider text-muted-foreground">{label}</p>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search */}
@@ -162,13 +224,13 @@ export default function Flashcards() {
           </div>
 
           {/* Filters + Sort */}
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex gap-1.5">
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
               {filters.map(f => (
                 <button
                   key={f.value}
                   onClick={() => setFilter(f.value)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                     filter === f.value
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
@@ -180,7 +242,7 @@ export default function Flashcards() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground text-xs gap-1">
+                <Button variant="ghost" size="sm" className="text-muted-foreground text-xs gap-1 shrink-0">
                   <ArrowUpDown className="h-3 w-3" /> {sortLabels[sortBy]}
                 </Button>
               </DropdownMenuTrigger>
@@ -196,9 +258,9 @@ export default function Flashcards() {
         </>
       )}
 
-      <p className="mt-3 text-sm text-muted-foreground">
-        {filteredWords.length} words{filter !== 'all' || search ? ` (of ${savedWords.length})` : ' saved'}
-        {dueCount > 0 && <span className="text-accent font-semibold"> · {dueCount} due for review</span>}
+      <p className="mt-3 text-xs text-muted-foreground">
+        {filteredWords.length} word{filteredWords.length === 1 ? '' : 's'}
+        {(filter !== 'all' || search) && ` (of ${savedWords.length})`}
       </p>
 
       {savedWords.length === 0 ? (
@@ -208,26 +270,60 @@ export default function Flashcards() {
           <p className="mt-1 text-sm">Tap words while reading to save them.</p>
         </div>
       ) : (
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-3 flex flex-col gap-2">
           {filteredWords.map((word) => {
             const mastery = word.mastery || 0;
-            const masteryColor = mastery >= 3 ? 'bg-green-500' : mastery > 0 ? 'bg-amber-400' : 'bg-muted';
+            const level = masteryLevel(mastery);
+            const isDue = dueIds.has(word.id);
+            const masteryPct = Math.min(100, (mastery / 5) * 100);
+            const nextLabel = nextReviewLabel(word.nextReviewAt);
             return (
-              <div key={word.id} className="rounded-lg border bg-card p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`h-2 w-2 rounded-full ${masteryColor}`} />
+              <div
+                key={word.id}
+                className="relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 pl-5 ring-1 ring-transparent transition-all hover:border-primary/30 hover:bg-muted/30 active:scale-[0.99]"
+              >
+                {/* Vertical color indicator */}
+                <span className={`absolute left-0 top-0 bottom-0 w-[3px] ${LEVEL_BAR[level]}`} />
+
+                {/* Due badge */}
+                {isDue && (
+                  <span className="absolute right-3 top-2 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
+                    Due
+                  </span>
+                )}
+
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2.5 min-w-0 flex-1">
                     <PlayWordButton word={word.word} reading={word.reading} size={16} />
-                    <div>
-                      <p className="font-japanese text-lg font-bold">{word.word}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {word.reading} — {word.meanings.join(', ')}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <p className="font-japanese text-lg font-bold truncate">{word.word}</p>
+                        <span className="font-japanese text-xs text-muted-foreground truncate">{word.reading}</span>
+                      </div>
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+                        {word.meanings.join(', ')}
                       </p>
+                      {nextLabel && (
+                        <p className="mt-1 text-[10px] font-medium text-muted-foreground/80">
+                          Next: {nextLabel}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <button onClick={() => removeWord(word.id)} className="rounded p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                  <button
+                    onClick={() => removeWord(word.id)}
+                    className="shrink-0 rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </button>
+                </div>
+
+                {/* Mastery progress bar */}
+                <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={`h-full rounded-full transition-all ${LEVEL_BAR[level]}`}
+                    style={{ width: `${masteryPct}%` }}
+                  />
                 </div>
               </div>
             );

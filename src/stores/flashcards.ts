@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { pushFlashcard, deleteFlashcard as cloudDeleteFlashcard } from '@/lib/sync/cloud-sync';
-
-const SRS_INTERVALS = [0, 1, 3, 7, 30]; // days
+import { applyReview, migrateCard, type Quality } from '@/lib/srs';
 
 export interface SavedWord {
   id: string;
@@ -15,13 +14,11 @@ export interface SavedWord {
   mastery: number;
   lastReviewedAt?: string;
   nextReviewAt?: string;
-}
-
-function getNextReviewDate(mastery: number): string {
-  const days = SRS_INTERVALS[Math.min(mastery, SRS_INTERVALS.length - 1)];
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString();
+  // SM-2 fields (local-first, backfilled on demand)
+  easeFactor?: number;
+  interval?: number;
+  reps?: number;
+  lapses?: number;
 }
 
 interface FlashcardStore {
@@ -34,13 +31,20 @@ interface FlashcardStore {
   hasWord: (id: string) => boolean;
   incrementMastery: (id: string) => void;
   resetMastery: (id: string) => void;
-  adjustMastery: (id: string, quality: 'again' | 'hard' | 'good') => void;
+  adjustMastery: (id: string, quality: 'again' | 'hard' | 'good' | 'easy') => void;
   getDueCount: () => number;
   getDueWords: () => SavedWord[];
   // Sync helpers
   hydrateWords: (words: SavedWord[], userId: string) => void;
   clearWords: () => void;
 }
+
+const QUALITY_MAP: Record<'again' | 'hard' | 'good' | 'easy', Quality> = {
+  again: 0,
+  hard: 3,
+  good: 4,
+  easy: 5,
+};
 
 // Debounce push per word
 const pushTimers = new Map<string, number>();
@@ -66,6 +70,10 @@ export const useFlashcardStore = create<FlashcardStore>()(
         const newWord: SavedWord = {
           ...entry,
           mastery: 0,
+          easeFactor: 2.5,
+          interval: 0,
+          reps: 0,
+          lapses: 0,
           nextReviewAt: new Date().toISOString(),
         };
         set({ savedWords: [...get().savedWords, newWord] });
@@ -83,26 +91,18 @@ export const useFlashcardStore = create<FlashcardStore>()(
       },
       hasWord: (id) => !!get().savedWords.find(w => w.id === id),
       incrementMastery: (id) => {
-        const updated = get().savedWords.map(w => {
-          if (w.id !== id) return w;
-          const newMastery = (w.mastery || 0) + 1;
-          return {
-            ...w,
-            mastery: newMastery,
-            lastReviewedAt: new Date().toISOString(),
-            nextReviewAt: getNextReviewDate(newMastery),
-          };
-        });
-        set({ savedWords: updated });
-        const uid = get().syncUserId;
-        const w = updated.find(x => x.id === id);
-        if (uid && w) schedulePush(uid, w);
+        // Treat as a "Good" review (back-compat helper)
+        get().adjustMastery(id, 'good');
       },
       resetMastery: (id) => {
         const updated = get().savedWords.map(w =>
           w.id === id ? {
             ...w,
             mastery: 0,
+            reps: 0,
+            interval: 0,
+            easeFactor: 2.5,
+            lapses: (w.lapses ?? 0),
             lastReviewedAt: new Date().toISOString(),
             nextReviewAt: new Date().toISOString(),
           } : w
@@ -115,16 +115,9 @@ export const useFlashcardStore = create<FlashcardStore>()(
       adjustMastery: (id, quality) => {
         const updated = get().savedWords.map(w => {
           if (w.id !== id) return w;
-          const now = new Date().toISOString();
-          if (quality === 'again') {
-            return { ...w, mastery: 0, lastReviewedAt: now, nextReviewAt: now };
-          }
-          if (quality === 'hard') {
-            const d = new Date(); d.setDate(d.getDate() + 1);
-            return { ...w, lastReviewedAt: now, nextReviewAt: d.toISOString() };
-          }
-          const newMastery = (w.mastery || 0) + 1;
-          return { ...w, mastery: newMastery, lastReviewedAt: now, nextReviewAt: getNextReviewDate(newMastery) };
+          const migrated = migrateCard(w);
+          const result = applyReview(migrated, QUALITY_MAP[quality]);
+          return { ...migrated, ...result };
         });
         set({ savedWords: updated });
         const uid = get().syncUserId;
@@ -139,7 +132,10 @@ export const useFlashcardStore = create<FlashcardStore>()(
         const now = new Date().toISOString();
         return get().savedWords.filter(w => !w.nextReviewAt || w.nextReviewAt <= now);
       },
-      hydrateWords: (words, userId) => set({ savedWords: words, syncUserId: userId }),
+      hydrateWords: (words, userId) => set({
+        savedWords: words.map(migrateCard),
+        syncUserId: userId,
+      }),
       clearWords: () => {
         pushTimers.forEach((t) => clearTimeout(t));
         pushTimers.clear();
