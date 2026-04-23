@@ -28,37 +28,35 @@ export function BottomNav() {
   const dueCount = useFlashcardStore(s => s.getDueCount());
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
-      <div className="pointer-events-none absolute inset-x-0 -top-6 h-6 bg-gradient-to-t from-background/95 to-transparent" />
-      <div className="relative border-t border-border/60 bg-card/85 backdrop-blur-xl">
-        <SyncIndicator />
-        <div className="mx-auto flex max-w-lg items-center justify-around py-2">
-          {tabs.map(({ path, label, icon: Icon }) => {
-            const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
-            const showBadge = path === '/flashcards' && dueCount > 0;
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={`relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 text-[11px] font-semibold transition-all ${
-                  active
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <div className={`relative flex h-7 w-7 items-center justify-center rounded-lg transition-all ${active ? 'bg-primary/10' : ''}`}>
-                  <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.4 : 1.8} />
-                  {showBadge && (
-                    <span className="absolute -right-1.5 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-accent-foreground shadow-sm">
-                      {dueCount > 9 ? '9+' : dueCount}
-                    </span>
-                  )}
-                </div>
-                <span className="tracking-tight">{label}</span>
-              </Link>
-            );
-          })}
-        </div>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
+      <SyncIndicator />
+      <div className="mx-auto flex max-w-lg items-center justify-around py-2">
+        {tabs.map(({ path, label, icon: Icon }) => {
+          const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
+          const showBadge = path === '/flashcards' && dueCount > 0;
+          return (
+            <Link
+              key={path}
+              to={path}
+              className={`relative flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium transition-colors ${
+                active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <div className="relative">
+                <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+                {showBadge && (
+                  <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white">
+                    {dueCount > 9 ? '9+' : dueCount}
+                  </span>
+                )}
+              </div>
+              {label}
+              {active && (
+                <span className="mt-0.5 h-1 w-1 rounded-full bg-primary" />
+              )}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );

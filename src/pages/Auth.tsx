@@ -74,19 +74,16 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-warm px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className="w-full max-w-sm"
       >
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-hero">
-            <span className="font-japanese text-2xl font-black text-white drop-shadow">積</span>
-          </div>
-          <h1 className="font-display text-3xl font-black tracking-tight">Tsundoku</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold tracking-tight">Tsundoku</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             {mode === 'signup' ? 'Create your account' : mode === 'forgot' ? 'Reset your password' : 'Welcome back'}
           </p>
         </div>
