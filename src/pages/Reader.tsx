@@ -62,8 +62,9 @@ export default function Reader() {
   const [audioLoading, setAudioLoading] = useState(false);
   const [audioCurrentSentence, setAudioCurrentSentence] = useState<number | null>(null);
   const audioSeekRef = useRef<((sec: number) => void) | null>(null);
-  // Tracks whether the user manually scrolled recently — disables auto-scroll briefly
-  const userScrolledAtRef = useRef<number>(0);
+  // Auto-scroll is OFF by default. It turns ON when the user plays/resumes audio
+  // or scrubs the slider — and turns OFF the moment they scroll the page manually.
+  const autoScrollRef = useRef<boolean>(false);
   const programmaticScrollUntilRef = useRef<number>(0);
   const scrollAnimationFrameRef = useRef<number | null>(null);
   const scrollTargetRef = useRef<number | null>(null);
@@ -158,7 +159,9 @@ export default function Reader() {
     if (Date.now() < programmaticScrollUntilRef.current) {
       // Programmatic scroll in progress — ignore.
     } else {
-      userScrolledAtRef.current = Date.now();
+      // Any genuine user scroll disables auto-follow until they re-engage
+      // by pressing play/resume or scrubbing.
+      autoScrollRef.current = false;
     }
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
@@ -214,7 +217,6 @@ export default function Reader() {
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const target = window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
-      userScrolledAtRef.current = 0;
       programmaticScrollUntilRef.current = Date.now() + 300;
       scrollTargetRef.current = target;
       animateScrollToTarget();
@@ -268,24 +270,31 @@ export default function Reader() {
     [audioSync]
   );
 
-  // While the user drags the audio slider, keep a single running animation
-  // and only update its destination when the target sentence changes.
+  // While the user drags the audio slider, re-engage auto-scroll and follow
+  // the target sentence.
   const handleAudioScrub = useCallback(
     (timeSec: number) => {
       if (!audioSync) return;
       const idx = findSentenceAt(audioSync, timeSec);
       if (idx == null) return;
+      autoScrollRef.current = true;
       setAudioCurrentSentence(idx);
       queueSentenceScroll(idx);
     },
     [audioSync, queueSentenceScroll]
   );
 
-  // Auto-scroll active sentence into view (skipped if user just scrolled manually)
+  // Called when the user presses play / resume — re-engage auto-follow and
+  // snap to the currently active sentence.
+  const handleAudioPlay = useCallback(() => {
+    autoScrollRef.current = true;
+    if (audioCurrentSentence != null) queueSentenceScroll(audioCurrentSentence);
+  }, [audioCurrentSentence, queueSentenceScroll]);
+
+  // Auto-scroll active sentence into view ONLY when auto-follow is engaged.
   useEffect(() => {
     if (audioCurrentSentence == null) return;
-    const sinceScroll = Date.now() - userScrolledAtRef.current;
-    if (sinceScroll < 2500) return; // user is in control
+    if (!autoScrollRef.current) return;
     queueSentenceScroll(audioCurrentSentence);
   }, [audioCurrentSentence, queueSentenceScroll]);
 
@@ -648,6 +657,7 @@ export default function Reader() {
           bottomOffset={0}
           onTimeUpdate={handleAudioTime}
           onScrub={handleAudioScrub}
+          onPlay={handleAudioPlay}
           seekRequestRef={audioSeekRef}
         />
       )}
