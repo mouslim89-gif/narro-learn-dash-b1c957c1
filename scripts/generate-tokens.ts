@@ -231,8 +231,8 @@ function mergeTokens(kTokens: KToken[], bookOverrides: Record<string, string> = 
         break;
       }
       
-      // Apply reading overrides for merged surface form
-      const mergedOverride = READING_OVERRIDES[text];
+      // Apply reading overrides for merged surface form (book-specific takes priority)
+      const mergedOverride = bookOverrides[text] ?? READING_OVERRIDES[text];
       if (mergedOverride) {
         reading = mergedOverride;
       }
