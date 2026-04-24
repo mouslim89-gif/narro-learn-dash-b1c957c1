@@ -5,6 +5,7 @@
 import kuromoji from 'kuromoji';
 import * as path from 'path';
 import * as fs from 'fs';
+import { bookReadingOverrides } from '../src/data/book-reading-overrides';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const booksPath = path.resolve(__dirname, '../src/data/books.ts');
