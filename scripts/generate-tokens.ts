@@ -5,40 +5,36 @@
 import kuromoji from 'kuromoji';
 import * as path from 'path';
 import * as fs from 'fs';
+import { bookReadingOverrides } from '../src/data/book-reading-overrides';
+import { books, hasChapters, chapterKey } from '../src/data/books';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const booksPath = path.resolve(__dirname, '../src/data/books.ts');
-const booksSource = fs.readFileSync(booksPath, 'utf-8');
 
 type Difficulty = 'simplified' | 'intermediate' | 'original';
 
 interface BookContent {
+  /** Key used in bookTokens map. For chaptered books, one entry per chapter. */
   id: string;
   content: Record<Difficulty, string>;
 }
 
+/** Flatten books + chapters into the (key, content-per-difficulty) form the tokenizer loop consumes. */
 function extractBookContents(): BookContent[] {
-  const books: BookContent[] = [];
-  const varPattern = /const\s+(\w+)\s*=\s*`([^`]*)`/g;
-  const vars: Record<string, string> = {};
-  let match;
-  while ((match = varPattern.exec(booksSource)) !== null) {
-    vars[match[1]] = match[2];
-  }
-  const bookPattern = /id:\s*'([^']+)'[\s\S]*?content:\s*\{\s*simplified:\s*(\w+)\s*,\s*intermediate:\s*(\w+)\s*,\s*original:\s*(\w+)\s*\}/g;
-  while ((match = bookPattern.exec(booksSource)) !== null) {
-    const [, id, simpVar, intVar, origVar] = match;
-    books.push({
-      id,
-      content: {
-        simplified: vars[simpVar] || '',
-        intermediate: vars[intVar] || '',
-        original: vars[origVar] || '',
+  const out: BookContent[] = [];
+  for (const book of books) {
+    if (hasChapters(book)) {
+      // Also emit book-level fallback content so lookups without a chapterId still work.
+      out.push({ id: book.id, content: book.content });
+      for (const ch of book.chapters!) {
+        out.push({ id: chapterKey(book.id, ch.id), content: ch.content });
       }
-    });
+    } else {
+      out.push({ id: book.id, content: book.content });
+    }
   }
-  return books;
+  return out;
 }
+
 
 interface KToken {
   surface_form: string;
@@ -135,7 +131,7 @@ function isPunctuation(kt: KToken): boolean {
  * - Regular particles (は、が、を...) stay standalone
  * - Punctuation stays standalone
  */
-function mergeTokens(kTokens: KToken[]): OutputToken[] {
+function mergeTokens(kTokens: KToken[], bookOverrides: Record<string, string> = {}): OutputToken[] {
   const result: OutputToken[] = [];
   let i = 0;
 
@@ -163,8 +159,8 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
 
     // Content word (independent) → start a group, merge following dependents
     if (isContentWord(kt) && isIndependent(kt)) {
-      // Apply reading overrides for known Kuromoji mistakes
-      const overrideReading = READING_OVERRIDES[kt.surface_form];
+      // Apply reading overrides for known Kuromoji mistakes (book-specific takes priority)
+      const overrideReading = bookOverrides[kt.surface_form] ?? READING_OVERRIDES[kt.surface_form];
       let text = kt.surface_form;
       let reading = overrideReading
         ? katakanaToHiragana(overrideReading)
@@ -230,8 +226,8 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
         break;
       }
       
-      // Apply reading overrides for merged surface form
-      const mergedOverride = READING_OVERRIDES[text];
+      // Apply reading overrides for merged surface form (book-specific takes priority)
+      const mergedOverride = bookOverrides[text] ?? READING_OVERRIDES[text];
       if (mergedOverride) {
         reading = mergedOverride;
       }
@@ -276,25 +272,36 @@ function mergeTokens(kTokens: KToken[]): OutputToken[] {
   }
 
   // Post-process: merge known compound words that Kuromoji splits incorrectly
-  return postMergeCompounds(result);
+  return postMergeCompounds(result, bookOverrides);
 }
 
 /** Merge adjacent tokens that form known compound words */
-function postMergeCompounds(tokens: OutputToken[]): OutputToken[] {
-  const COMPOUNDS: Record<string, { reading: string; pos: string }> = {
+function postMergeCompounds(
+  tokens: OutputToken[],
+  bookOverrides: Record<string, string> = {},
+): OutputToken[] {
+  const BASE_COMPOUNDS: Record<string, { reading: string; pos: string }> = {
     'きび団子': { reading: 'きびだんご', pos: '名詞/一般' },
   };
+  // Any multi-char override is also a candidate compound (covers 犍陀多, 蓮池, etc.
+  // that Kuromoji splits because the kanji/word is rare).
+  const compounds: Record<string, { reading: string; pos: string }> = { ...BASE_COMPOUNDS };
+  for (const [surface, reading] of Object.entries(bookOverrides)) {
+    if (surface.length >= 2 && !compounds[surface]) {
+      compounds[surface] = { reading, pos: '名詞/一般' };
+    }
+  }
 
   const result: OutputToken[] = [];
   let i = 0;
   while (i < tokens.length) {
     let merged = false;
-    // Try merging 2-3 consecutive tokens
-    for (let len = 3; len >= 2; len--) {
+    // Try merging up to 5 consecutive tokens (longest match wins)
+    for (let len = 5; len >= 2; len--) {
       if (i + len > tokens.length) continue;
       const combined = tokens.slice(i, i + len).map(t => t.t).join('');
-      if (COMPOUNDS[combined]) {
-        const { reading, pos } = COMPOUNDS[combined];
+      if (compounds[combined]) {
+        const { reading, pos } = compounds[combined];
         result.push({ t: combined, j: true, r: reading, p: pos });
         i += len;
         merged = true;
@@ -326,12 +333,15 @@ async function main() {
 
   for (const book of books) {
     allTokens[book.id] = {};
+    // For chapter keys (bookId__chapterId) strip the suffix to reuse book-level overrides.
+    const rootId = book.id.split('__')[0];
+    const bookOverrides = bookReadingOverrides[rootId] ?? {};
     for (const diff of ['simplified', 'intermediate', 'original'] as Difficulty[]) {
       const text = book.content[diff];
       if (!text) continue;
 
       const kTokens: KToken[] = tokenizer.tokenize(text);
-      const merged = mergeTokens(kTokens);
+      const merged = mergeTokens(kTokens, bookOverrides);
       allTokens[book.id][diff] = merged;
       console.log(`  ${book.id}/${diff}: ${kTokens.length} morphemes → ${merged.length} tokens`);
     }
@@ -362,15 +372,18 @@ export const bookTokens: Record<string, Record<string, BookToken[]>> = ${JSON.st
   console.log(`\nWritten to ${outputPath} (${(Buffer.byteLength(output) / 1024).toFixed(0)} KB)`);
   
   // Print some sample merged tokens for verification
-  const sample = allTokens['momotaro']['simplified'].slice(0, 30);
-  console.log('\nSample (momotaro/simplified first 30 tokens):');
-  for (const t of sample) {
-    const parts = [t.t];
-    if (t.r) parts.push(`[${t.r}]`);
-    if (t.b) parts.push(`→${t.b}`);
-    if (t.p) parts.push(`(${t.p})`);
-    if (!t.j) parts.push('(punct)');
-    console.log('  ' + parts.join(' '));
+  const firstBook = books[0];
+  if (firstBook) {
+    const sample = allTokens[firstBook.id]?.[Object.keys(allTokens[firstBook.id])[0] as Difficulty]?.slice(0, 20) ?? [];
+    console.log(`\nSample (${firstBook.id} first 20 tokens):`);
+    for (const t of sample) {
+      const parts = [t.t];
+      if (t.r) parts.push(`[${t.r}]`);
+      if (t.b) parts.push(`→${t.b}`);
+      if (t.p) parts.push(`(${t.p})`);
+      if (!t.j) parts.push('(punct)');
+      console.log('  ' + parts.join(' '));
+    }
   }
 }
 
