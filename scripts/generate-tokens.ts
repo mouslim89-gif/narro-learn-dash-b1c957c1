@@ -272,25 +272,36 @@ function mergeTokens(kTokens: KToken[], bookOverrides: Record<string, string> = 
   }
 
   // Post-process: merge known compound words that Kuromoji splits incorrectly
-  return postMergeCompounds(result);
+  return postMergeCompounds(result, bookOverrides);
 }
 
 /** Merge adjacent tokens that form known compound words */
-function postMergeCompounds(tokens: OutputToken[]): OutputToken[] {
-  const COMPOUNDS: Record<string, { reading: string; pos: string }> = {
+function postMergeCompounds(
+  tokens: OutputToken[],
+  bookOverrides: Record<string, string> = {},
+): OutputToken[] {
+  const BASE_COMPOUNDS: Record<string, { reading: string; pos: string }> = {
     'きび団子': { reading: 'きびだんご', pos: '名詞/一般' },
   };
+  // Any multi-char override is also a candidate compound (covers 犍陀多, 蓮池, etc.
+  // that Kuromoji splits because the kanji/word is rare).
+  const compounds: Record<string, { reading: string; pos: string }> = { ...BASE_COMPOUNDS };
+  for (const [surface, reading] of Object.entries(bookOverrides)) {
+    if (surface.length >= 2 && !compounds[surface]) {
+      compounds[surface] = { reading, pos: '名詞/一般' };
+    }
+  }
 
   const result: OutputToken[] = [];
   let i = 0;
   while (i < tokens.length) {
     let merged = false;
-    // Try merging 2-3 consecutive tokens
-    for (let len = 3; len >= 2; len--) {
+    // Try merging up to 5 consecutive tokens (longest match wins)
+    for (let len = 5; len >= 2; len--) {
       if (i + len > tokens.length) continue;
       const combined = tokens.slice(i, i + len).map(t => t.t).join('');
-      if (COMPOUNDS[combined]) {
-        const { reading, pos } = COMPOUNDS[combined];
+      if (compounds[combined]) {
+        const { reading, pos } = compounds[combined];
         result.push({ t: combined, j: true, r: reading, p: pos });
         i += len;
         merged = true;
