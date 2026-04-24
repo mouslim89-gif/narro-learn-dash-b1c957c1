@@ -188,4 +188,16 @@ export const books: Book[] = [
     content: konbiniCh1.content, // Fallback content = chapter 1
     chapters: konbiniChapters,
   },
+  {
+    id: 'kumo-no-ito',
+    titleJp: '蜘蛛の糸',
+    titleEn: 'The Spider\u2019s Thread',
+    author: 'Akutagawa Ryūnosuke',
+    genre: 'fiction',
+    jlptLevel: 'N2',
+    coverColor: '#6B4F8F',
+    readingTimeMin: 10,
+    synopsis: "A Buddhist parable by Akutagawa. One morning in paradise, the Buddha lowers a single spider's thread into hell to save Kandata, a murderer who once spared the life of a spider. As Kandata climbs, other sinners follow him up the thread — and his reaction decides his fate. A short, luminous meditation on selfishness and compassion.",
+    content: { simplified: kumoSimplified, intermediate: kumoIntermediate, original: kumoOriginal },
+  },
 ];
