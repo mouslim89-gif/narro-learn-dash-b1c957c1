@@ -164,8 +164,8 @@ function mergeTokens(kTokens: KToken[], bookOverrides: Record<string, string> = 
 
     // Content word (independent) → start a group, merge following dependents
     if (isContentWord(kt) && isIndependent(kt)) {
-      // Apply reading overrides for known Kuromoji mistakes
-      const overrideReading = READING_OVERRIDES[kt.surface_form];
+      // Apply reading overrides for known Kuromoji mistakes (book-specific takes priority)
+      const overrideReading = bookOverrides[kt.surface_form] ?? READING_OVERRIDES[kt.surface_form];
       let text = kt.surface_form;
       let reading = overrideReading
         ? katakanaToHiragana(overrideReading)
