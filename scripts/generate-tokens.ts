@@ -6,40 +6,35 @@ import kuromoji from 'kuromoji';
 import * as path from 'path';
 import * as fs from 'fs';
 import { bookReadingOverrides } from '../src/data/book-reading-overrides';
+import { books, hasChapters, chapterKey } from '../src/data/books';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const booksPath = path.resolve(__dirname, '../src/data/books.ts');
-const booksSource = fs.readFileSync(booksPath, 'utf-8');
 
 type Difficulty = 'simplified' | 'intermediate' | 'original';
 
 interface BookContent {
+  /** Key used in bookTokens map. For chaptered books, one entry per chapter. */
   id: string;
   content: Record<Difficulty, string>;
 }
 
+/** Flatten books + chapters into the (key, content-per-difficulty) form the tokenizer loop consumes. */
 function extractBookContents(): BookContent[] {
-  const books: BookContent[] = [];
-  const varPattern = /const\s+(\w+)\s*=\s*`([^`]*)`/g;
-  const vars: Record<string, string> = {};
-  let match;
-  while ((match = varPattern.exec(booksSource)) !== null) {
-    vars[match[1]] = match[2];
-  }
-  const bookPattern = /id:\s*'([^']+)'[\s\S]*?content:\s*\{\s*simplified:\s*(\w+)\s*,\s*intermediate:\s*(\w+)\s*,\s*original:\s*(\w+)\s*\}/g;
-  while ((match = bookPattern.exec(booksSource)) !== null) {
-    const [, id, simpVar, intVar, origVar] = match;
-    books.push({
-      id,
-      content: {
-        simplified: vars[simpVar] || '',
-        intermediate: vars[intVar] || '',
-        original: vars[origVar] || '',
+  const out: BookContent[] = [];
+  for (const book of books) {
+    if (hasChapters(book)) {
+      // Also emit book-level fallback content so lookups without a chapterId still work.
+      out.push({ id: book.id, content: book.content });
+      for (const ch of book.chapters!) {
+        out.push({ id: chapterKey(book.id, ch.id), content: ch.content });
       }
-    });
+    } else {
+      out.push({ id: book.id, content: book.content });
+    }
   }
-  return books;
+  return out;
 }
+
 
 interface KToken {
   surface_form: string;
