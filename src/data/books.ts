@@ -1,4 +1,5 @@
 import { konbiniChapters } from './books/konbini-ningen';
+import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
