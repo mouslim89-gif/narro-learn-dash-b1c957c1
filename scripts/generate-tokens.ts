@@ -322,7 +322,9 @@ async function main() {
 
   for (const book of books) {
     allTokens[book.id] = {};
-    const bookOverrides = bookReadingOverrides[book.id] ?? {};
+    // For chapter keys (bookId__chapterId) strip the suffix to reuse book-level overrides.
+    const rootId = book.id.split('__')[0];
+    const bookOverrides = bookReadingOverrides[rootId] ?? {};
     for (const diff of ['simplified', 'intermediate', 'original'] as Difficulty[]) {
       const text = book.content[diff];
       if (!text) continue;
