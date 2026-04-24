@@ -136,7 +136,7 @@ function isPunctuation(kt: KToken): boolean {
  * - Regular particles (は、が、を...) stay standalone
  * - Punctuation stays standalone
  */
-function mergeTokens(kTokens: KToken[]): OutputToken[] {
+function mergeTokens(kTokens: KToken[], bookOverrides: Record<string, string> = {}): OutputToken[] {
   const result: OutputToken[] = [];
   let i = 0;
 
