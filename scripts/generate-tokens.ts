@@ -327,12 +327,13 @@ async function main() {
 
   for (const book of books) {
     allTokens[book.id] = {};
+    const bookOverrides = bookReadingOverrides[book.id] ?? {};
     for (const diff of ['simplified', 'intermediate', 'original'] as Difficulty[]) {
       const text = book.content[diff];
       if (!text) continue;
 
       const kTokens: KToken[] = tokenizer.tokenize(text);
-      const merged = mergeTokens(kTokens);
+      const merged = mergeTokens(kTokens, bookOverrides);
       allTokens[book.id][diff] = merged;
       console.log(`  ${book.id}/${diff}: ${kTokens.length} morphemes → ${merged.length} tokens`);
     }
