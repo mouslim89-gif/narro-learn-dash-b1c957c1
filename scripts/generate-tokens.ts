@@ -361,15 +361,18 @@ export const bookTokens: Record<string, Record<string, BookToken[]>> = ${JSON.st
   console.log(`\nWritten to ${outputPath} (${(Buffer.byteLength(output) / 1024).toFixed(0)} KB)`);
   
   // Print some sample merged tokens for verification
-  const sample = allTokens['momotaro']['simplified'].slice(0, 30);
-  console.log('\nSample (momotaro/simplified first 30 tokens):');
-  for (const t of sample) {
-    const parts = [t.t];
-    if (t.r) parts.push(`[${t.r}]`);
-    if (t.b) parts.push(`→${t.b}`);
-    if (t.p) parts.push(`(${t.p})`);
-    if (!t.j) parts.push('(punct)');
-    console.log('  ' + parts.join(' '));
+  const firstBook = books[0];
+  if (firstBook) {
+    const sample = allTokens[firstBook.id]?.[Object.keys(allTokens[firstBook.id])[0] as Difficulty]?.slice(0, 20) ?? [];
+    console.log(`\nSample (${firstBook.id} first 20 tokens):`);
+    for (const t of sample) {
+      const parts = [t.t];
+      if (t.r) parts.push(`[${t.r}]`);
+      if (t.b) parts.push(`→${t.b}`);
+      if (t.p) parts.push(`(${t.p})`);
+      if (!t.j) parts.push('(punct)');
+      console.log('  ' + parts.join(' '));
+    }
   }
 }
 
