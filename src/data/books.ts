@@ -2,6 +2,7 @@ import { konbiniChapters } from './books/konbini-ningen';
 import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
 import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
+import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -225,5 +226,17 @@ export const books: Book[] = [
     readingTimeMin: 25,
     synopsis: "Melos, a simple shepherd, is condemned to death after attempting to kill a paranoid tyrant. Granted three days to attend his sister's wedding, he leaves his best friend behind as hostage — and must race back through floods, bandits, and his own despair to save him. Dazai's celebrated tale of friendship, trust, and the impossible weight of a promise.",
     content: { simplified: merosuSimplified, intermediate: merosuIntermediate, original: merosuOriginal },
+  },
+  {
+    id: 'lemon',
+    titleJp: '檸檬',
+    titleEn: 'Lemon',
+    author: 'Kajii Motojirō',
+    genre: 'fiction',
+    jlptLevel: 'N2',
+    coverColor: '#E8C547',
+    readingTimeMin: 12,
+    synopsis: "A young man weighed down by illness, debt, and an unnameable malaise wanders the back streets of Kyoto. A single lemon at a fruit stand transfigures his mood — and at the Maruzen bookstore, he leaves it perched atop a tower of art books, imagining it as a bright yellow bomb. Kajii's luminous Taishō-era prose poem on beauty, melancholy, and small acts of mischief.",
+    content: { simplified: lemonSimplified, intermediate: lemonIntermediate, original: lemonOriginal },
   },
 ];
