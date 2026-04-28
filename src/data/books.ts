@@ -1,6 +1,7 @@
 import { konbiniChapters } from './books/konbini-ningen';
 import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
+import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -212,5 +213,17 @@ export const books: Book[] = [
     readingTimeMin: 12,
     synopsis: "A masterless servant takes shelter from the rain under the crumbling Rashōmon gate, debating whether to starve or turn to crime. Climbing into the tower among the abandoned dead, he confronts an old woman pulling hair from a corpse — and what she says will tip his decision. Akutagawa's celebrated study of survival, morality, and the thin line between victim and villain.",
     content: { simplified: rashomonSimplified, intermediate: rashomonIntermediate, original: rashomonOriginal },
+  },
+  {
+    id: 'hashire-merosu',
+    titleJp: '走れメロス',
+    titleEn: 'Run, Melos!',
+    author: 'Dazai Osamu',
+    genre: 'fiction',
+    jlptLevel: 'N2',
+    coverColor: '#C8956D',
+    readingTimeMin: 25,
+    synopsis: "Melos, a simple shepherd, is condemned to death after attempting to kill a paranoid tyrant. Granted three days to attend his sister's wedding, he leaves his best friend behind as hostage — and must race back through floods, bandits, and his own despair to save him. Dazai's celebrated tale of friendship, trust, and the impossible weight of a promise.",
+    content: { simplified: merosuSimplified, intermediate: merosuIntermediate, original: merosuOriginal },
   },
 ];
