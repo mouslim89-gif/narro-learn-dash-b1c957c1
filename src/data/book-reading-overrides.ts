@@ -188,7 +188,7 @@ export const bookReadingOverrides: Record<string, Record<string, string>> = {
     '半行程': 'はんこうてい',
     '災難': 'さいなん',
     '橋桁': 'はしげた',
-    '濁: 'にご',
+    '濁流': 'だくりゅう',
     '船頭': 'せんどう',
     '誠実': 'せいじつ',
     '対岸': 'たいがん',
