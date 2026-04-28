@@ -1,12 +1,12 @@
 /**
- * Generate grammar notes for "hashire-merosu" (3 difficulties) and merge
+ * Generate grammar notes for "lemon" (3 difficulties) and merge
  * into book-grammar.ts. Idempotent — re-run to refresh.
  *
- * Run: npx tsx scripts/generate-grammar-for-merosu.ts
+ * Run: npx tsx scripts/generate-grammar-for-lemon.ts
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { merosuSimplified, merosuIntermediate, merosuOriginal } from '../src/data/books/hashire-merosu';
+import { lemonSimplified, lemonIntermediate, lemonOriginal } from '../src/data/books/lemon';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -22,9 +22,9 @@ const SUPABASE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('Missing Supabase env vars');
 
 const versions = {
-  simplified: merosuSimplified,
-  intermediate: merosuIntermediate,
-  original: merosuOriginal,
+  simplified: lemonSimplified,
+  intermediate: lemonIntermediate,
+  original: lemonOriginal,
 };
 
 interface GrammarNote {
@@ -56,7 +56,7 @@ async function fetchGrammar(text: string): Promise<GrammarNote[]> {
 async function main() {
   const result: Record<string, GrammarNote[]> = {};
   for (const diff of ['simplified', 'intermediate', 'original'] as const) {
-    console.log(`Fetching grammar for hashire-merosu/${diff} (${versions[diff].length} chars)...`);
+    console.log(`Fetching grammar for lemon/${diff} (${versions[diff].length} chars)...`);
     const notes = await fetchGrammar(versions[diff]);
     console.log(`  → ${notes.length} notes`);
     result[diff] = notes;
@@ -70,7 +70,7 @@ async function main() {
   const jsonStr = grammarSrc.slice(startIdx, endIdx);
   const allGrammar: Record<string, Record<string, GrammarNote[]>> = JSON.parse(jsonStr);
 
-  allGrammar['hashire-merosu'] = result;
+  allGrammar['lemon'] = result;
 
   const output = `// Auto-generated grammar notes for all books
 // Do not edit manually - regenerate with scripts/generate-book-data
