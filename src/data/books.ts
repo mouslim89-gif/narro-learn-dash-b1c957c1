@@ -1,5 +1,6 @@
 import { konbiniChapters } from './books/konbini-ningen';
 import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
+import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -199,5 +200,17 @@ export const books: Book[] = [
     readingTimeMin: 10,
     synopsis: "A Buddhist parable by Akutagawa. One morning in paradise, the Buddha lowers a single spider's thread into hell to save Kandata, a murderer who once spared the life of a spider. As Kandata climbs, other sinners follow him up the thread — and his reaction decides his fate. A short, luminous meditation on selfishness and compassion.",
     content: { simplified: kumoSimplified, intermediate: kumoIntermediate, original: kumoOriginal },
+  },
+  {
+    id: 'rashomon',
+    titleJp: '羅生門',
+    titleEn: 'Rashōmon',
+    author: 'Akutagawa Ryūnosuke',
+    genre: 'fiction',
+    jlptLevel: 'N1',
+    coverColor: '#8B2E2E',
+    readingTimeMin: 12,
+    synopsis: "A masterless servant takes shelter from the rain under the crumbling Rashōmon gate, debating whether to starve or turn to crime. Climbing into the tower among the abandoned dead, he confronts an old woman pulling hair from a corpse — and what she says will tip his decision. Akutagawa's celebrated study of survival, morality, and the thin line between victim and villain.",
+    content: { simplified: rashomonSimplified, intermediate: rashomonIntermediate, original: rashomonOriginal },
   },
 ];
