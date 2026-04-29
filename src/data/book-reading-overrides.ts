@@ -588,7 +588,6 @@ export const bookReadingOverrides: Record<string, Record<string, string>> = {
     '時分': 'じぶん',
     '毎朝': 'まいあさ',
     '年中': 'ねんじゅう',
-    '途中': 'とちゅう',
     '鬼子': 'おにご',
     '留守': 'るす',
     '目撃': 'もくげき',
