@@ -4,6 +4,7 @@ import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './bo
 import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
 import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon';
 import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
+import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -251,5 +252,17 @@ export const books: Book[] = [
     readingTimeMin: 10,
     synopsis: "Zenchi Naigu, an aging monk, is tormented by his absurdly long nose — fifteen centimeters of dangling sausage that hangs past his chin. Trying every remedy he can find, he finally succeeds in shrinking it. But the relief he expected turns into something stranger: those who once pitied him now openly laugh. Akutagawa's wry, compassionate parable on vanity, pity, and the secret cruelty of human kindness.",
     content: { simplified: hanaSimplified, intermediate: hanaIntermediate, original: hanaOriginal },
+  },
+  {
+    id: 'matsu',
+    titleJp: '待つ',
+    titleEn: 'Waiting',
+    author: 'Dazai Osamu',
+    genre: 'fiction',
+    jlptLevel: 'N4',
+    coverColor: '#7A9BB8',
+    readingTimeMin: 6,
+    synopsis: "Every day, a twenty-year-old woman walks from the market to a small train station. She buys a ticket, sits on a cold bench, and waits. She doesn't know who she is waiting for — not a husband, not a lover, not a friend — only that she cannot stop. Dazai's brief, haunting wartime monologue on longing, loneliness, and the shape of an unnamed hope.",
+    content: { simplified: matsuSimplified, intermediate: matsuIntermediate, original: matsuOriginal },
   },
 ];
