@@ -6,6 +6,7 @@ import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon
 import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
+import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -277,5 +278,17 @@ export const books: Book[] = [
     readingTimeMin: 11,
     synopsis: "After a night of heavy drinking, Dazai's narrator collapses in the room of a young woman about to be married — not his lover, just someone he's promised her mother to look after. As a candle burns down in the darkness during a power cut, he counts the minutes between his desire and the dawn, hoping one of them will give out before the other. A short, wry, painfully honest sketch of weakness, restraint, and the saving grace of morning light.",
     content: { simplified: asaSimplified, intermediate: asaIntermediate, original: asaOriginal },
+  },
+  {
+    id: 'gyofukuki',
+    titleJp: '魚服記',
+    titleEn: 'The Fish Tale',
+    author: 'Dazai Osamu',
+    genre: 'fiction',
+    jlptLevel: 'N3',
+    coverColor: '#5B7B8C',
+    readingTimeMin: 10,
+    synopsis: "Deep in a northern mountain, thirteen-year-old Suwa lives alone with her charcoal-burning father by a roaring waterfall. After a winter night when her drunken father becomes something monstrous, she flees into the blizzard and throws herself into the freezing pool — only to wake transformed, weightless, and finally free. Dazai's earliest masterpiece: a brutal folk tale that slips quietly into the miraculous.",
+    content: { simplified: gyofukukiSimplified, intermediate: gyofukukiIntermediate, original: gyofukukiOriginal },
   },
 ];
