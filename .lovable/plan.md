@@ -1,57 +1,61 @@
-## Ajouter le livre 朝 (Asa / Morning) — Dazai Osamu
+## Ajouter le livre 魚服記 (Gyofukuki) — Dazai Osamu
 
-Court récit autobiographique de Dazai : le narrateur, ivre, passe la nuit dans la chambre d'une jeune femme (Kiku-chan), fiancée à un autre. Une bougie qui se consume devient la mesure de sa résistance — jusqu'à ce que l'aube arrive juste à temps. Mélange typique de Dazai : autodérision, ironie, tension morale, finale en suspens.
+Court récit de Dazai (1933) : Suwa, jeune fille de 13 ans qui vit seule avec son père charbonnier dans la montagne, tient une petite boutique près d'une cascade. Une nuit d'hiver, son père ivre la menace ; elle s'enfuit dans la tempête de neige et se jette dans la cascade. Elle se réveille transformée en petit poisson (funa), libre, débarrassée de la mémoire humaine. Conte lyrique, sombre, tournant vers le merveilleux.
 
 ### Métadonnées proposées
-- **id**: `asa`
-- **titleJp**: 朝
-- **titleEn**: Morning
+
+- **id**: `gyofukuki`
+- **titleJp**: 魚服記
+- **titleEn**: The Fish Tale
 - **author**: Dazai Osamu
 - **genre**: fiction
-- **jlptLevel**: **N3** (intermediate ~3500 chars, vocabulaire et grammaire plus riches que 待つ N4 — proche de 鼻 / Hashire Merosu)
-- **coverColor**: `#E8A87C` (orange pâle aurore — distinct des autres Dazai : `#B85C2A` ア,秋 / `#C8956D` メロス / `#7A9BB8` 待つ)
-- **readingTimeMin**: 11 (~3500 chars intermediate ÷ ~320 chars/min)
-- **synopsis** (proposition) : "After a night of heavy drinking, Dazai's narrator collapses in the room of a young woman about to be married — not his lover, just someone he's promised her mother to look after. As a candle burns down in the darkness during a power cut, he counts the minutes between his desire and the dawn, hoping one of them will give out before the other. A short, wry, painfully honest sketch of weakness, restraint, and the saving grace of morning light."
+- **jlptLevel**: **N3** — l'intermediate contient clairement du N3 (轟音, 絶望, 抵抗, 振り絞る, 〜まつわる, 〜たびに, ひどく…), le beginner reste accessible. Cohérent avec asa et hana.
+- **coverColor proposition**: `#5B7B8C` (bleu-gris cascade froide) — distinct des autres Dazai (#B85C2A 秋, #C8956D メロス, #7A9BB8 待つ, #E8A87C 朝).
+- **readingTimeMin**: 10 (~2900 chars intermediate ÷ ~290 chars/min, légèrement plus lent que asa car registre plus narratif/descriptif).
+- **synopsis (proposition a)**: "Deep in a northern mountain, thirteen-year-old Suwa lives alone with her charcoal-burning father by a roaring waterfall. After a winter night when her drunken father becomes something monstrous, she flees into the blizzard and throws herself into the freezing pool — only to wake transformed, weightless, and finally free. Dazai's earliest masterpiece: a brutal folk tale that slips quietly into the miraculous."
 - **audio**: aucun pour l'instant.
 
 ### Sources
-- **Beginner**: `user-uploads://asa_beg.json` — déjà propre (parenthèses explicatives type `（日本の温かいテーブル）`, `（電気が止まること）` à **stripper** au passage pour rester cohérent avec hana/matsu).
-- **Intermediate**: `user-uploads://asa_inter.json` — quasi propre (une seule parenthèse furigana `足袋（たび）` à stripper).
-- **Original**: à fetcher depuis Aozora Bunko (Dazai, 朝 — carte 1565, fichier `1565_8393.html` à confirmer), puis pipeline standard : strip `<ruby>`/`《…》`, `［＃…］`, `｜`, normalisation espaces.
+
+- **Beginner**: `user-uploads://gyofuki_beg.json` — propre, parenthèses furigana à stripper (`馬禿山（まはげやま）`, `炭（すみ）`, `滑り（すべり）`, etc.).
+- **Intermediate**: `user-uploads://gyofuki_inter.json` — propre, mêmes parenthèses furigana à stripper (`羊歯（しだ）`, `滝壺（たきつぼ）`, `籠（かご）`, `獣（けもの）`, `阿呆（あほう）`, `轟音（ごうおん）`, `蛇（へび）`).
+- **Original**: à fetcher depuis Aozora Bunko (Dazai 太宰治, 魚服記 — carte 263, fichier `1572_15904.html` à confirmer), puis pipeline standard : strip `<ruby>`/`《…》`, `［＃…］`, `｜`, normalisation espaces.
 
 ### Étapes
 
-1. **Créer `src/data/books/asa.ts`** avec `asaSimplified`, `asaIntermediate`, `asaOriginal`. Stripper toutes les parenthèses explicatives/furigana sur les 3 niveaux.
-2. **Étendre `src/data/book-reading-overrides.ts`** — bloc `'asa'` pour les lectures non triviales du texte original. Liste préliminaire (à finaliser après lecture Aozora) :
-   - `足袋: たび`, `提灯: ちょうちん`, `蝋燭/ろうそく: ろうそく`, `炎: ほのお`, `酔: よ`, `頬: ほお`, `本箱: ほんばこ`, `階段: かいだん`, `貴婦人: きふじん`, `奥方: おくがた`, `編集者: へんしゅうしゃ`, `日本橋: にほんばし`, `仰向け: あおむけ`, `直角: ちょっかく`, `馴染み: なじみ`, `小料理屋: こりょうりや`, `停電: ていでん`, `本職: ほんしょく`, `原稿: げんこう`.
-3. **Enregistrer dans `src/data/books.ts`** : import + entrée `Book` après `matsu`.
+1. **Créer `src/data/books/gyofukuki.ts**` avec `gyofukukiSimplified`, `gyofukukiIntermediate`, `gyofukukiOriginal`. Stripper toutes les parenthèses furigana sur les 3 niveaux.
+2. **Étendre `src/data/book-reading-overrides.ts**` — bloc `'gyofukuki'`. Liste préliminaire :
+  - `馬禿山: まはげやま`, `滝: たき`, `滝壺: たきつぼ`, `炭: すみ`, `炭焼き: すみやき`, `蛇: へび`, `羊歯: しだ`, `籠: かご`, `獣: けもの`, `阿呆: あほう`, `轟音: ごうおん`, `崖: がけ`, `麓: ふもと`, `紅葉: こうよう`, `駄菓子: だがし`, `塩せんべい: しおせんべい`, `鏡: かがみ`, `髪飾り: かみかざり`, `木枯らし: こがらし`, `吹雪: ふぶき`, `絶望: ぜつぼう`, `抵抗: ていこう`, `振り絞る: ふりしぼる`, `濁る: にごる`, `突き飛ばす: つきとばす`, `身を投げる: みをなげる`, `フナ: ふな`, `腐った: くさった`, `初秋: しょしゅう`, `店番: みせばん`, `小屋: こや`.
+3. **Enregistrer dans `src/data/books.ts**` : import + entrée `Book` après `asa`.
 4. **Régénérer tokens** : `bunx tsx scripts/generate-tokens.ts`.
-5. **Créer `scripts/generate-grammar-for-asa.ts`** (copie de `generate-grammar-for-matsu.ts`) puis exécuter — ~7 notes par niveau. Cibles attendues : `〜ふりをする`, `〜てしまう`, `〜たまま`, `〜ように`, `〜ながら`, `〜うちに`, `〜ばかり`, `〜ものだ`, conditionnel `〜たら`, `〜ように思える`.
-6. **Précharger le dictionnaire** : `bunx tsx scripts/sync-dictionary-to-db.ts` (nouveaux mots : 旦那, 婿, 編集者, 停電, 蝋燭, 足袋, 仰向け, 覚悟, 大胆, 真っ暗, 黙る, etc.).
-7. **QA** sur `/reader/asa/{simplified,intermediate,original}` — pas de parenthèses résiduelles, furigana corrects (notamment 足袋 → たび et non そくたい), cover orange-aurore visible dans la Library, ~11 min de lecture cohérent.
+5. **Créer `scripts/generate-grammar-for-gyofukuki.ts**` (copie de `generate-grammar-for-asa.ts`) puis exécuter — ~7 notes par niveau. Cibles attendues : `〜ように言う`, `〜たびに`, `〜まつわる`, `〜ながら`, `〜てしまう`, `〜ようとする`, `〜まま`, `〜ように`, conditionnel `〜と` (changement automatique), `〜ているうちに`, passif `〜られる`.
+6. **Précharger le dictionnaire** : `bunx tsx scripts/sync-dictionary-to-db.ts`.
+7. **QA** sur `/reader/gyofukuki/{simplified,intermediate,original}` — pas de parenthèses résiduelles, furigana corrects (馬禿山 → まはげやま, 羊歯 → しだ, フナ visible), cover bleu-gris distinct dans la Library, ~10 min cohérent.
 
 ### Fichiers
-- créer `src/data/books/asa.ts`
-- créer `scripts/generate-grammar-for-asa.ts`
+
+- créer `src/data/books/gyofukuki.ts`
+- créer `scripts/generate-grammar-for-gyofukuki.ts`
 - éditer `src/data/books.ts`, `src/data/book-reading-overrides.ts`, `.lovable/plan.md`
-- édités automatiquement : `src/data/book-tokens.ts`, `src/data/book-grammar.ts`
+- édités auto : `src/data/book-tokens.ts`, `src/data/book-grammar.ts`
 
 ### Hors scope
-- Audio MP3 (à ajouter plus tard).
+
+- Audio MP3.
+- Adaptation simplified additionnelle (on prend le beginner JSON tel quel après strip).
 
 ### Points à confirmer (sinon je pars sur les valeurs ci-dessus)
 
 1. **JLPT N3** OK ? Alternatives :
-   - **N4** si tu juges le beginner suffisamment accessible (mais l'intermediate a clairement du N3 : 〜ものだ、せせら〜、覚悟を決める…).
-   - **N2** si tu veux refléter la difficulté de l'**original** (Dazai original = registre littéraire des années 40).
-
-2. **Couleur `#E8A87C`** (orange pâle aurore) OK ? Variations :
-   - `#F4C28C` plus pâle/doré (lumière du matin).
-   - `#D98859` plus chaud/saturé (soleil levant).
-   - `#A8B5A0` vert-gris pâle (aube froide, contraste avec la nuit ivre du récit).
-
-3. **Reading time 11 min** OK ? Alternatives : 9 min (lecteur rapide) ou 13 min (avec popups dico).
-
-4. **Synopsis EN** ci-dessus OK, ou tu préfères :
-   - (b) plus court/sec : "Dazai, drunk, spends the night in the room of a young woman engaged to another man. A candle, a power cut, and the slow race between his weakness and the dawn."
-   - (c) plus poétique : "A candle, a sleeping woman, and a man fighting himself in the dark — until morning quietly arrives and saves them both."
+  - **N4** si tu veux refléter le beginner (mais l'intermediate est franchement N3).
+  - **N2** pour refléter l'original Aozora (Dazai 1933, registre littéraire).
+2. **Couleur `#5B7B8C**` (bleu-gris cascade froide) OK ? Variations :
+  - `#3D5A6C` plus sombre/profond (eau du滝壺 nocturne).
+  - `#8FA8B5` plus pâle (brume de cascade).
+  - `#6B8E5A` vert-mousse (羊歯 / forêt automnale).
+  - `#A8443A` rouge sombre (violence de la nuit, contraste fort avec les autres Dazai).
+3. **Reading time 10 min** OK ? Alternatives : 8 min ou 12 min.
+4. **Title EN** : "The Fish Tale" (court, joli) — alternatives : "Metamorphosis into a Fish" (littéral), "Fish Story" (sec), ou laisser juste `Gyofukuki` en romaji.
+5. **Synopsis EN** ci-dessus OK, ou tu préfères :
+  - (b) plus court : "Suwa, thirteen, lives by a thundering waterfall with her charcoal-burner father. One winter night his violence drives her into the snow — and into the freezing pool, where the story quietly turns into something else entirely."
+  - (c) plus factuel : "Early Dazai folk tale: a young mountain girl, her drunken father, and a winter night that ends in a leap into a waterfall — and a strange, gentle transformation."
