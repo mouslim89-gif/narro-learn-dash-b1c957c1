@@ -1,44 +1,57 @@
-## Ajouter le livre 待つ (Matsu / Waiting) — Dazai Osamu
+## Ajouter le livre 朝 (Asa / Morning) — Dazai Osamu
 
-Court texte de Dazai (~1942), monologue d'une jeune femme qui attend chaque jour sur le banc d'une gare sans savoir qui ou quoi.
+Court récit autobiographique de Dazai : le narrateur, ivre, passe la nuit dans la chambre d'une jeune femme (Kiku-chan), fiancée à un autre. Une bougie qui se consume devient la mesure de sa résistance — jusqu'à ce que l'aube arrive juste à temps. Mélange typique de Dazai : autodérision, ironie, tension morale, finale en suspens.
 
 ### Métadonnées proposées
-- **id**: `matsu`
-- **titleJp**: 待つ
-- **titleEn**: Waiting
+- **id**: `asa`
+- **titleJp**: 朝
+- **titleEn**: Morning
 - **author**: Dazai Osamu
 - **genre**: fiction
-- **jlptLevel**: N4 (texte court, grammaire accessible — plus simple que A,秋 / Hashire Merosu)
-- **coverColor**: `#7A9BB8` (bleu-gris ferroviaire, ton mélancolique d'attente sur un quai — distinct des autres covers Dazai #B85C2A et #C8956D)
-- **readingTimeMin**: 6
-- **synopsis**: "Every day, a twenty-year-old woman walks from the market to a small train station. She buys a ticket, sits on a cold bench, and waits. She doesn't know who she is waiting for — not a husband, not a lover, not a friend — only that she cannot stop. Dazai's brief, haunting wartime monologue on longing, loneliness, and the shape of an unnamed hope."
-- **audio**: aucun pour l'instant
+- **jlptLevel**: **N3** (intermediate ~3500 chars, vocabulaire et grammaire plus riches que 待つ N4 — proche de 鼻 / Hashire Merosu)
+- **coverColor**: `#E8A87C` (orange pâle aurore — distinct des autres Dazai : `#B85C2A` ア,秋 / `#C8956D` メロス / `#7A9BB8` 待つ)
+- **readingTimeMin**: 11 (~3500 chars intermediate ÷ ~320 chars/min)
+- **synopsis** (proposition) : "After a night of heavy drinking, Dazai's narrator collapses in the room of a young woman about to be married — not his lover, just someone he's promised her mother to look after. As a candle burns down in the darkness during a power cut, he counts the minutes between his desire and the dawn, hoping one of them will give out before the other. A short, wry, painfully honest sketch of weakness, restraint, and the saving grace of morning light."
+- **audio**: aucun pour l'instant.
 
 ### Sources
-- **Beginner**: `user-uploads://matsu_beg.json` — déjà propre (aucune parenthèse furigana détectée).
-- **Intermediate**: `user-uploads://matsu_inter.json` — déjà propre.
-- **Original**: à fetcher depuis Aozora Bunko (Dazai, 待つ — carte 1572, fichier `1572_8407.html`), puis sanitiser : strip `<ruby>` / `《…》` furigana, `［＃…］` markers, `｜`, normalisation des espaces pleine largeur (même pipeline que `hana.ts` / `lemon.ts`).
+- **Beginner**: `user-uploads://asa_beg.json` — déjà propre (parenthèses explicatives type `（日本の温かいテーブル）`, `（電気が止まること）` à **stripper** au passage pour rester cohérent avec hana/matsu).
+- **Intermediate**: `user-uploads://asa_inter.json` — quasi propre (une seule parenthèse furigana `足袋（たび）` à stripper).
+- **Original**: à fetcher depuis Aozora Bunko (Dazai, 朝 — carte 1565, fichier `1565_8393.html` à confirmer), puis pipeline standard : strip `<ruby>`/`《…》`, `［＃…］`, `｜`, normalisation espaces.
 
 ### Étapes
 
-1. **Créer `src/data/books/matsu.ts`** avec exports `matsuSimplified`, `matsuIntermediate`, `matsuOriginal`.
-2. **Étendre `src/data/book-reading-overrides.ts`** — bloc `'matsu'` minimaliste (les JSON ne contiennent pas de furigana parenthésés). À ajouter selon le texte original : `籠 (かご)`, `濁 (にご)`, `炯眼` si présent, `身支度`, `提灯 (ちょうちん)`, `蘇芳`, `頬 (ほお)`, `膝 (ひざ)`, etc. — liste finalisée après lecture du texte Aozora.
-3. **Enregistrer dans `src/data/books.ts`** : import + entrée Book après `hana`.
+1. **Créer `src/data/books/asa.ts`** avec `asaSimplified`, `asaIntermediate`, `asaOriginal`. Stripper toutes les parenthèses explicatives/furigana sur les 3 niveaux.
+2. **Étendre `src/data/book-reading-overrides.ts`** — bloc `'asa'` pour les lectures non triviales du texte original. Liste préliminaire (à finaliser après lecture Aozora) :
+   - `足袋: たび`, `提灯: ちょうちん`, `蝋燭/ろうそく: ろうそく`, `炎: ほのお`, `酔: よ`, `頬: ほお`, `本箱: ほんばこ`, `階段: かいだん`, `貴婦人: きふじん`, `奥方: おくがた`, `編集者: へんしゅうしゃ`, `日本橋: にほんばし`, `仰向け: あおむけ`, `直角: ちょっかく`, `馴染み: なじみ`, `小料理屋: こりょうりや`, `停電: ていでん`, `本職: ほんしょく`, `原稿: げんこう`.
+3. **Enregistrer dans `src/data/books.ts`** : import + entrée `Book` après `matsu`.
 4. **Régénérer tokens** : `bunx tsx scripts/generate-tokens.ts`.
-5. **Créer `scripts/generate-grammar-for-matsu.ts`** (copie de `generate-grammar-for-hana.ts`) puis exécuter pour peupler `book-grammar.ts` (~6 notes par niveau).
-6. **Précharger le dictionnaire** : `bunx tsx scripts/sync-dictionary-to-db.ts` pour les nouveaux mots (待つ, 駅, 改札口, ベンチ, 切符, 戦争, 馬鹿げた, 息苦しい, etc.).
-7. **QA** sur `/reader/matsu/{simplified,intermediate,original}` — pas de markers Aozora résiduels, furigana correct, cover bleu-gris dans la Library, ~6 min de lecture cohérent.
+5. **Créer `scripts/generate-grammar-for-asa.ts`** (copie de `generate-grammar-for-matsu.ts`) puis exécuter — ~7 notes par niveau. Cibles attendues : `〜ふりをする`, `〜てしまう`, `〜たまま`, `〜ように`, `〜ながら`, `〜うちに`, `〜ばかり`, `〜ものだ`, conditionnel `〜たら`, `〜ように思える`.
+6. **Précharger le dictionnaire** : `bunx tsx scripts/sync-dictionary-to-db.ts` (nouveaux mots : 旦那, 婿, 編集者, 停電, 蝋燭, 足袋, 仰向け, 覚悟, 大胆, 真っ暗, 黙る, etc.).
+7. **QA** sur `/reader/asa/{simplified,intermediate,original}` — pas de parenthèses résiduelles, furigana corrects (notamment 足袋 → たび et non そくたい), cover orange-aurore visible dans la Library, ~11 min de lecture cohérent.
 
 ### Fichiers
-- créer `src/data/books/matsu.ts`
-- créer `scripts/generate-grammar-for-matsu.ts`
+- créer `src/data/books/asa.ts`
+- créer `scripts/generate-grammar-for-asa.ts`
 - éditer `src/data/books.ts`, `src/data/book-reading-overrides.ts`, `.lovable/plan.md`
 - édités automatiquement : `src/data/book-tokens.ts`, `src/data/book-grammar.ts`
 
 ### Hors scope
 - Audio MP3 (à ajouter plus tard).
 
-### Points à confirmer (optionnels — sinon je pars sur les valeurs ci-dessus)
-- **JLPT N4** OK ? (alternatives : N3 si tu veux aligner avec la grille « Akutagawa courts = N3 »).
-- **Couleur `#7A9BB8`** OK ? (alternatives : `#5C7A99` plus saturé ; `#9CAEC4` plus pâle ; `#B8A87A` sable doux).
-- **Reading time 6 min** ? (~1900 chars intermediate → 6 min à 300 chars/min).
+### Points à confirmer (sinon je pars sur les valeurs ci-dessus)
+
+1. **JLPT N3** OK ? Alternatives :
+   - **N4** si tu juges le beginner suffisamment accessible (mais l'intermediate a clairement du N3 : 〜ものだ、せせら〜、覚悟を決める…).
+   - **N2** si tu veux refléter la difficulté de l'**original** (Dazai original = registre littéraire des années 40).
+
+2. **Couleur `#E8A87C`** (orange pâle aurore) OK ? Variations :
+   - `#F4C28C` plus pâle/doré (lumière du matin).
+   - `#D98859` plus chaud/saturé (soleil levant).
+   - `#A8B5A0` vert-gris pâle (aube froide, contraste avec la nuit ivre du récit).
+
+3. **Reading time 11 min** OK ? Alternatives : 9 min (lecteur rapide) ou 13 min (avec popups dico).
+
+4. **Synopsis EN** ci-dessus OK, ou tu préfères :
+   - (b) plus court/sec : "Dazai, drunk, spends the night in the room of a young woman engaged to another man. A candle, a power cut, and the slow race between his weakness and the dawn."
+   - (c) plus poétique : "A candle, a sleeping woman, and a man fighting himself in the dark — until morning quietly arrives and saves them both."
