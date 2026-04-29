@@ -1,51 +1,59 @@
-## Replace Lemon (檸檬) — simplified & intermediate versions
+## Ajouter le livre 鼻 (Hana / The Nose) — Akutagawa Ryūnosuke
 
-The two uploaded files (`lemon_beg-2.json`, `lemon_inter-2.json`) replace the current beginner and intermediate texts of 梶井基次郎『檸檬』. The **original** version (Aozora) stays unchanged. Audio is out of scope (none provided).
+Nouveau livre N3, ~10 min de lecture, basé sur les 2 fichiers JSON uploadés (beginner + intermediate) + version originale Aozora Bunko.
 
-### What changes
-- The new texts are noticeably longer and richer than the current ones (the intermediate now has ~12 paragraphs, the beginner ~9), with more concrete scenes (八百卯, 寺町通り, 京極, 蓄音機, 南京玉, びいどろ, 画集棚, etc.).
-- They contain inline glosses in parentheses: `八百卯（やおう）`, `紡錘形（ぼうすいけい）`. Per the project convention (`.lovable/plan.md`), these must be **stripped from the displayed text** and the readings re-added via `book-reading-overrides.ts` so furigana still works.
+### Métadonnées
+- **id**: `hana`
+- **titleJp**: 鼻
+- **titleEn**: The Nose
+- **author**: Akutagawa Ryūnosuke
+- **genre**: fiction
+- **jlptLevel**: N3
+- **coverColor**: `#C97B5C` (terracotta doux, ton chair — clin d'œil au sujet, contraste avec les couvertures existantes)
+- **readingTimeMin**: 10
+- **synopsis**: "Zen-chi Naigu, an aging monk, is tormented by his absurdly long nose — fifteen centimeters of dangling sausage that hangs past his chin. Trying every remedy he can find, he finally succeeds in shrinking it. But the relief he expected turns into something stranger: those who once pitied him now openly laugh. Akutagawa's wry, compassionate parable on vanity, pity, and the secret cruelty of human kindness."
+- pas d'audio (sera ajouté plus tard)
 
-### Steps
+### Étapes
 
-1. **Update `src/data/books/lemon.ts`**
-   - Replace `lemonSimplified` with the `beginner.content` from `lemon_beg-2.json`, with all `（…）` and `(…)` removed.
-   - Replace `lemonIntermediate` with the `intermediate.content` from `lemon_inter-2.json`, same stripping.
-   - `lemonOriginal` stays as-is.
-   - Verify zero `（`, `(`, `※`, `｜` remain.
+1. **Créer `src/data/books/hana.ts`** avec 3 exports : `hanaSimplified`, `hanaIntermediate`, `hanaOriginal`.
+   - Beginner : contenu de `hana_beg.json`, parenthèses `（…）` strippées.
+   - Intermediate : contenu de `hana_inter.json`, parenthèses strippées.
+   - Original : texte Aozora Bunko (carte 42) de 芥川龍之介『鼻』, fetché avec `code--fetch_website` depuis `https://www.aozora.gr.jp/cards/000879/files/42_15228.html`, nettoyé (suppression des `《…》` furigana, `［…］` markers, `｜`, espaces pleine largeur en début de paragraphe préservés ou normalisés selon la convention des autres livres Akutagawa — vérifier `rashomon.ts`/`kumo-no-ito.ts`).
 
-2. **Extend `src/data/book-reading-overrides.ts`** (`'lemon'` block)
-   Add the new terms appearing in the new texts:
-   - `八百卯 やおう` (proper noun, fruit shop)
-   - `御池 おいけ` (street name, intermediate)
-   - `紡錘形 ぼうすいけい` (intermediate)
-   - `南京玉 なんきんだま`, `南京虫 なんきんむし` (intermediate)
-   - `琥珀色 こはくいろ` (intermediate)
-   - `肺結核 はいけっかく` (intermediate)
-   - `二日酔い ふつかよい` (the existing override is `二日酔`; add the variant)
-   - Keep all existing overrides.
+2. **Étendre `src/data/book-reading-overrides.ts`** — ajouter un bloc `'hana'` avec les lectures perdues lors du strip des parenthèses :
+   - `池の尾 いけのお`
+   - `禅智内供 ぜんちないぐ`
+   - `内供 ないぐ`
+   - `お粥 おかゆ`
+   - `弟子 でし`
+   - `毛抜き けぬき`
+   - `小坊主 こぼうず`
+   - autres termes détectés à la lecture du texte original (ex. `上唇`, `付け根`, `身支度`, `炎熱`).
 
-3. **Regenerate `src/data/book-tokens.ts`**
-   `bunx tsx scripts/generate-tokens.ts` (re-tokenizes all books; only lemon entries effectively change).
+3. **Enregistrer le livre dans `src/data/books.ts`** :
+   - import `{ hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';`
+   - ajouter l'entrée Book dans le tableau `books` (après `lemon`).
 
-4. **Regenerate grammar for lemon only**
-   `bunx tsx scripts/generate-grammar-for-lemon.ts` — the existing script already imports the three lemon strings from `src/data/books/lemon.ts`, so it picks up the new texts automatically. It merges into `src/data/book-grammar.ts` without touching other books.
+4. **Régénérer les tokens** : `bunx tsx scripts/generate-tokens.ts` (re-tokenise tous les livres ; seules les entrées hana changent).
 
-5. **Sync new vocabulary**
-   `bunx tsx scripts/sync-dictionary-to-db.ts` to fetch readings/definitions for any new words introduced (蓄音機, 紡錘形, 南京玉, 八百卯, 京極, 琥珀色, 痛快, 木っ端微塵, etc., to the extent they're not already cached) into `src/data/book-dictionary.ts`.
+5. **Créer `scripts/generate-grammar-for-hana.ts`** (copie de `generate-grammar-for-lemon.ts`, adapté pour hana) puis l'exécuter pour peupler `book-grammar.ts` avec ~6-7 notes par niveau.
 
-6. **QA on `/reader/lemon/{simplified,intermediate}`**
-   - No parentheses or Aozora markers visible.
-   - Furigana toggle shows correct readings on `八百卯`, `紡錘形`, `蓄音機`, `木っ端微塵`, `京極`, `琥珀色`.
-   - Reading-time estimate (12 min) is still reasonable; if the intermediate is now significantly longer I may bump it to ~15 min in `src/data/books.ts` — I'll check character count first and only bump if it crosses ~6000 chars.
+6. **Précharger le dictionnaire** : `bunx tsx scripts/sync-dictionary-to-db.ts` pour ajouter les nouveaux mots (鼻, 内供, 池の尾, 上唇, 付け根, 紡錘形, お粥, くしゃみ, 自尊心, 蘇芳, etc.) dans la table `dictionary` Supabase.
 
-### Files
-- edit `src/data/books/lemon.ts`
-- edit `src/data/book-reading-overrides.ts`
-- edit (auto-regenerated) `src/data/book-tokens.ts`, `src/data/book-grammar.ts`, `src/data/book-dictionary.ts`
-- possibly edit `src/data/books.ts` (only if reading-time bump is needed)
-- edit `.lovable/plan.md` (note the replacement)
+7. **QA sur `/reader/hana/{simplified,intermediate,original}`** :
+   - Aucune parenthèse `（…）` ni marker Aozora visible.
+   - Furigana correct sur 禅智内供, 池の尾, 上唇, 紡錘形, お粥.
+   - Cover orange-terracotta dans la Library.
+   - Reading time ~10 min cohérent (~3500 chars intermediate).
 
-### Out of scope
-- Audio (no MP3 provided).
-- Original version (unchanged).
+### Fichiers
+- créer `src/data/books/hana.ts`
+- créer `scripts/generate-grammar-for-hana.ts`
+- éditer `src/data/books.ts` (import + entrée Book)
+- éditer `src/data/book-reading-overrides.ts` (bloc hana)
+- édités automatiquement : `src/data/book-tokens.ts`, `src/data/book-grammar.ts`
+- éditer `.lovable/plan.md`
+
+### Hors scope
+- Audio MP3 (à ajouter plus tard — laisser `audio` non défini).
