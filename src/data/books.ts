@@ -5,6 +5,7 @@ import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/ha
 import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon';
 import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
+import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -264,5 +265,17 @@ export const books: Book[] = [
     readingTimeMin: 6,
     synopsis: "Every day, a twenty-year-old woman walks from the market to a small train station. She buys a ticket, sits on a cold bench, and waits. She doesn't know who she is waiting for — not a husband, not a lover, not a friend — only that she cannot stop. Dazai's brief, haunting wartime monologue on longing, loneliness, and the shape of an unnamed hope.",
     content: { simplified: matsuSimplified, intermediate: matsuIntermediate, original: matsuOriginal },
+  },
+  {
+    id: 'asa',
+    titleJp: '朝',
+    titleEn: 'Morning',
+    author: 'Dazai Osamu',
+    genre: 'fiction',
+    jlptLevel: 'N3',
+    coverColor: '#E8A87C',
+    readingTimeMin: 11,
+    synopsis: "After a night of heavy drinking, Dazai's narrator collapses in the room of a young woman about to be married — not his lover, just someone he's promised her mother to look after. As a candle burns down in the darkness during a power cut, he counts the minutes between his desire and the dawn, hoping one of them will give out before the other. A short, wry, painfully honest sketch of weakness, restraint, and the saving grace of morning light.",
+    content: { simplified: asaSimplified, intermediate: asaIntermediate, original: asaOriginal },
   },
 ];
