@@ -88,7 +88,7 @@ export default function Library() {
           {continueBook && (
             <section className="px-6 py-4">
               <Link to={`/reader/${continueBook.book.id}/${continueBook.progress.difficulty}`}>
-                <div className="card-refined elev-soft-hover relative overflow-hidden rounded-xl ring-1 ring-border/40 p-5 transition-all duration-200 active:scale-[0.99]">
+                <div className="card-refined card-lift relative overflow-hidden rounded-xl ring-1 ring-border/40 p-5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Continue Reading</p>
                   <div className="flex items-center gap-4">
                     <div
@@ -118,7 +118,7 @@ export default function Library() {
           {/* Featured */}
           <section className="px-6 py-4">
             <Link to={`/book/${featured.id}`}>
-              <div className="card-refined elev-soft-hover relative overflow-hidden rounded-xl ring-1 ring-border/40 p-6 transition-all duration-200 active:scale-[0.99]">
+              <div className="card-refined card-lift relative overflow-hidden rounded-xl ring-1 ring-border/40 p-6">
                 <div className="flex items-start gap-5">
                   <div
                     className="book-paper relative flex h-32 w-24 flex-shrink-0 items-end overflow-hidden rounded p-3 shadow-md"
@@ -161,7 +161,7 @@ export default function Library() {
                   <span className="section-bullet" />
                   {genreLabels[genre]}
                 </h3>
-                <div className="mt-3 flex gap-4 overflow-x-auto px-6 pb-2 scrollbar-none">
+                <div className="stagger-children mt-3 flex gap-4 overflow-x-auto px-6 pb-2 scrollbar-none">
                   {genreBooks.map((book) => (
                     <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
                   ))}
