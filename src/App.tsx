@@ -25,10 +25,13 @@ import ResetPassword from "./pages/ResetPassword";
 const queryClient = new QueryClient();
 
 const pageVariants = {
-  initial: { opacity: 0, y: 8 },
+  initial: { opacity: 0, y: 6 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 },
+  exit: { opacity: 0, y: -4 },
 };
+
+// Apple-like spring easing (matches --ease-out-soft in index.css)
+const pageTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
 
 function DarkModeSync() {
   const darkMode = useReadingProgressStore((s) => s.darkMode);
@@ -58,7 +61,7 @@ function AnimatedRoutes() {
           initial="initial"
           animate="animate"
           exit="exit"
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          transition={pageTransition}
         >
           <Routes location={location}>
             <Route path="/auth" element={<Auth />} />
