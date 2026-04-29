@@ -7,6 +7,7 @@ import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
 import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
+import { sakuraSimplified, sakuraIntermediate, sakuraOriginal } from './books/sakura';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -290,5 +291,17 @@ export const books: Book[] = [
     readingTimeMin: 10,
     synopsis: "Deep in a northern mountain, thirteen-year-old Suwa lives alone with her charcoal-burning father by a roaring waterfall. After a winter night when her drunken father becomes something monstrous, she flees into the blizzard and throws herself into the freezing pool — only to wake transformed, weightless, and finally free. Dazai's earliest masterpiece: a brutal folk tale that slips quietly into the miraculous.",
     content: { simplified: gyofukukiSimplified, intermediate: gyofukukiIntermediate, original: gyofukukiOriginal },
+  },
+  {
+    id: 'sakura',
+    titleJp: '桜の樹の下には',
+    titleEn: 'Under the Cherry Tree',
+    author: 'Kajii Motojirō',
+    genre: 'fiction',
+    jlptLevel: 'N2',
+    coverColor: '#E8B4C8',
+    readingTimeMin: 7,
+    synopsis: "\"Bodies are buried beneath the cherry trees!\" Kajii's narrator confides his strange revelation to a friend: only the imagined corpses rotting underground could explain why the blossoms bloom with such unbearable beauty. A short, hallucinatory prose poem in which horror and rapture become indistinguishable.",
+    content: { simplified: sakuraSimplified, intermediate: sakuraIntermediate, original: sakuraOriginal },
   },
 ];
