@@ -3,6 +3,7 @@ import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
 import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
 import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon';
+import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -238,5 +239,17 @@ export const books: Book[] = [
     readingTimeMin: 12,
     synopsis: "A young man weighed down by illness, debt, and an unnameable malaise wanders the back streets of Kyoto. A single lemon at a fruit stand transfigures his mood — and at the Maruzen bookstore, he leaves it perched atop a tower of art books, imagining it as a bright yellow bomb. Kajii's luminous Taishō-era prose poem on beauty, melancholy, and small acts of mischief.",
     content: { simplified: lemonSimplified, intermediate: lemonIntermediate, original: lemonOriginal },
+  },
+  {
+    id: 'hana',
+    titleJp: '鼻',
+    titleEn: 'The Nose',
+    author: 'Akutagawa Ryūnosuke',
+    genre: 'fiction',
+    jlptLevel: 'N3',
+    coverColor: '#C97B5C',
+    readingTimeMin: 10,
+    synopsis: "Zenchi Naigu, an aging monk, is tormented by his absurdly long nose — fifteen centimeters of dangling sausage that hangs past his chin. Trying every remedy he can find, he finally succeeds in shrinking it. But the relief he expected turns into something stranger: those who once pitied him now openly laugh. Akutagawa's wry, compassionate parable on vanity, pity, and the secret cruelty of human kindness.",
+    content: { simplified: hanaSimplified, intermediate: hanaIntermediate, original: hanaOriginal },
   },
 ];
