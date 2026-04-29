@@ -398,6 +398,140 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ──────────────────────────────────────────
+   Apple-like motion system
+   Subtle, spring-out easing, ~150–280ms
+   ────────────────────────────────────────── */
+
+/* Easing tokens (CSS custom props for reuse) */
+:root {
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);      /* spring-like ease-out */
+  --ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1);       /* snappier ease-out */
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Universal tap feedback — apply on any interactive surface */
+.tap-scale {
+  transition: transform 0.18s var(--ease-out-soft), box-shadow 0.18s var(--ease-out-soft), background-color 0.18s var(--ease-out-soft);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.tap-scale:active {
+  transform: scale(0.965);
+}
+.tap-scale-sm {
+  transition: transform 0.15s var(--ease-out-soft), background-color 0.15s var(--ease-out-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+.tap-scale-sm:active {
+  transform: scale(0.92);
+}
+
+/* Card lift — soft hover + tap */
+.card-lift {
+  transition:
+    transform 0.25s var(--ease-out-soft),
+    box-shadow 0.25s var(--ease-out-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .card-lift:hover {
+    transform: translateY(-2px);
+  }
+}
+.card-lift:active {
+  transform: translateY(0) scale(0.985);
+  transition-duration: 0.12s;
+}
+
+/* Subtle ripple-like flash on press (color-only, no layout) */
+.press-flash {
+  position: relative;
+  overflow: hidden;
+}
+.press-flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, hsl(var(--foreground) / 0.08), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-out-soft);
+}
+.press-flash:active::after {
+  opacity: 1;
+  transition-duration: 0.05s;
+}
+
+/* Entrance animations */
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in-soft {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes scale-pop {
+  0% { opacity: 0; transform: scale(0.94); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.42s var(--ease-out-soft) both;
+}
+.animate-fade-in-soft {
+  animation: fade-in-soft 0.3s var(--ease-out-soft) both;
+}
+.animate-scale-pop {
+  animation: scale-pop 0.28s var(--ease-out-soft) both;
+}
+
+/* Stagger helpers — apply to a parent, children animate in sequence */
+.stagger-children > * {
+  animation: fade-in-up 0.45s var(--ease-out-soft) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.07s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.17s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.22s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.27s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.32s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.37s; }
+.stagger-children > *:nth-child(n+9) { animation-delay: 0.4s; }
+
+/* Smooth color/opacity transitions — apply to icons, labels */
+.smooth-colors {
+  transition: color 0.2s var(--ease-out-soft), background-color 0.2s var(--ease-out-soft), opacity 0.2s var(--ease-out-soft);
+}
+
+/* Soft pulse — for badges/indicators (replaces harsh animate-pulse) */
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.92); }
+}
+.animate-soft-pulse {
+  animation: soft-pulse 1.8s var(--ease-in-out-soft) infinite;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tap-scale:active,
+  .tap-scale-sm:active,
+  .card-lift:active,
+  .card-lift:hover {
+    transform: none;
+  }
+}
+
 /* xs breakpoint helper for very narrow screens */
 @media (min-width: 360px) {
   .xs\:block { display: block; }

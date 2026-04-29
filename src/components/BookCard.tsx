@@ -7,10 +7,10 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
   return (
     <Link
       to={`/book/${book.id}`}
-      className="group flex w-36 flex-shrink-0 flex-col gap-2 md:w-44"
+      className="group flex w-36 flex-shrink-0 flex-col gap-2 md:w-44 tap-scale"
     >
       <div
-        className="book-cover book-paper relative flex h-52 items-end overflow-hidden rounded-md p-3 shadow-md transition-all duration-200 group-active:scale-[0.97] group-hover:scale-[1.02] group-hover:shadow-lg md:h-60"
+        className="book-cover book-paper relative flex h-52 items-end overflow-hidden rounded-md p-3 shadow-md card-lift group-hover:shadow-lg md:h-60"
         style={{ backgroundColor: book.coverColor }}
       >
         {/* Soft top highlight + bottom shade for depth */}
