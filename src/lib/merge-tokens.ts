@@ -24,6 +24,11 @@ const AUX_VERB_BASES = new Set([
   'ほしい',
 ]);
 
+// Pseudo-nominal auxiliaries that Kuromoji tags as 名詞,特殊,助動詞語幹
+// (そう/よう/たい/らしい/みたい). Match by surface so they glue to a preceding
+// verb/adj head even when the POS is 名詞.
+const AUX_PSEUDO_NOUN = new Set(['そう', 'よう', 'たい', 'らしい', 'みたい']);
+
 function isHead(tok: BookToken): boolean {
   if (!tok.p) return false;
   return tok.p.startsWith('動詞/自立') || tok.p.startsWith('形容詞');
@@ -34,6 +39,12 @@ function isMergeableAux(tok: BookToken): boolean {
   // Auxiliaries (ます, た, ない, れる, せる, られる, させる, です…)
   if (MERGEABLE_POS_PREFIXES.some(p => tok.p!.startsWith(p))) return true;
   return false;
+}
+
+function isAuxPseudoNoun(tok: BookToken): boolean {
+  if (!tok.p) return false;
+  if (!AUX_PSEUDO_NOUN.has(tok.t)) return false;
+  return tok.p.startsWith('名詞') || tok.p.startsWith('助動詞') || tok.p.startsWith('形容詞');
 }
 
 function isTeParticle(tok: BookToken): boolean {
