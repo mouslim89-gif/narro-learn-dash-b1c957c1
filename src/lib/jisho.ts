@@ -21,14 +21,28 @@ function isUsable(entry: CacheEntry | undefined): entry is CacheEntry {
   return !!entry && Array.isArray(entry.results) && entry.results.length > 0;
 }
 
+function isKnownStaleEntry(keyword: string, entry: CacheEntry | undefined): boolean {
+  if (keyword !== 'なる' || !entry) return false;
+  return !entry.results.some((result) => {
+    const matchesNaru = result.japanese.some((j) => j.word === '成る' || j.word === '為る' || j.reading === 'なる');
+    const isVerb = result.senses.some((sense) => sense.parts_of_speech.some((pos) => pos.includes('verb')));
+    return matchesNaru && isVerb;
+  });
+}
+
+function isUsableForKeyword(keyword: string, entry: CacheEntry | undefined): entry is CacheEntry {
+  return isUsable(entry) && !isKnownStaleEntry(keyword, entry);
+}
+
 export function getCached(keyword: string): CacheEntry | undefined {
   const entry = cache.get(keyword);
   // Treat empty cached entries as a miss so callers fall back to a live lookup.
-  return isUsable(entry) ? entry : undefined;
+  return isUsableForKeyword(keyword, entry) ? entry : undefined;
 }
 
 export function seedCache(entries: Record<string, CacheEntry>): void {
   for (const [word, entry] of Object.entries(entries)) {
+    if (isKnownStaleEntry(word, entry)) continue;
     cache.set(word, entry);
   }
 }
@@ -37,7 +51,7 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
   const existing = cache.get(keyword);
   // Use cache only if the entry actually has results, OR if we've already
   // attempted a live lookup for this keyword (to avoid hammering the API).
-  if (isUsable(existing) || (existing && liveAttempted.has(keyword))) {
+  if (isUsableForKeyword(keyword, existing) || (existing && !isKnownStaleEntry(keyword, existing) && liveAttempted.has(keyword))) {
     return existing;
   }
 
