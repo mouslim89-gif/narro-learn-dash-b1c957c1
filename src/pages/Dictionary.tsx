@@ -43,10 +43,11 @@ export default function DictionaryPage() {
   }, [query]);
 
   const handleSave = (result: JishoResult) => {
+    const disp = getDisplayWord(result);
     const entry: Omit<SavedWord, 'mastery'> = {
-      id: result.japanese[0]?.word || result.slug,
-      word: result.japanese[0]?.word || result.slug,
-      reading: result.japanese[0]?.reading || '',
+      id: disp.word || result.slug,
+      word: disp.word || result.slug,
+      reading: disp.reading || result.japanese[0]?.reading || '',
       meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
@@ -98,8 +99,9 @@ export default function DictionaryPage() {
 
       <div className="mt-4 flex flex-col gap-3">
         {jishoResults.map((result, idx) => {
-          const word = result.japanese[0]?.word || result.slug;
-          const reading = result.japanese[0]?.reading;
+          const disp = getDisplayWord(result);
+          const word = disp.word || result.slug;
+          const reading = disp.reading;
           const saved = hasWord(word);
           const isCommon = (result as any).is_common;
 
