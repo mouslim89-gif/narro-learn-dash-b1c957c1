@@ -161,7 +161,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
 
   // Try looking up the base form first (more likely to have dictionary entries)
   const lookupKey = kuromojiBase || word;
-  const cached = getCached(word) || (kuromojiBase ? getCached(kuromojiBase) : undefined);
+  const cached = (kuromojiBase && kuromojiBase !== word ? getCached(kuromojiBase) : undefined) ?? getCached(word);
   const [loading, setLoading] = useState(!cached);
   const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, kuromojiPos));
   const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? kuromojiBase ?? null);
