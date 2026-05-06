@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Star, ChevronRight, Loader2, Languages } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { getCached, lookupWord, pickBestResult, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 
 interface WordMiniPopupProps {
   word: string;
@@ -126,10 +126,11 @@ export function WordMiniPopup({
 
   const handleSave = () => {
     if (!result) return;
+    const disp = getDisplayWord(result);
     const entry: SavedWord = {
       id: wordId,
-      word: result.japanese[0]?.word || word,
-      reading: result.japanese[0]?.reading || '',
+      word: disp.word || word,
+      reading: disp.reading || result.japanese[0]?.reading || '',
       meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
@@ -138,6 +139,10 @@ export function WordMiniPopup({
     };
     addWord(entry);
   };
+
+  const disp = result ? getDisplayWord(result) : { word, reading: undefined as string | undefined };
+  const headerWord = disp.word || word;
+  const headerReading = disp.reading;
 
   return (
     <div
@@ -158,11 +163,11 @@ export function WordMiniPopup({
       {/* Header: word + actions inline */}
       <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-0.5">
         <span className="font-japanese text-lg font-bold truncate min-w-0">
-          {result ? (result.japanese[0]?.word || word) : word}
+          {headerWord}
         </span>
         <PlayWordButton
-          word={result?.japanese[0]?.word || word}
-          reading={result?.japanese[0]?.reading}
+          word={headerWord}
+          reading={headerReading}
           size={16}
         />
         {result && !loading && (
@@ -205,9 +210,9 @@ export function WordMiniPopup({
       </div>
 
       {/* Reading */}
-      {result?.japanese[0]?.reading && (
+      {headerReading && headerReading !== headerWord && (
         <p className="font-japanese text-xs text-muted-foreground px-2.5 -mt-0.5">
-          {result.japanese[0].reading}
+          {headerReading}
         </p>
       )}
 

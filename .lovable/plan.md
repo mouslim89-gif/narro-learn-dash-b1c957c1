@@ -1,41 +1,49 @@
-## Problème
+## Objectif
 
-Quand un token a été glué (ex. `に + なって` → surface `になって`, base `なる`), les popups appellent `getCached(word)` AVANT `getCached(baseForm)`. Comme `になって` est dans le cache préchargé (Jisho retourne "になって初めて" / "成ってない" / "ニナリッチ" pour les variantes), on n'arrive jamais à `なる`.
+Pour les mots habituellement écrits en kana (ex: `あの`, `する`, `いる`, `こと`, `もの`…), afficher la forme kana au lieu du kanji (`彼の`, `為る`, `居る`, `事`, `物`) dans les popups, le mini-popup, et le dictionnaire.
 
-Même cause pour le lookup live : `lookupWord(baseForm)` est essayé en premier seulement si `getCached(word)` est vide — mais comme il ne l'est pas, on prend la mauvaise entrée.
+## Détection
 
-## Correction
-
-**`src/components/WordPopup.tsx` et `src/components/WordMiniPopup.tsx`** — inverser la priorité :
-
-1. Si `baseForm` est défini ET différent de `word` :
-   - `cached = getCached(baseForm)` d'abord, fallback `getCached(word)`
-   - Lookup live : `lookupWord(baseForm)` d'abord, fallback `lookupWord(word)` (déjà le cas, mais déclencher même si `cached(word)` existe)
-2. Sinon comportement actuel.
-
-Mettre à jour `deinflected` à `baseForm` quand on résout via la base.
-
-## Détails techniques
-
-Dans les deux popups, remplacer :
+Jisho marque ces mots avec le tag `"Usually written using kana alone"` dans les `senses[].parts_of_speech` (ou parfois `misc`). On crée un helper unique :
 
 ```ts
-const cached = getCached(word) || (baseForm ? getCached(baseForm) : undefined);
+// src/lib/jisho.ts
+export function isUsuallyKana(result: JishoResult): boolean {
+  return result.senses.some(s =>
+    s.parts_of_speech.some(p => /usually written using kana/i.test(p))
+  );
+}
+
+export function getDisplayWord(result: JishoResult): { word: string; reading?: string } {
+  const j = result.japanese[0];
+  if (!j) return { word: '' };
+  if (isUsuallyKana(result) && j.reading) {
+    // reading devient le "word", on n'affiche plus de reading séparée
+    return { word: j.reading };
+  }
+  return { word: j.word || j.reading, reading: j.reading };
+}
 ```
 
-par :
+## Application
 
-```ts
-const cached = (baseForm && baseForm !== word ? getCached(baseForm) : undefined)
-  ?? getCached(word);
-```
+3 endroits remplacent l'accès direct à `result.japanese[0]?.word` par `getDisplayWord(result)` :
 
-Le bloc `useEffect` actuel essaie déjà `lookupWord(baseForm)` en premier — il fonctionnera correctement une fois que la priorité du cache est inversée (le `if (cached)` early-return prendra alors l'entrée `なる` directement).
+1. **`src/components/WordPopup.tsx`** (lignes ~247-277) — `displayWord` / `displayReading`. Si kana-only, ne pas afficher la "reading" en double.
+2. **`src/components/WordMiniPopup.tsx`** (lignes ~160-211) — header word + reading sous le titre. Même logique : pas de reading si kana-only.
+3. **`src/pages/Dictionary.tsx`** (lignes ~111-126) — affichage du mot + reading dans la liste de résultats.
 
-Aucun changement nécessaire dans `merge-tokens.ts`, `jisho.ts`, ni l'edge function.
+Pour la sauvegarde en flashcards (`handleSave`) : on stocke `word = reading` quand kana-only, pour que la flashcard montre aussi `あの` plutôt que `彼の`.
 
-## Vérification
+## Ce qui n'est PAS modifié
 
-- Tester `になって`, `になった`, `になります` → doit afficher la def de `なる` (Godan verb).
-- Vérifier que les autres mots non-gloués (ex. `桜`, `樹`) restent inchangés (pas de baseForm distinct).
-- Vérifier que `信じて` (baseForm `信じる`) affiche bien `信じる`.
+- Le texte dans le Reader (le token original tel qu'écrit dans le livre est conservé — si l'auteur écrit `彼の` on garde `彼の`, on ne réécrit pas le livre).
+- La recherche / lookup (on continue à chercher par n'importe quelle forme).
+- Le `dictForm` passé à `ConjugationTable` reste la forme canonique kanji (sinon les conjugaisons cassent).
+
+## Risques / edge cases
+
+- Certains résultats ont `Usually written using kana` sur le sens 2 mais pas le sens 1 → on considère kana-only seulement si **le premier sens** le porte (plus fiable). Ajustable.
+- Mots sans `reading` (rare) → fallback sur `word`.
+
+Veux-tu que j'applique aussi ce comportement aux flashcards déjà sauvegardées (migration), ou seulement aux nouvelles ?

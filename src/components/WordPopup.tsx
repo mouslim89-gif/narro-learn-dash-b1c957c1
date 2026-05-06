@@ -5,7 +5,7 @@ import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { getCached, lookupWord, pickBestResult, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -231,10 +231,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
 
   const handleSave = () => {
     if (!result) return;
+    const disp = getDisplayWord(result);
     const entry: SavedWord = {
       id: wordId,
-      word: result.japanese[0]?.word || word,
-      reading: result.japanese[0]?.reading || '',
+      word: disp.word || word,
+      reading: disp.reading || result.japanese[0]?.reading || '',
       meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
@@ -244,8 +245,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
     addWord(entry);
   };
 
-  const displayWord = result?.japanese[0]?.word || word;
-  const displayReading = result?.japanese[0]?.reading;
+  const disp = result ? getDisplayWord(result) : { word, reading: undefined as string | undefined };
+  const displayWord = disp.word || word;
+  const displayReading = disp.reading;
   const isCommon = (result as any)?.is_common;
 
   return (
