@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
-import { mergeConjugatedTokens } from '@/lib/merge-tokens';
+import { mergeConjugatedTokens, gluePhrasalCompounds } from '@/lib/merge-tokens';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
@@ -151,7 +151,7 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      return mergeConjugatedTokens(cleanRubyTokens(raw));
+      return gluePhrasalCompounds(mergeConjugatedTokens(cleanRubyTokens(raw)));
     }
     // Fallback — split text into char-level tokens
     const fallbackText = book ? stripParens(getChapterContent(book, chapterId, difficulty)) : '';
