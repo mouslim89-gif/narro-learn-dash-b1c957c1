@@ -30,7 +30,7 @@ export function WordMiniPopup({
 
   const cached = getCached(word) || (baseForm ? getCached(baseForm) : undefined);
   const [loading, setLoading] = useState(!cached);
-  const [result, setResult] = useState<JishoResult | null>(cached?.results?.[0] ?? null);
+  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos));
   const [error, setError] = useState(false);
 
   const wordId = word;
