@@ -5,7 +5,7 @@ import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { getCached, lookupWord, pickBestResult, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -163,7 +163,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
   const lookupKey = kuromojiBase || word;
   const cached = getCached(word) || (kuromojiBase ? getCached(kuromojiBase) : undefined);
   const [loading, setLoading] = useState(!cached);
-  const [result, setResult] = useState<JishoResult | null>(cached?.results?.[0] ?? null);
+  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, kuromojiPos));
   const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? kuromojiBase ?? null);
   const [error, setError] = useState(false);
 
@@ -172,8 +172,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
 
   useEffect(() => {
     if (cached) {
-      if (cached.results.length > 0) {
-        setResult(cached.results[0]);
+      const best = pickBestResult(cached.results, kuromojiPos);
+      if (best) {
+        setResult(best);
         setDeinflected(cached.deinflected ?? kuromojiBase ?? null);
       } else {
         setError(true);
@@ -192,17 +193,19 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
         let entry: CacheEntry | null = null;
         if (kuromojiBase && kuromojiBase !== word) {
           entry = await lookupWord(kuromojiBase);
-          if (entry.results.length > 0) {
+          const best = pickBestResult(entry.results, kuromojiPos);
+          if (best) {
             if (!cancelled) {
-              setResult(entry.results[0]);
+              setResult(best);
               setDeinflected(kuromojiBase);
             }
             return;
           }
         }
         entry = await lookupWord(word);
-        if (!cancelled && entry.results.length > 0) {
-          setResult(entry.results[0]);
+        const best = pickBestResult(entry.results, kuromojiPos);
+        if (!cancelled && best) {
+          setResult(best);
           setDeinflected(entry.deinflected ?? kuromojiBase ?? null);
         } else if (!cancelled) {
           setError(true);
@@ -216,7 +219,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
     tryLookup();
 
     return () => { cancelled = true; };
-  }, [word, kuromojiBase, cached]);
+  }, [word, kuromojiBase, kuromojiPos, cached]);
 
   const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
