@@ -4,6 +4,7 @@ import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns } from '@/lib/merge-tokens';
+import { applyTokenOverrides } from '@/data/token-overrides';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
@@ -151,7 +152,7 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      return gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(cleanRubyTokens(raw))));
+      return gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw)))));
     }
     // Fallback — split text into char-level tokens
     const fallbackText = book ? stripParens(getChapterContent(book, chapterId, difficulty)) : '';
