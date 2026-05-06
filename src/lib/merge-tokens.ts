@@ -234,3 +234,50 @@ export function gluePhrasalCompounds(tokens: BookToken[]): BookToken[] {
   return out;
 }
 
+// ---------------------------------------------------------------------------
+// Split nouns that Kuromoji glued together with an internal の particle
+// (e.g. 桜の樹 → 桜 + の + 樹). Reading is split on の as well.
+// ---------------------------------------------------------------------------
+const KANJI_RE = /[\u3400-\u9fff々]/;
+
+export function splitNoParticleNouns(tokens: BookToken[]): BookToken[] {
+  const out: BookToken[] = [];
+  for (const tok of tokens) {
+    if (
+      tok.j &&
+      tok.p?.startsWith('名詞') &&
+      tok.t.length >= 3 &&
+      tok.t.includes('の')
+    ) {
+      const idx = tok.t.indexOf('の');
+      const left = tok.t.slice(0, idx);
+      const right = tok.t.slice(idx + 1);
+      if (
+        left.length > 0 &&
+        right.length > 0 &&
+        KANJI_RE.test(left) &&
+        KANJI_RE.test(right) &&
+        !left.includes('の') &&
+        !right.includes('の')
+      ) {
+        // Split reading on の too (best effort).
+        let leftR: string | undefined;
+        let rightR: string | undefined;
+        if (tok.r) {
+          const ri = tok.r.indexOf('の');
+          if (ri > 0 && ri < tok.r.length - 1) {
+            leftR = tok.r.slice(0, ri);
+            rightR = tok.r.slice(ri + 1);
+          }
+        }
+        out.push({ t: left, j: true, p: '名詞/一般', r: leftR });
+        out.push({ t: 'の', j: true, p: '助詞', r: 'の' });
+        out.push({ t: right, j: true, p: '名詞/一般', r: rightR });
+        continue;
+      }
+    }
+    out.push(tok);
+  }
+  return out;
+}
+
