@@ -102,3 +102,34 @@ export async function searchJisho(query: string): Promise<JishoResult[]> {
   const entry = await lookupWord(query);
   return entry.results;
 }
+
+// Map a Kuromoji POS prefix to Jisho parts_of_speech keywords.
+const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
+  { match: (p) => p.startsWith('助詞'), needles: ['Particle'] },
+  { match: (p) => p.startsWith('助動詞'), needles: ['Auxiliary', 'Copula', 'Particle'] },
+  { match: (p) => p.startsWith('動詞'), needles: ['Verb'] },
+  { match: (p) => p.startsWith('形容詞'), needles: ['Adjective'] },
+  { match: (p) => p.startsWith('連体詞'), needles: ['Pre-noun', 'Adnominal'] },
+  { match: (p) => p.startsWith('副詞'), needles: ['Adverb'] },
+  { match: (p) => p.startsWith('接続詞'), needles: ['Conjunction'] },
+  { match: (p) => p.startsWith('感動詞'), needles: ['Interjection'] },
+  { match: (p) => p === '表現', needles: ['Expression'] },
+  { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix'] },
+];
+
+/** Pick the result whose parts_of_speech best matches the Kuromoji POS. */
+export function pickBestResult(
+  results: JishoResult[] | undefined,
+  kuromojiPos?: string,
+): JishoResult | null {
+  if (!results || results.length === 0) return null;
+  if (!kuromojiPos) return results[0];
+  const rule = POS_KEYWORDS.find((r) => r.match(kuromojiPos));
+  if (!rule) return results[0];
+  for (const r of results) {
+    const pos = r.senses.flatMap((s) => s.parts_of_speech).join(' ');
+    if (rule.needles.some((n) => pos.includes(n))) return r;
+  }
+  return results[0];
+}
+
