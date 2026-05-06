@@ -151,7 +151,7 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      return mergeConjugatedTokens(cleanRubyTokens(raw));
+      return gluePhrasalCompounds(mergeConjugatedTokens(cleanRubyTokens(raw)));
     }
     // Fallback — split text into char-level tokens
     const fallbackText = book ? stripParens(getChapterContent(book, chapterId, difficulty)) : '';
