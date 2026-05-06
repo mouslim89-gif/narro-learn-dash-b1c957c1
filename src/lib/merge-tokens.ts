@@ -90,7 +90,11 @@ export function mergeConjugatedTokens(tokens: BookToken[]): BookToken[] {
           lastWasTe = true;
           continue;
         }
-        // Standalone て-form connecting to a non-aux: stop here, leave て as separate token
+        // Standalone て-form (e.g. 信じて + いい): absorb て into the verb chunk
+        // so it becomes a single clickable unit, then stop.
+        surface += next.t;
+        reading += next.r ?? '';
+        j++;
         break;
       }
 

@@ -1,54 +1,45 @@
-## Problème
+## Améliorer la détection des verbes/auxiliaires
 
-Dans `src/pages/Reader.tsx` (`paragraphs` useMemo, lignes ~187-216), la logique actuelle :
+Extension de la couche de fusion frontend (`src/lib/merge-tokens.ts`). Pas de regénération des tokens des livres nécessaire.
 
-1. **Ignore complètement les `\n`** présents dans le texte source. Les livres (ex. `urashima.ts`) utilisent pourtant ces sauts de ligne comme séparateurs de paragraphes naturels.
-2. **Découpe à l'intérieur des guillemets** `「…」`. Une phrase qui s'ouvre par 「 et se termine par 。 sans 」 démarre un nouveau paragraphe ; la suite (jusqu'à 」) tombe dans un autre paragraphe → le guillemet est cassé en deux blocs visuels.
-3. La règle `current.length >= 3` coupe arbitrairement au milieu d'un dialogue ouvert.
+### Cas corrigés
 
-Exemple Urashima reproduit (simulation) :
+| Entrée | Voulu |
+|---|---|
+| 信じ + て + いい | 信じて + いい |
+| じゃ + ない / なかった / ありません | じゃない… |
+| で + は + ない / では + ない | ではない… |
+| よう + に / な | ように / ような |
+| そう + に / な | そうに / そうな |
+| みたい + に / な / だ / です | みたいに… |
+| なければ + ならない / いけない | なければならない |
+| なくて + は + いけない / ならない | なくてはいけない |
+| こと + が + ある / ない | ことがある / ことがない |
+| わけ + で + は + ない / わけ + では + ない | わけではない |
+| かも + しれない / しれません | かもしれない |
+| について / に対して / として / による / によって | groupés |
+
+### Plan technique
+
+**1. Modifier `mergeConjugatedTokens`** (`src/lib/merge-tokens.ts`) :
+- Quand on consomme て/で après un verbe tête et que ce qui suit n'est PAS un auxiliaire reconnu, avaler quand même て/で dans le chunk verbe puis s'arrêter. Résultat : `信じて` devient une unité (base = `信じる`), et `いい` reste intact comme token suivant.
+
+**2. Nouvelle passe `gluePhrasalCompounds(tokens)`** appliquée après merge :
+- Parcourt la liste, et pour chaque position essaie de matcher (du plus long au plus court) une table de patterns définis par séquence de surfaces exactes.
+- Quand match, fusionne en un seul `BookToken` :
+  - `t` = concat des surfaces
+  - `r` = concat des lectures
+  - `b` = forme canonique (ex: `じゃない`, `ではない`, `ように`, `かもしれない`)
+  - `j: true`
+  - `p` adapté : `助動詞` pour les négations, `副詞` pour ように/そうに/みたいに, `連体詞` pour ような/そうな/みたいな, `表現` pour les autres expressions figées.
+- Permet au dictionnaire / GPT grammar de chercher la forme composée directement.
+
+**3. Brancher dans `src/pages/Reader.tsx` (ligne 154)** :
+```ts
+return gluePhrasalCompounds(mergeConjugatedTokens(cleanRubyTokens(raw)));
 ```
-… いじめているのです。
-浦島は見かねて、
-「まあ…ではない。  ← coupure ici
-いい子だから」
-と、とめましたが…
-```
-Le 「…」 est étendu sur 2 paragraphes visuels alors que la source a 3 lignes nettes séparées par `\n`.
 
-## Solution proposée
+### Fichiers touchés
 
-Réécrire le `useMemo` `paragraphs` (et légèrement `sentences`) pour :
-
-### 1. Faire des `\n` la source de vérité des paragraphes
-- Lors du découpage en phrases, considérer un token contenant `\n` comme une frontière de paragraphe explicite (en plus de `。！？`).
-- Stocker un flag `breakAfter: boolean` sur chaque phrase quand le token de fin contenait `\n`.
-
-### 2. Garder les guillemets atomiques
-- Tenir un compteur d'ouverture `「`/`』` − fermeture `」`/`』` pendant l'agrégation.
-- **Ne jamais clore un paragraphe tant que le compteur > 0** (guillemet ouvert), même si on rencontre un `\n` ou la règle des 3 phrases.
-- Cela force `「…」` à rester dans le même bloc visuel.
-
-### 3. Simplifier les heuristiques
-Remplacer les règles « startsDialogue / endsDialogue / current.length >= 3 » par :
-
-```
-pour chaque phrase:
-  ajouter à current
-  mettre à jour quoteDepth
-  si quoteDepth == 0 ET (phrase.breakAfter OU current full-stops accumulés ≥ seuil):
-     flush current → groups
-```
-
-### 4. Nettoyer les tokens `\n` orphelins
-Les `\n` ne doivent plus être rendus comme texte (ils étaient affichés en blanc mais comptaient dans le layout). Les filtrer après usage comme marqueur de break.
-
-## Fichier à modifier
-
-- `src/pages/Reader.tsx` — uniquement les `useMemo` `sentences` et `paragraphs` (≈ lignes 171-216). Aucun autre fichier touché, pas de changement de données.
-
-## Validation
-
-- Tester sur Urashima (original) : le 「まあ…いい子だから」 doit tenir sur **une** ligne/un seul paragraphe.
-- Vérifier Rashōmon, Kumo no Ito, Hashire Merosu (dialogues fréquents) — aucun guillemet ne doit être scindé.
-- Vérifier que les paragraphes longs sans dialogue s'aèrent toujours grâce aux `\n` du source (et non plus à la règle arbitraire des 3 phrases).
+- `src/lib/merge-tokens.ts` — étendre la logique て isolé + ajouter `gluePhrasalCompounds` avec table de patterns.
+- `src/pages/Reader.tsx` — chaîner la nouvelle passe (1 ligne + 1 import).
