@@ -36,7 +36,8 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 const stripParens = (text: string): string =>
   text
     .replace(/[（(][^（）()\n\r]*[）)]/g, '')
-    .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g, '$1$2');
+    .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g, '$1$2')
+    .replace(/^一$/gm, '​');
 
 const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
   const out: BookToken[] = [];
