@@ -1,80 +1,93 @@
 import type { BookToken } from '@/data/book-tokens';
 
 /**
- * Per-book token overrides. Lets you manually fix tokenization for tricky
- * spans without touching merge logic or regenerating tokens.
+ * Per-book token overrides — version simplifiée.
  *
- * Each override matches a CONSECUTIVE sequence of token surface forms
- * (`match`) anywhere in the book and replaces them with `replace`.
+ * Chaque règle est une string :  "match  =>  replace"
+ *   - les tokens sont séparés par "|"
+ *   - chaque token côté droit peut être enrichi avec :
+ *        surface@reading           ex: "呑めそうな@のめそうな"
+ *        surface@reading#base      ex: "呑めそうな@のめそうな#呑む"
+ *        surface@reading#base:pos  ex: "呑めそうな@のめそうな#呑む:動詞/自立"
+ *   - défaut : pos="名詞", j=true (japonais). Pour ponctuation, mets ":記号".
  *
- * Matching is on surface form only (`tok.t`). Longer matches win.
+ * Exemples :
+ *   'sakura': [
+ *     '桜の樹  =>  桜@さくら | の@の:助詞 | 樹@き',
+ *     '呑め|そう|な  =>  呑めそうな@のめそうな#呑む:動詞/自立',
+ *   ],
  *
- * Example:
- *   '桜の樹' is currently one noun token → split it:
- *     { match: ['桜の樹'], replace: [
- *       { t: '桜', j: true, p: '名詞', r: 'さくら' },
- *       { t: 'の', j: true, p: '助詞', r: 'の' },
- *       { t: '樹', j: true, p: '名詞', r: 'き' },
- *     ]}
- *
- *   Or merge a sequence into a single token:
- *     { match: ['呑め', 'そう', 'な'], replace: [
- *       { t: '呑めそうな', j: true, p: '動詞/自立', b: '呑む', r: 'のめそうな' },
- *     ]}
- *
- * Use `'*'` (book id) to apply an override to ALL books.
+ * Utilise '*' comme bookId pour appliquer à tous les livres.
  */
-export interface TokenOverride {
-  match: string[];
-  replace: BookToken[];
-}
-
-export const tokenOverrides: Record<string, TokenOverride[]> = {
-  // Example — uncomment and adapt as needed:
+export const tokenOverrides: Record<string, string[]> = {
   // 'sakura': [
-  //   { match: ['呑め', 'そう', 'な'], replace: [
-  //     { t: '呑めそうな', j: true, p: '動詞/自立', b: '呑む', r: 'のめそうな' },
-  //   ]},
+  //   '呑め|そう|な  =>  呑めそうな@のめそうな#呑む:動詞/自立',
   // ],
-  '*': [
-    // Global overrides applied to every book go here.
-  ],
+  '*': [],
 };
 
-/**
- * Apply token overrides for a given book. Runs at the very start of the
- * runtime pipeline, before any merge/split logic. Longest matches win.
- */
+// ─────────────────────────────────────────────────────────────
+// Internals — pas besoin de toucher en dessous
+// ─────────────────────────────────────────────────────────────
+
+interface ParsedRule { match: string[]; replace: BookToken[]; }
+
+function parseToken(spec: string): BookToken {
+  // surface@reading#base:pos
+  let rest = spec.trim();
+  let pos: string | undefined;
+  let base: string | undefined;
+  let reading: string | undefined;
+
+  const colon = rest.indexOf(':');
+  if (colon >= 0) { pos = rest.slice(colon + 1).trim(); rest = rest.slice(0, colon); }
+  const hash = rest.indexOf('#');
+  if (hash >= 0) { base = rest.slice(hash + 1).trim(); rest = rest.slice(0, hash); }
+  const at = rest.indexOf('@');
+  if (at >= 0) { reading = rest.slice(at + 1).trim(); rest = rest.slice(0, at); }
+  const surface = rest.trim();
+
+  const tok: BookToken = { t: surface, j: pos !== '記号' };
+  if (reading) tok.r = reading;
+  if (base) tok.b = base;
+  if (pos) tok.p = pos; else tok.p = '名詞';
+  return tok;
+}
+
+function parseRule(rule: string): ParsedRule | null {
+  const sep = rule.split('=>');
+  if (sep.length !== 2) return null;
+  const match = sep[0].split('|').map(s => s.trim()).filter(Boolean);
+  const replace = sep[1].split('|').map(s => s.trim()).filter(Boolean).map(parseToken);
+  if (match.length === 0) return null;
+  return { match, replace };
+}
+
 export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
-  const rules = [
+  const raw = [
     ...(tokenOverrides[bookId] ?? []),
     ...(tokenOverrides['*'] ?? []),
   ];
-  if (rules.length === 0) return tokens;
+  if (raw.length === 0) return tokens;
 
-  // Sort longest match first so overlapping rules resolve deterministically.
-  const sorted = [...rules].sort((a, b) => b.match.length - a.match.length);
+  const rules = raw.map(parseRule).filter((r): r is ParsedRule => r !== null)
+    .sort((a, b) => b.match.length - a.match.length);
+  if (rules.length === 0) return tokens;
 
   const out: BookToken[] = [];
   let i = 0;
   while (i < tokens.length) {
-    let matched: TokenOverride | null = null;
-    for (const rule of sorted) {
-      if (rule.match.length === 0) continue;
-      if (i + rule.match.length > tokens.length) continue;
+    let matched: ParsedRule | null = null;
+    for (const r of rules) {
+      if (i + r.match.length > tokens.length) continue;
       let ok = true;
-      for (let k = 0; k < rule.match.length; k++) {
-        if (tokens[i + k].t !== rule.match[k]) { ok = false; break; }
+      for (let k = 0; k < r.match.length; k++) {
+        if (tokens[i + k].t !== r.match[k]) { ok = false; break; }
       }
-      if (ok) { matched = rule; break; }
+      if (ok) { matched = r; break; }
     }
-    if (matched) {
-      out.push(...matched.replace);
-      i += matched.match.length;
-    } else {
-      out.push(tokens[i]);
-      i++;
-    }
+    if (matched) { out.push(...matched.replace); i += matched.match.length; }
+    else { out.push(tokens[i]); i++; }
   }
   return out;
 }
