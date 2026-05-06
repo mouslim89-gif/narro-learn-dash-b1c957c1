@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
-import { mergeConjugatedTokens } from '@/lib/merge-tokens';
+import { mergeConjugatedTokens, gluePhrasalCompounds } from '@/lib/merge-tokens';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
