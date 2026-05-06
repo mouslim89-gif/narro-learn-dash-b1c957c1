@@ -40,7 +40,8 @@ export function WordMiniPopup({
 
   useEffect(() => {
     if (cached) {
-      if (cached.results.length > 0) setResult(cached.results[0]);
+      const best = pickBestResult(cached.results, pos);
+      if (best) setResult(best);
       else setError(true);
       setLoading(false);
       return;
@@ -55,13 +56,15 @@ export function WordMiniPopup({
         let entry: CacheEntry | null = null;
         if (baseForm && baseForm !== word) {
           entry = await lookupWord(baseForm);
-          if (entry.results.length > 0) {
-            if (!cancelled) setResult(entry.results[0]);
+          const best = pickBestResult(entry.results, pos);
+          if (best) {
+            if (!cancelled) setResult(best);
             return;
           }
         }
         entry = await lookupWord(word);
-        if (!cancelled && entry.results.length > 0) setResult(entry.results[0]);
+        const best = pickBestResult(entry.results, pos);
+        if (!cancelled && best) setResult(best);
         else if (!cancelled) setError(true);
       } catch {
         if (!cancelled) setError(true);
@@ -71,7 +74,7 @@ export function WordMiniPopup({
     };
     tryLookup();
     return () => { cancelled = true; };
-  }, [word, baseForm, cached]);
+  }, [word, baseForm, pos, cached]);
 
   // Position based on sentence rect
   useEffect(() => {
