@@ -81,7 +81,12 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
       continue;
     }
 
-    out.push({ ...token });
+    // Replace standalone "一" with zero-width space
+    if (token.t === '一' && (i === 0 || raw[i-1].t === '\n') && (i === raw.length - 1 || raw[i+1].t === '\n')) {
+      out.push({ ...token, t: '​' });
+    } else {
+      out.push({ ...token });
+    }
     i++;
   }
 
