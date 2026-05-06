@@ -123,9 +123,11 @@ export function mergeConjugatedTokens(tokens: BookToken[]): BookToken[] {
 // ではない, ように, ような, かもしれない, について, …) into a single
 // clickable token whose base form points to the canonical compound.
 
+type PhrasalMatcher = string | { base: string };
+
 type PhrasalPattern = {
-  /** Sequence of surface forms to match consecutively (token.t === surface). */
-  surfaces: string[];
+  /** Sequence of surface forms (string) or base-form matchers ({base}) to match consecutively. */
+  surfaces: PhrasalMatcher[];
   /** Canonical base form used for dictionary lookup. */
   base: string;
   /** POS tag for the merged token. */
