@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Star, ChevronRight, Loader2, Languages } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { getCached, lookupWord, pickBestResult, type JishoResult, type CacheEntry } from '@/lib/jisho';
 
 interface WordMiniPopupProps {
   word: string;
