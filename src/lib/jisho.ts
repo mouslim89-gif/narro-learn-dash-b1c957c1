@@ -131,6 +131,25 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
   { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix'] },
 ];
 
+/** True if first sense of result is tagged "Usually written using kana alone". */
+export function isUsuallyKana(result: JishoResult | null | undefined): boolean {
+  if (!result) return false;
+  const first = result.senses?.[0];
+  if (!first) return false;
+  return first.parts_of_speech.some((p) => /usually written using kana/i.test(p));
+}
+
+/** Returns the form to display: kana when the entry is usually-kana, else kanji form. */
+export function getDisplayWord(result: JishoResult | null | undefined): { word: string; reading?: string } {
+  if (!result) return { word: '' };
+  const j = result.japanese[0];
+  if (!j) return { word: '' };
+  if (isUsuallyKana(result) && j.reading) {
+    return { word: j.reading };
+  }
+  return { word: j.word || j.reading, reading: j.reading };
+}
+
 /** Pick the result whose parts_of_speech best matches the Kuromoji POS. */
 export function pickBestResult(
   results: JishoResult[] | undefined,
