@@ -8,6 +8,7 @@ import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu
 import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
 import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
 import { sakuraSimplified, sakuraIntermediate, sakuraOriginal } from './books/sakura';
+import { urashimaSimplified, urashimaIntermediate, urashimaOriginal } from './books/urashima';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -303,5 +304,17 @@ export const books: Book[] = [
     readingTimeMin: 7,
     synopsis: "\"Bodies are buried beneath the cherry trees!\" Kajii's narrator confides his strange revelation to a friend: only the imagined corpses rotting underground could explain why the blossoms bloom with such unbearable beauty. A short, hallucinatory prose poem in which horror and rapture become indistinguishable.",
     content: { simplified: sakuraSimplified, intermediate: sakuraIntermediate, original: sakuraOriginal },
+  },
+  {
+    id: 'urashima',
+    titleJp: '浦島太郎',
+    titleEn: 'Urashima Tarō',
+    author: 'Kusuyama Masao',
+    genre: 'fiction',
+    jlptLevel: 'N4',
+    coverColor: '#4A90B8',
+    readingTimeMin: 9,
+    synopsis: "A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home — only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final, devastating gift.",
+    content: { simplified: urashimaSimplified, intermediate: urashimaIntermediate, original: urashimaOriginal },
   },
 ];
