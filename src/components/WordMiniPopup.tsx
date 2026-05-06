@@ -28,7 +28,7 @@ export function WordMiniPopup({
   const { addWord, hasWord } = useFlashcardStore();
   const popupRef = useRef<HTMLDivElement>(null);
 
-  const cached = getCached(word) || (baseForm ? getCached(baseForm) : undefined);
+  const cached = (baseForm && baseForm !== word ? getCached(baseForm) : undefined) ?? getCached(word);
   const [loading, setLoading] = useState(!cached);
   const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos));
   const [error, setError] = useState(false);
