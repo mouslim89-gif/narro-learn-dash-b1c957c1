@@ -1,61 +1,56 @@
-## Ajouter le livre 魚服記 (Gyofukuki) — Dazai Osamu
+## Add 浦島太郎 (Urashima Tarō) — Kusuyama Masao
 
-Court récit de Dazai (1933) : Suwa, jeune fille de 13 ans qui vit seule avec son père charbonnier dans la montagne, tient une petite boutique près d'une cascade. Une nuit d'hiver, son père ivre la menace ; elle s'enfuit dans la tempête de neige et se jette dans la cascade. Elle se réveille transformée en petit poisson (funa), libre, débarrassée de la mémoire humaine. Conte lyrique, sombre, tournant vers le merveilleux.
+Classic Japanese folk tale: a kind young fisherman saves a tortured turtle, is taken to the underwater Dragon Palace (Ryūgū-jō) by Princess Otohime, spends three blissful years there, then returns home to find 300 years have passed. Opens the forbidden tamatebako and instantly becomes an old man.
 
-### Métadonnées proposées
+### Proposed metadata
 
-- **id**: `gyofukuki`
-- **titleJp**: 魚服記
-- **titleEn**: The Fish Tale
-- **author**: Dazai Osamu
-- **genre**: fiction
-- **jlptLevel**: **N3** — l'intermediate contient clairement du N3 (轟音, 絶望, 抵抗, 振り絞る, 〜まつわる, 〜たびに, ひどく…), le beginner reste accessible. Cohérent avec asa et hana.
-- **coverColor proposition**: `#5B7B8C` (bleu-gris cascade froide) — distinct des autres Dazai (#B85C2A 秋, #C8956D メロス, #7A9BB8 待つ, #E8A87C 朝).
-- **readingTimeMin**: 10 (~2900 chars intermediate ÷ ~290 chars/min, légèrement plus lent que asa car registre plus narratif/descriptif).
-- **synopsis (proposition a)**: "Deep in a northern mountain, thirteen-year-old Suwa lives alone with her charcoal-burning father by a roaring waterfall. After a winter night when her drunken father becomes something monstrous, she flees into the blizzard and throws herself into the freezing pool — only to wake transformed, weightless, and finally free. Dazai's earliest masterpiece: a brutal folk tale that slips quietly into the miraculous."
-- **audio**: aucun pour l'instant.
+- **id**: `urashima`
+- **titleJp**: 浦島太郎
+- **titleEn**: Urashima Tarō
+- **author**: Kusuyama Masao
+- **genre**: fiction (folk tale)
+- **jlptLevel**: **N4** — beginner is solidly N5/N4, intermediate is N4 with a bit of N3 (養う, 諭す, 名残惜しい, がく然, 途方に暮れる). Coherent with kumo (also a folk tale).
+- **coverColor**: `#4A90B8` deep ocean blue — the sea is the soul of this story; distinct from existing covers.
+- **readingTimeMin**: 9 (intermediate ~3400 chars).
+- **synopsis**: "A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home — only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final, devastating gift."
+- **audio**: none for now.
+- **Original version**: Aozora Bunko (Kusuyama Masao 楠山正雄, card 329 — 浦島太郎). Will fetch + sanitize (`<ruby>`, `［＃...］`, `《》`, `｜`).
 
-### Sources
+### Steps
 
-- **Beginner**: `user-uploads://gyofuki_beg.json` — propre, parenthèses furigana à stripper (`馬禿山（まはげやま）`, `炭（すみ）`, `滑り（すべり）`, etc.).
-- **Intermediate**: `user-uploads://gyofuki_inter.json` — propre, mêmes parenthèses furigana à stripper (`羊歯（しだ）`, `滝壺（たきつぼ）`, `籠（かご）`, `獣（けもの）`, `阿呆（あほう）`, `轟音（ごうおん）`, `蛇（へび）`).
-- **Original**: à fetcher depuis Aozora Bunko (Dazai 太宰治, 魚服記 — carte 263, fichier `1572_15904.html` à confirmer), puis pipeline standard : strip `<ruby>`/`《…》`, `［＃…］`, `｜`, normalisation espaces.
+1. Create `src/data/books/urashima.ts` with `urashimaSimplified` (from `taro_beg.json`), `urashimaIntermediate` (from `taro_inter.json` — strip `（…）` furigana like `丹後（たんご）`, `珊瑚（さんご）`, `瑠璃（るり）`, `鯛（たい）`, `平目（ひらめ）`, `蝉（せみ）`, `蓋（ふた）`, `紐（ひも）`, `髭（ひげ）`, `杖（つえ）`, `竜宮城（りゅうぐうじょう）`, `乙姫（おとひめ）`, `玉手箱（たまてばこ）`), and `urashimaOriginal` (Aozora, sanitized).
+2. Extend `src/data/book-reading-overrides.ts` with an `'urashima'` block. Preliminary list:
+   - `浦島太郎: うらしまたろう`, `浦島: うらしま`, `太郎: たろう`, `漁師: りょうし`, `亀: かめ`, `甲羅: こうら`, `舟: ふね`, `小舟: こぶね`, `波: なみ`, `海辺: うみべ`, `砂浜: すなはま`, `珊瑚: さんご`, `瑠璃: るり`, `真珠: しんじゅ`, `乙姫: おとひめ`, `竜宮城: りゅうぐうじょう`, `玉手箱: たまてばこ`, `蓋: ふた`, `紐: ひも`, `煙: けむり`, `髭: ひげ`, `杖: つえ`, `丹後: たんご`, `両親: りょうしん`, `年老いた: としおいた`, `養う: やしなう`, `諭す: さとす`, `紅葉: こうよう`, `桜: さくら`, `蝉: せみ`, `鯛: たい`, `平目: ひらめ`, `神隠し: かみかくし`, `名残惜しい: なごりおしい`, `言い伝え: いいつたえ`, `墓: はか`, `寺: てら`, `裏山: うらやま`.
+3. Register in `src/data/books.ts` (import + `Book` entry).
+4. Regenerate tokens: `bunx tsx scripts/generate-tokens.ts`.
+5. Create `scripts/generate-grammar-for-urashima.ts` (copy of asa script). Expected targets: `〜てしまう`, `〜なければならない`, `〜てやる/てくれる`, `〜てもらう`, `〜たまま`, passive `〜られる`, causative `〜せる`, `〜ように`, `〜かもしれない`, `〜はず`, `〜ばかり`, `〜きり`.
+6. Preload dictionary: `bunx tsx scripts/sync-dictionary-to-db.ts`.
+7. QA `/reader/urashima/{simplified,intermediate,original}` — no leftover `（…）`, furigana correct (竜宮城 → りゅうぐうじょう, 玉手箱 → たまてばこ, 乙姫 → おとひめ), deep blue cover visible in Library, ~9 min coherent.
 
-### Étapes
+### Files
 
-1. **Créer `src/data/books/gyofukuki.ts**` avec `gyofukukiSimplified`, `gyofukukiIntermediate`, `gyofukukiOriginal`. Stripper toutes les parenthèses furigana sur les 3 niveaux.
-2. **Étendre `src/data/book-reading-overrides.ts**` — bloc `'gyofukuki'`. Liste préliminaire :
-  - `馬禿山: まはげやま`, `滝: たき`, `滝壺: たきつぼ`, `炭: すみ`, `炭焼き: すみやき`, `蛇: へび`, `羊歯: しだ`, `籠: かご`, `獣: けもの`, `阿呆: あほう`, `轟音: ごうおん`, `崖: がけ`, `麓: ふもと`, `紅葉: こうよう`, `駄菓子: だがし`, `塩せんべい: しおせんべい`, `鏡: かがみ`, `髪飾り: かみかざり`, `木枯らし: こがらし`, `吹雪: ふぶき`, `絶望: ぜつぼう`, `抵抗: ていこう`, `振り絞る: ふりしぼる`, `濁る: にごる`, `突き飛ばす: つきとばす`, `身を投げる: みをなげる`, `フナ: ふな`, `腐った: くさった`, `初秋: しょしゅう`, `店番: みせばん`, `小屋: こや`.
-3. **Enregistrer dans `src/data/books.ts**` : import + entrée `Book` après `asa`.
-4. **Régénérer tokens** : `bunx tsx scripts/generate-tokens.ts`.
-5. **Créer `scripts/generate-grammar-for-gyofukuki.ts**` (copie de `generate-grammar-for-asa.ts`) puis exécuter — ~7 notes par niveau. Cibles attendues : `〜ように言う`, `〜たびに`, `〜まつわる`, `〜ながら`, `〜てしまう`, `〜ようとする`, `〜まま`, `〜ように`, conditionnel `〜と` (changement automatique), `〜ているうちに`, passif `〜られる`.
-6. **Précharger le dictionnaire** : `bunx tsx scripts/sync-dictionary-to-db.ts`.
-7. **QA** sur `/reader/gyofukuki/{simplified,intermediate,original}` — pas de parenthèses résiduelles, furigana corrects (馬禿山 → まはげやま, 羊歯 → しだ, フナ visible), cover bleu-gris distinct dans la Library, ~10 min cohérent.
+- create `src/data/books/urashima.ts`
+- create `scripts/generate-grammar-for-urashima.ts`
+- edit `src/data/books.ts`, `src/data/book-reading-overrides.ts`
+- auto-edited: `src/data/book-tokens.ts`, `src/data/book-grammar.ts`
 
-### Fichiers
-
-- créer `src/data/books/gyofukuki.ts`
-- créer `scripts/generate-grammar-for-gyofukuki.ts`
-- éditer `src/data/books.ts`, `src/data/book-reading-overrides.ts`, `.lovable/plan.md`
-- édités auto : `src/data/book-tokens.ts`, `src/data/book-grammar.ts`
-
-### Hors scope
+### Out of scope
 
 - Audio MP3.
-- Adaptation simplified additionnelle (on prend le beginner JSON tel quel après strip).
+- Extra simplified rewriting (we use the beginner JSON as-is).
 
-### Points à confirmer (sinon je pars sur les valeurs ci-dessus)
+### Points to confirm (otherwise I go with the values above)
 
-1. **JLPT N3** OK ? Alternatives :
-  - **N4** si tu veux refléter le beginner (mais l'intermediate est franchement N3).
-  - **N2** pour refléter l'original Aozora (Dazai 1933, registre littéraire).
-2. **Couleur `#5B7B8C**` (bleu-gris cascade froide) OK ? Variations :
-  - `#3D5A6C` plus sombre/profond (eau du滝壺 nocturne).
-  - `#8FA8B5` plus pâle (brume de cascade).
-  - `#6B8E5A` vert-mousse (羊歯 / forêt automnale).
-  - `#A8443A` rouge sombre (violence de la nuit, contraste fort avec les autres Dazai).
-3. **Reading time 10 min** OK ? Alternatives : 8 min ou 12 min.
-4. **Title EN** : "The Fish Tale" (court, joli) — alternatives : "Metamorphosis into a Fish" (littéral), "Fish Story" (sec), ou laisser juste `Gyofukuki` en romaji.
-5. **Synopsis EN** ci-dessus OK, ou tu préfères :
-  - (b) plus court : "Suwa, thirteen, lives by a thundering waterfall with her charcoal-burner father. One winter night his violence drives her into the snow — and into the freezing pool, where the story quietly turns into something else entirely."
-  - (c) plus factuel : "Early Dazai folk tale: a young mountain girl, her drunken father, and a winter night that ends in a leap into a waterfall — and a strange, gentle transformation."
+1. **JLPT N4** OK? Alternatives:
+   - **N5** to reflect the beginner JSON only.
+   - **N3** to reflect the original Aozora (Meiji-era register).
+2. **Cover `#4A90B8`** (deep ocean blue) OK? Variations:
+   - `#1B3A5C` very dark abyss (the depths of Ryūgū).
+   - `#7BC4D9` bright turquoise (sunny shore + tropical fish).
+   - `#C9A86B` aged gold (the tamatebako, melancholy ending).
+   - `#E8D5B7` pale sand (beach/nostalgia tone).
+3. **Reading time 9 min** OK? Alternatives: 7 or 11.
+4. **Title EN "Urashima Tarō"** (romaji, recognizable) OK? Alternatives: "The Fisherman and the Turtle", "Tarō of the Sea", "The Dragon Palace".
+5. **Synopsis** OK, or prefer:
+   - (b) shorter: "A young fisherman is taken to a palace beneath the sea after saving a turtle. When he finally returns home, three hundred years have passed — and a forbidden box waits in his hands."
+   - (c) more factual: "Classic Japanese folk tale: Urashima Tarō saves a turtle, visits the Dragon Palace, and returns to find centuries have gone by on land."
