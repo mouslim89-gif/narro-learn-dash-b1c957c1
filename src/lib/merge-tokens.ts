@@ -208,7 +208,13 @@ export function gluePhrasalCompounds(tokens: BookToken[]): BookToken[] {
       let ok = true;
       for (let k = 0; k < pat.surfaces.length; k++) {
         const t = tokens[i + k];
-        if (!t.j || t.t !== pat.surfaces[k]) { ok = false; break; }
+        const m = pat.surfaces[k];
+        if (!t.j) { ok = false; break; }
+        if (typeof m === 'string') {
+          if (t.t !== m) { ok = false; break; }
+        } else {
+          if ((t.b ?? t.t) !== m.base) { ok = false; break; }
+        }
       }
       if (ok) { matched = pat; break; }
     }
