@@ -186,6 +186,9 @@ const PHRASAL_PATTERNS: PhrasalPattern[] = [
   { surfaces: ['と', 'して'], base: 'として', pos: '表現' },
   { surfaces: ['に', 'よる'], base: 'による', pos: '表現' },
   { surfaces: ['に', 'よって'], base: 'によって', pos: '表現' },
+
+  // に + なる (any conjugation): becomes 〜になる, dictionary form なる
+  { surfaces: ['に', { base: 'なる' }], base: 'なる', pos: '動詞/自立' },
 ];
 
 // Sort patterns by surface count descending so longer matches win.
