@@ -5,7 +5,7 @@ import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { getCached, lookupWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { getCached, lookupWord, pickBestResult, type JishoResult, type CacheEntry } from '@/lib/jisho';
 import { ConjugationTable, getWordType } from '@/components/ConjugationTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
