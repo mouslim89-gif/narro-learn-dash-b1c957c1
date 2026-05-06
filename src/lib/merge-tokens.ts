@@ -115,3 +115,122 @@ export function mergeConjugatedTokens(tokens: BookToken[]): BookToken[] {
 
   return out;
 }
+
+// ---------------------------------------------------------------------------
+// Phrasal-compound gluing
+// ---------------------------------------------------------------------------
+// After verb-aux merging, fuse fixed multi-token expressions (じゃない,
+// ではない, ように, ような, かもしれない, について, …) into a single
+// clickable token whose base form points to the canonical compound.
+
+type PhrasalPattern = {
+  /** Sequence of surface forms to match consecutively (token.t === surface). */
+  surfaces: string[];
+  /** Canonical base form used for dictionary lookup. */
+  base: string;
+  /** POS tag for the merged token. */
+  pos: string;
+};
+
+// Order matters only when patterns share a prefix — we sort by length desc.
+const PHRASAL_PATTERNS: PhrasalPattern[] = [
+  // negative copulas
+  { surfaces: ['じゃ', 'ありませんでした'], base: 'じゃない', pos: '助動詞' },
+  { surfaces: ['じゃ', 'ありません'], base: 'じゃない', pos: '助動詞' },
+  { surfaces: ['じゃ', 'なかった'], base: 'じゃない', pos: '助動詞' },
+  { surfaces: ['じゃ', 'ない'], base: 'じゃない', pos: '助動詞' },
+  { surfaces: ['で', 'は', 'ありませんでした'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['で', 'は', 'ありません'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['で', 'は', 'なかった'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['で', 'は', 'ない'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['では', 'ありませんでした'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['では', 'ありません'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['では', 'なかった'], base: 'ではない', pos: '助動詞' },
+  { surfaces: ['では', 'ない'], base: 'ではない', pos: '助動詞' },
+
+  // よう / そう / みたい + に/な/だ/です
+  { surfaces: ['よう', 'に'], base: 'ように', pos: '副詞' },
+  { surfaces: ['よう', 'な'], base: 'ような', pos: '連体詞' },
+  { surfaces: ['そう', 'に'], base: 'そうに', pos: '副詞' },
+  { surfaces: ['そう', 'な'], base: 'そうな', pos: '連体詞' },
+  { surfaces: ['みたい', 'に'], base: 'みたいに', pos: '副詞' },
+  { surfaces: ['みたい', 'な'], base: 'みたいな', pos: '連体詞' },
+  { surfaces: ['みたい', 'です'], base: 'みたいだ', pos: '助動詞' },
+  { surfaces: ['みたい', 'だ'], base: 'みたいだ', pos: '助動詞' },
+
+  // なければ / なくては
+  { surfaces: ['なければ', 'ならない'], base: 'なければならない', pos: '表現' },
+  { surfaces: ['なければ', 'なりません'], base: 'なければならない', pos: '表現' },
+  { surfaces: ['なければ', 'いけない'], base: 'なければいけない', pos: '表現' },
+  { surfaces: ['なければ', 'いけません'], base: 'なければいけない', pos: '表現' },
+  { surfaces: ['なくて', 'は', 'ならない'], base: 'なくてはならない', pos: '表現' },
+  { surfaces: ['なくて', 'は', 'いけない'], base: 'なくてはいけない', pos: '表現' },
+
+  // ことがある / ことがない
+  { surfaces: ['こと', 'が', 'ある'], base: 'ことがある', pos: '表現' },
+  { surfaces: ['こと', 'が', 'ない'], base: 'ことがない', pos: '表現' },
+
+  // わけではない
+  { surfaces: ['わけ', 'で', 'は', 'ない'], base: 'わけではない', pos: '表現' },
+  { surfaces: ['わけ', 'では', 'ない'], base: 'わけではない', pos: '表現' },
+
+  // かもしれない
+  { surfaces: ['かも', 'しれません'], base: 'かもしれない', pos: '助動詞' },
+  { surfaces: ['かも', 'しれない'], base: 'かもしれない', pos: '助動詞' },
+
+  // について / に対して / として / による / によって
+  { surfaces: ['に', 'ついて'], base: 'について', pos: '表現' },
+  { surfaces: ['に', '対して'], base: 'に対して', pos: '表現' },
+  { surfaces: ['と', 'して'], base: 'として', pos: '表現' },
+  { surfaces: ['に', 'よる'], base: 'による', pos: '表現' },
+  { surfaces: ['に', 'よって'], base: 'によって', pos: '表現' },
+];
+
+// Sort patterns by surface count descending so longer matches win.
+const SORTED_PHRASAL = [...PHRASAL_PATTERNS].sort(
+  (a, b) => b.surfaces.length - a.surfaces.length
+);
+
+export function gluePhrasalCompounds(tokens: BookToken[]): BookToken[] {
+  const out: BookToken[] = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    let matched: PhrasalPattern | null = null;
+
+    for (const pat of SORTED_PHRASAL) {
+      if (i + pat.surfaces.length > tokens.length) continue;
+      let ok = true;
+      for (let k = 0; k < pat.surfaces.length; k++) {
+        const t = tokens[i + k];
+        if (!t.j || t.t !== pat.surfaces[k]) { ok = false; break; }
+      }
+      if (ok) { matched = pat; break; }
+    }
+
+    if (matched) {
+      let surface = '';
+      let reading = '';
+      for (let k = 0; k < matched.surfaces.length; k++) {
+        const t = tokens[i + k];
+        surface += t.t;
+        reading += t.r ?? '';
+      }
+      out.push({
+        t: surface,
+        j: true,
+        p: matched.pos,
+        r: reading || undefined,
+        b: matched.base,
+      });
+      i += matched.surfaces.length;
+      continue;
+    }
+
+    out.push(tokens[i]);
+    i++;
+  }
+
+  return out;
+}
+
