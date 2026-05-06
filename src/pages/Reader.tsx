@@ -36,7 +36,8 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 const stripParens = (text: string): string =>
   text
     .replace(/[（(][^（）()\n\r]*[）)]/g, '')
-    .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g, '$1$2');
+    .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g, '$1$2')
+    .replace(/^一$/gm, '​');
 
 const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
   const out: BookToken[] = [];
@@ -80,7 +81,12 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
       continue;
     }
 
-    out.push({ ...token });
+    // Replace standalone "一" with zero-width space
+    if (token.t === '一' && (i === 0 || raw[i-1].t === '\n') && (i === raw.length - 1 || raw[i+1].t === '\n')) {
+      out.push({ ...token, t: '​' });
+    } else {
+      out.push({ ...token });
+    }
     i++;
   }
 
