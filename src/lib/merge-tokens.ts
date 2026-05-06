@@ -91,6 +91,14 @@ export function mergeConjugatedTokens(tokens: BookToken[]): BookToken[] {
         continue;
       }
 
+      if (isAuxPseudoNoun(next)) {
+        surface += next.t;
+        reading += next.r ?? '';
+        lastWasTe = false;
+        j++;
+        continue;
+      }
+
       if (isTeParticle(next)) {
         // Consume て/で and try to chain an auxiliary verb after it
         const after = tokens[j + 1];
