@@ -168,44 +168,77 @@ export default function Reader() {
     return stripParens(getChapterContent(book, chapterId, difficulty));
   }, [book, chapterId, difficulty]);
 
-  // Split tokens into sentences for highlighting
+  // Split tokens into sentences. A sentence breaks on 。！？ OR on a newline
+  // (newlines in source are authoritative paragraph hints from the book).
+  // We strip pure-newline tokens so they never render visually, but record a
+  // `breakAfter` flag on the sentence so paragraph grouping can use it.
   const sentences = useMemo(() => {
-    const result: { tokens: BookToken[] }[] = [];
+    const result: { tokens: BookToken[]; breakAfter: boolean }[] = [];
     let current: BookToken[] = [];
+    const flush = (breakAfter: boolean) => {
+      if (current.length > 0) {
+        result.push({ tokens: current, breakAfter });
+        current = [];
+      } else if (breakAfter && result.length > 0) {
+        result[result.length - 1].breakAfter = true;
+      }
+    };
     tokens.forEach((token) => {
+      // Newline-only tokens act purely as paragraph separators.
+      if (/^[\n\r]+$/.test(token.t)) {
+        flush(true);
+        return;
+      }
+      // Tokens containing embedded newlines: split off the newline as a break.
+      if (token.t.includes('\n')) {
+        const cleaned = token.t.replace(/[\n\r]+/g, '');
+        if (cleaned.length > 0) current.push({ ...token, t: cleaned });
+        flush(true);
+        return;
+      }
       current.push(token);
       if (token.t.includes('。') || token.t.includes('！') || token.t.includes('？')) {
-        result.push({ tokens: [...current] });
-        current = [];
+        flush(false);
       }
     });
-    if (current.length > 0) result.push({ tokens: current });
+    flush(false);
     return result;
   }, [tokens]);
 
-  // Group sentences into visual paragraphs
+  // Group sentences into visual paragraphs.
+  // Rules:
+  //  - A sentence with `breakAfter` (newline in source) closes the paragraph.
+  //  - But: never close while a Japanese quote 「…」 / 『…』 is still open —
+  //    keep the whole quoted span in one visual paragraph.
   const paragraphs = useMemo(() => {
     const groups: { tokens: BookToken[] }[][] = [];
     let current: { tokens: BookToken[] }[] = [];
+    let quoteDepth = 0;
+
+    const countQuotes = (text: string) => {
+      let depth = 0;
+      for (const ch of text) {
+        if (ch === '「' || ch === '『') depth++;
+        else if (ch === '」' || ch === '』') depth--;
+      }
+      return depth;
+    };
 
     sentences.forEach((sentence) => {
       const text = sentence.tokens.map((t) => t.t).join('');
-      const startsDialogue = text.startsWith('「') || text.startsWith('『');
-      const endsDialogue = text.includes('」') || text.includes('』');
+      const startsDialogue = quoteDepth === 0 && (text.trimStart().startsWith('「') || text.trimStart().startsWith('『'));
 
-      // Start new paragraph before dialogue
-      if (startsDialogue && current.length > 0) {
+      // Start new paragraph before a fresh dialogue line.
+      if (startsDialogue && current.length > 0 && quoteDepth === 0) {
         groups.push(current);
         current = [];
       }
 
       current.push(sentence);
+      quoteDepth = Math.max(0, quoteDepth + countQuotes(text));
 
-      // Start new paragraph after dialogue ends
-      if (endsDialogue) {
-        groups.push(current);
-        current = [];
-      } else if (current.length >= 3 && !startsDialogue) {
+      // Only flush when no quote is open.
+      if (quoteDepth === 0 && sentence.breakAfter) {
         groups.push(current);
         current = [];
       }
