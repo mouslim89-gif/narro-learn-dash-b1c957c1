@@ -123,9 +123,11 @@ export function mergeConjugatedTokens(tokens: BookToken[]): BookToken[] {
 // ではない, ように, ような, かもしれない, について, …) into a single
 // clickable token whose base form points to the canonical compound.
 
+type PhrasalMatcher = string | { base: string };
+
 type PhrasalPattern = {
-  /** Sequence of surface forms to match consecutively (token.t === surface). */
-  surfaces: string[];
+  /** Sequence of surface forms (string) or base-form matchers ({base}) to match consecutively. */
+  surfaces: PhrasalMatcher[];
   /** Canonical base form used for dictionary lookup. */
   base: string;
   /** POS tag for the merged token. */
@@ -184,6 +186,9 @@ const PHRASAL_PATTERNS: PhrasalPattern[] = [
   { surfaces: ['と', 'して'], base: 'として', pos: '表現' },
   { surfaces: ['に', 'よる'], base: 'による', pos: '表現' },
   { surfaces: ['に', 'よって'], base: 'によって', pos: '表現' },
+
+  // に + なる (any conjugation): becomes 〜になる, dictionary form なる
+  { surfaces: ['に', { base: 'なる' }], base: 'なる', pos: '動詞/自立' },
 ];
 
 // Sort patterns by surface count descending so longer matches win.
@@ -203,7 +208,13 @@ export function gluePhrasalCompounds(tokens: BookToken[]): BookToken[] {
       let ok = true;
       for (let k = 0; k < pat.surfaces.length; k++) {
         const t = tokens[i + k];
-        if (!t.j || t.t !== pat.surfaces[k]) { ok = false; break; }
+        const m = pat.surfaces[k];
+        if (!t.j) { ok = false; break; }
+        if (typeof m === 'string') {
+          if (t.t !== m) { ok = false; break; }
+        } else {
+          if ((t.b ?? t.t) !== m.base) { ok = false; break; }
+        }
       }
       if (ok) { matched = pat; break; }
     }
