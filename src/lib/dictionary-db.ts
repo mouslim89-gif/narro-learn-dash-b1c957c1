@@ -76,6 +76,7 @@ async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
 
 /** Public: hydrate the jisho in-memory cache for a given book. */
 export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
+  await ensureCacheVersion();
   const allWords = collectBookWords(bookId);
   if (allWords.length === 0) return;
 
@@ -89,15 +90,13 @@ export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
     else missing.push(w);
   });
 
-  // 2. Already-cached entries → seed memory immediately so popups feel instant.
+  // 2. Already-cached entries → seed memory (seedCache filters out stale entries).
   if (Object.keys(seed).length > 0) seedCache(seed);
 
-  // 3. Skip network entirely if nothing is missing OR book is marked hydrated.
-  const hydrated = await get<boolean>(`book:${bookId}:hydrated`, metaStore);
-  if (missing.length === 0 || hydrated) {
-    if (!hydrated) await set(`book:${bookId}:hydrated`, true, metaStore);
-    return;
-  }
+  // 3. Skip the DB fetch only if everything we need is present locally.
+  // (We no longer rely on a "hydrated" flag — a missing word always triggers a refetch
+  // so corrected DB entries propagate to clients without manual cache clears.)
+  if (missing.length === 0) return;
 
   // 4. Fetch the missing words from DB and persist.
   const fetched = await fetchFromDb(missing);
