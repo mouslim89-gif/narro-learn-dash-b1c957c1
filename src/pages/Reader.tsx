@@ -811,7 +811,6 @@ export default function Reader() {
                           key={i}
                           style={{ touchAction: 'none' }}
                           onPointerDown={(e) => {
-                            (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
                             dragRef.current.active = true;
                             dragRef.current.startKey = tokKey;
                             dragRef.current.addedKeys = new Set([tokKey]);
@@ -825,7 +824,8 @@ export default function Reader() {
                             const dy = e.clientY - dragRef.current.startY;
                             if (!dragRef.current.moved && Math.sqrt(dx*dx + dy*dy) > 6) {
                               dragRef.current.moved = true;
-                              // Add the start token to selection now that we know it's a drag
+                              // Capture pointer only now → keeps the click working for taps.
+                              try { (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId); } catch {}
                               const startKey = dragRef.current.startKey;
                               if (startKey != null) {
                                 setSelectedIdx((arr) => arr.includes(startKey) ? arr : [...arr, startKey].sort((a, b) => a - b));
