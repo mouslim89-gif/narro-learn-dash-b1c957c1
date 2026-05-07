@@ -131,12 +131,14 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
   { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix', 'Na-adjective', 'No-adjective', 'Adjectival noun'] },
 ];
 
-/** True if first sense of result is tagged "Usually written using kana alone". */
+/** True if any sense (or tag) of the result is marked "Usually written using kana alone". */
 export function isUsuallyKana(result: JishoResult | null | undefined): boolean {
   if (!result) return false;
-  const first = result.senses?.[0];
-  if (!first) return false;
-  return first.parts_of_speech.some((p) => /usually written using kana/i.test(p));
+  const re = /usually written using kana|^uk$/i;
+  if (result.tags?.some((t) => re.test(t))) return true;
+  return (result.senses ?? []).some((s) =>
+    s.parts_of_speech.some((p) => re.test(p)),
+  );
 }
 
 /** Returns the form to display: kana when the entry is usually-kana, else kanji form. */
