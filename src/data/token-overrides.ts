@@ -24,6 +24,7 @@ export const tokenOverrides: Record<string, Rule[]> = {
   "*": [
     ["何|も", "何も:なにも"],
     ["お", "お:お:御"],
+    ["いつ|まで|も", "いつまでも"],
   ],
   urashima: [["りょう|し", "りょうし:りょうし:漁師"]],
 };
