@@ -1,42 +1,57 @@
-## Problème
+## Diagnostic
 
-Override `["で|ある", "である::である"]` → token résultant a `p: "名詞"` (défaut forcé dans `parseToken`).
-Dans `pickBestResult`, le filtre POS sur "Noun" rejette l'entrée Copula `である` et garde `である体` (Noun).
+1. **DB pollution** : la table `dictionary` contient `の → {"results": []}` (vérifié via psql).
+2. `hydrateDictionaryForBook` seed cette entrée vide dans le cache mémoire au chargement du livre.
+3. `getCached('の')` retourne `undefined` (length=0), donc `WordMiniPopup` appelle `lookupWord('の')`.
+4. `lookupWord` voit l'entrée existante vide → tente une fetch live → ajoute `'の'` à `liveAttempted`.
+5. Si cette fetch live échoue ou retombe sur une réponse vide (timing, rate-limit, retour ancien), la garde `liveAttempted` empêche tout retry futur → l'entrée vide reste collée.
+6. `pickBestResult([], …)` → `null` → `setError(true)` → "No definition found".
 
-Même bug structurel que の : le défaut `名詞` dans `parseToken` casse les overrides qui ne précisent pas de POS.
+L'edge function `jisho-lookup` retourne pourtant bien 5 résultats actuellement pour `の` (vérifié via curl direct). Le problème est donc le **cache vide persistant**.
 
-## Solutions possibles
+## Solutions
 
-### Option A — Retirer le défaut `名詞` dans `parseToken` (recommandé)
+### Option A — Nettoyer la DB + ne plus seeder les entrées vides (recommandé)
 
-Dans `src/data/token-overrides.ts`, ligne 78 :
-```ts
-p: punct ? "記号" : (resolvedPos ?? "名詞"),
+**1. Supprimer la ligne polluée en DB :**
+```sql
+delete from dictionary where word = 'の' and jsonb_array_length(entry->'results') = 0;
+-- (étendre à toutes les entrées vides pour nettoyer d'un coup)
+delete from dictionary where jsonb_array_length(entry->'results') = 0;
 ```
-→
+
+**2. Dans `src/lib/jisho.ts` → `seedCache`** : skip les entrées vides pour qu'une mauvaise donnée DB ne pollue jamais le cache mémoire :
 ```ts
-...(punct ? { p: "記号" } : resolvedPos ? { p: resolvedPos } : {}),
+export function seedCache(entries: Record<string, CacheEntry>): void {
+  for (const [word, entry] of Object.entries(entries)) {
+    if (isKnownStaleEntry(word, entry)) continue;
+    if (!entry?.results || entry.results.length === 0) continue; // ← nouveau
+    cache.set(word, entry);
+  }
+}
 ```
 
-Comme ça, sans POS spécifié, aucun filtre POS n'est appliqué et `pickBestResult` choisit par surface match → `である` (Copula) en premier.
+**3. Côté IndexedDB** : idem dans `dictionary-db.ts`, ne pas persister les entrées vides récupérées de Supabase (sinon le client local restera coincé même après cleanup DB) :
+```ts
+fetched.forEach((entry, word) => {
+  if (!entry?.results?.length) return; // skip empty
+  fetchedObj[word] = entry;
+  idbPairs.push([word, entry]);
+});
+```
 
-Avantage : règle générale, fix tous les overrides futurs sans POS.
-Risque : si d'autres tokens dépendent du défaut 名詞 implicite — à vérifier mais peu probable vu que sans POS, `pickBestResult` tombe sur le premier surface match, ce qui est le comportement le plus naturel.
+Avantage : robuste contre toute donnée DB pourrie, future-proof.
 
-C'est d'ailleurs la fix qui avait été faite pour le bug の précédent mais qui a été perdue.
+### Option B — Forcer le retry dans `lookupWord`
 
-### Option B — Spécifier le POS dans l'override
+Retirer la garde `liveAttempted` pour les entrées vides : toujours retry quand `results.length === 0`. Plus simple mais coût réseau plus élevé sur les vrais "no result" (mots inventés, etc.).
 
-Remplacer `["で|ある", "である::である"]` par `["で|ある", "である:::aux"]`.
-`aux` → `助動詞` → matche "Auxiliary, Copula, Particle" dans `POS_KEYWORDS`.
+### Option C — Quick fix DB only
 
-Avantage : ciblé, pas de changement de la logique.
-Inconvénient : il faudra le faire à chaque override, le bug reviendra.
-
-### Option C — Faire les deux
-
-Retirer le défaut `名詞` (Option A) **et** taguer explicitement les particules/copules comme `である:::aux` et `の:::particle` quand on veut forcer le POS. Plus robuste.
+Juste supprimer la ligne `の` en DB et invalider le hydrated flag IndexedDB. Le bug reviendra si une autre entrée vide est insérée plus tard.
 
 ## Recommandation
 
-**Option A** : c'est la fix qui a déjà été identifiée auparavant pour le bug de の (cf. l'historique du chat) mais qui semble avoir été reperdue. Le défaut `名詞` est la source de récidive. Une fois retiré, on peut aussi simplifier l'override de の en `["の", "の"]` ou même le supprimer si pas nécessaire.
+**Option A** : nettoyer la DB + filtrer les entrées vides dans `seedCache` ET dans `dictionary-db.ts`. C'est la fix défensive qui empêche toute récidive.
+
+Note : il faudra aussi probablement invalider le flag `book:gyofukuki:hydrated` dans IndexedDB côté user pour forcer un re-fetch propre, ou bumper une version de schéma. Le plus simple : ajouter un check au démarrage qui purge les entrées IDB vides.

@@ -67,7 +67,7 @@ export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
   const missing: string[] = [];
   allWords.forEach((w, i) => {
     const entry = cached[i];
-    if (entry) seed[w] = entry;
+    if (entry && entry.results && entry.results.length > 0) seed[w] = entry;
     else missing.push(w);
   });
 
@@ -87,6 +87,7 @@ export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
     const fetchedObj: Record<string, CacheEntry> = {};
     const idbPairs: [string, CacheEntry][] = [];
     fetched.forEach((entry, word) => {
+      if (!entry?.results?.length) return;
       fetchedObj[word] = entry;
       idbPairs.push([word, entry]);
     });
