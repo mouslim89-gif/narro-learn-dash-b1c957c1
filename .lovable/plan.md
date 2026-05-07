@@ -1,57 +1,41 @@
+# Fix : cache dictionnaire pollué (三 → 三人, etc.)
+
 ## Diagnostic
 
-1. **DB pollution** : la table `dictionary` contient `の → {"results": []}` (vérifié via psql).
-2. `hydrateDictionaryForBook` seed cette entrée vide dans le cache mémoire au chargement du livre.
-3. `getCached('の')` retourne `undefined` (length=0), donc `WordMiniPopup` appelle `lookupWord('の')`.
-4. `lookupWord` voit l'entrée existante vide → tente une fetch live → ajoute `'の'` à `liveAttempted`.
-5. Si cette fetch live échoue ou retombe sur une réponse vide (timing, rate-limit, retour ancien), la garde `liveAttempted` empêche tout retry futur → l'entrée vide reste collée.
-6. `pickBestResult([], …)` → `null` → `setError(true)` → "No definition found".
+La table `dictionary` (cache backend) contient pour `三` les résultats `[三人, 三人組, …]` — aucune entrée pour `三` lui-même. L'API Jisho live renvoie pourtant correctement `三, 三-1, 三つ, 三味線, 三日`.
 
-L'edge function `jisho-lookup` retourne pourtant bien 5 résultats actuellement pour `の` (vérifié via curl direct). Le problème est donc le **cache vide persistant**.
+Le bug n'est donc **pas** dans `pickBestResult` ni dans la priorité aux noms (déjà retirée). C'est juste de la mauvaise data en cache, probablement issue d'un ancien sync où la requête était mal formée. Mêmes symptômes confirmés pour : `一, 二, 四, 五, 七, 九, に, で, と` (tous ont un slug premier composé au lieu du caractère seul).
 
-## Solutions
+## Plan
 
-### Option A — Nettoyer la DB + ne plus seeder les entrées vides (recommandé)
+### 1. Détecter les entrées polluées
+Une entrée est "polluée" si **aucun** de ses `results[*].japanese[*].word` ni `reading` ne matche exactement le `word` clé. Requête de détection :
 
-**1. Supprimer la ligne polluée en DB :**
 ```sql
-delete from dictionary where word = 'の' and jsonb_array_length(entry->'results') = 0;
--- (étendre à toutes les entrées vides pour nettoyer d'un coup)
-delete from dictionary where jsonb_array_length(entry->'results') = 0;
+SELECT word FROM dictionary
+WHERE NOT EXISTS (
+  SELECT 1 FROM jsonb_array_elements(entry->'results') r,
+              jsonb_array_elements(r->'japanese') j
+  WHERE j->>'word' = dictionary.word OR j->>'reading' = dictionary.word
+);
 ```
 
-**2. Dans `src/lib/jisho.ts` → `seedCache`** : skip les entrées vides pour qu'une mauvaise donnée DB ne pollue jamais le cache mémoire :
-```ts
-export function seedCache(entries: Record<string, CacheEntry>): void {
-  for (const [word, entry] of Object.entries(entries)) {
-    if (isKnownStaleEntry(word, entry)) continue;
-    if (!entry?.results || entry.results.length === 0) continue; // ← nouveau
-    cache.set(word, entry);
-  }
-}
-```
+### 2. Purger ces entrées (migration DELETE)
+On les supprime toutes en une fois.
 
-**3. Côté IndexedDB** : idem dans `dictionary-db.ts`, ne pas persister les entrées vides récupérées de Supabase (sinon le client local restera coincé même après cleanup DB) :
-```ts
-fetched.forEach((entry, word) => {
-  if (!entry?.results?.length) return; // skip empty
-  fetchedObj[word] = entry;
-  idbPairs.push([word, entry]);
-});
-```
+### 3. Re-sync ciblé
+Lancer `scripts/sync-dictionary-to-db.ts` qui repassera par `jisho-lookup` et réinsèrera proprement les entrées manquantes.
 
-Avantage : robuste contre toute donnée DB pourrie, future-proof.
+### 4. Vider le cache mémoire local
+Pas de changement de code nécessaire : le live fetch dans `lookupWord` repeuplera à la demande pour les utilisateurs déjà actifs (et `seedCache` ignore déjà les entrées vides depuis le fix précédent). Au prochain `hydrateDictionaryForBook`, les nouvelles entrées propres seront chargées.
 
-### Option B — Forcer le retry dans `lookupWord`
+## Fichiers touchés
 
-Retirer la garde `liveAttempted` pour les entrées vides : toujours retry quand `results.length === 0`. Plus simple mais coût réseau plus élevé sur les vrais "no result" (mots inventés, etc.).
+- Nouvelle migration SQL : `DELETE FROM dictionary WHERE …` (la requête ci-dessus)
+- Aucun changement de code
 
-### Option C — Quick fix DB only
+## Étapes que je ferai après approbation
 
-Juste supprimer la ligne `の` en DB et invalider le hydrated flag IndexedDB. Le bug reviendra si une autre entrée vide est insérée plus tard.
-
-## Recommandation
-
-**Option A** : nettoyer la DB + filtrer les entrées vides dans `seedCache` ET dans `dictionary-db.ts`. C'est la fix défensive qui empêche toute récidive.
-
-Note : il faudra aussi probablement invalider le flag `book:gyofukuki:hydrated` dans IndexedDB côté user pour forcer un re-fetch propre, ou bumper une version de schéma. Le plus simple : ajouter un check au démarrage qui purge les entrées IDB vides.
+1. Créer la migration `DELETE` ciblée
+2. Exécuter `scripts/sync-dictionary-to-db.ts` pour repeupler
+3. Vérifier en DB que `三` a bien `slug = "三"` en premier
