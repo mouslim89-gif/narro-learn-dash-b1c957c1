@@ -250,7 +250,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
   const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined };
   const displayWord = disp.word || word;
-  const displayReading = disp.reading;
+  const displayReading = overrideReading || disp.reading;
   const isCommon = (result as any)?.is_common;
 
   return (
