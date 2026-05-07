@@ -43,6 +43,7 @@ export function getCached(keyword: string): CacheEntry | undefined {
 export function seedCache(entries: Record<string, CacheEntry>): void {
   for (const [word, entry] of Object.entries(entries)) {
     if (isKnownStaleEntry(word, entry)) continue;
+    if (!entry?.results || entry.results.length === 0) continue;
     cache.set(word, entry);
   }
 }
