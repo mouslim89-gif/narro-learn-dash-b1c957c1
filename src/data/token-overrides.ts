@@ -1,4 +1,4 @@
-import type { BookToken } from '@/data/book-tokens';
+import type { BookToken } from "@/data/book-tokens";
 
 /**
  * Per-book token overrides — version simplifiée.
@@ -23,14 +23,18 @@ export const tokenOverrides: Record<string, string[]> = {
   // 'sakura': [
   //   '呑め|そう|な  =>  呑めそうな@のめそうな#呑む:動詞/自立',
   // ],
-  '*': [],
+  "*": [],
+  urashima: ["りょう|し  =>  漁師@りょうし"],
 };
 
 // ─────────────────────────────────────────────────────────────
 // Internals — pas besoin de toucher en dessous
 // ─────────────────────────────────────────────────────────────
 
-interface ParsedRule { match: string[]; replace: BookToken[]; }
+interface ParsedRule {
+  match: string[];
+  replace: BookToken[];
+}
 
 function parseToken(spec: string): BookToken {
   // surface@reading#base:pos
@@ -39,38 +43,54 @@ function parseToken(spec: string): BookToken {
   let base: string | undefined;
   let reading: string | undefined;
 
-  const colon = rest.indexOf(':');
-  if (colon >= 0) { pos = rest.slice(colon + 1).trim(); rest = rest.slice(0, colon); }
-  const hash = rest.indexOf('#');
-  if (hash >= 0) { base = rest.slice(hash + 1).trim(); rest = rest.slice(0, hash); }
-  const at = rest.indexOf('@');
-  if (at >= 0) { reading = rest.slice(at + 1).trim(); rest = rest.slice(0, at); }
+  const colon = rest.indexOf(":");
+  if (colon >= 0) {
+    pos = rest.slice(colon + 1).trim();
+    rest = rest.slice(0, colon);
+  }
+  const hash = rest.indexOf("#");
+  if (hash >= 0) {
+    base = rest.slice(hash + 1).trim();
+    rest = rest.slice(0, hash);
+  }
+  const at = rest.indexOf("@");
+  if (at >= 0) {
+    reading = rest.slice(at + 1).trim();
+    rest = rest.slice(0, at);
+  }
   const surface = rest.trim();
 
-  const tok: BookToken = { t: surface, j: pos !== '記号' };
+  const tok: BookToken = { t: surface, j: pos !== "記号" };
   if (reading) tok.r = reading;
   if (base) tok.b = base;
-  if (pos) tok.p = pos; else tok.p = '名詞';
+  if (pos) tok.p = pos;
+  else tok.p = "名詞";
   return tok;
 }
 
 function parseRule(rule: string): ParsedRule | null {
-  const sep = rule.split('=>');
+  const sep = rule.split("=>");
   if (sep.length !== 2) return null;
-  const match = sep[0].split('|').map(s => s.trim()).filter(Boolean);
-  const replace = sep[1].split('|').map(s => s.trim()).filter(Boolean).map(parseToken);
+  const match = sep[0]
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const replace = sep[1]
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map(parseToken);
   if (match.length === 0) return null;
   return { match, replace };
 }
 
 export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
-  const raw = [
-    ...(tokenOverrides[bookId] ?? []),
-    ...(tokenOverrides['*'] ?? []),
-  ];
+  const raw = [...(tokenOverrides[bookId] ?? []), ...(tokenOverrides["*"] ?? [])];
   if (raw.length === 0) return tokens;
 
-  const rules = raw.map(parseRule).filter((r): r is ParsedRule => r !== null)
+  const rules = raw
+    .map(parseRule)
+    .filter((r): r is ParsedRule => r !== null)
     .sort((a, b) => b.match.length - a.match.length);
   if (rules.length === 0) return tokens;
 
@@ -82,12 +102,23 @@ export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookTo
       if (i + r.match.length > tokens.length) continue;
       let ok = true;
       for (let k = 0; k < r.match.length; k++) {
-        if (tokens[i + k].t !== r.match[k]) { ok = false; break; }
+        if (tokens[i + k].t !== r.match[k]) {
+          ok = false;
+          break;
+        }
       }
-      if (ok) { matched = r; break; }
+      if (ok) {
+        matched = r;
+        break;
+      }
     }
-    if (matched) { out.push(...matched.replace); i += matched.match.length; }
-    else { out.push(tokens[i]); i++; }
+    if (matched) {
+      out.push(...matched.replace);
+      i += matched.match.length;
+    } else {
+      out.push(tokens[i]);
+      i++;
+    }
   }
   return out;
 }
