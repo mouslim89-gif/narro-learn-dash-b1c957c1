@@ -7,6 +7,7 @@ import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult
 interface WordMiniPopupProps {
   word: string;
   baseForm?: string;
+  reading?: string;
   pos?: string;
   contextSentence?: string;
   sentenceRect: { top: number; bottom: number; left: number; right: number };
@@ -18,6 +19,7 @@ interface WordMiniPopupProps {
 export function WordMiniPopup({
   word,
   baseForm,
+  reading: overrideReading,
   pos,
   contextSentence,
   sentenceRect,
@@ -143,7 +145,7 @@ export function WordMiniPopup({
 
   const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined };
   const headerWord = disp.word || word;
-  const headerReading = disp.reading;
+  const headerReading = overrideReading || disp.reading;
 
   return (
     <div

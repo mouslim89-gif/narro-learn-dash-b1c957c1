@@ -111,10 +111,10 @@ export default function Reader() {
     (diffParam as Difficulty) || saved?.difficulty || 'simplified'
   );
   const [showSettings, setShowSettings] = useState(false);
-  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
+  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
   const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
   const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
-  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; pos?: string; contextSentence?: string } | null>(null);
+  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string } | null>(null);
 
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -721,6 +721,7 @@ export default function Reader() {
                             setMiniPopup({
                               text: token.t,
                               baseForm: token.b,
+                              reading: token.r,
                               pos: token.p,
                               contextSentence: sentenceText,
                               sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
@@ -744,14 +745,15 @@ export default function Reader() {
         <WordMiniPopup
           word={miniPopup.text}
           baseForm={miniPopup.baseForm}
+          reading={miniPopup.reading}
           pos={miniPopup.pos}
           contextSentence={miniPopup.contextSentence}
           sentenceRect={miniPopup.sentenceRect}
           onClose={() => setMiniPopup(null)}
           onShowMore={() => {
-            const { text, baseForm, pos, contextSentence } = miniPopup;
+            const { text, baseForm, reading, pos, contextSentence } = miniPopup;
             setMiniPopup(null);
-            setFullPopupWord({ text, baseForm, pos, contextSentence });
+            setFullPopupWord({ text, baseForm, reading, pos, contextSentence });
           }}
           onTranslateSentence={() => {
             const idx = miniPopup.sentenceIdx;
@@ -773,6 +775,7 @@ export default function Reader() {
         <WordPopup
           word={fullPopupWord.text}
           baseForm={fullPopupWord.baseForm}
+          reading={fullPopupWord.reading}
           pos={fullPopupWord.pos}
           contextSentence={fullPopupWord.contextSentence}
           onClose={() => setFullPopupWord(null)}
