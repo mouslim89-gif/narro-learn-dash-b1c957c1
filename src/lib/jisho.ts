@@ -141,11 +141,20 @@ export function isUsuallyKana(result: JishoResult | null | undefined): boolean {
   );
 }
 
-/** Returns the form to display: kana when the entry is usually-kana, else kanji form. */
-export function getDisplayWord(result: JishoResult | null | undefined): { word: string; reading?: string } {
+const KANA_ONLY = /^[\u3040-\u309F\u30A0-\u30FF\u30FC]+$/;
+
+/** Returns the form to display: kana when the entry is usually-kana or surface is kana, else kanji form. */
+export function getDisplayWord(
+  result: JishoResult | null | undefined,
+  surface?: string,
+): { word: string; reading?: string } {
   if (!result) return { word: '' };
   const j = result.japanese[0];
   if (!j) return { word: '' };
+  if (surface && KANA_ONLY.test(surface)) {
+    const match = result.japanese.find((x) => x.reading === surface || x.word === surface);
+    if (match?.reading) return { word: match.reading };
+  }
   if (isUsuallyKana(result) && j.reading) {
     return { word: j.reading };
   }
