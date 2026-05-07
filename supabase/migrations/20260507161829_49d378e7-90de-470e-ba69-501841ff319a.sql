@@ -1,0 +1,1 @@
+DELETE FROM public.dictionary WHERE jsonb_array_length(entry->'results') = 0;
