@@ -140,18 +140,18 @@ function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
       }
     }
     if (matched) {
-      // For replacement tokens whose POS was omitted in the rule, inherit the
-      // POS of the first matched token (so "Auto"/omit doesn't lose info).
-      const inheritedPos = tokens[i]?.p;
+      // For replacement tokens whose fields were omitted in the rule, inherit
+      // them from the first matched token. This makes "Auto" preserve the
+      // original Kuromoji info (POS, reading, base form).
+      const src = tokens[i];
       for (const rt of matched.replace) {
-        const anyRt = rt as BookToken & { __posOmitted?: boolean };
-        if (anyRt.__posOmitted && inheritedPos) {
-          out.push({ ...rt, p: inheritedPos });
-        } else {
-          // Strip internal flag before emitting
-          const { __posOmitted: _omit, ...clean } = anyRt as BookToken & { __posOmitted?: boolean };
-          out.push(clean as BookToken);
-        }
+        const anyRt = rt as ParsedToken;
+        const { __posOmitted, __rOmitted, __bOmitted, ...clean } = anyRt;
+        const merged: BookToken = { ...clean };
+        if (__posOmitted && src?.p) merged.p = src.p;
+        if (__rOmitted && src?.r) merged.r = src.r;
+        if (__bOmitted && src?.b) merged.b = src.b;
+        out.push(merged);
       }
       i += matched.match.length;
     } else {
