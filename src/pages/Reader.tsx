@@ -710,6 +710,7 @@ export default function Reader() {
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
                       const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
                       const tokKey = globalIdx * 10000 + i;
+                      if (tokenEditMode) tokenByKey.current.set(tokKey, token);
                       const isSelected = tokenEditMode && selectedIdx.includes(tokKey);
 
                       // Known-word highlight: disabled in grammar mode (POS colors prevail).
