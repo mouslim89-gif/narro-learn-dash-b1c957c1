@@ -652,6 +652,22 @@ export default function Reader() {
               </div>
             )}
           </div>
+
+          {isAdmin && (
+            <>
+              <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Dev</p>
+              <label className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2">
+                <span className="flex items-center gap-2 text-xs font-semibold">
+                  <Wrench className="h-3.5 w-3.5" />
+                  Token edit mode
+                </span>
+                <Switch
+                  checked={tokenEditMode}
+                  onCheckedChange={(v) => { setTokenEditMode(v); setSelectedIdx([]); setMiniPopup(null); setSentenceTranslation(null); }}
+                />
+              </label>
+            </>
+          )}
         </div>
       )}
 
