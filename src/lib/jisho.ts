@@ -169,7 +169,31 @@ export function pickBestResult(
 ): JishoResult | null {
   if (!results || results.length === 0) return null;
 
-  // 1. Prefer an entry whose word or reading exactly matches the surface from the text.
+  const rule = kuromojiPos ? POS_KEYWORDS.find((r) => r.match(kuromojiPos)) : undefined;
+  const matchesPos = (result: JishoResult) => {
+    if (!rule) return false;
+    const pos = result.senses.flatMap((s) => s.parts_of_speech).join(' ');
+    return rule.needles.some((n) => pos.includes(n));
+  };
+
+  // 1. If Kuromoji/token override gives a POS, use it first so kana homonyms like に
+  // don't pick the reading of 二 before the particle entry.
+  if (rule) {
+    const posMatches = results.filter(matchesPos);
+    if (posMatches.length > 0) {
+      if (surface) {
+        const exactWord = posMatches.find((r) => r.japanese.some((j) => j.word === surface));
+        if (exactWord) return exactWord;
+        const exactForm = posMatches.find((r) =>
+          r.japanese.some((j) => j.word === surface || j.reading === surface),
+        );
+        if (exactForm) return exactForm;
+      }
+      return posMatches[0];
+    }
+  }
+
+  // 2. Prefer an entry whose word or reading exactly matches the surface from the text.
   if (surface) {
     const exact = results.find((r) =>
       r.japanese.some((j) => j.word === surface || j.reading === surface),
@@ -177,14 +201,6 @@ export function pickBestResult(
     if (exact) return exact;
   }
 
-  // 2. Fall back to matching by Kuromoji POS.
-  if (!kuromojiPos) return results[0];
-  const rule = POS_KEYWORDS.find((r) => r.match(kuromojiPos));
-  if (!rule) return results[0];
-  for (const r of results) {
-    const pos = r.senses.flatMap((s) => s.parts_of_speech).join(' ');
-    if (rule.needles.some((n) => pos.includes(n))) return r;
-  }
   return results[0];
 }
 
