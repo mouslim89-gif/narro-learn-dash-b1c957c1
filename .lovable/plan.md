@@ -1,64 +1,77 @@
-## Constat
+# Mode "Édition de tokens" dans le Reader (admin-only)
 
-Deux bugs liés aux nombres :
+## Objectif
 
-1. **`三四百米` reste un seul token** — Kuromoji groupe les chiffres consécutifs (名詞/数 + 名詞/接尾) en une chaîne unique via `mergeTokens` (suffixes nominaux fusionnés). Résultat : un seul gros token cliquable au lieu de 4 (`三` `四` `百` `米`).
+Ajouter dans le Reader un mode interactif qui permet, à toi seul, de visualiser tous les tokens du chapitre et de les modifier (fusionner, splitter, éditer reading/base/POS, surface furigana). Les modifs sont accumulées dans un buffer et exportables sous forme de règles `Rule` prêtes à coller dans `src/data/token-overrides.ts`.
 
-2. **Clic sur `三` renvoie `三つ`** — Dans `pickBestResult` (`src/lib/jisho.ts`), pour un token POS `名詞/数` :
-   - La règle `名詞` cherche `Noun`/`Pronoun`/`Suffix`… dans les `parts_of_speech` Jisho.
-   - Le 1er résultat `三` n'a que `Numeric` → exclu du filtre POS.
-   - Le 2e résultat `三つ` a `Noun` → matche → retourné.
-   - Même bug pour `一`/`二`/`百` etc.
+## 1. Garde admin (email hardcodé)
 
-## Plan
+Nouveau fichier `src/lib/admin.ts` :
 
-### 1. Splitter les séquences numériques (token-level)
+- Constante `ADMIN_EMAILS = ["mouslim89@gmail.com"]`
+- Hook `useIsAdmin()` qui lit `useAuth()` et renvoie `true` si `user.email` est dans la liste.
 
-Dans `scripts/generate-tokens.ts` :
-- Ajouter une passe **post-merge** qui détecte tout token dont le texte est composé uniquement de kanji/chiffres numériques (`一二三四五六七八九十百千万億兆〇零` + `０-９`) **et** dont le POS est `名詞/数` ou contient `数`.
-- Éclater ce token en un token par caractère, chacun avec :
-  - `t` = le caractère
-  - `r` = lecture par défaut (`さん`, `し`, `ひゃく`, `べい` pour `米` etc.) — utiliser une petite map kanji→on'yomi numérique
-  - `p = '名詞/数'`
-- Cas spécial : `米` (mètre, suffixe d'unité) → garder mais comme token séparé avec sa lecture.
-- Régénérer `book-tokens.ts` via `npx tsx scripts/generate-tokens.ts`.
+Tu nous diras ton email exact lors de l'implémentation (ou je mets un placeholder à compléter).
 
-**Variante** : laisser le merger Kuromoji gérer la fusion mais empêcher la fusion quand la séquence ne forme pas un nombre lexicalisé (plus complexe, rejeté).
+## 2. Bouton d'entrée dans le menu Settings du Reader
 
-### 2. Fix `pickBestResult` pour les numériques
+Dans `src/pages/Reader.tsx`, dans le panneau Settings existant :
 
-Dans `src/lib/jisho.ts`, ajouter une règle POS dédiée :
+- Si `useIsAdmin()` → afficher une section "Dev" avec un toggle **"Token edit mode"**.
+- Quand activé, le Reader passe en mode édition (state `tokenEditMode`).
 
-```ts
-{ match: (p) => p.includes('数'), needles: ['Numeric', 'Counter', 'Noun'] }
-```
+## 3. UI mode édition
 
-placée **avant** la règle générique `名詞`. Ainsi pour token POS `名詞/数` + surface `三` :
-- Filtre POS retient `Numeric` → résultats `三` (Numeric), `三つ` (Numeric+Noun)…
-- Match exact surface `三` → renvoie l'entrée `三`.
+Nouveau composant `src/components/TokenEditOverlay.tsx`.
 
-Bonus : ça résout aussi `一`→`一つ`, `百`→`百貨店`, etc.
+Comportement dans le Reader quand `tokenEditMode = true` :
 
-### 3. Vérification
+- Les popups habituels (mini/full word popup, sentence translation) sont désactivés.
+- Chaque token est rendu avec une bordure fine et un fond léger basé sur sa couleur POS (réutilise `getPosColorClass`).
+- **Tap simple sur un token** → ouvre un panneau bottom-sheet (réutilise `Sheet` shadcn) avec :
+  - Surface (`t`) — éditable
+  - Reading (`r`) — éditable (furigana affiché dans wordpopup ET au-dessus du texte)
+  - Base (`b`) — éditable (clé dico)
+  - POS (`p`) — select avec les alias (particle, verb, …) + champ libre
+  - Toggle "ponctuation" (`j=false`)
+  - Bouton **"Splitter"** → ouvre un éditeur où tu saisis les nouveaux tokens un par un (chacun avec t/r/b/p)
+  - Bouton **"Supprimer cette règle"** si la règle existe déjà dans le buffer
+- **Sélection multi-token** : tap long sur un token → entre en mode sélection ; les taps suivants ajoutent/retirent des tokens contigus à la sélection. Bouton flottant **"Fusionner ces N tokens"** → ouvre le même panneau pour définir le token résultant.
+- Barre flottante en bas avec :
+  - Compteur "X règle(s) en attente"
+  - Bouton **"Voir les règles"** → modal qui affiche le bloc TS prêt à coller, avec bouton "Copier" :
+    ```ts
+    // À coller dans tokenOverrides["gyofukuki"] :
+    ["三|人", "三:さん", "人:じん"],
+    ["お", "お:お:御"],
+    ```
+  - Bouton **"Reset"** vide le buffer.
+- Les règles du buffer sont **appliquées en live** au rendu pour que tu voies l'effet immédiatement (on les fusionne avec `tokenOverrides` existants via `applyTokenOverrides`).
 
-- Recharger Reader sur `gyofukuki/original` : `三四百米` doit afficher 4 tokens cliquables.
-- Cliquer `三` → popup "three / さん", pas `三つ`.
-- Vérifier `一`, `二`, `百` ailleurs dans les livres.
-- Tests : aucun snapshot existant à casser, mais `book-tokens.ts` change → diff volumineux attendu.
+## 4. Persistance buffer
 
-### Fichiers modifiés
+`localStorage` clé `token-edit-buffer:<bookId>:<chapterId>` (Zustand store dédié `src/stores/token-edit.ts` avec `persist`). Pas de DB, pas de partage avec les autres users — tu copies le bloc dans `token-overrides.ts` quand tu es satisfait.
 
-- `scripts/generate-tokens.ts` (ajout passe split numérique)
-- `src/data/book-tokens.ts` (régénéré)
-- `src/lib/jisho.ts` (règle POS Numeric)
+## 5. Génération des règles
 
-Pas de changement DB ni edge function.
+Helper `src/lib/token-edit-rules.ts` :
 
-## Question
+- `tokensToRule(matched: BookToken[], replacement: BookToken[]): Rule` — produit le format court `[match, ...replace]` en respectant la convention de `token-overrides.ts` (préfixe `!` pour ponctuation, `pos` aliasé en `particle/verb/...`, champs vides skippés).
+- `formatRulesBlock(rules: Rule[], bookId: string): string` — sort le snippet TS formaté.
 
-Pour la lecture par défaut des kanji numériques splittés, tu préfères :
-- **(a)** lecture on'yomi simple (`三`→さん, `四`→し, `百`→ひゃく) — simple, parfois "faux" en contexte (ex. `四百` se lit `よんひゃく`)
-- **(b)** pas de furigana sur les chiffres splittés, l'utilisateur se réfère au popup
-- **(c)** garder la lecture totale sur le 1er kanji (`三四百米`→`さんしひゃくべい` sur `三`) et rien sur les autres
+## 6. Détails techniques
 
-Je recommande **(a)** : pragmatique et le clic donne la vraie définition.
+- Aucun changement aux fichiers `dictionary-db`, `jisho.ts`, `merge-tokens`, `generate-tokens.ts`.
+- Le mode édition travaille sur la liste **après** `cleanRubyTokens` + `mergeConjugatedTokens` + `applyTokenOverrides` (= la même qu'aujourd'hui), pour que tu vois ce que voit l'utilisateur.
+- Les règles que tu crées sont scopées au `bookId` courant (jamais `*`), car c'est le cas d'usage le plus fréquent. Toggle "appliquer à tous les livres" disponible dans le panneau d'édition.
+- Le furigana modifié via le mode édition est utilisé à la fois dans le texte (`FuriganaWord`) et dans les popups (déjà géré par `overrideReading` ajouté précédemment).
+
+## Fichiers touchés
+
+- **Nouveau** `src/lib/admin.ts`
+- **Nouveau** `src/stores/token-edit.ts`
+- **Nouveau** `src/lib/token-edit-rules.ts`
+- **Nouveau** `src/components/TokenEditOverlay.tsx`
+- **Nouveau** `src/components/TokenEditPanel.tsx` (le bottom-sheet d'édition)
+- **Modifié** `src/pages/Reader.tsx` — toggle dans Settings + branchement de l'overlay + désactivation des popups en mode édition
+

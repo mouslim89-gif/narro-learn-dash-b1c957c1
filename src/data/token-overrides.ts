@@ -84,6 +84,17 @@ function parseRule(rule: Rule): ParsedRule | null {
   return { match, replace: replaceStrs.map(parseToken) };
 }
 
+/** Apply an arbitrary list of raw Rule arrays to a token stream. */
+export function applyRules(rawRules: Rule[], tokens: BookToken[]): BookToken[] {
+  if (rawRules.length === 0) return tokens;
+  const rules = rawRules
+    .map(parseRule)
+    .filter((r): r is ParsedRule => r !== null)
+    .sort((a, b) => b.match.length - a.match.length);
+  if (rules.length === 0) return tokens;
+  return runRules(rules, tokens);
+}
+
 export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
   const raw = [...(tokenOverrides[bookId] ?? []), ...(tokenOverrides["*"] ?? [])];
   if (raw.length === 0) return tokens;
@@ -93,6 +104,10 @@ export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookTo
     .filter((r): r is ParsedRule => r !== null)
     .sort((a, b) => b.match.length - a.match.length);
   if (rules.length === 0) return tokens;
+  return runRules(rules, tokens);
+}
+
+function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
 
   const out: BookToken[] = [];
   let i = 0;
