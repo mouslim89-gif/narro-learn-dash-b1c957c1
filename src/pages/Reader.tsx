@@ -158,6 +158,19 @@ export default function Reader() {
   const [selectedIdx, setSelectedIdx] = useState<number[]>([]);
   const [editPanel, setEditPanel] = useState<{ matchedIdx: number[] } | null>(null);
   const tokenByKey = useRef<Map<number, BookToken>>(new Map());
+  // Drag-to-select state (token edit mode only)
+  const dragRef = useRef<{ active: boolean; startKey: number | null; addedKeys: Set<number>; startX: number; startY: number; moved: boolean }>(
+    { active: false, startKey: null, addedKeys: new Set(), startX: 0, startY: 0, moved: false }
+  );
+
+  // Global pointer up to end drag
+  useEffect(() => {
+    if (!tokenEditMode) return;
+    const onUp = () => { dragRef.current.active = false; dragRef.current.startKey = null; dragRef.current.addedKeys.clear(); };
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => { window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
+  }, [tokenEditMode]);
 
   const tokens = useMemo(() => {
     if (!id) return [];
