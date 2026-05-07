@@ -122,3 +122,7 @@ export function applyRules(raw: Rule[], tokens: BookToken[]): BookToken[] {
   }
   return out;
 }
+
+export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
+  return applyRules([...(tokenOverrides[bookId] ?? []), ...(tokenOverrides["*"] ?? [])], tokens);
+}
