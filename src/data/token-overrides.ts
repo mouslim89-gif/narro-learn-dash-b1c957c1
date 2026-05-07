@@ -33,6 +33,9 @@ export const tokenOverrides: Record<string, Rule[]> = {
     ["に", "に:::particle"],
     ["の", "の:の::particle"],
     ["で|ある", "である::である"],
+    ["仕事中です", "仕事中::仕事中", "です"],
+    ["仕事中", "仕事中:しごとちゅう:仕事中"],
+    ["です", "です::です:aux"],
   ],
   urashima: [["りょう|し", "りょうし:りょうし:漁師"]],
 };
@@ -54,21 +57,16 @@ const POS_ALIASES: Record<string, string> = {
   pronoun: "代名詞",
 };
 
-function parseToken(s: string): BookToken & { __posOmitted?: boolean; __posCleared?: boolean } {
+function parseToken(s: string): BookToken {
   const punct = s.startsWith("!");
   if (punct) s = s.slice(1);
   const [t, r, b, pos] = s.split(":");
-  const posLower = pos?.toLowerCase();
-  const posCleared = !punct && posLower === "none";
-  const resolvedPos = pos && !posCleared ? (POS_ALIASES[posLower] ?? pos) : undefined;
-  const posOmitted = !punct && !pos;
-  const tok: BookToken & { __posOmitted?: boolean; __posCleared?: boolean } = {
+  const resolvedPos = pos ? (POS_ALIASES[pos.toLowerCase()] ?? pos) : undefined;
+  const tok: BookToken = {
     t,
     j: !punct,
-    p: punct ? "記号" : (resolvedPos ?? (posCleared ? undefined : "名詞")),
+    p: punct ? "記号" : (resolvedPos ?? "名詞"),
   };
-  if (posOmitted) tok.__posOmitted = true;
-  if (posCleared) tok.__posCleared = true;
   if (r) tok.r = r;
   if (b) tok.b = b;
   return tok;
@@ -89,17 +87,6 @@ function parseRule(rule: Rule): ParsedRule | null {
   return { match, replace: replaceStrs.map(parseToken) };
 }
 
-/** Apply an arbitrary list of raw Rule arrays to a token stream. */
-export function applyRules(rawRules: Rule[], tokens: BookToken[]): BookToken[] {
-  if (rawRules.length === 0) return tokens;
-  const rules = rawRules
-    .map(parseRule)
-    .filter((r): r is ParsedRule => r !== null)
-    .sort((a, b) => b.match.length - a.match.length);
-  if (rules.length === 0) return tokens;
-  return runRules(rules, tokens);
-}
-
 export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
   const raw = [...(tokenOverrides[bookId] ?? []), ...(tokenOverrides["*"] ?? [])];
   if (raw.length === 0) return tokens;
@@ -109,10 +96,6 @@ export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookTo
     .filter((r): r is ParsedRule => r !== null)
     .sort((a, b) => b.match.length - a.match.length);
   if (rules.length === 0) return tokens;
-  return runRules(rules, tokens);
-}
-
-function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
 
   const out: BookToken[] = [];
   let i = 0;
@@ -133,20 +116,7 @@ function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
       }
     }
     if (matched) {
-      const inheritedPos = tokens[i]?.p;
-      for (const rt of matched.replace) {
-        const anyRt = rt as BookToken & { __posOmitted?: boolean; __posCleared?: boolean };
-        if (anyRt.__posCleared) {
-          // Explicit "no POS" — drop the placeholder so dictionary won't filter
-          const { __posOmitted: _o, __posCleared: _c, p: _p, ...clean } = anyRt;
-          out.push(clean as BookToken);
-        } else if (anyRt.__posOmitted && inheritedPos) {
-          out.push({ ...rt, p: inheritedPos });
-        } else {
-          const { __posOmitted: _omit, __posCleared: _c2, ...clean } = anyRt;
-          out.push(clean as BookToken);
-        }
-      }
+      out.push(...matched.replace);
       i += matched.match.length;
     } else {
       out.push(tokens[i]);
