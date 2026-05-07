@@ -14,35 +14,38 @@ const POS_TO_ALIAS: Record<string, string> = {
   代名詞: 'pronoun',
 };
 
+/**
+ * Convention used by encodeReplacement:
+ *  - tok.p === undefined  → POS omitted from rule (engine keeps original POS via fallback)
+ *  - tok.p === '' (empty) → POS omitted (same as undefined)
+ *  - tok.p === '<value>'  → emit alias or raw value
+ *  - tok.j === false      → prefix '!' (punctuation)
+ */
 function encodeReplacement(tok: BookToken): string {
   const punct = tok.j === false;
   const t = tok.t;
   const r = tok.r ?? '';
   const b = tok.b ?? '';
-  const pRaw = tok.p ?? '';
-  // Only emit pos if not the default "名詞"
+  const pRaw = tok.p;
   let p = '';
-  if (pRaw && pRaw !== '名詞') {
+  if (pRaw && pRaw.trim().length > 0) {
     p = POS_TO_ALIAS[pRaw] ?? pRaw;
   }
-  // Trim trailing empty fields
   const parts = [t, r, b, p];
   while (parts.length > 1 && parts[parts.length - 1] === '') parts.pop();
   return (punct ? '!' : '') + parts.join(':');
 }
 
-/** Build a Rule from matched tokens + replacement tokens. */
 export function tokensToRule(matched: BookToken[], replacement: BookToken[]): Rule {
   const matchStr = matched.map((m) => m.t).join('|');
   const replaceStrs = replacement.map(encodeReplacement);
   return [matchStr, ...replaceStrs];
 }
 
-function formatRule(rule: Rule): string {
+export function formatRule(rule: Rule): string {
   return '[' + rule.map((s) => JSON.stringify(s)).join(', ') + ']';
 }
 
-/** Format a buffer as a TS snippet ready to paste into token-overrides.ts. */
 export function formatRulesBlock(rules: Rule[], scope: string): string {
   if (rules.length === 0) return `// (no rules for "${scope}")`;
   const header = scope === '*'
