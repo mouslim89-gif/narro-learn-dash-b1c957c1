@@ -19,6 +19,8 @@ interface WordPopupProps {
   word: string;
   /** Dictionary form from Kuromoji (e.g. 行く for 行きました) */
   baseForm?: string;
+  /** Override reading (kana) from token, takes priority over dictionary reading */
+  reading?: string;
   /** Part of speech from Kuromoji (e.g. "動詞/自立") */
   pos?: string;
   /** Sentence from the story where the word was encountered */
