@@ -163,7 +163,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
   const lookupKey = kuromojiBase || word;
   const cached = (kuromojiBase && kuromojiBase !== word ? getCached(kuromojiBase) : undefined) ?? getCached(word);
   const [loading, setLoading] = useState(!cached);
-  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, kuromojiPos));
+  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, kuromojiPos, word));
   const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? kuromojiBase ?? null);
   const [error, setError] = useState(false);
 
@@ -172,7 +172,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
 
   useEffect(() => {
     if (cached) {
-      const best = pickBestResult(cached.results, kuromojiPos);
+      const best = pickBestResult(cached.results, kuromojiPos, word);
       if (best) {
         setResult(best);
         setDeinflected(cached.deinflected ?? kuromojiBase ?? null);
@@ -193,7 +193,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
         let entry: CacheEntry | null = null;
         if (kuromojiBase && kuromojiBase !== word) {
           entry = await lookupWord(kuromojiBase);
-          const best = pickBestResult(entry.results, kuromojiPos);
+          const best = pickBestResult(entry.results, kuromojiPos, word);
           if (best) {
             if (!cancelled) {
               setResult(best);
@@ -203,7 +203,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
           }
         }
         entry = await lookupWord(word);
-        const best = pickBestResult(entry.results, kuromojiPos);
+        const best = pickBestResult(entry.results, kuromojiPos, word);
         if (!cancelled && best) {
           setResult(best);
           setDeinflected(entry.deinflected ?? kuromojiBase ?? null);
