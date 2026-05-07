@@ -193,7 +193,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
         let entry: CacheEntry | null = null;
         if (kuromojiBase && kuromojiBase !== word) {
           entry = await lookupWord(kuromojiBase);
-          const best = pickBestResult(entry.results, kuromojiPos, word);
+          const best = pickBestResult(entry.results, kuromojiPos, kuromojiBase);
           if (best) {
             if (!cancelled) {
               setResult(best);
