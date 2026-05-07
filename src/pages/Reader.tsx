@@ -754,7 +754,7 @@ export default function Reader() {
                         ? `outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ? 'bg-primary/30 outline-primary' : 'hover:bg-primary/10'}`
                         : '';
 
-                      return (
+                      const tokenNode = (
                         <ReaderToken
                           key={i}
                           token={token}
@@ -764,13 +764,13 @@ export default function Reader() {
                           knownLevel={knownLevel}
                           onTap={() => {
                             if (tokenEditMode) {
+                              // Suppress tap if a drag-select just happened.
+                              if (dragRef.current.moved) { dragRef.current.moved = false; return; }
                               if (selectedIdx.length > 0) {
-                                // toggle in selection
                                 setSelectedIdx((arr) =>
                                   arr.includes(tokKey) ? arr.filter((k) => k !== tokKey) : [...arr, tokKey].sort((a, b) => a - b)
                                 );
                               } else {
-                                // single-token edit
                                 setEditPanel({ matchedIdx: [tokKey] });
                               }
                               return;
@@ -802,6 +802,49 @@ export default function Reader() {
                             triggerSentenceTranslation(globalIdx, sentenceText);
                           }}
                         />
+                      );
+
+                      if (!tokenEditMode) return tokenNode;
+
+                      return (
+                        <span
+                          key={i}
+                          style={{ touchAction: 'none' }}
+                          onPointerDown={(e) => {
+                            (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+                            dragRef.current.active = true;
+                            dragRef.current.startKey = tokKey;
+                            dragRef.current.addedKeys = new Set([tokKey]);
+                            dragRef.current.startX = e.clientX;
+                            dragRef.current.startY = e.clientY;
+                            dragRef.current.moved = false;
+                          }}
+                          onPointerMove={(e) => {
+                            if (!dragRef.current.active) return;
+                            const dx = e.clientX - dragRef.current.startX;
+                            const dy = e.clientY - dragRef.current.startY;
+                            if (!dragRef.current.moved && Math.sqrt(dx*dx + dy*dy) > 6) {
+                              dragRef.current.moved = true;
+                              // Add the start token to selection now that we know it's a drag
+                              const startKey = dragRef.current.startKey;
+                              if (startKey != null) {
+                                setSelectedIdx((arr) => arr.includes(startKey) ? arr : [...arr, startKey].sort((a, b) => a - b));
+                              }
+                            }
+                            if (!dragRef.current.moved) return;
+                            const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+                            const wrap = el?.closest('[data-tok-key]') as HTMLElement | null;
+                            if (!wrap) return;
+                            const k = Number(wrap.dataset.tokKey);
+                            if (Number.isFinite(k) && !dragRef.current.addedKeys.has(k)) {
+                              dragRef.current.addedKeys.add(k);
+                              setSelectedIdx((arr) => arr.includes(k) ? arr : [...arr, k].sort((a, b) => a - b));
+                            }
+                          }}
+                          data-tok-key={tokKey}
+                        >
+                          {tokenNode}
+                        </span>
                       );
                     })}
                   </span>
