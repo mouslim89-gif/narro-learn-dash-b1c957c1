@@ -31,7 +31,7 @@ export const tokenOverrides: Record<string, Rule[]> = {
     ["お", "お:お:御"],
     ["いつ|まで|も", "いつまでも"],
     ["に", "に:::particle"],
-    ["の", "の:::particle"],
+    ["の", "の::乃"],
   ],
   urashima: [["りょう|し", "りょうし:りょうし:漁師"]],
 };
