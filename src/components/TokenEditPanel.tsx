@@ -9,10 +9,29 @@ import { Trash2, Plus, Copy } from 'lucide-react';
 import { tokensToRule, formatRule } from '@/lib/token-edit-rules';
 import { toast } from '@/hooks/use-toast';
 
-const POS_OPTIONS = [
-  '名詞', '動詞', '形容詞', '副詞', '助詞', '助動詞',
-  '接続詞', '感動詞', '代名詞', '連体詞', '記号', '名詞/数', '名詞/接尾',
+/** English label → Japanese POS tag stored on the token. */
+const POS_OPTIONS: { label: string; value: string }[] = [
+  { label: 'Noun', value: '名詞' },
+  { label: 'Verb', value: '動詞' },
+  { label: 'Auxiliary verb (です/ます…)', value: '助動詞' },
+  { label: 'I-adjective', value: '形容詞' },
+  { label: 'Na-adjective', value: '形容動詞' },
+  { label: 'Adverb', value: '副詞' },
+  { label: 'Particle', value: '助詞' },
+  { label: 'Conjunction', value: '接続詞' },
+  { label: 'Interjection', value: '感動詞' },
+  { label: 'Pronoun', value: '代名詞' },
+  { label: 'Pre-noun adjectival (連体詞)', value: '連体詞' },
+  { label: 'Symbol / punctuation', value: '記号' },
+  { label: 'Counter (名詞/数)', value: '名詞/数' },
+  { label: 'Suffix (名詞/接尾)', value: '名詞/接尾' },
+  { label: 'Expression', value: '表現' },
 ];
+
+function posLabel(value?: string): string {
+  if (!value) return '';
+  return POS_OPTIONS.find((o) => o.value === value)?.label ?? value;
+}
 
 type PMode = 'auto' | 'omit' | 'set';
 
