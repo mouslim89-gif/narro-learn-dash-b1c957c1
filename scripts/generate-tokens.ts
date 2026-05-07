@@ -313,7 +313,43 @@ function postMergeCompounds(
       i++;
     }
   }
-  return result;
+  return splitNumerics(result);
+}
+
+// Per-kanji default reading for splitting numeric runs (on'yomi numérique simple).
+const NUMERIC_KANJI_READINGS: Record<string, string> = {
+  '一': 'いち', '二': 'に', '三': 'さん', '四': 'よん', '五': 'ご',
+  '六': 'ろく', '七': 'なな', '八': 'はち', '九': 'きゅう', '十': 'じゅう',
+  '百': 'ひゃく', '千': 'せん', '万': 'まん', '億': 'おく', '兆': 'ちょう',
+  '〇': 'れい', '零': 'れい',
+};
+const NUMERIC_CHARS = new Set(Object.keys(NUMERIC_KANJI_READINGS).concat('０１２３４５６７８９0123456789'.split('')));
+
+function isAllNumericChars(text: string): boolean {
+  if (!text) return false;
+  for (const ch of text) if (!NUMERIC_CHARS.has(ch)) return false;
+  return true;
+}
+
+/** Split numeric tokens (e.g. 三四百) into one token per kanji/digit. */
+function splitNumerics(tokens: OutputToken[]): OutputToken[] {
+  const out: OutputToken[] = [];
+  for (const tok of tokens) {
+    const isNumericPos = tok.p?.includes('数') || tok.p === '名詞/数';
+    if (tok.j && isNumericPos && tok.t.length > 1 && isAllNumericChars(tok.t)) {
+      for (const ch of tok.t) {
+        out.push({
+          t: ch,
+          j: true,
+          r: NUMERIC_KANJI_READINGS[ch] ?? ch,
+          p: '名詞/数',
+        });
+      }
+    } else {
+      out.push(tok);
+    }
+  }
+  return out;
 }
 
 async function main() {
