@@ -232,7 +232,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
 
   const handleSave = () => {
     if (!result) return;
-    const disp = getDisplayWord(result);
+    const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {
       id: wordId,
       word: disp.word || word,
@@ -246,7 +246,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, pos: kuromojiPos, cont
     addWord(entry);
   };
 
-  const disp = result ? getDisplayWord(result) : { word, reading: undefined as string | undefined };
+  const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined };
   const displayWord = disp.word || word;
   const displayReading = disp.reading;
   const isCommon = (result as any)?.is_common;
