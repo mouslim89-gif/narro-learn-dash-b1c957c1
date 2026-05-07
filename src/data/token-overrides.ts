@@ -133,16 +133,17 @@ function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
       }
     }
     if (matched) {
-      // For replacement tokens whose POS was omitted in the rule, inherit the
-      // POS of the first matched token (so "Auto"/omit doesn't lose info).
       const inheritedPos = tokens[i]?.p;
       for (const rt of matched.replace) {
-        const anyRt = rt as BookToken & { __posOmitted?: boolean };
-        if (anyRt.__posOmitted && inheritedPos) {
+        const anyRt = rt as BookToken & { __posOmitted?: boolean; __posCleared?: boolean };
+        if (anyRt.__posCleared) {
+          // Explicit "no POS" — drop the placeholder so dictionary won't filter
+          const { __posOmitted: _o, __posCleared: _c, p: _p, ...clean } = anyRt;
+          out.push(clean as BookToken);
+        } else if (anyRt.__posOmitted && inheritedPos) {
           out.push({ ...rt, p: inheritedPos });
         } else {
-          // Strip internal flag before emitting
-          const { __posOmitted: _omit, ...clean } = anyRt as BookToken & { __posOmitted?: boolean };
+          const { __posOmitted: _omit, __posCleared: _c2, ...clean } = anyRt;
           out.push(clean as BookToken);
         }
       }
