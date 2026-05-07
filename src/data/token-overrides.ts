@@ -54,28 +54,18 @@ const POS_ALIASES: Record<string, string> = {
   pronoun: "代名詞",
 };
 
-interface ParsedToken extends BookToken {
-  __posOmitted?: boolean;
-  __rOmitted?: boolean;
-  __bOmitted?: boolean;
-}
-
-function parseToken(s: string): ParsedToken {
+function parseToken(s: string): BookToken & { __posOmitted?: boolean } {
   const punct = s.startsWith("!");
   if (punct) s = s.slice(1);
   const [t, r, b, pos] = s.split(":");
   const resolvedPos = pos ? (POS_ALIASES[pos.toLowerCase()] ?? pos) : undefined;
   const posOmitted = !punct && !resolvedPos;
-  const rOmitted = !r;
-  const bOmitted = !b;
-  const tok: ParsedToken = {
+  const tok: BookToken & { __posOmitted?: boolean } = {
     t,
     j: !punct,
     p: punct ? "記号" : (resolvedPos ?? "名詞"),
   };
   if (posOmitted) tok.__posOmitted = true;
-  if (rOmitted) tok.__rOmitted = true;
-  if (bOmitted) tok.__bOmitted = true;
   if (r) tok.r = r;
   if (b) tok.b = b;
   return tok;
@@ -140,18 +130,18 @@ function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
       }
     }
     if (matched) {
-      // For replacement tokens whose fields were omitted in the rule, inherit
-      // them from the first matched token. This makes "Auto" preserve the
-      // original Kuromoji info (POS, reading, base form).
-      const src = tokens[i];
+      // For replacement tokens whose POS was omitted in the rule, inherit the
+      // POS of the first matched token (so "Auto"/omit doesn't lose info).
+      const inheritedPos = tokens[i]?.p;
       for (const rt of matched.replace) {
-        const anyRt = rt as ParsedToken;
-        const { __posOmitted, __rOmitted, __bOmitted, ...clean } = anyRt;
-        const merged: BookToken = { ...clean };
-        if (__posOmitted && src?.p) merged.p = src.p;
-        if (__rOmitted && src?.r) merged.r = src.r;
-        if (__bOmitted && src?.b) merged.b = src.b;
-        out.push(merged);
+        const anyRt = rt as BookToken & { __posOmitted?: boolean };
+        if (anyRt.__posOmitted && inheritedPos) {
+          out.push({ ...rt, p: inheritedPos });
+        } else {
+          // Strip internal flag before emitting
+          const { __posOmitted: _omit, ...clean } = anyRt as BookToken & { __posOmitted?: boolean };
+          out.push(clean as BookToken);
+        }
       }
       i += matched.match.length;
     } else {
