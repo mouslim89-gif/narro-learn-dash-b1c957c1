@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useTokenEditStore } from '@/stores/token-edit';
-import { formatRulesBlock } from '@/lib/token-edit-rules';
+import { formatRulesBlock, formatRule } from '@/lib/token-edit-rules';
 import { tokenOverrides } from '@/data/token-overrides';
 import { toast } from '@/hooks/use-toast';
-import { Copy, Trash2, X } from 'lucide-react';
+import { Copy, Trash2, X, Undo2 } from 'lucide-react';
 
 interface Props {
   bookId: string;
-  /** Number of tokens currently selected (for the merge button). */
   selectionCount: number;
   onMerge: () => void;
   onClearSelection: () => void;
@@ -17,7 +16,7 @@ interface Props {
 }
 
 export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearSelection, onExitEditMode }: Props) {
-  const { buffers, clear } = useTokenEditStore();
+  const { buffers, clear, undoLast } = useTokenEditStore();
   const [scope, setScope] = useState<string>(bookId);
   const [showRules, setShowRules] = useState(false);
 
@@ -35,13 +34,23 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
     toast({ title: 'Copied', description: 'Rules block copied to clipboard.' });
   };
 
+  const handleUndo = () => {
+    // Undo from book scope first, then global if book is empty.
+    const targetScope = bookBuf.length > 0 ? bookId : globalBuf.length > 0 ? '*' : null;
+    if (!targetScope) return;
+    const popped = undoLast(targetScope);
+    if (popped) {
+      toast({ title: 'Undone', description: formatRule(popped) });
+    }
+  };
+
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 p-3 backdrop-blur-xl">
         <div className="mx-auto flex max-w-2xl flex-wrap items-center gap-2">
           <button
             onClick={onExitEditMode}
-            className="rounded-md bg-muted px-2 py-1.5 text-xs"
+            className="rounded-md bg-muted px-2 py-1.5 text-xs hover:bg-muted/80"
             title="Exit edit mode"
           >
             <X className="h-4 w-4" />
@@ -52,18 +61,28 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
           <span className="text-xs text-muted-foreground">{total} pending</span>
 
           {selectionCount > 1 && (
-            <>
-              <Button size="sm" onClick={onMerge}>
+            <div className="flex gap-1 rounded-md bg-accent/15 px-1 py-1">
+              <Button size="sm" onClick={onMerge} className="h-7">
                 Merge {selectionCount}
               </Button>
-              <Button size="sm" variant="ghost" onClick={onClearSelection}>
-                Clear sel
+              <Button size="sm" variant="ghost" onClick={onClearSelection} className="h-7">
+                Clear
               </Button>
-            </>
+            </div>
           )}
 
-          <div className="ml-auto flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setShowRules(true)}>
+          <div className="ml-auto flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleUndo}
+              disabled={total === 0}
+              title="Undo last rule"
+              className="h-8 px-2"
+            >
+              <Undo2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowRules(true)} className="h-8">
               View rules
             </Button>
           </div>
