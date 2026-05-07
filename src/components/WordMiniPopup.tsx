@@ -28,9 +28,10 @@ export function WordMiniPopup({
   const { addWord, hasWord } = useFlashcardStore();
   const popupRef = useRef<HTMLDivElement>(null);
 
+  const surfaceForMatch = baseForm || word;
   const cached = (baseForm && baseForm !== word ? getCached(baseForm) : undefined) ?? getCached(word);
   const [loading, setLoading] = useState(!cached);
-  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos, word));
+  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos, surfaceForMatch));
   const [error, setError] = useState(false);
 
   const wordId = word;
@@ -40,7 +41,7 @@ export function WordMiniPopup({
 
   useEffect(() => {
     if (cached) {
-      const best = pickBestResult(cached.results, pos, word);
+      const best = pickBestResult(cached.results, pos, surfaceForMatch);
       if (best) setResult(best);
       else setError(true);
       setLoading(false);
@@ -63,7 +64,7 @@ export function WordMiniPopup({
           }
         }
         entry = await lookupWord(word);
-        const best = pickBestResult(entry.results, pos, word);
+        const best = pickBestResult(entry.results, pos, surfaceForMatch);
         if (!cancelled && best) setResult(best);
         else if (!cancelled) setError(true);
       } catch {
