@@ -56,7 +56,7 @@ export function WordMiniPopup({
         let entry: CacheEntry | null = null;
         if (baseForm && baseForm !== word) {
           entry = await lookupWord(baseForm);
-          const best = pickBestResult(entry.results, pos, word);
+          const best = pickBestResult(entry.results, pos, baseForm);
           if (best) {
             if (!cancelled) setResult(best);
             return;
