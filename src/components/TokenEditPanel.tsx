@@ -191,9 +191,9 @@ export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
                       className="rounded-md border bg-background px-2 py-1.5 text-xs"
                       title="POS handling"
                     >
-                      <option value="auto">Auto</option>
-                      <option value="omit">None</option>
-                      <option value="set">Set…</option>
+                      <option value="auto">Keep original</option>
+                      <option value="omit">No filter (any POS)</option>
+                      <option value="set">Force POS…</option>
                     </select>
                     {d.pMode === 'set' && (
                       <select
@@ -201,18 +201,22 @@ export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
                         onChange={(e) => updateDraft(i, { p: e.target.value })}
                         className="flex-1 rounded-md border bg-background px-2 py-1.5 text-sm"
                       >
-                        {POS_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
-                        {d.p && !POS_OPTIONS.includes(d.p) && <option value={d.p}>{d.p}</option>}
+                        {POS_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                        {d.p && !POS_OPTIONS.some((o) => o.value === d.p) && (
+                          <option value={d.p}>{d.p}</option>
+                        )}
                       </select>
                     )}
                     {d.pMode === 'auto' && d.origP && (
                       <span className="flex-1 truncate rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground" title="Inherited from original token">
-                        ↻ {d.origP}
+                        ↻ {posLabel(d.origP)}
                       </span>
                     )}
                     {d.pMode === 'omit' && (
                       <span className="flex-1 rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground">
-                        omitted
+                        dictionary will not filter by POS
                       </span>
                     )}
                   </div>
