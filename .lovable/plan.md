@@ -1,41 +1,35 @@
-# Fix : cache dictionnaire pollué (三 → 三人, etc.)
+## Constat
 
-## Diagnostic
+- `三` n’existe plus dans la table `dictionary`, donc l’app devrait appeler la fonction live et recevoir la bonne entrée `三`.
+- `一` est correct en base (`一`, `一つ`, etc.), mais si l’app affiche encore `一歩`, c’est très probablement l’ancien cache IndexedDB du navigateur qui reste utilisé.
+- Le problème peut donc revenir tant que le cache local garde des entrées polluées, même après nettoyage de la base.
 
-La table `dictionary` (cache backend) contient pour `三` les résultats `[三人, 三人組, …]` — aucune entrée pour `三` lui-même. L'API Jisho live renvoie pourtant correctement `三, 三-1, 三つ, 三味線, 三日`.
+## Plan recommandé
 
-Le bug n'est donc **pas** dans `pickBestResult` ni dans la priorité aux noms (déjà retirée). C'est juste de la mauvaise data en cache, probablement issue d'un ancien sync où la requête était mal formée. Mêmes symptômes confirmés pour : `一, 二, 四, 五, 七, 九, に, で, と` (tous ont un slug premier composé au lieu du caractère seul).
+1. **Validation stricte du cache local**
+   - Modifier `seedCache` / `getCached` pour refuser une entrée si aucun résultat ne correspond au mot demandé (`word` ou `reading`).
+   - Ça empêche une vieille entrée IndexedDB `三 → 三人` ou `一 → 一歩` d’être utilisée.
 
-## Plan
+2. **Fallback live automatique**
+   - Si une entrée cache est invalide pour le mot demandé, la traiter comme un miss.
+   - L’app appellera alors `jisho-lookup` et récupérera les résultats corrects.
 
-### 1. Détecter les entrées polluées
-Une entrée est "polluée" si **aucun** de ses `results[*].japanese[*].word` ni `reading` ne matche exactement le `word` clé. Requête de détection :
+3. **Ne pas marquer le livre “hydrated” trop tôt**
+   - Ajuster `hydrateDictionaryForBook` pour ne pas ignorer les mots manquants simplement parce que le livre est déjà marqué hydraté.
+   - Ça évite qu’un mot supprimé/corrigé en base ne soit jamais refetch côté client.
 
-```sql
-SELECT word FROM dictionary
-WHERE NOT EXISTS (
-  SELECT 1 FROM jsonb_array_elements(entry->'results') r,
-              jsonb_array_elements(r->'japanese') j
-  WHERE j->>'word' = dictionary.word OR j->>'reading' = dictionary.word
-);
-```
+4. **Purge ciblée côté navigateur**
+   - Option économique : ajouter une version de cache dictionnaire (`dictCacheVersion`) et invalider uniquement l’ancien IndexedDB une fois.
+   - Ça force tous les utilisateurs à repartir sur les données propres sans leur demander de vider le cache manuellement.
 
-### 2. Purger ces entrées (migration DELETE)
-On les supprime toutes en une fois.
+5. **Vérification**
+   - Tester `三` et `一` via la fonction dictionnaire.
+   - Vérifier que le code sélectionne `三` et `一`, pas `三人` / `一歩`.
 
-### 3. Re-sync ciblé
-Lancer `scripts/sync-dictionary-to-db.ts` qui repassera par `jisho-lookup` et réinsèrera proprement les entrées manquantes.
+## Détail technique
 
-### 4. Vider le cache mémoire local
-Pas de changement de code nécessaire : le live fetch dans `lookupWord` repeuplera à la demande pour les utilisateurs déjà actifs (et `seedCache` ignore déjà les entrées vides depuis le fix précédent). Au prochain `hydrateDictionaryForBook`, les nouvelles entrées propres seront chargées.
-
-## Fichiers touchés
-
-- Nouvelle migration SQL : `DELETE FROM dictionary WHERE …` (la requête ci-dessus)
-- Aucun changement de code
-
-## Étapes que je ferai après approbation
-
-1. Créer la migration `DELETE` ciblée
-2. Exécuter `scripts/sync-dictionary-to-db.ts` pour repeupler
-3. Vérifier en DB que `三` a bien `slug = "三"` en premier
+- Fichiers concernés :
+  - `src/lib/jisho.ts`
+  - `src/lib/dictionary-db.ts`
+- Pas besoin de modifier le schéma de base.
+- Pas besoin de purger plus largement la table maintenant : la fonction live renvoie déjà les bonnes données pour `三` et `一`.
