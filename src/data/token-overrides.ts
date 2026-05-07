@@ -25,9 +25,7 @@ export const tokenOverrides: Record<string, Rule[]> = {
     ["何|も", "何も:なにも"],
     ["お", "お:お:御"],
   ],
-  urashima: [
-    ["りょう|し", "漁師:りょうし"],
-  ],
+  urashima: [["りょう|し", "りょうし:りょうし:漁師"]],
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -51,7 +49,10 @@ interface ParsedRule {
 
 function parseRule(rule: Rule): ParsedRule | null {
   const [matchStr, ...replaceStrs] = rule;
-  const match = matchStr.split("|").map((s) => s.trim()).filter(Boolean);
+  const match = matchStr
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (match.length === 0 || replaceStrs.length === 0) return null;
   return { match, replace: replaceStrs.map(parseToken) };
 }
