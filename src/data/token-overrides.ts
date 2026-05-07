@@ -113,7 +113,21 @@ export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookTo
       }
     }
     if (matched) {
-      out.push(...matched.replace);
+      const matchedTokens = tokens.slice(i, i + matched.match.length);
+      if (matched.replace.length === matched.match.length) {
+        // 1:1 — garde la surface d'origine de chaque token
+        for (let k = 0; k < matched.replace.length; k++) {
+          const rep = matched.replace[k];
+          out.push({ ...rep, t: matchedTokens[k].t });
+        }
+      } else if (matched.replace.length === 1) {
+        // N:1 — concatène les surfaces d'origine
+        const rep = matched.replace[0];
+        out.push({ ...rep, t: matchedTokens.map((m) => m.t).join("") });
+      } else {
+        // N:M — fallback : utilise les surfaces définies dans la règle
+        out.push(...matched.replace);
+      }
       i += matched.match.length;
     } else {
       out.push(tokens[i]);
