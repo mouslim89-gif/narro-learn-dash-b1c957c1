@@ -141,7 +141,7 @@ export function WordMiniPopup({
     addWord(entry);
   };
 
-  const disp = result ? getDisplayWord(result) : { word, reading: undefined as string | undefined };
+  const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined };
   const headerWord = disp.word || word;
   const headerReading = disp.reading;
 
