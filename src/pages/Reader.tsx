@@ -721,6 +721,7 @@ export default function Reader() {
                             setMiniPopup({
                               text: token.t,
                               baseForm: token.b,
+                              reading: token.r,
                               pos: token.p,
                               contextSentence: sentenceText,
                               sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
