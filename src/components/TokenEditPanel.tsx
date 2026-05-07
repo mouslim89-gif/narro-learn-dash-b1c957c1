@@ -59,12 +59,15 @@ function toDraft(tok: BookToken): TokenDraft {
   };
 }
 
-/** Convert a draft to the BookToken used to build the rule. */
+/** Convert a draft to the BookToken used to build the rule.
+ *  pMode === 'auto' → p undefined (encoder omits POS, engine inherits original)
+ *  pMode === 'omit' → p === '-' sentinel (encoder emits alias `none`, engine clears POS so dictionary is unfiltered)
+ *  pMode === 'set'  → p === chosen POS
+ */
 function toToken(d: TokenDraft): BookToken {
-  const p =
-    d.pMode === 'set'
-      ? (d.p && d.p.trim() ? d.p : undefined)
-      : undefined;
+  let p: string | undefined;
+  if (d.pMode === 'set') p = d.p && d.p.trim() ? d.p : undefined;
+  else if (d.pMode === 'omit') p = '-';
   const tok: BookToken = {
     t: d.t,
     j: d.j !== false,
