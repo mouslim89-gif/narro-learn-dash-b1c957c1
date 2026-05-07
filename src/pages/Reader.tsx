@@ -157,6 +157,7 @@ export default function Reader() {
   // Selection state for merge & edit panel
   const [selectedIdx, setSelectedIdx] = useState<number[]>([]);
   const [editPanel, setEditPanel] = useState<{ matchedIdx: number[] } | null>(null);
+  const tokenByKey = useRef<Map<number, BookToken>>(new Map());
 
   const tokens = useMemo(() => {
     if (!id) return [];
