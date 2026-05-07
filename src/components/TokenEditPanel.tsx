@@ -42,18 +42,18 @@ function toDraft(tok: BookToken): TokenDraft {
 
 /** Convert a draft to the BookToken used to build the rule. */
 function toToken(d: TokenDraft): BookToken {
-  // p is encoded as undefined when auto/omit so encodeReplacement skips it.
   const p =
     d.pMode === 'set'
       ? (d.p && d.p.trim() ? d.p : undefined)
       : undefined;
-  return {
+  const tok: BookToken = {
     t: d.t,
     j: d.j !== false,
-    ...(p ? { p } : { p: undefined as unknown as string }),
-    ...(d.r ? { r: d.r } : {}),
-    ...(d.b ? { b: d.b } : {}),
   };
+  if (p) tok.p = p;
+  if (d.r) tok.r = d.r;
+  if (d.b) tok.b = d.b;
+  return tok;
 }
 
 interface Props {
