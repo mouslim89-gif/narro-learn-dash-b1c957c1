@@ -702,29 +702,47 @@ export default function Reader() {
                     className={`transition-all duration-200 rounded ${dimmed ? 'opacity-25' : ''} ${activeTranslation ? 'bg-primary/5' : ''} ${activeAudio ? 'bg-primary/10 px-0.5' : ''}`}
                   >
                     {sentence.tokens.map((token, i) => {
-                      if (!token.j) {
+                      if (!token.j && !tokenEditMode) {
                         return <span key={i}>{token.t}</span>;
                       }
 
                       const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
                       const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
+                      const tokKey = globalIdx * 10000 + i;
+                      const isSelected = tokenEditMode && selectedIdx.includes(tokKey);
 
                       // Known-word highlight: disabled in grammar mode (POS colors prevail).
                       let knownLevel: KnownLevel | null = null;
-                      if (displayMode !== 'grammar' && showKnownHighlights) {
+                      if (!tokenEditMode && displayMode !== 'grammar' && showKnownHighlights) {
                         const lvl = getKnownLevel(token, knownIndex);
                         if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
                       }
+
+                      const editClass = tokenEditMode
+                        ? `outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ? 'bg-primary/30 outline-primary' : 'hover:bg-primary/10'}`
+                        : '';
 
                       return (
                         <ReaderToken
                           key={i}
                           token={token}
                           showFurigana={showFurigana}
-                          colorClass={colorClass}
-                          isHighlighted={isHighlighted}
+                          colorClass={`${colorClass} ${editClass}`.trim()}
+                          isHighlighted={isHighlighted && !tokenEditMode}
                           knownLevel={knownLevel}
                           onTap={() => {
+                            if (tokenEditMode) {
+                              if (selectedIdx.length > 0) {
+                                // toggle in selection
+                                setSelectedIdx((arr) =>
+                                  arr.includes(tokKey) ? arr.filter((k) => k !== tokKey) : [...arr, tokKey].sort((a, b) => a - b)
+                                );
+                              } else {
+                                // single-token edit
+                                setEditPanel({ matchedIdx: [tokKey] });
+                              }
+                              return;
+                            }
                             if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
                               setMiniPopup(null);
                               return;
@@ -744,7 +762,13 @@ export default function Reader() {
                               tokenIdx: i,
                             });
                           }}
-                          onLongPress={() => triggerSentenceTranslation(globalIdx, sentenceText)}
+                          onLongPress={() => {
+                            if (tokenEditMode) {
+                              setSelectedIdx((arr) => arr.includes(tokKey) ? arr : [...arr, tokKey].sort((a, b) => a - b));
+                              return;
+                            }
+                            triggerSentenceTranslation(globalIdx, sentenceText);
+                          }}
                         />
                       );
                     })}
