@@ -145,7 +145,7 @@ export function WordMiniPopup({
 
   const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined };
   const headerWord = disp.word || word;
-  const headerReading = disp.reading;
+  const headerReading = overrideReading || disp.reading;
 
   return (
     <div
