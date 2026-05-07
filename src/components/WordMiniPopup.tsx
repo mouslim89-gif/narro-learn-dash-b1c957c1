@@ -7,6 +7,7 @@ import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult
 interface WordMiniPopupProps {
   word: string;
   baseForm?: string;
+  reading?: string;
   pos?: string;
   contextSentence?: string;
   sentenceRect: { top: number; bottom: number; left: number; right: number };
@@ -18,6 +19,7 @@ interface WordMiniPopupProps {
 export function WordMiniPopup({
   word,
   baseForm,
+  reading: overrideReading,
   pos,
   contextSentence,
   sentenceRect,
