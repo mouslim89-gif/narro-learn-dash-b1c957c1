@@ -1,52 +1,52 @@
-## Problème
+## Le bug
 
-`呑めそうな` (forme "looks like one can drink") est tokenisée par Kuromoji en :
+Dans le texte, le token est `ひそか` (kana, classé `名詞` par Kuromoji).
+Le lookup Jisho de `ひそか` renvoie plusieurs entrées :
 
-- `呑め` — 動詞/自立 (stem potential)
-- `そう` — **名詞,特殊,助動詞語幹** (PAS dans `MERGEABLE_POS_PREFIXES`)
-- `な` — 助動詞 (連体形 de だ)
+1. `密か` — **na-adjective** (le bon mot)
+2. `密か事` (みそかごと) — **noun** (un mot rare et différent)
+3. …
 
-La fusion verbale (`mergeConjugatedTokens`) s'arrête à `呑め` car `そう` n'est pas reconnu comme auxiliaire mergeable. Ensuite le pattern phrasal `['そう','な']` colle `そうな` ensemble. On finit avec `[呑め, そうな]`, et `そうな` est cliquable seul → définition de `な` / `そう`.
+`pickBestResult` (`src/lib/jisho.ts`) cherche le premier résultat dont le POS correspond au POS Kuromoji. Comme `ひそか` est marqué `名詞`, la règle ne matche que `Noun/Pronoun/Suffix/Prefix`. `密か` (na-adj) est rejeté → on tombe sur `密か事`. Puis `getDisplayWord` affiche `j.word` = `密か事`.
 
-Même problème pour `〜たい`, `〜らしい`, `〜そうだ`, `〜そうに`, `〜たがる`.
+C'est le même type de problème pour tous les na-adjectifs en kana que Kuromoji classe `名詞`.
 
-## Solution
+## Correctifs proposés (à choisir)
 
-Étendre `mergeConjugatedTokens` avec un set d'**auxiliaires « pseudo-nominaux »** reconnus par leur **surface form**, qui se collent à un verbe/adjectif tête même quand Kuromoji les tague `名詞`.
+### Option A — Étendre le matching POS (recommandé, 1 fichier)
+
+Dans `src/lib/jisho.ts`, pour la règle `名詞`, ajouter `'Na-adjective'`, `'No-adjective'`, `'Adjectival noun'` aux `needles`. Ça suit la réalité linguistique : Kuromoji étiquette beaucoup de na-adj comme noms.
 
 ```ts
-// Auxiliaries Kuromoji tags as 名詞,特殊,助動詞語幹 — match by surface
-const AUX_PSEUDO_NOUN = new Set(['そう', 'よう', 'たい', 'らしい', 'みたい']);
-
-function isAuxPseudoNoun(tok: BookToken): boolean {
-  return AUX_PSEUDO_NOUN.has(tok.t) &&
-         (tok.p?.startsWith('名詞') || tok.p?.startsWith('助動詞'));
-}
+{ match: (p) => p.startsWith('名詞'),
+  needles: ['Noun','Pronoun','Suffix','Prefix','Na-adjective','No-adjective'] },
 ```
 
-Dans la boucle interne de `mergeConjugatedTokens`, ajouter une branche : si `next` matche `isAuxPseudoNoun`, on l'absorbe et on continue la fusion (ce qui permet ensuite d'avaler `な`/`だ`/`に` 助動詞 qui suivent via la branche `isMergeableAux` existante).
+Avantage : règle générale, corrige aussi 静か, 綺麗, 大切, etc.
+Risque : très faible (na-adj sont quasi toujours le sens voulu quand Kuromoji dit 名詞).
 
-Résultat pour `呑めそうな` :
-- merge tête `呑め` (base `呑む`, pos `動詞/自立`)
-- absorbe `そう` (pseudo-aux)
-- absorbe `な` (助動詞) → token unique `呑めそうな`, base `呑む`, pos `動詞/自立`.
+### Option B — Préférer une entrée dont la forme matche la surface
 
-Cliquer dessus lookup `呑む` → bonne définition. Le label de conjugaison dans `WordPopup` affichera "Dictionary form: 呑む" (à terme on pourra ajouter un label dédié `〜そうな` mais hors scope).
+Avant de regarder le POS, si parmi les résultats il y en a un dont `japanese[0].word === surface` OU `japanese[0].reading === surface`, on le choisit. Ex : pour `ひそか`, on prendrait `密か` (reading=ひそか) avant `密か事` (reading=みそかごと).
 
-## Effets de bord à vérifier
+Avantage : règle aussi générale, garantit "le mot du popup = le mot du texte".
+Inconvénient : nécessite de passer la `surface` à `pickBestResult` (changer la signature, ~3 call-sites).
 
-- Patterns phrasaux `['そう','な']`, `['よう','な']`, `['みたい','な']` : ils s'appliquent **après** la fusion verbale, donc seuls les cas où そう/よう/みたい ne suivent PAS un verbe restent (ex: `本当のような` avec の avant). OK, comportement préservé.
-- `〜たい` (auxiliaire désir) : déjà 助動詞 normalement, mais certains cas le taguent 形容詞 — `isHead` matche déjà 形容詞, donc pas de régression.
-- Il faut s'assurer que `そう` ne soit absorbé que **directement** après une tête verbe/adj (pas après un nom indépendant). Comme on est dans la boucle interne déclenchée par `isHead`, c'est garanti.
+### Option C — Cap sur le `getDisplayWord`
 
-## Fichier modifié
+Si la surface du token est en kana pur et que le résultat trouvé a un `reading` différent → fallback au `reading` (ou rejeter le résultat). Plus défensif mais plus magique.
 
-- **`src/lib/merge-tokens.ts`** : ajout de `AUX_PSEUDO_NOUN` + `isAuxPseudoNoun`, et nouvelle branche dans la boucle de `mergeConjugatedTokens` (avant la branche `isTeParticle`).
+### Option D — Override manuel via `token-overrides.ts`
 
-## Variantes possibles (à choisir)
+Ajouter une règle `ひそか => ひそか@ひそか:形容動詞` pour ce cas précis. Ne corrige que ce mot, pas la cause profonde.
 
-1. **Approche surface-set** (proposée ci-dessus) — simple, ciblée, faible risque.
-2. **Approche POS-élargie** : ajouter `'名詞,特殊,助動詞語幹'` à `MERGEABLE_POS_PREFIXES` → plus générique mais risque de manger des noms légitimes mal tagués.
-3. **Approche phrasal pattern** : ajouter des patterns `[{verbHead}, 'そう', 'な']` etc. → multiplie les patterns, plus verbeux.
+## Recommandation
 
-Je recommande la **variante 1**. OK pour partir là-dessus ?
+Combiner **A + B** : A corrige le POS matching trop strict, B garantit que si une entrée a exactement la même forme que le texte elle est préférée. Les deux sont petits et couvrent tous les cas similaires sans toucher à la tokenisation. (note de l'utilisateur, je choisis cette option!)
+
+## Fichiers touchés
+
+- `src/lib/jisho.ts` — modifier `pickBestResult` (et sa signature si Option B) + ajouter `'Na-adjective'` à la règle 名詞.
+- `src/components/WordMiniPopup.tsx` + `src/components/WordPopup.tsx` — passer la `surface` au `pickBestResult` (uniquement si Option B).
+
+Dis-moi quelle(s) option(s) tu veux que j'implémente.
