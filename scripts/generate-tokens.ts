@@ -331,22 +331,34 @@ function isAllNumericChars(text: string): boolean {
   return true;
 }
 
-/** Split numeric tokens (e.g. 三四百) into one token per kanji/digit. */
+/** Split numeric tokens (e.g. 三四百, 三四百米) into one token per numeric kanji/digit, keeping any non-numeric suffix as its own token. */
 function splitNumerics(tokens: OutputToken[]): OutputToken[] {
   const out: OutputToken[] = [];
   for (const tok of tokens) {
-    const isNumericPos = tok.p?.includes('数') || tok.p === '名詞/数';
-    if (tok.j && isNumericPos && tok.t.length > 1 && isAllNumericChars(tok.t)) {
-      for (const ch of tok.t) {
-        out.push({
-          t: ch,
-          j: true,
-          r: NUMERIC_KANJI_READINGS[ch] ?? ch,
-          p: '名詞/数',
-        });
-      }
-    } else {
+    const isNumericPos = tok.p?.includes('数');
+    if (!tok.j || !isNumericPos || tok.t.length <= 1) {
       out.push(tok);
+      continue;
+    }
+    // Find leading run of numeric chars.
+    let split = 0;
+    while (split < tok.t.length && NUMERIC_CHARS.has(tok.t[split])) split++;
+    if (split <= 1 && split === tok.t.length) {
+      out.push(tok);
+      continue;
+    }
+    const numericPart = tok.t.slice(0, split);
+    const rest = tok.t.slice(split);
+    if (numericPart.length > 1) {
+      for (const ch of numericPart) {
+        out.push({ t: ch, j: true, r: NUMERIC_KANJI_READINGS[ch] ?? ch, p: '名詞/数' });
+      }
+    } else if (numericPart.length === 1) {
+      out.push({ t: numericPart, j: true, r: NUMERIC_KANJI_READINGS[numericPart] ?? numericPart, p: '名詞/数' });
+    }
+    if (rest) {
+      // Suffix counter (米, 人, 匹, 年, ...) → standalone token, reading unknown here.
+      out.push({ t: rest, j: true, p: '名詞/接尾' });
     }
   }
   return out;
