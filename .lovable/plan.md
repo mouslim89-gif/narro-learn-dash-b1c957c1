@@ -1,52 +1,55 @@
-## Le bug
+## Format ultra-court
 
-Dans le texte, le token est `ひそか` (kana, classé `名詞` par Kuromoji).
-Le lookup Jisho de `ひそか` renvoie plusieurs entrées :
-
-1. `密か` — **na-adjective** (le bon mot)
-2. `密か事` (みそかごと) — **noun** (un mot rare et différent)
-3. …
-
-`pickBestResult` (`src/lib/jisho.ts`) cherche le premier résultat dont le POS correspond au POS Kuromoji. Comme `ひそか` est marqué `名詞`, la règle ne matche que `Noun/Pronoun/Suffix/Prefix`. `密か` (na-adj) est rejeté → on tombe sur `密か事`. Puis `getDisplayWord` affiche `j.word` = `密か事`.
-
-C'est le même type de problème pour tous les na-adjectifs en kana que Kuromoji classe `名詞`.
-
-## Correctifs proposés (à choisir)
-
-### Option A — Étendre le matching POS (recommandé, 1 fichier)
-
-Dans `src/lib/jisho.ts`, pour la règle `名詞`, ajouter `'Na-adjective'`, `'No-adjective'`, `'Adjectival noun'` aux `needles`. Ça suit la réalité linguistique : Kuromoji étiquette beaucoup de na-adj comme noms.
+Chaque règle = un tableau : `[match, ...replace]`.
+- `match` : string `"a|b|c"` (tokens du texte séparés par `|`)
+- chaque `replace` : string `"surface:reading:base"` (reading et base optionnels)
+- Pour la ponctuation : préfixe `!` → `"!。"`
 
 ```ts
-{ match: (p) => p.startsWith('名詞'),
-  needles: ['Noun','Pronoun','Suffix','Prefix','Na-adjective','No-adjective'] },
+export const tokenOverrides: Record<string, Rule[]> = {
+  "*": [
+    ["何|も", "何も:なにも"],
+    ["お",   "お:お:御"],     // ← affiché "お", lu "お", dico cherche "御"
+  ],
+  urashima: [
+    ["りょう|し", "漁師:りょうし"],
+  ],
+};
 ```
 
-Avantage : règle générale, corrige aussi 静か, 綺麗, 大切, etc.
-Risque : très faible (na-adj sont quasi toujours le sens voulu quand Kuromoji dit 名詞).
+Règles de parsing :
+- `surface` toujours obligatoire (1er champ avant `:`)
+- `reading` (2e champ) → `r`
+- `base` (3e champ) → `b` (= ce que le dico cherche)
+- POS par défaut `名詞` ; `j: true` sauf si surface commence par `!`
 
-### Option B — Préférer une entrée dont la forme matche la surface
+Pour multi-tokens en sortie : on ajoute simplement plus de strings dans le tableau.
+```ts
+["桜|の|樹", "桜:さくら", "の", "樹:き"]
+```
 
-Avant de regarder le POS, si parmi les résultats il y en a un dont `japanese[0].word === surface` OU `japanese[0].reading === surface`, on le choisit. Ex : pour `ひそか`, on prendrait `密か` (reading=ひそか) avant `密か事` (reading=みそかごと).
+## Bug `お → 尾`
 
-Avantage : règle aussi générale, garantit "le mot du popup = le mot du texte".
-Inconvénient : nécessite de passer la `surface` à `pickBestResult` (changer la signature, ~3 call-sites).
-
-### Option C — Cap sur le `getDisplayWord`
-
-Si la surface du token est en kana pur et que le résultat trouvé a un `reading` différent → fallback au `reading` (ou rejeter le résultat). Plus défensif mais plus magique.
-
-### Option D — Override manuel via `token-overrides.ts`
-
-Ajouter une règle `ひそか => ひそか@ひそか:形容動詞` pour ce cas précis. Ne corrige que ce mot, pas la cause profonde.
-
-## Recommandation
-
-Combiner **A + B** : A corrige le POS matching trop strict, B garantit que si une entrée a exactement la même forme que le texte elle est préférée. Les deux sont petits et couvrent tous les cas similaires sans toucher à la tokenisation. (note de l'utilisateur, je choisis cette option!)
+Avec `["お", "お:お:御"]`, le token reçoit `b="御"` → lookup Jisho cherche `御` directement, plus de collision avec 尾.
 
 ## Fichiers touchés
 
-- `src/lib/jisho.ts` — modifier `pickBestResult` (et sa signature si Option B) + ajouter `'Na-adjective'` à la règle 名詞.
-- `src/components/WordMiniPopup.tsx` + `src/components/WordPopup.tsx` — passer la `surface` au `pickBestResult` (uniquement si Option B).
+- `src/data/token-overrides.ts` — réécrit (~40 lignes total avec parser mini).
+- Reader.tsx inchangé (signature `applyTokenOverrides(bookId, tokens)` conservée).
 
-Dis-moi quelle(s) option(s) tu veux que j'implémente.
+## Détails techniques
+
+Type :
+```ts
+type Rule = [match: string, ...replace: string[]];
+```
+
+Parser d'un replace string :
+```ts
+function parse(s: string): BookToken {
+  const punct = s.startsWith("!");
+  if (punct) s = s.slice(1);
+  const [t, r, b] = s.split(":");
+  return { t, j: !punct, ...(r && { r }), ...(b && { b }), p: punct ? "記号" : "名詞" };
+}
+```

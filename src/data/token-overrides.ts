@@ -1,87 +1,59 @@
 import type { BookToken } from "@/data/book-tokens";
 
 /**
- * Per-book token overrides — version simplifiée.
+ * Per-book token overrides — format ultra-court.
  *
- * Chaque règle est une string :  "match  =>  replace"
- *   - les tokens sont séparés par "|"
- *   - chaque token côté droit peut être enrichi avec :
- *        surface@reading           ex: "呑めそうな@のめそうな"
- *        surface@reading#base      ex: "呑めそうな@のめそうな#呑む"
- *        surface@reading#base:pos  ex: "呑めそうな@のめそうな#呑む:動詞/自立"
- *   - défaut : pos="名詞", j=true (japonais). Pour ponctuation, mets ":記号".
+ * Chaque règle est un tableau : [match, ...replace]
+ *   - match : "a|b|c"  (les tokens du texte à matcher, séparés par "|")
+ *   - replace : "surface:reading:base"  (reading et base optionnels)
+ *       · surface : ce qui s'affiche dans le texte
+ *       · reading : furigana (kana)
+ *       · base    : ce que le dictionnaire ira chercher
+ *   - Pour la ponctuation : préfixe "!" → "!。"
  *
  * Exemples :
- *   'sakura': [
- *     '桜の樹  =>  桜@さくら | の@の:助詞 | 樹@き',
- *     '呑め|そう|な  =>  呑めそうな@のめそうな#呑む:動詞/自立',
- *   ],
+ *   ["何|も", "何も:なにも"]                     // 2 tokens → 1 token
+ *   ["お",    "お:お:御"]                        // affiché "お", dico cherche "御"
+ *   ["桜|の|樹", "桜:さくら", "の", "樹:き"]      // multi-tokens en sortie
  *
  * Utilise '*' comme bookId pour appliquer à tous les livres.
  */
-export const tokenOverrides: Record<string, string[]> = {
-  // 'sakura': [
-  //   '呑め|そう|な  =>  呑めそうな@のめそうな#呑む:動詞/自立',
-  // ],
-  "*": ["何|も  =>  何も", "お  =>  御@お#御"],
-  urashima: ["りょう|し  =>  漁師@りょうし"],
+export type Rule = [match: string, ...replace: string[]];
+
+export const tokenOverrides: Record<string, Rule[]> = {
+  "*": [
+    ["何|も", "何も:なにも"],
+    ["お", "お:お:御"],
+  ],
+  urashima: [
+    ["りょう|し", "漁師:りょうし"],
+  ],
 };
 
 // ─────────────────────────────────────────────────────────────
 // Internals — pas besoin de toucher en dessous
 // ─────────────────────────────────────────────────────────────
 
+function parseToken(s: string): BookToken {
+  const punct = s.startsWith("!");
+  if (punct) s = s.slice(1);
+  const [t, r, b] = s.split(":");
+  const tok: BookToken = { t, j: !punct, p: punct ? "記号" : "名詞" };
+  if (r) tok.r = r;
+  if (b) tok.b = b;
+  return tok;
+}
+
 interface ParsedRule {
   match: string[];
   replace: BookToken[];
 }
 
-function parseToken(spec: string): BookToken {
-  // surface@reading#base:pos
-  let rest = spec.trim();
-  let pos: string | undefined;
-  let base: string | undefined;
-  let reading: string | undefined;
-
-  const colon = rest.indexOf(":");
-  if (colon >= 0) {
-    pos = rest.slice(colon + 1).trim();
-    rest = rest.slice(0, colon);
-  }
-  const hash = rest.indexOf("#");
-  if (hash >= 0) {
-    base = rest.slice(hash + 1).trim();
-    rest = rest.slice(0, hash);
-  }
-  const at = rest.indexOf("@");
-  if (at >= 0) {
-    reading = rest.slice(at + 1).trim();
-    rest = rest.slice(0, at);
-  }
-  const surface = rest.trim();
-
-  const tok: BookToken = { t: surface, j: pos !== "記号" };
-  if (reading) tok.r = reading;
-  if (base) tok.b = base;
-  if (pos) tok.p = pos;
-  else tok.p = "名詞";
-  return tok;
-}
-
-function parseRule(rule: string): ParsedRule | null {
-  const sep = rule.split("=>");
-  if (sep.length !== 2) return null;
-  const match = sep[0]
-    .split("|")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const replace = sep[1]
-    .split("|")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map(parseToken);
-  if (match.length === 0) return null;
-  return { match, replace };
+function parseRule(rule: Rule): ParsedRule | null {
+  const [matchStr, ...replaceStrs] = rule;
+  const match = matchStr.split("|").map((s) => s.trim()).filter(Boolean);
+  if (match.length === 0 || replaceStrs.length === 0) return null;
+  return { match, replace: replaceStrs.map(parseToken) };
 }
 
 export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
@@ -113,21 +85,7 @@ export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookTo
       }
     }
     if (matched) {
-      const matchedTokens = tokens.slice(i, i + matched.match.length);
-      if (matched.replace.length === matched.match.length) {
-        // 1:1 — garde la surface d'origine de chaque token
-        for (let k = 0; k < matched.replace.length; k++) {
-          const rep = matched.replace[k];
-          out.push({ ...rep, t: matchedTokens[k].t });
-        }
-      } else if (matched.replace.length === 1) {
-        // N:1 — concatène les surfaces d'origine
-        const rep = matched.replace[0];
-        out.push({ ...rep, t: matchedTokens.map((m) => m.t).join("") });
-      } else {
-        // N:M — fallback : utilise les surfaces définies dans la règle
-        out.push(...matched.replace);
-      }
+      out.push(...matched.replace);
       i += matched.match.length;
     } else {
       out.push(tokens[i]);
