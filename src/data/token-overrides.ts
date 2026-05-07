@@ -31,6 +31,7 @@ export const tokenOverrides: Record<string, Rule[]> = {
     ["お", "お:お:御"],
     ["いつ|まで|も", "いつまでも"],
     ["に", "に:::particle"],
+    ["の", "の:::particle"],
   ],
   urashima: [["りょう|し", "りょうし:りょうし:漁師"]],
 };
@@ -56,11 +57,11 @@ function parseToken(s: string): BookToken {
   const punct = s.startsWith("!");
   if (punct) s = s.slice(1);
   const [t, r, b, pos] = s.split(":");
-  const resolvedPos = pos ? POS_ALIASES[pos.toLowerCase()] ?? pos : undefined;
+  const resolvedPos = pos ? (POS_ALIASES[pos.toLowerCase()] ?? pos) : undefined;
   const tok: BookToken = {
     t,
     j: !punct,
-    p: punct ? "記号" : resolvedPos ?? "名詞",
+    p: punct ? "記号" : (resolvedPos ?? "名詞"),
   };
   if (r) tok.r = r;
   if (b) tok.b = b;
