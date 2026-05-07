@@ -54,18 +54,28 @@ const POS_ALIASES: Record<string, string> = {
   pronoun: "代名詞",
 };
 
-function parseToken(s: string): BookToken & { __posOmitted?: boolean } {
+interface ParsedToken extends BookToken {
+  __posOmitted?: boolean;
+  __rOmitted?: boolean;
+  __bOmitted?: boolean;
+}
+
+function parseToken(s: string): ParsedToken {
   const punct = s.startsWith("!");
   if (punct) s = s.slice(1);
   const [t, r, b, pos] = s.split(":");
   const resolvedPos = pos ? (POS_ALIASES[pos.toLowerCase()] ?? pos) : undefined;
   const posOmitted = !punct && !resolvedPos;
-  const tok: BookToken & { __posOmitted?: boolean } = {
+  const rOmitted = !r;
+  const bOmitted = !b;
+  const tok: ParsedToken = {
     t,
     j: !punct,
     p: punct ? "記号" : (resolvedPos ?? "名詞"),
   };
   if (posOmitted) tok.__posOmitted = true;
+  if (rOmitted) tok.__rOmitted = true;
+  if (bOmitted) tok.__bOmitted = true;
   if (r) tok.r = r;
   if (b) tok.b = b;
   return tok;
