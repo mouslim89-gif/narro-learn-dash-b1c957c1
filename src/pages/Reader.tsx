@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns } from '@/lib/merge-tokens';
-import { applyTokenOverrides } from '@/data/token-overrides';
+import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
@@ -22,6 +22,11 @@ import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
 import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from '@/lib/known-words';
 import { Switch } from '@/components/ui/switch';
+import { useIsAdmin } from '@/lib/admin';
+import { useTokenEditStore } from '@/stores/token-edit';
+import { TokenEditPanel } from '@/components/TokenEditPanel';
+import { TokenEditFloatingBar } from '@/components/TokenEditFloatingBar';
+import { tokensToRule } from '@/lib/token-edit-rules';
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
