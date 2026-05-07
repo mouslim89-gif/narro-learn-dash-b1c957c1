@@ -87,16 +87,13 @@ function parseRule(rule: Rule): ParsedRule | null {
   return { match, replace: replaceStrs.map(parseToken) };
 }
 
-export function applyTokenOverrides(bookId: string, tokens: BookToken[]): BookToken[] {
-  const raw = [...(tokenOverrides[bookId] ?? []), ...(tokenOverrides["*"] ?? [])];
+export function applyRules(raw: Rule[], tokens: BookToken[]): BookToken[] {
   if (raw.length === 0) return tokens;
-
   const rules = raw
     .map(parseRule)
     .filter((r): r is ParsedRule => r !== null)
     .sort((a, b) => b.match.length - a.match.length);
   if (rules.length === 0) return tokens;
-
   const out: BookToken[] = [];
   let i = 0;
   while (i < tokens.length) {
