@@ -857,6 +857,34 @@ export default function Reader() {
           seekRequestRef={audioSeekRef}
         />
       )}
+
+      {tokenEditMode && id && (
+        <TokenEditFloatingBar
+          bookId={id}
+          selectionCount={selectedIdx.length}
+          onMerge={() => setEditPanel({ matchedIdx: [...selectedIdx] })}
+          onClearSelection={() => setSelectedIdx([])}
+          onExitEditMode={() => { setTokenEditMode(false); setSelectedIdx([]); }}
+        />
+      )}
+
+      {editPanel && (
+        <TokenEditPanel
+          open={!!editPanel}
+          onClose={() => setEditPanel(null)}
+          matched={editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t)}
+          onSubmit={(replacement) => {
+            const matched = editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t);
+            if (matched.length > 0 && id) {
+              const rule = tokensToRule(matched, replacement);
+              addRule(id, rule);
+              toast({ title: 'Rule added', description: `Saved to buffer for "${id}".` });
+            }
+            setEditPanel(null);
+            setSelectedIdx([]);
+          }}
+        />
+      )}
     </div>
   );
 }
