@@ -128,7 +128,7 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
   { match: (p) => p.startsWith('接続詞'), needles: ['Conjunction'] },
   { match: (p) => p.startsWith('感動詞'), needles: ['Interjection'] },
   { match: (p) => p === '表現', needles: ['Expression'] },
-  { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix'] },
+  { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix', 'Na-adjective', 'No-adjective', 'Adjectival noun'] },
 ];
 
 /** True if first sense of result is tagged "Usually written using kana alone". */
