@@ -158,6 +158,19 @@ export default function Reader() {
   const [selectedIdx, setSelectedIdx] = useState<number[]>([]);
   const [editPanel, setEditPanel] = useState<{ matchedIdx: number[] } | null>(null);
   const tokenByKey = useRef<Map<number, BookToken>>(new Map());
+  // Drag-to-select state (token edit mode only)
+  const dragRef = useRef<{ active: boolean; startKey: number | null; addedKeys: Set<number>; startX: number; startY: number; moved: boolean }>(
+    { active: false, startKey: null, addedKeys: new Set(), startX: 0, startY: 0, moved: false }
+  );
+
+  // Global pointer up to end drag
+  useEffect(() => {
+    if (!tokenEditMode) return;
+    const onUp = () => { dragRef.current.active = false; dragRef.current.startKey = null; dragRef.current.addedKeys.clear(); };
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => { window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
+  }, [tokenEditMode]);
 
   const tokens = useMemo(() => {
     if (!id) return [];
@@ -531,6 +544,21 @@ export default function Reader() {
           >
             <BookType className="h-5 w-5" />
           </button>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setTokenEditMode(!tokenEditMode);
+                setSelectedIdx([]);
+                setMiniPopup(null);
+                setSentenceTranslation(null);
+              }}
+              className="reader-icon-btn"
+              data-active={tokenEditMode ? 'true' : undefined}
+              title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
+            >
+              <Wrench className="h-5 w-5" />
+            </button>
+          )}
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="reader-icon-btn"
@@ -653,23 +681,9 @@ export default function Reader() {
             )}
           </div>
 
-          {isAdmin && (
-            <>
-              <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Dev</p>
-              <label className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2">
-                <span className="flex items-center gap-2 text-xs font-semibold">
-                  <Wrench className="h-3.5 w-3.5" />
-                  Token edit mode
-                </span>
-                <Switch
-                  checked={tokenEditMode}
-                  onCheckedChange={(v) => { setTokenEditMode(v); setSelectedIdx([]); setMiniPopup(null); setSentenceTranslation(null); }}
-                />
-              </label>
-            </>
-          )}
         </div>
       )}
+
 
       {/* Slim gradient progress bar */}
       <div className="reader-progress-track">
@@ -740,7 +754,7 @@ export default function Reader() {
                         ? `outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ? 'bg-primary/30 outline-primary' : 'hover:bg-primary/10'}`
                         : '';
 
-                      return (
+                      const tokenNode = (
                         <ReaderToken
                           key={i}
                           token={token}
@@ -750,13 +764,13 @@ export default function Reader() {
                           knownLevel={knownLevel}
                           onTap={() => {
                             if (tokenEditMode) {
+                              // Suppress tap if a drag-select just happened.
+                              if (dragRef.current.moved) { dragRef.current.moved = false; return; }
                               if (selectedIdx.length > 0) {
-                                // toggle in selection
                                 setSelectedIdx((arr) =>
                                   arr.includes(tokKey) ? arr.filter((k) => k !== tokKey) : [...arr, tokKey].sort((a, b) => a - b)
                                 );
                               } else {
-                                // single-token edit
                                 setEditPanel({ matchedIdx: [tokKey] });
                               }
                               return;
@@ -788,6 +802,49 @@ export default function Reader() {
                             triggerSentenceTranslation(globalIdx, sentenceText);
                           }}
                         />
+                      );
+
+                      if (!tokenEditMode) return tokenNode;
+
+                      return (
+                        <span
+                          key={i}
+                          style={{ touchAction: 'none' }}
+                          onPointerDown={(e) => {
+                            (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+                            dragRef.current.active = true;
+                            dragRef.current.startKey = tokKey;
+                            dragRef.current.addedKeys = new Set([tokKey]);
+                            dragRef.current.startX = e.clientX;
+                            dragRef.current.startY = e.clientY;
+                            dragRef.current.moved = false;
+                          }}
+                          onPointerMove={(e) => {
+                            if (!dragRef.current.active) return;
+                            const dx = e.clientX - dragRef.current.startX;
+                            const dy = e.clientY - dragRef.current.startY;
+                            if (!dragRef.current.moved && Math.sqrt(dx*dx + dy*dy) > 6) {
+                              dragRef.current.moved = true;
+                              // Add the start token to selection now that we know it's a drag
+                              const startKey = dragRef.current.startKey;
+                              if (startKey != null) {
+                                setSelectedIdx((arr) => arr.includes(startKey) ? arr : [...arr, startKey].sort((a, b) => a - b));
+                              }
+                            }
+                            if (!dragRef.current.moved) return;
+                            const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+                            const wrap = el?.closest('[data-tok-key]') as HTMLElement | null;
+                            if (!wrap) return;
+                            const k = Number(wrap.dataset.tokKey);
+                            if (Number.isFinite(k) && !dragRef.current.addedKeys.has(k)) {
+                              dragRef.current.addedKeys.add(k);
+                              setSelectedIdx((arr) => arr.includes(k) ? arr : [...arr, k].sort((a, b) => a - b));
+                            }
+                          }}
+                          data-tok-key={tokKey}
+                        >
+                          {tokenNode}
+                        </span>
                       );
                     })}
                   </span>
