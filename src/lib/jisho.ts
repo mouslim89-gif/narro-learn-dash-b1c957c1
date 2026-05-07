@@ -128,7 +128,7 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
   { match: (p) => p.startsWith('接続詞'), needles: ['Conjunction'] },
   { match: (p) => p.startsWith('感動詞'), needles: ['Interjection'] },
   { match: (p) => p === '表現', needles: ['Expression'] },
-  { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix'] },
+  { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix', 'Na-adjective', 'No-adjective', 'Adjectival noun'] },
 ];
 
 /** True if first sense of result is tagged "Usually written using kana alone". */
@@ -150,12 +150,23 @@ export function getDisplayWord(result: JishoResult | null | undefined): { word: 
   return { word: j.word || j.reading, reading: j.reading };
 }
 
-/** Pick the result whose parts_of_speech best matches the Kuromoji POS. */
+/** Pick the result whose form best matches the surface, falling back to POS matching. */
 export function pickBestResult(
   results: JishoResult[] | undefined,
   kuromojiPos?: string,
+  surface?: string,
 ): JishoResult | null {
   if (!results || results.length === 0) return null;
+
+  // 1. Prefer an entry whose word or reading exactly matches the surface from the text.
+  if (surface) {
+    const exact = results.find((r) =>
+      r.japanese.some((j) => j.word === surface || j.reading === surface),
+    );
+    if (exact) return exact;
+  }
+
+  // 2. Fall back to matching by Kuromoji POS.
   if (!kuromojiPos) return results[0];
   const rule = POS_KEYWORDS.find((r) => r.match(kuromojiPos));
   if (!rule) return results[0];

@@ -30,7 +30,7 @@ export function WordMiniPopup({
 
   const cached = (baseForm && baseForm !== word ? getCached(baseForm) : undefined) ?? getCached(word);
   const [loading, setLoading] = useState(!cached);
-  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos));
+  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos, word));
   const [error, setError] = useState(false);
 
   const wordId = word;
@@ -40,7 +40,7 @@ export function WordMiniPopup({
 
   useEffect(() => {
     if (cached) {
-      const best = pickBestResult(cached.results, pos);
+      const best = pickBestResult(cached.results, pos, word);
       if (best) setResult(best);
       else setError(true);
       setLoading(false);
@@ -56,14 +56,14 @@ export function WordMiniPopup({
         let entry: CacheEntry | null = null;
         if (baseForm && baseForm !== word) {
           entry = await lookupWord(baseForm);
-          const best = pickBestResult(entry.results, pos);
+          const best = pickBestResult(entry.results, pos, word);
           if (best) {
             if (!cancelled) setResult(best);
             return;
           }
         }
         entry = await lookupWord(word);
-        const best = pickBestResult(entry.results, pos);
+        const best = pickBestResult(entry.results, pos, word);
         if (!cancelled && best) setResult(best);
         else if (!cancelled) setError(true);
       } catch {
