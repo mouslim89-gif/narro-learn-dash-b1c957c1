@@ -1,77 +1,50 @@
-# Mode "Édition de tokens" dans le Reader (admin-only)
+## Améliorations du mode Token Edit
 
-## Objectif
+### 1. Bouton header (admin only)
+Dans `src/pages/Reader.tsx`, ajouter une icône `Wrench` dans le header à côté du bouton Settings, visible uniquement si `useIsAdmin()`.
+- Tap = toggle direct de `tokenEditMode`
+- Style actif: fond `primary/15`, icône colorée primary
+- Retirer le toggle "Token edit mode" de la section Dev du panneau Settings (devient redondant). Garder éventuellement un petit raccourci "Clear buffer" pour admin.
 
-Ajouter dans le Reader un mode interactif qui permet, à toi seul, de visualiser tous les tokens du chapitre et de les modifier (fusionner, splitter, éditer reading/base/POS, surface furigana). Les modifs sont accumulées dans un buffer et exportables sous forme de règles `Rule` prêtes à coller dans `src/data/token-overrides.ts`.
+### 2. POS optionnel + mode "Auto"
+Dans `src/components/TokenEditPanel.tsx`:
+- Ajouter en tête du select POS deux options spéciales:
+  - `Auto` (valeur par défaut pour un edit) — garde le POS d'origine du token matché, n'écrase rien dans la règle
+  - `Aucun (omit)` — la règle générée n'inclut PAS le champ p
+- Ajout de `pMode: 'auto' | 'none' | 'set'` dans `TokenDraft` pour distinguer ces cas.
 
-## 1. Garde admin (email hardcodé)
+Dans `src/lib/token-edit-rules.ts` (`encodeReplacement`):
+- Si `pMode === 'none'` ou si `p` est vide → ne pas émettre p (déjà partiellement géré, à formaliser).
+- Si `pMode === 'auto'` → ne pas émettre p non plus (le moteur garde l'original via fallback existant dans `applyRules`).
 
-Nouveau fichier `src/lib/admin.ts` :
+Vérifier que `applyRules` dans `src/data/token-overrides.ts` conserve bien le POS du token matché quand le replacement n'a pas de p (ajuster si besoin — petit fix défensif).
 
-- Constante `ADMIN_EMAILS = ["mouslim89@gmail.com"]`
-- Hook `useIsAdmin()` qui lit `useAuth()` et renvoie `true` si `user.email` est dans la liste.
+### 3. Preview live de la règle
+Ajouter en bas du `TokenEditPanel`, au-dessus des boutons Cancel/Save, un bloc `<pre>` compact qui affiche en temps réel le snippet TS de la règle en cours de construction (utilise `tokensToRule` + `formatRule` exporté depuis `token-edit-rules.ts`). Bouton "Copy" inline.
 
-Tu nous diras ton email exact lors de l'implémentation (ou je mets un placeholder à compléter).
+### 4. Undo dernière règle
+Dans `src/stores/token-edit.ts`:
+- Ajouter `undoLast: (scope: string) => Rule | null` qui pop la dernière règle du buffer et la renvoie.
 
-## 2. Bouton d'entrée dans le menu Settings du Reader
+Dans `src/components/TokenEditFloatingBar.tsx`:
+- Bouton `Undo` (icône `Undo2`) à côté de "View rules", désactivé si buffer vide. Toast de confirmation avec contenu retiré.
 
-Dans `src/pages/Reader.tsx`, dans le panneau Settings existant :
+### 5. Sélection par drag
+Dans `src/pages/Reader.tsx` (rendu des tokens en mode edit):
+- Sur chaque `ReaderToken`, ajouter `onPointerDown` qui démarre un drag (state `dragSelecting`), `onPointerEnter` (pendant drag) qui ajoute le token à `selectedIdx`, `onPointerUp` global qui termine.
+- Tap simple sans mouvement (< 5px) = ouvre le panel d'édition pour ce token (comportement actuel).
+- Touch: utiliser `pointer events` natifs (fonctionne tactile + souris). Sur touch, désactiver le scroll vertical pendant le drag via `touch-action: none` sur le conteneur tokens en mode edit.
+- Garder Clear sel et Merge dans la barre flottante.
 
-- Si `useIsAdmin()` → afficher une section "Dev" avec un toggle **"Token edit mode"**.
-- Quand activé, le Reader passe en mode édition (state `tokenEditMode`).
+### 6. Polish floating bar
+- Réordonner: `[Exit] EDIT MODE · N pending  ——  [Undo] [View rules]`
+- Quand sélection > 1 : afficher `[Merge N] [Clear]` au centre, en `accent`.
 
-## 3. UI mode édition
+### Fichiers touchés
 
-Nouveau composant `src/components/TokenEditOverlay.tsx`.
-
-Comportement dans le Reader quand `tokenEditMode = true` :
-
-- Les popups habituels (mini/full word popup, sentence translation) sont désactivés.
-- Chaque token est rendu avec une bordure fine et un fond léger basé sur sa couleur POS (réutilise `getPosColorClass`).
-- **Tap simple sur un token** → ouvre un panneau bottom-sheet (réutilise `Sheet` shadcn) avec :
-  - Surface (`t`) — éditable
-  - Reading (`r`) — éditable (furigana affiché dans wordpopup ET au-dessus du texte)
-  - Base (`b`) — éditable (clé dico)
-  - POS (`p`) — select avec les alias (particle, verb, …) + champ libre
-  - Toggle "ponctuation" (`j=false`)
-  - Bouton **"Splitter"** → ouvre un éditeur où tu saisis les nouveaux tokens un par un (chacun avec t/r/b/p)
-  - Bouton **"Supprimer cette règle"** si la règle existe déjà dans le buffer
-- **Sélection multi-token** : tap long sur un token → entre en mode sélection ; les taps suivants ajoutent/retirent des tokens contigus à la sélection. Bouton flottant **"Fusionner ces N tokens"** → ouvre le même panneau pour définir le token résultant.
-- Barre flottante en bas avec :
-  - Compteur "X règle(s) en attente"
-  - Bouton **"Voir les règles"** → modal qui affiche le bloc TS prêt à coller, avec bouton "Copier" :
-    ```ts
-    // À coller dans tokenOverrides["gyofukuki"] :
-    ["三|人", "三:さん", "人:じん"],
-    ["お", "お:お:御"],
-    ```
-  - Bouton **"Reset"** vide le buffer.
-- Les règles du buffer sont **appliquées en live** au rendu pour que tu voies l'effet immédiatement (on les fusionne avec `tokenOverrides` existants via `applyTokenOverrides`).
-
-## 4. Persistance buffer
-
-`localStorage` clé `token-edit-buffer:<bookId>:<chapterId>` (Zustand store dédié `src/stores/token-edit.ts` avec `persist`). Pas de DB, pas de partage avec les autres users — tu copies le bloc dans `token-overrides.ts` quand tu es satisfait.
-
-## 5. Génération des règles
-
-Helper `src/lib/token-edit-rules.ts` :
-
-- `tokensToRule(matched: BookToken[], replacement: BookToken[]): Rule` — produit le format court `[match, ...replace]` en respectant la convention de `token-overrides.ts` (préfixe `!` pour ponctuation, `pos` aliasé en `particle/verb/...`, champs vides skippés).
-- `formatRulesBlock(rules: Rule[], bookId: string): string` — sort le snippet TS formaté.
-
-## 6. Détails techniques
-
-- Aucun changement aux fichiers `dictionary-db`, `jisho.ts`, `merge-tokens`, `generate-tokens.ts`.
-- Le mode édition travaille sur la liste **après** `cleanRubyTokens` + `mergeConjugatedTokens` + `applyTokenOverrides` (= la même qu'aujourd'hui), pour que tu vois ce que voit l'utilisateur.
-- Les règles que tu crées sont scopées au `bookId` courant (jamais `*`), car c'est le cas d'usage le plus fréquent. Toggle "appliquer à tous les livres" disponible dans le panneau d'édition.
-- Le furigana modifié via le mode édition est utilisé à la fois dans le texte (`FuriganaWord`) et dans les popups (déjà géré par `overrideReading` ajouté précédemment).
-
-## Fichiers touchés
-
-- **Nouveau** `src/lib/admin.ts`
-- **Nouveau** `src/stores/token-edit.ts`
-- **Nouveau** `src/lib/token-edit-rules.ts`
-- **Nouveau** `src/components/TokenEditOverlay.tsx`
-- **Nouveau** `src/components/TokenEditPanel.tsx` (le bottom-sheet d'édition)
-- **Modifié** `src/pages/Reader.tsx` — toggle dans Settings + branchement de l'overlay + désactivation des popups en mode édition
-
+- **Modifié** `src/pages/Reader.tsx` — bouton Wrench header, retrait toggle Settings, drag-select pointer events, `touch-action`.
+- **Modifié** `src/components/TokenEditPanel.tsx` — POS Auto/Aucun, preview live, badge POS d'origine.
+- **Modifié** `src/lib/token-edit-rules.ts` — gestion pMode, export `formatRule`.
+- **Modifié** `src/stores/token-edit.ts` — `undoLast`.
+- **Modifié** `src/components/TokenEditFloatingBar.tsx` — bouton Undo, layout.
+- **Modifié (défensif)** `src/data/token-overrides.ts` — `applyRules` garde POS original si replacement omet p.
