@@ -112,6 +112,4 @@ export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
     await setMany(idbPairs, wordStore);
   }
 
-  // 5. Mark the book hydrated so we skip the missing-words check next time.
-  await set(`book:${bookId}:hydrated`, true, metaStore);
 }
