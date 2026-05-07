@@ -5,15 +5,20 @@ import type { BookToken } from "@/data/book-tokens";
  *
  * Chaque règle est un tableau : [match, ...replace]
  *   - match : "a|b|c"  (les tokens du texte à matcher, séparés par "|")
- *   - replace : "surface:reading:base"  (reading et base optionnels)
+ *   - replace : "surface:reading:base:pos"  (reading, base et pos optionnels)
  *       · surface : ce qui s'affiche dans le texte
  *       · reading : furigana (kana)
  *       · base    : ce que le dictionnaire ira chercher
+ *       · pos     : nature grammaticale — alias acceptés :
+ *                   particle, verb, adj, noun, adv, aux, expr, conj, interj, pronoun
+ *                   (ou directement le POS Kuromoji : 助詞, 動詞, 形容詞, …)
  *   - Pour la ponctuation : préfixe "!" → "!。"
+ *   - Pour sauter un champ, laisse-le vide. Ex : "に:::particle"
  *
  * Exemples :
  *   ["何|も", "何も:なにも"]                     // 2 tokens → 1 token
  *   ["お",    "お:お:御"]                        // affiché "お", dico cherche "御"
+ *   ["に",    "に:::particle"]                   // force POS particule
  *   ["桜|の|樹", "桜:さくら", "の", "樹:き"]      // multi-tokens en sortie
  *
  * Utilise '*' comme bookId pour appliquer à tous les livres.
@@ -25,7 +30,7 @@ export const tokenOverrides: Record<string, Rule[]> = {
     ["何|も", "何も:なにも"],
     ["お", "お:お:御"],
     ["いつ|まで|も", "いつまでも"],
-    ["に", "に:に:に"],
+    ["に", "に:::particle"],
   ],
   urashima: [["りょう|し", "りょうし:りょうし:漁師"]],
 };
@@ -34,11 +39,29 @@ export const tokenOverrides: Record<string, Rule[]> = {
 // Internals — pas besoin de toucher en dessous
 // ─────────────────────────────────────────────────────────────
 
+const POS_ALIASES: Record<string, string> = {
+  particle: "助詞",
+  verb: "動詞",
+  adj: "形容詞",
+  noun: "名詞",
+  adv: "副詞",
+  aux: "助動詞",
+  expr: "表現",
+  conj: "接続詞",
+  interj: "感動詞",
+  pronoun: "代名詞",
+};
+
 function parseToken(s: string): BookToken {
   const punct = s.startsWith("!");
   if (punct) s = s.slice(1);
-  const [t, r, b] = s.split(":");
-  const tok: BookToken = { t, j: !punct, p: punct ? "記号" : "名詞" };
+  const [t, r, b, pos] = s.split(":");
+  const resolvedPos = pos ? POS_ALIASES[pos.toLowerCase()] ?? pos : undefined;
+  const tok: BookToken = {
+    t,
+    j: !punct,
+    p: punct ? "記号" : resolvedPos ?? "名詞",
+  };
   if (r) tok.r = r;
   if (b) tok.b = b;
   return tok;
