@@ -9,10 +9,29 @@ import { Trash2, Plus, Copy } from 'lucide-react';
 import { tokensToRule, formatRule } from '@/lib/token-edit-rules';
 import { toast } from '@/hooks/use-toast';
 
-const POS_OPTIONS = [
-  '名詞', '動詞', '形容詞', '副詞', '助詞', '助動詞',
-  '接続詞', '感動詞', '代名詞', '連体詞', '記号', '名詞/数', '名詞/接尾',
+/** English label → Japanese POS tag stored on the token. */
+const POS_OPTIONS: { label: string; value: string }[] = [
+  { label: 'Noun', value: '名詞' },
+  { label: 'Verb', value: '動詞' },
+  { label: 'Auxiliary verb (です/ます…)', value: '助動詞' },
+  { label: 'I-adjective', value: '形容詞' },
+  { label: 'Na-adjective', value: '形容動詞' },
+  { label: 'Adverb', value: '副詞' },
+  { label: 'Particle', value: '助詞' },
+  { label: 'Conjunction', value: '接続詞' },
+  { label: 'Interjection', value: '感動詞' },
+  { label: 'Pronoun', value: '代名詞' },
+  { label: 'Pre-noun adjectival (連体詞)', value: '連体詞' },
+  { label: 'Symbol / punctuation', value: '記号' },
+  { label: 'Counter (名詞/数)', value: '名詞/数' },
+  { label: 'Suffix (名詞/接尾)', value: '名詞/接尾' },
+  { label: 'Expression', value: '表現' },
 ];
+
+function posLabel(value?: string): string {
+  if (!value) return '';
+  return POS_OPTIONS.find((o) => o.value === value)?.label ?? value;
+}
 
 type PMode = 'auto' | 'omit' | 'set';
 
@@ -40,12 +59,15 @@ function toDraft(tok: BookToken): TokenDraft {
   };
 }
 
-/** Convert a draft to the BookToken used to build the rule. */
+/** Convert a draft to the BookToken used to build the rule.
+ *  pMode === 'auto' → p undefined (encoder omits POS, engine inherits original)
+ *  pMode === 'omit' → p === '-' sentinel (encoder emits alias `none`, engine clears POS so dictionary is unfiltered)
+ *  pMode === 'set'  → p === chosen POS
+ */
 function toToken(d: TokenDraft): BookToken {
-  const p =
-    d.pMode === 'set'
-      ? (d.p && d.p.trim() ? d.p : undefined)
-      : undefined;
+  let p: string | undefined;
+  if (d.pMode === 'set') p = d.p && d.p.trim() ? d.p : undefined;
+  else if (d.pMode === 'omit') p = '-';
   const tok: BookToken = {
     t: d.t,
     j: d.j !== false,
@@ -172,9 +194,9 @@ export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
                       className="rounded-md border bg-background px-2 py-1.5 text-xs"
                       title="POS handling"
                     >
-                      <option value="auto">Auto</option>
-                      <option value="omit">None</option>
-                      <option value="set">Set…</option>
+                      <option value="auto">Keep original</option>
+                      <option value="omit">No filter (any POS)</option>
+                      <option value="set">Force POS…</option>
                     </select>
                     {d.pMode === 'set' && (
                       <select
@@ -182,18 +204,22 @@ export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
                         onChange={(e) => updateDraft(i, { p: e.target.value })}
                         className="flex-1 rounded-md border bg-background px-2 py-1.5 text-sm"
                       >
-                        {POS_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
-                        {d.p && !POS_OPTIONS.includes(d.p) && <option value={d.p}>{d.p}</option>}
+                        {POS_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                        {d.p && !POS_OPTIONS.some((o) => o.value === d.p) && (
+                          <option value={d.p}>{d.p}</option>
+                        )}
                       </select>
                     )}
                     {d.pMode === 'auto' && d.origP && (
                       <span className="flex-1 truncate rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground" title="Inherited from original token">
-                        ↻ {d.origP}
+                        ↻ {posLabel(d.origP)}
                       </span>
                     )}
                     {d.pMode === 'omit' && (
                       <span className="flex-1 rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground">
-                        omitted
+                        dictionary will not filter by POS
                       </span>
                     )}
                   </div>

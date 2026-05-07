@@ -54,18 +54,21 @@ const POS_ALIASES: Record<string, string> = {
   pronoun: "代名詞",
 };
 
-function parseToken(s: string): BookToken & { __posOmitted?: boolean } {
+function parseToken(s: string): BookToken & { __posOmitted?: boolean; __posCleared?: boolean } {
   const punct = s.startsWith("!");
   if (punct) s = s.slice(1);
   const [t, r, b, pos] = s.split(":");
-  const resolvedPos = pos ? (POS_ALIASES[pos.toLowerCase()] ?? pos) : undefined;
-  const posOmitted = !punct && !resolvedPos;
-  const tok: BookToken & { __posOmitted?: boolean } = {
+  const posLower = pos?.toLowerCase();
+  const posCleared = !punct && posLower === "none";
+  const resolvedPos = pos && !posCleared ? (POS_ALIASES[posLower] ?? pos) : undefined;
+  const posOmitted = !punct && !pos;
+  const tok: BookToken & { __posOmitted?: boolean; __posCleared?: boolean } = {
     t,
     j: !punct,
-    p: punct ? "記号" : (resolvedPos ?? "名詞"),
+    p: punct ? "記号" : (resolvedPos ?? (posCleared ? undefined : "名詞")),
   };
   if (posOmitted) tok.__posOmitted = true;
+  if (posCleared) tok.__posCleared = true;
   if (r) tok.r = r;
   if (b) tok.b = b;
   return tok;
@@ -130,16 +133,17 @@ function runRules(rules: ParsedRule[], tokens: BookToken[]): BookToken[] {
       }
     }
     if (matched) {
-      // For replacement tokens whose POS was omitted in the rule, inherit the
-      // POS of the first matched token (so "Auto"/omit doesn't lose info).
       const inheritedPos = tokens[i]?.p;
       for (const rt of matched.replace) {
-        const anyRt = rt as BookToken & { __posOmitted?: boolean };
-        if (anyRt.__posOmitted && inheritedPos) {
+        const anyRt = rt as BookToken & { __posOmitted?: boolean; __posCleared?: boolean };
+        if (anyRt.__posCleared) {
+          // Explicit "no POS" — drop the placeholder so dictionary won't filter
+          const { __posOmitted: _o, __posCleared: _c, p: _p, ...clean } = anyRt;
+          out.push(clean as BookToken);
+        } else if (anyRt.__posOmitted && inheritedPos) {
           out.push({ ...rt, p: inheritedPos });
         } else {
-          // Strip internal flag before emitting
-          const { __posOmitted: _omit, ...clean } = anyRt as BookToken & { __posOmitted?: boolean };
+          const { __posOmitted: _omit, __posCleared: _c2, ...clean } = anyRt;
           out.push(clean as BookToken);
         }
       }

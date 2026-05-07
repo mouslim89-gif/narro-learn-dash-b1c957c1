@@ -28,7 +28,9 @@ function encodeReplacement(tok: BookToken): string {
   const b = tok.b ?? '';
   const pRaw = tok.p;
   let p = '';
-  if (pRaw && pRaw.trim().length > 0) {
+  if (pRaw === '-') {
+    p = 'none'; // explicit: no POS filter
+  } else if (pRaw && pRaw.trim().length > 0) {
     p = POS_TO_ALIAS[pRaw] ?? pRaw;
   }
   const parts = [t, r, b, p];
