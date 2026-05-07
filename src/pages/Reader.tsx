@@ -531,6 +531,21 @@ export default function Reader() {
           >
             <BookType className="h-5 w-5" />
           </button>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setTokenEditMode(!tokenEditMode);
+                setSelectedIdx([]);
+                setMiniPopup(null);
+                setSentenceTranslation(null);
+              }}
+              className="reader-icon-btn"
+              data-active={tokenEditMode ? 'true' : undefined}
+              title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
+            >
+              <Wrench className="h-5 w-5" />
+            </button>
+          )}
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="reader-icon-btn"
