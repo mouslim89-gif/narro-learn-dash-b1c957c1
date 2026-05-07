@@ -127,7 +127,7 @@ export function WordMiniPopup({
 
   const handleSave = () => {
     if (!result) return;
-    const disp = getDisplayWord(result);
+    const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {
       id: wordId,
       word: disp.word || word,
