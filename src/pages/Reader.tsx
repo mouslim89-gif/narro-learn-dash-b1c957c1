@@ -671,8 +671,6 @@ export default function Reader() {
         </div>
       )}
 
-      {/* spacer removed: Dev section moved to header Wrench button */}
-      {false && <span /> /* keep parser happy */}
 
       {/* Slim gradient progress bar */}
       <div className="reader-progress-track">
