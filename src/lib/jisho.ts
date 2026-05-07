@@ -21,13 +21,30 @@ function isUsable(entry: CacheEntry | undefined): entry is CacheEntry {
   return !!entry && Array.isArray(entry.results) && entry.results.length > 0;
 }
 
+// CJK Unified Ideographs range — used to detect single-kanji keywords that need strict validation.
+const CJK = /[\u3400-\u9FFF\uF900-\uFAFF]/;
+
+function entryMatchesKeyword(keyword: string, entry: CacheEntry): boolean {
+  return entry.results.some((r) =>
+    r.japanese.some((j) => j.word === keyword || j.reading === keyword),
+  );
+}
+
 function isKnownStaleEntry(keyword: string, entry: CacheEntry | undefined): boolean {
-  if (keyword !== 'なる' || !entry) return false;
-  return !entry.results.some((result) => {
-    const matchesNaru = result.japanese.some((j) => j.word === '成る' || j.word === '為る' || j.reading === 'なる');
-    const isVerb = result.senses.some((sense) => sense.parts_of_speech.some((pos) => pos.includes('verb')));
-    return matchesNaru && isVerb;
-  });
+  if (!entry) return false;
+  if (keyword === 'なる') {
+    return !entry.results.some((result) => {
+      const matchesNaru = result.japanese.some((j) => j.word === '成る' || j.word === '為る' || j.reading === 'なる');
+      const isVerb = result.senses.some((sense) => sense.parts_of_speech.some((pos) => pos.includes('verb')));
+      return matchesNaru && isVerb;
+    });
+  }
+  // For short keywords (1-2 chars), reject entries where no result actually matches the keyword.
+  // Catches polluted cache like 三 → [三人, 三人組...] or 一 → [一歩...].
+  if (keyword.length <= 2 && CJK.test(keyword)) {
+    return !entryMatchesKeyword(keyword, entry);
+  }
+  return false;
 }
 
 function isUsableForKeyword(keyword: string, entry: CacheEntry | undefined): entry is CacheEntry {

@@ -19,6 +19,24 @@ import { bookTokens } from '@/data/book-tokens';
 const wordStore = createStore('yomimasu-dict', 'words');
 const metaStore = createStore('yomimasu-dict-meta', 'meta');
 
+// Bump this whenever cached dictionary entries become invalid (e.g. after fixing
+// polluted entries like 三 → 三人 or 一 → 一歩). On bump, we clear IndexedDB once.
+const DICT_CACHE_VERSION = 2;
+
+let cacheCleanupPromise: Promise<void> | null = null;
+async function ensureCacheVersion(): Promise<void> {
+  if (cacheCleanupPromise) return cacheCleanupPromise;
+  cacheCleanupPromise = (async () => {
+    const stored = await get<number>('dictCacheVersion', metaStore);
+    if (stored === DICT_CACHE_VERSION) return;
+    const { clear } = await import('idb-keyval');
+    await clear(wordStore);
+    await clear(metaStore);
+    await set('dictCacheVersion', DICT_CACHE_VERSION, metaStore);
+  })();
+  return cacheCleanupPromise;
+}
+
 /** Collect every unique surface + base form a book actually uses across difficulties. */
 function collectBookWords(bookId: string): string[] {
   const set = new Set<string>();
@@ -58,6 +76,7 @@ async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
 
 /** Public: hydrate the jisho in-memory cache for a given book. */
 export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
+  await ensureCacheVersion();
   const allWords = collectBookWords(bookId);
   if (allWords.length === 0) return;
 
@@ -71,15 +90,13 @@ export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
     else missing.push(w);
   });
 
-  // 2. Already-cached entries → seed memory immediately so popups feel instant.
+  // 2. Already-cached entries → seed memory (seedCache filters out stale entries).
   if (Object.keys(seed).length > 0) seedCache(seed);
 
-  // 3. Skip network entirely if nothing is missing OR book is marked hydrated.
-  const hydrated = await get<boolean>(`book:${bookId}:hydrated`, metaStore);
-  if (missing.length === 0 || hydrated) {
-    if (!hydrated) await set(`book:${bookId}:hydrated`, true, metaStore);
-    return;
-  }
+  // 3. Skip the DB fetch only if everything we need is present locally.
+  // (We no longer rely on a "hydrated" flag — a missing word always triggers a refetch
+  // so corrected DB entries propagate to clients without manual cache clears.)
+  if (missing.length === 0) return;
 
   // 4. Fetch the missing words from DB and persist.
   const fetched = await fetchFromDb(missing);
@@ -95,6 +112,4 @@ export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
     await setMany(idbPairs, wordStore);
   }
 
-  // 5. Mark the book hydrated so we skip the missing-words check next time.
-  await set(`book:${bookId}:hydrated`, true, metaStore);
 }
