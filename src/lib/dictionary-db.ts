@@ -19,6 +19,24 @@ import { bookTokens } from '@/data/book-tokens';
 const wordStore = createStore('yomimasu-dict', 'words');
 const metaStore = createStore('yomimasu-dict-meta', 'meta');
 
+// Bump this whenever cached dictionary entries become invalid (e.g. after fixing
+// polluted entries like 三 → 三人 or 一 → 一歩). On bump, we clear IndexedDB once.
+const DICT_CACHE_VERSION = 2;
+
+let cacheCleanupPromise: Promise<void> | null = null;
+async function ensureCacheVersion(): Promise<void> {
+  if (cacheCleanupPromise) return cacheCleanupPromise;
+  cacheCleanupPromise = (async () => {
+    const stored = await get<number>('dictCacheVersion', metaStore);
+    if (stored === DICT_CACHE_VERSION) return;
+    const { clear } = await import('idb-keyval');
+    await clear(wordStore);
+    await clear(metaStore);
+    await set('dictCacheVersion', DICT_CACHE_VERSION, metaStore);
+  })();
+  return cacheCleanupPromise;
+}
+
 /** Collect every unique surface + base form a book actually uses across difficulties. */
 function collectBookWords(bookId: string): string[] {
   const set = new Set<string>();
