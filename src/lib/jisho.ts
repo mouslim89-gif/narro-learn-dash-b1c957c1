@@ -146,6 +146,8 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
   { match: (p) => p.startsWith('接続詞'), needles: ['Conjunction'] },
   { match: (p) => p.startsWith('感動詞'), needles: ['Interjection'] },
   { match: (p) => p === '表現', needles: ['Expression'] },
+  // Numeric must come before generic 名詞 so 三/一/百 don't pick 三つ/一つ/百貨店.
+  { match: (p) => p.includes('数'), needles: ['Numeric', 'Counter'] },
   { match: (p) => p.startsWith('名詞'), needles: ['Noun', 'Pronoun', 'Suffix', 'Prefix', 'Na-adjective', 'No-adjective', 'Adjectival noun'] },
 ];
 

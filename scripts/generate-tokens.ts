@@ -313,7 +313,55 @@ function postMergeCompounds(
       i++;
     }
   }
-  return result;
+  return splitNumerics(result);
+}
+
+// Per-kanji default reading for splitting numeric runs (on'yomi numérique simple).
+const NUMERIC_KANJI_READINGS: Record<string, string> = {
+  '一': 'いち', '二': 'に', '三': 'さん', '四': 'よん', '五': 'ご',
+  '六': 'ろく', '七': 'なな', '八': 'はち', '九': 'きゅう', '十': 'じゅう',
+  '百': 'ひゃく', '千': 'せん', '万': 'まん', '億': 'おく', '兆': 'ちょう',
+  '〇': 'れい', '零': 'れい',
+};
+const NUMERIC_CHARS = new Set(Object.keys(NUMERIC_KANJI_READINGS).concat('０１２３４５６７８９0123456789'.split('')));
+
+function isAllNumericChars(text: string): boolean {
+  if (!text) return false;
+  for (const ch of text) if (!NUMERIC_CHARS.has(ch)) return false;
+  return true;
+}
+
+/** Split numeric tokens (e.g. 三四百, 三四百米) into one token per numeric kanji/digit, keeping any non-numeric suffix as its own token. */
+function splitNumerics(tokens: OutputToken[]): OutputToken[] {
+  const out: OutputToken[] = [];
+  for (const tok of tokens) {
+    const isNumericPos = tok.p?.includes('数');
+    if (!tok.j || !isNumericPos || tok.t.length <= 1) {
+      out.push(tok);
+      continue;
+    }
+    // Find leading run of numeric chars.
+    let split = 0;
+    while (split < tok.t.length && NUMERIC_CHARS.has(tok.t[split])) split++;
+    if (split <= 1 && split === tok.t.length) {
+      out.push(tok);
+      continue;
+    }
+    const numericPart = tok.t.slice(0, split);
+    const rest = tok.t.slice(split);
+    if (numericPart.length > 1) {
+      for (const ch of numericPart) {
+        out.push({ t: ch, j: true, r: NUMERIC_KANJI_READINGS[ch] ?? ch, p: '名詞/数' });
+      }
+    } else if (numericPart.length === 1) {
+      out.push({ t: numericPart, j: true, r: NUMERIC_KANJI_READINGS[numericPart] ?? numericPart, p: '名詞/数' });
+    }
+    if (rest) {
+      // Suffix counter (米, 人, 匹, 年, ...) → standalone token, reading unknown here.
+      out.push({ t: rest, j: true, p: '名詞/接尾' });
+    }
+  }
+  return out;
 }
 
 async function main() {
