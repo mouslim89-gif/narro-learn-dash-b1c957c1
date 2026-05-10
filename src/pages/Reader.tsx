@@ -946,12 +946,13 @@ export default function Reader() {
           open={!!editPanel}
           onClose={() => setEditPanel(null)}
           matched={editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t)}
-          onSubmit={(replacement) => {
+          onSubmit={(replacement, opts) => {
             const matched = editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t);
             if (matched.length > 0 && id) {
               const rule = tokensToRule(matched, replacement);
-              addPending(id, rule);
-              toast({ title: 'Rule pending', description: 'Click Apply to save it.' });
+              const scope = opts.global ? '*' : id;
+              addPending(scope, rule);
+              toast({ title: 'Rule pending', description: opts.global ? 'Global rule — click Apply to save.' : 'Click Apply to save it.' });
             }
             setEditPanel(null);
             setSelectedIdx([]);

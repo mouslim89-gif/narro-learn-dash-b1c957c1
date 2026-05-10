@@ -82,11 +82,12 @@ interface Props {
   open: boolean;
   onClose: () => void;
   matched: BookToken[];
-  onSubmit: (replacement: BookToken[]) => void;
+  onSubmit: (replacement: BookToken[], opts: { global: boolean }) => void;
 }
 
 export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
   const [drafts, setDrafts] = useState<TokenDraft[]>([]);
+  const [globalScope, setGlobalScope] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -251,15 +252,24 @@ export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
           </pre>
         </div>
 
-        <div className="sticky bottom-0 mt-4 flex gap-2 bg-background pt-3">
-          <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
-          <Button
-            disabled={!valid}
-            onClick={() => onSubmit(drafts.map(toToken))}
-            className="flex-1"
-          >
-            Save rule
-          </Button>
+        <div className="sticky bottom-0 mt-4 space-y-2 bg-background pt-3">
+          <label className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold">Apply globally</span>
+              <span className="text-[10px] text-muted-foreground">Use across all books (scope: *)</span>
+            </div>
+            <Switch checked={globalScope} onCheckedChange={setGlobalScope} />
+          </label>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
+            <Button
+              disabled={!valid}
+              onClick={() => onSubmit(drafts.map(toToken), { global: globalScope })}
+              className="flex-1"
+            >
+              Save rule
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
