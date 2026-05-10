@@ -97,9 +97,9 @@ export const useUserRulesStore = create<UserRulesState>()(
             console.error('[user-rules] applyPending insert error', ins.error);
             throw ins.error;
           }
-          mergeInsertedIntoSaved(set, get, ins.data ?? []);
+          mergeInsertedIntoSaved(set, get, (ins.data ?? []) as never);
         } else {
-          mergeInsertedIntoSaved(set, get, data ?? []);
+          mergeInsertedIntoSaved(set, get, (data ?? []) as never);
         }
         // Clear pending
         set({ pending: {} });
