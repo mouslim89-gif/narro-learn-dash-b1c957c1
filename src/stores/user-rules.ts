@@ -15,7 +15,7 @@ interface UserRulesState {
   loading: boolean;
   loadedFor: string | null; // userId we last loaded for
 
-  loadFromCloud: (userId: string, bookId: string) => Promise<void>;
+  loadFromCloud: (userId: string) => Promise<void>;
   addPending: (scope: string, rule: Rule) => void;
   undoPending: (scope: string) => Rule | null;
   clearPending: (scope: string) => void;
@@ -32,24 +32,22 @@ export const useUserRulesStore = create<UserRulesState>()(
       loading: false,
       loadedFor: null,
 
-      loadFromCloud: async (userId, bookId) => {
+      // Pull ALL rules for the user across all scopes. Cloud is the only source of truth for `saved`.
+      loadFromCloud: async (userId) => {
         set({ loading: true });
         const { data, error } = await supabase
           .from('user_token_rules')
           .select('id, book_id, rule, position')
           .eq('user_id', userId)
-          .in('book_id', [bookId, '*'])
           .order('position', { ascending: true });
         if (error) {
           console.error('[user-rules] load error', error);
           set({ loading: false });
           return;
         }
-        const next: Record<string, SavedRule[]> = { ...get().saved };
-        next[bookId] = [];
-        next['*'] = [];
+        const next: Record<string, SavedRule[]> = {};
         for (const row of data ?? []) {
-          const arr = next[row.book_id] ?? (next[row.book_id] = []);
+          const arr = next[row.book_id as string] ?? (next[row.book_id as string] = []);
           arr.push({ id: row.id as string, rule: row.rule as Rule, position: row.position as number });
         }
         set({ saved: next, loading: false, loadedFor: userId });
@@ -85,23 +83,23 @@ export const useUserRulesStore = create<UserRulesState>()(
         }
         if (rows.length === 0) return { inserted: 0 };
 
-        // Insert with onConflict do nothing (unique on user_id, book_id, md5(rule))
         const { data, error } = await supabase
           .from('user_token_rules')
-          .upsert(rows as never, { onConflict: 'user_id,book_id', ignoreDuplicates: true })
+          .insert(rows as never)
           .select('id, book_id, rule, position');
+
         if (error) {
-          // Fallback: plain insert (some schemas reject upsert with ignoreDuplicates without index match)
-          const ins = await supabase.from('user_token_rules').insert(rows as never).select('id, book_id, rule, position');
-          if (ins.error) {
-            console.error('[user-rules] applyPending insert error', ins.error);
-            throw ins.error;
+          // Duplicate (unique md5(rule) index) — resync from cloud and clear pending.
+          if ((error as { code?: string }).code === '23505') {
+            await get().loadFromCloud(userId);
+            set({ pending: {} });
+            return { inserted: 0 };
           }
-          mergeInsertedIntoSaved(set, get, (ins.data ?? []) as never);
-        } else {
-          mergeInsertedIntoSaved(set, get, (data ?? []) as never);
+          console.error('[user-rules] applyPending insert error', error);
+          throw error;
         }
-        // Clear pending
+
+        mergeInsertedIntoSaved(set, get, (data ?? []) as never);
         set({ pending: {} });
         return { inserted: rows.length };
       },
@@ -121,8 +119,9 @@ export const useUserRulesStore = create<UserRulesState>()(
       resetForLogout: () => set({ saved: {}, pending: {}, loadedFor: null }),
     }),
     {
-      name: 'user-token-rules-v1',
-      partialize: (s) => ({ pending: s.pending, saved: s.saved }),
+      name: 'user-token-rules-v2',
+      // Only persist pending drafts. `saved` always comes from the cloud to avoid cross-account leaks.
+      partialize: (s) => ({ pending: s.pending }),
     }
   )
 );

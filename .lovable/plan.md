@@ -1,72 +1,46 @@
-## Goal
+## Problème observé
 
-Replace the current "buffer + Copy block" workflow with **persistent rules synced to Lovable Cloud**, applied to the Reader via an explicit **Apply** action. No code patching, no copy-paste.
+Quand tu modifies un token (ex. merge `一緒に`) :
+- ✅ Application immédiate : OK
+- ❌ Après logout / changement de compte : règles invisibles
+- ❌ Après reconnexion sur le compte admin : règles toujours pas appliquées
 
-## UX
+## Diagnostic
 
-In the Reader's edit mode floating bar, the **View rules** dialog becomes a **Manage rules** dialog with two tabs (`book` / `* global`). Each rule row shows its formatted text + a delete (×) button. New rules created via merge / single-token edits land directly in this list as **pending** (badge), and the bar shows:
+J'ai vérifié la base : ta règle `["一緒|に", "一緒に:いっしょに:一緒に"]` (scope `*`) **est bien sauvée** pour ton user admin. Le problème est donc côté client, dans `src/stores/user-rules.ts` et `src/contexts/AuthContext.tsx`.
 
-- `Apply (N)` — primary button. Saves all pending rules to Cloud and reapplies tokens to the Reader. Disabled when N=0.
-- `Undo` — same as today, but undoes the last pending rule.
-- `Manage` — opens the dialog (replaces "View rules"). From there: delete any saved rule, clear scope, etc.
+Trois bugs combinés :
 
-The `Copy` button is removed.
+1. **Aucun reset sur logout.** `resetForLogout()` existe mais n'est jamais appelé. Le store Zustand est persisté dans `localStorage` (clé `user-token-rules-v1`) avec `saved` ET `pending`. Quand tu changes de compte :
+   - Les règles d'un user restent visibles brièvement pour l'autre.
+   - À la reconnexion admin, `loadFromCloud` est appelé, mais il ne reset que `saved[bookId]` et `saved['*']` — les autres scopes restent pollués par l'ancienne session.
 
-After Apply, the Reader re-tokenizes immediately so the user sees the result.
+2. **`loadFromCloud` ne se redéclenche pas correctement.** Le `useEffect` dans `Reader.tsx` dépend de `[user, id, loadFromCloud]`. Si tu reviens sur un livre déjà ouvert avant le logout, `id` n'a pas changé et `user` peut être considéré stable selon le timing de l'auth listener — les règles fraîches du cloud ne sont pas re-pull.
 
-## Storage (Lovable Cloud)
+3. **`applyPending` peut perdre l'état local.** L'upsert utilise `onConflict: 'user_id,book_id'` mais l'index unique réel est `md5(rule::text)`. Quand l'upsert "réussit" sans matcher l'index, il peut renvoyer `data = []`. Résultat : `pending` est vidé, `saved` n'est pas mis à jour, et l'affichage perd la règle jusqu'au prochain `loadFromCloud`.
 
-New table `user_token_rules`:
+## Plan de correction
 
-- `user_id uuid` (auth.uid)
-- `book_id text` — `'*'` for global
-- `rule jsonb` — the `Rule` tuple `[match, ...replacements]`
-- `position int` — preserves order (rules are order-sensitive: longer/specific first wins, but author order matters too)
-- `created_at`, `updated_at`
+### 1. `src/stores/user-rules.ts`
+- **Ne plus persister `saved`** dans `localStorage` (garder seulement `pending` pour ne pas perdre les drafts non sauvegardés). Le cloud devient l'unique source de vérité pour `saved`.
+- Dans `loadFromCloud`, **remplacer entièrement `saved`** (pas un merge partiel) pour éliminer les résidus inter-users.
+- Réécrire `applyPending` : remplacer l'upsert ambigu par un `insert(...).select(...)`. En cas d'erreur de duplicat (`23505`), fallback sur un `loadFromCloud` complet pour resync.
 
-RLS: user can CRUD only their own rows. Composite index on `(user_id, book_id, position)`.
+### 2. `src/contexts/AuthContext.tsx`
+- Dans `onAuthStateChange`, détecter `SIGNED_OUT` et `SIGNED_IN` (changement d'`user.id`) et appeler `useUserRulesStore.getState().resetForLogout()` avant de laisser le nouveau user déclencher son propre `loadFromCloud`.
 
-We store one row per rule (not a JSON blob) so delete/reorder is cheap and conflict-free across devices.
+### 3. `src/pages/Reader.tsx`
+- Dans le `useEffect` de chargement, dépendre explicitement de `user?.id` (au lieu de l'objet `user`) pour garantir le re-pull à chaque changement de compte.
+- Forcer `loadFromCloud` à attendre la fin avant de calculer `tokens` (afficher un état "chargement règles…" optionnel, ou juste accepter le re-render quand `savedRules` change — déjà le cas).
 
-## Sync model
+### 4. (Optionnel) Realtime sync
+Comme déjà fait pour `flashcards` et `reading_progress` dans `src/lib/sync/cloud-sync.ts`, ajouter un canal Realtime sur `user_token_rules` filtré par `user_id`, pour que les modifications faites sur un autre appareil arrivent en direct.
 
-Follow the existing `use-cloud-sync.ts` hybrid pattern:
+## Résultat attendu
 
-1. On Reader mount (and on auth change), fetch rules for `book_id IN (currentBookId, '*')`, cache in a Zustand store `useUserRulesStore` (persisted to localStorage as offline fallback).
-2. Token pipeline in `Reader.tsx` line 180 changes from:
-   ```
-   applyTokenOverrides(id, …) → applyRules(bufRules, out)
-   ```
-   to:
-   ```
-   applyRules([...hardcoded(id), ...hardcoded('*'), ...userRules(id), ...userRules('*')], cleanRubyTokens(raw))
-   ```
-   Hardcoded rules in `token-overrides.ts` remain (curated defaults), user rules layer on top.
-3. **Pending vs saved**: the Zustand store keeps `saved[]` (mirrors Cloud) and `pending[]` (local only). Reader renders using `saved` only. Clicking **Apply**:
-   - `INSERT` pending rows into Supabase in a single batch
-   - moves them from `pending` → `saved`
-   - triggers Reader re-tokenize (state bump)
-4. Delete from Manage dialog → optimistic remove + `DELETE` row.
-5. If offline / not logged in, pending rules persist in localStorage; Apply is disabled with a tooltip "Sign in to save rules".
+- Logout → store vidé immédiatement.
+- Login (n'importe quel compte) → pull depuis le cloud, état propre.
+- Sauvegarde d'une règle → insert direct, `saved` mis à jour de manière fiable, `pending` vidé seulement si l'insert a réussi.
+- Multi-appareils → propagation en temps réel (si on ajoute le point 4).
 
-## Files touched
-
-- **NEW** migration: create `user_token_rules` table + RLS.
-- **NEW** `src/stores/user-rules.ts` — Zustand store, `loadFromCloud()`, `addPending()`, `applyPending()`, `deleteSaved()`.
-- **EDIT** `src/data/token-overrides.ts` — export `applyRules` (already done); no change to hardcoded rules.
-- **EDIT** `src/pages/Reader.tsx` — load user rules on mount, include them in the `applyRules` chain, add a `version` dependency so the memo re-runs after Apply.
-- **EDIT** `src/components/TokenEditFloatingBar.tsx` — replace `Copy` with `Apply (N)`; rename "View rules" → "Manage"; redesign dialog (list view with delete buttons, pending badges, no `<pre>`/copy block).
-- **EDIT** `src/stores/token-edit.ts` — the existing buffer becomes the `pending` source feeding `useUserRulesStore`, OR we deprecate it and move pending into `useUserRulesStore` directly (cleaner — recommended).
-- **REMOVE** `formatRulesBlock` usage (keep `formatRule` for displaying single rules in the list).
-
-## Edge cases
-
-- Same rule added twice → unique constraint on `(user_id, book_id, rule)` (using `md5(rule::text)` expression index) to dedupe gracefully; INSERT uses `ON CONFLICT DO NOTHING`.
-- Multi-device: a "Refresh" button in the Manage dialog re-pulls from Cloud. Realtime subscription is overkill for this volume; pull-on-mount is enough.
-- Rule order: stored `position` = `max(position)+1` at insert time per `(user_id, book_id)`.
-
-## Out of scope
-
-- Sharing rules between users.
-- Editing existing rule text in-place (delete + recreate is fine for v1).
-- Reordering rules in the UI (positions are append-only for v1).
+Veux-tu que j'inclue le point 4 (Realtime) dans l'implémentation ou on garde ça pour plus tard ?
