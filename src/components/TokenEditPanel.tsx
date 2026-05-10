@@ -82,11 +82,12 @@ interface Props {
   open: boolean;
   onClose: () => void;
   matched: BookToken[];
-  onSubmit: (replacement: BookToken[]) => void;
+  onSubmit: (replacement: BookToken[], opts: { global: boolean }) => void;
 }
 
 export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
   const [drafts, setDrafts] = useState<TokenDraft[]>([]);
+  const [globalScope, setGlobalScope] = useState(false);
 
   useEffect(() => {
     if (open) {
