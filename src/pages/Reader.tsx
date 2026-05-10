@@ -931,7 +931,7 @@ export default function Reader() {
         />
       )}
 
-      {tokenEditMode && id && (
+      {tokenEditMode && isAdmin && id && (
         <TokenEditFloatingBar
           bookId={id}
           selectionCount={selectedIdx.length}
