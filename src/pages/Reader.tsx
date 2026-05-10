@@ -950,8 +950,8 @@ export default function Reader() {
             const matched = editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t);
             if (matched.length > 0 && id) {
               const rule = tokensToRule(matched, replacement);
-              addRule(id, rule);
-              toast({ title: 'Rule added', description: `Saved to buffer for "${id}".` });
+              addPending(id, rule);
+              toast({ title: 'Rule pending', description: 'Click Apply to save it.' });
             }
             setEditPanel(null);
             setSelectedIdx([]);
