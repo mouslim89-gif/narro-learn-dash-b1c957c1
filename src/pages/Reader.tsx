@@ -188,10 +188,20 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      let out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw)))));
-      // Apply in-memory edit buffers on top so changes show live.
-      const bufRules = [...(editBuffers[id] ?? []), ...(editBuffers['*'] ?? [])];
-      if (bufRules.length > 0) out = applyRules(bufRules, out);
+      let out = cleanRubyTokens(raw);
+      // Layer rules: hardcoded book → hardcoded global → user saved book → user saved global → pending book → pending global
+      const userBookSaved = (savedRules[id] ?? []).map((r) => r.rule);
+      const userGlobalSaved = (savedRules['*'] ?? []).map((r) => r.rule);
+      const userBookPending = pendingRules[id] ?? [];
+      const userGlobalPending = pendingRules['*'] ?? [];
+      const all = [
+        ...(/* hardcoded merged via applyTokenOverrides */ [] as never[]),
+      ];
+      void all;
+      out = applyTokenOverrides(id, out);
+      const userRules = [...userBookSaved, ...userGlobalSaved, ...userBookPending, ...userGlobalPending];
+      if (userRules.length > 0) out = applyRules(userRules, out);
+      out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(out)));
       return out;
     }
     // Fallback — split text into char-level tokens
@@ -202,7 +212,7 @@ export default function Reader() {
       out.push({ t: ch, j: isJp });
     }
     return out;
-  }, [id, chapterId, difficulty, book, editBuffers]);
+  }, [id, chapterId, difficulty, book, savedRules, pendingRules]);
 
   const bookText = useMemo(() => {
     if (!book) return '';
