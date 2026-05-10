@@ -65,7 +65,7 @@ function parseToken(s: string): BookToken {
   const tok: BookToken = {
     t,
     j: !punct,
-    p: punct ? "記号" : (resolvedPos ?? "名詞"),
+    p: punct ? "記号" : resolvedPos,
   };
   if (r) tok.r = r;
   if (b) tok.b = b;

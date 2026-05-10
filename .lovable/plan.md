@@ -1,50 +1,43 @@
-## Améliorations du mode Token Edit
+## Why `です` shows up as the noun "spit (of land) / Dezu"
 
-### 1. Bouton header (admin only)
-Dans `src/pages/Reader.tsx`, ajouter une icône `Wrench` dans le header à côté du bouton Settings, visible uniquement si `useIsAdmin()`.
-- Tap = toggle direct de `tokenEditMode`
-- Style actif: fond `primary/15`, icône colorée primary
-- Retirer le toggle "Token edit mode" de la section Dev du panneau Settings (devient redondant). Garder éventuellement un petit raccourci "Clear buffer" pour admin.
+Three things combine:
 
-### 2. POS optionnel + mode "Auto"
-Dans `src/components/TokenEditPanel.tsx`:
-- Ajouter en tête du select POS deux options spéciales:
-  - `Auto` (valeur par défaut pour un edit) — garde le POS d'origine du token matché, n'écrase rien dans la règle
-  - `Aucun (omit)` — la règle générée n'inclut PAS le champ p
-- Ajout de `pMode: 'auto' | 'none' | 'set'` dans `TokenDraft` pour distinguer ces cas.
+1. In `src/data/book-tokens.ts`, Kuromoji glued です to the preceding noun, so the original token is e.g. `{t:"仕事中です", p:"名詞/サ変接続", b:"仕事"}` — there is no standalone です token in the text.
 
-Dans `src/lib/token-edit-rules.ts` (`encodeReplacement`):
-- Si `pMode === 'none'` ou si `p` est vide → ne pas émettre p (déjà partiellement géré, à formaliser).
-- Si `pMode === 'auto'` → ne pas émettre p non plus (le moteur garde l'original via fallback existant dans `applyRules`).
+2. Your override `["仕事中です", "仕事中::仕事中", "です"]` correctly splits it into two replacement tokens `仕事中` and `です`. But in `src/data/token-overrides.ts`, `parseToken` defaults POS to `"名詞"` whenever no POS is provided in the rule string:
 
-Vérifier que `applyRules` dans `src/data/token-overrides.ts` conserve bien le POS du token matché quand le replacement n'a pas de p (ajuster si besoin — petit fix défensif).
+   ```ts
+   p: punct ? "記号" : (resolvedPos ?? "名詞"),
+   ```
 
-### 3. Preview live de la règle
-Ajouter en bas du `TokenEditPanel`, au-dessus des boutons Cancel/Save, un bloc `<pre>` compact qui affiche en temps réel le snippet TS de la règle en cours de construction (utilise `tokensToRule` + `formatRule` exporté depuis `token-edit-rules.ts`). Bouton "Copy" inline.
+   So your `"です"` replacement becomes `{t:"です", p:"名詞"}` — a Noun.
 
-### 4. Undo dernière règle
-Dans `src/stores/token-edit.ts`:
-- Ajouter `undoLast: (scope: string) => Rule | null` qui pop la dernière règle du buffer et la renvoie.
+3. Your separate rule `["です", "です::です:aux"]` is never applied to that output: `applyRules` iterates the input tokens once and pushes replacements straight to `out`, it does not re-match rules against replacement tokens.
 
-Dans `src/components/TokenEditFloatingBar.tsx`:
-- Bouton `Undo` (icône `Undo2`) à côté de "View rules", désactivé si buffer vide. Toast de confirmation avec contenu retiré.
+Net result: `WordPopup` is called with `pos="名詞"`, `pickBestResult` filters Jisho results for `Noun`, and the copula entry (Copula/Auxiliary verb) is rejected → it falls down to 出洲 "spit (of land) / Dezu".
 
-### 5. Sélection par drag
-Dans `src/pages/Reader.tsx` (rendu des tokens en mode edit):
-- Sur chaque `ReaderToken`, ajouter `onPointerDown` qui démarre un drag (state `dragSelecting`), `onPointerEnter` (pendant drag) qui ajoute le token à `selectedIdx`, `onPointerUp` global qui termine.
-- Tap simple sans mouvement (< 5px) = ouvre le panel d'édition pour ce token (comportement actuel).
-- Touch: utiliser `pointer events` natifs (fonctionne tactile + souris). Sur touch, désactiver le scroll vertical pendant le drag via `touch-action: none` sur le conteneur tokens en mode edit.
-- Garder Clear sel et Merge dans la barre flottante.
+## Fix
 
-### 6. Polish floating bar
-- Réordonner: `[Exit] EDIT MODE · N pending  ——  [Undo] [View rules]`
-- Quand sélection > 1 : afficher `[Merge N] [Clear]` au centre, en `accent`.
+Make `parseToken` leave POS **undefined** when the rule doesn't specify one, instead of defaulting to `"名詞"`. With undefined POS:
 
-### Fichiers touchés
+- `pickBestResult` skips the POS-filter branch and falls through to "exact surface/reading match", which picks the copula です (first Jisho result whose reading is です) — the correct entry.
+- The separate `["です", "です::です:aux"]` rule then becomes redundant, but harmless (it would still apply if a raw です token ever appeared on its own).
+- All existing rules that DO specify a POS (`particle`, `aux`, etc.) continue to work unchanged.
 
-- **Modifié** `src/pages/Reader.tsx` — bouton Wrench header, retrait toggle Settings, drag-select pointer events, `touch-action`.
-- **Modifié** `src/components/TokenEditPanel.tsx` — POS Auto/Aucun, preview live, badge POS d'origine.
-- **Modifié** `src/lib/token-edit-rules.ts` — gestion pMode, export `formatRule`.
-- **Modifié** `src/stores/token-edit.ts` — `undoLast`.
-- **Modifié** `src/components/TokenEditFloatingBar.tsx` — bouton Undo, layout.
-- **Modifié (défensif)** `src/data/token-overrides.ts` — `applyRules` garde POS original si replacement omet p.
+### Single change
+
+`src/data/token-overrides.ts`, in `parseToken`:
+
+```ts
+// before
+p: punct ? "記号" : (resolvedPos ?? "名詞"),
+
+// after
+p: punct ? "記号" : resolvedPos,   // undefined when omitted → no POS filter
+```
+
+`BookToken.p` is already typed as optional, and `pickBestResult` / `WordPopup` already handle undefined POS. No other file needs to change.
+
+### Optional follow-up (not part of this fix)
+
+If you want `["です", "です::です:aux"]` to also affect *replacement* tokens emitted by earlier rules, we'd need a second pass of `applyRules`. Recommend skipping it — the fix above already solves the reported case and avoids re-entrancy edge cases.
