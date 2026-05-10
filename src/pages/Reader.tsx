@@ -159,12 +159,12 @@ export default function Reader() {
   const { user } = useAuth();
   const { saved: savedRules, pending: pendingRules, addPending, loadFromCloud } = useUserRulesStore();
 
-  // Load user rules from cloud when entering a book
+  // Load user rules from cloud whenever the user changes
   useEffect(() => {
-    if (user && id) {
-      loadFromCloud(user.id, id).catch(() => {});
+    if (user?.id) {
+      loadFromCloud(user.id).catch(() => {});
     }
-  }, [user, id, loadFromCloud]);
+  }, [user?.id, loadFromCloud]);
   // Selection state for merge & edit panel
   const [selectedIdx, setSelectedIdx] = useState<number[]>([]);
   const [editPanel, setEditPanel] = useState<{ matchedIdx: number[] } | null>(null);
