@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useTokenEditStore } from '@/stores/token-edit';
-import { formatRulesBlock, formatRule } from '@/lib/token-edit-rules';
-import { tokenOverrides } from '@/data/token-overrides';
+import { useUserRulesStore } from '@/stores/user-rules';
+import { useAuth } from '@/contexts/AuthContext';
+import { formatRule } from '@/lib/token-edit-rules';
 import { toast } from '@/hooks/use-toast';
-import { Copy, Trash2, X, Undo2 } from 'lucide-react';
+import { Trash2, X, Undo2, Check, Settings2, Loader2 } from 'lucide-react';
 
 interface Props {
   bookId: string;
@@ -16,31 +16,51 @@ interface Props {
 }
 
 export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearSelection, onExitEditMode }: Props) {
-  const { buffers, clear, undoLast } = useTokenEditStore();
+  const { user } = useAuth();
+  const { saved, pending, undoPending, clearPending, applyPending, deleteSaved } = useUserRulesStore();
   const [scope, setScope] = useState<string>(bookId);
-  const [showRules, setShowRules] = useState(false);
+  const [showManage, setShowManage] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const bookBuf = buffers[bookId] ?? [];
-  const globalBuf = buffers['*'] ?? [];
-  const total = bookBuf.length + globalBuf.length;
+  const bookPending = pending[bookId] ?? [];
+  const globalPending = pending['*'] ?? [];
+  const totalPending = bookPending.length + globalPending.length;
 
-  const activeBuf = scope === '*' ? globalBuf : bookBuf;
-  const baseRules = scope === '*' ? (tokenOverrides['*'] ?? []) : (tokenOverrides[scope] ?? []);
-  const merged = [...baseRules, ...activeBuf];
-  const block = formatRulesBlock(merged, scope);
+  const bookSaved = saved[bookId] ?? [];
+  const globalSaved = saved['*'] ?? [];
 
-  const copy = () => {
-    navigator.clipboard.writeText(block);
-    toast({ title: 'Copied', description: 'Rules block copied to clipboard.' });
-  };
+  const activePending = scope === '*' ? globalPending : bookPending;
+  const activeSaved = scope === '*' ? globalSaved : bookSaved;
 
   const handleUndo = () => {
-    // Undo from book scope first, then global if book is empty.
-    const targetScope = bookBuf.length > 0 ? bookId : globalBuf.length > 0 ? '*' : null;
+    const targetScope = bookPending.length > 0 ? bookId : globalPending.length > 0 ? '*' : null;
     if (!targetScope) return;
-    const popped = undoLast(targetScope);
-    if (popped) {
-      toast({ title: 'Undone', description: formatRule(popped) });
+    const popped = undoPending(targetScope);
+    if (popped) toast({ title: 'Undone', description: formatRule(popped) });
+  };
+
+  const handleApply = async () => {
+    if (!user) {
+      toast({ title: 'Sign in required', description: 'You need to be signed in to save rules.', variant: 'destructive' });
+      return;
+    }
+    setBusy(true);
+    try {
+      const { inserted } = await applyPending(user.id);
+      toast({ title: 'Applied', description: `${inserted} rule${inserted === 1 ? '' : 's'} saved.` });
+    } catch (e) {
+      toast({ title: 'Save failed', description: (e as Error).message, variant: 'destructive' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDelete = async (id: string, scopeKey: string) => {
+    try {
+      await deleteSaved(id, scopeKey);
+      toast({ title: 'Deleted' });
+    } catch {
+      toast({ title: 'Delete failed', variant: 'destructive' });
     }
   };
 
@@ -55,44 +75,39 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
           >
             <X className="h-4 w-4" />
           </button>
-          <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
-            EDIT MODE
-          </span>
-          <span className="text-xs text-muted-foreground">{total} pending</span>
+          <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">EDIT</span>
+          {totalPending > 0 && (
+            <span className="rounded bg-accent/20 px-2 py-1 text-xs font-semibold text-accent-foreground">
+              {totalPending} pending
+            </span>
+          )}
 
           {selectionCount > 1 && (
             <div className="flex gap-1 rounded-md bg-accent/15 px-1 py-1">
-              <Button size="sm" onClick={onMerge} className="h-7">
-                Merge {selectionCount}
-              </Button>
-              <Button size="sm" variant="ghost" onClick={onClearSelection} className="h-7">
-                Clear
-              </Button>
+              <Button size="sm" onClick={onMerge} className="h-7">Merge {selectionCount}</Button>
+              <Button size="sm" variant="ghost" onClick={onClearSelection} className="h-7">Clear</Button>
             </div>
           )}
 
           <div className="ml-auto flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleUndo}
-              disabled={total === 0}
-              title="Undo last rule"
-              className="h-8 px-2"
-            >
+            <Button size="sm" variant="outline" onClick={handleUndo} disabled={totalPending === 0} title="Undo last pending rule" className="h-8 px-2">
               <Undo2 className="h-3.5 w-3.5" />
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setShowRules(true)} className="h-8">
-              View rules
+            <Button size="sm" variant="outline" onClick={() => setShowManage(true)} className="h-8 px-2" title="Manage rules">
+              <Settings2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" onClick={handleApply} disabled={totalPending === 0 || busy || !user} className="h-8" title={!user ? 'Sign in to save' : 'Save pending rules'}>
+              {busy ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Check className="mr-1 h-3.5 w-3.5" />}
+              Apply{totalPending > 0 ? ` (${totalPending})` : ''}
             </Button>
           </div>
         </div>
       </div>
 
-      <Dialog open={showRules} onOpenChange={setShowRules}>
+      <Dialog open={showManage} onOpenChange={setShowManage}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Token override rules</DialogTitle>
+            <DialogTitle>Token rules</DialogTitle>
           </DialogHeader>
 
           <div className="flex gap-2">
@@ -100,34 +115,62 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
               onClick={() => setScope(bookId)}
               className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === bookId ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
             >
-              {bookId} ({bookBuf.length} new)
+              {bookId} ({bookSaved.length}+{bookPending.length})
             </button>
             <button
               onClick={() => setScope('*')}
               className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === '*' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
             >
-              * global ({globalBuf.length} new)
+              * global ({globalSaved.length}+{globalPending.length})
             </button>
           </div>
 
-          <pre className="max-h-[50vh] overflow-auto rounded-md bg-muted p-3 text-[11px] leading-relaxed">
-            <code>{block}</code>
-          </pre>
+          <div className="max-h-[55vh] space-y-3 overflow-auto">
+            {activePending.length > 0 && (
+              <section>
+                <div className="mb-1 flex items-center justify-between">
+                  <h3 className="text-[10px] font-semibold uppercase tracking-wide text-accent-foreground">Pending</h3>
+                  <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => clearPending(scope)}>
+                    Clear
+                  </Button>
+                </div>
+                <ul className="space-y-1">
+                  {activePending.map((r, i) => (
+                    <li key={i} className="flex items-center gap-2 rounded bg-accent/10 px-2 py-1.5">
+                      <code className="flex-1 truncate text-[11px]">{formatRule(r)}</code>
+                      <span className="rounded bg-accent/30 px-1.5 py-0.5 text-[9px] uppercase">pending</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-          <div className="flex gap-2">
-            <Button onClick={copy} className="flex-1">
-              <Copy className="mr-1 h-3.5 w-3.5" /> Copy
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                clear(scope);
-                toast({ title: 'Cleared', description: `Buffer for "${scope}" cleared.` });
-              }}
-            >
-              <Trash2 className="mr-1 h-3.5 w-3.5" /> Clear buffer
-            </Button>
+            <section>
+              <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Saved ({activeSaved.length})
+              </h3>
+              {activeSaved.length === 0 ? (
+                <p className="rounded bg-muted/40 px-2 py-2 text-xs text-muted-foreground">No saved rules yet.</p>
+              ) : (
+                <ul className="space-y-1">
+                  {activeSaved.map((r) => (
+                    <li key={r.id} className="flex items-center gap-2 rounded bg-muted/40 px-2 py-1.5">
+                      <code className="flex-1 truncate text-[11px]">{formatRule(r.rule)}</code>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDelete(r.id, scope)} title="Delete">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           </div>
+
+          {!user && (
+            <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              Sign in to save and sync your rules across devices.
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </>
