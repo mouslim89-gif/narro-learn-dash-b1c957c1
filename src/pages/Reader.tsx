@@ -24,6 +24,8 @@ import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from '@/lib/known-
 import { Switch } from '@/components/ui/switch';
 import { useIsAdmin } from '@/lib/admin';
 import { useTokenEditStore } from '@/stores/token-edit';
+import { useUserRulesStore } from '@/stores/user-rules';
+import { useAuth } from '@/contexts/AuthContext';
 import { TokenEditPanel } from '@/components/TokenEditPanel';
 import { TokenEditFloatingBar } from '@/components/TokenEditFloatingBar';
 import { tokensToRule } from '@/lib/token-edit-rules';
