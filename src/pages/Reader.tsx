@@ -188,20 +188,15 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      let out = cleanRubyTokens(raw);
-      // Layer rules: hardcoded book → hardcoded global → user saved book → user saved global → pending book → pending global
-      const userBookSaved = (savedRules[id] ?? []).map((r) => r.rule);
-      const userGlobalSaved = (savedRules['*'] ?? []).map((r) => r.rule);
-      const userBookPending = pendingRules[id] ?? [];
-      const userGlobalPending = pendingRules['*'] ?? [];
-      const all = [
-        ...(/* hardcoded merged via applyTokenOverrides */ [] as never[]),
+      let out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw)))));
+      // Layer user rules (saved from Cloud + pending local) on top.
+      const userRules = [
+        ...((savedRules[id] ?? []).map((r) => r.rule)),
+        ...((savedRules['*'] ?? []).map((r) => r.rule)),
+        ...(pendingRules[id] ?? []),
+        ...(pendingRules['*'] ?? []),
       ];
-      void all;
-      out = applyTokenOverrides(id, out);
-      const userRules = [...userBookSaved, ...userGlobalSaved, ...userBookPending, ...userGlobalPending];
       if (userRules.length > 0) out = applyRules(userRules, out);
-      out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(out)));
       return out;
     }
     // Fallback — split text into char-level tokens
