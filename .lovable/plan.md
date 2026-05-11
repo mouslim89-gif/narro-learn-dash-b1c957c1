@@ -1,56 +1,25 @@
-## 1. Fix "permission denied" on publish
+I found the exact cause: the `is_admin` function exists and is `SECURITY DEFINER`, but it is only executable by internal roles. The logged-in admin account reaches the publish policy, then the database blocks the policy itself with: `permission denied for function is_admin`.
 
-**Hypothèse la plus probable**: la policy `WITH CHECK (is_admin(auth.uid()))` est attachée au rôle `public`. Quand PostgREST appelle au nom du JWT, le rôle effectif est `authenticated`, mais `is_admin` est `SECURITY DEFINER` et lit `admin_users` — qui a sa propre RLS `is_admin(auth.uid())` sur `ALL`. Le `SELECT` à l'intérieur de `is_admin` peut être bloqué/vidé selon le contexte.
+## Plan
 
-**Correctif DB (migration)**:
-- Recréer `public.is_admin(uuid)` en `SECURITY DEFINER` avec `SET search_path = public` et un `SELECT` qui passe la RLS (déjà OK car SECURITY DEFINER + owner = postgres, mais on s'assure que le owner a bypass).
-- Ajouter une policy SELECT dédiée non-récursive sur `admin_users`: `USING (true)` est déjà là — OK.
-- Re-créer les policies de `shared_token_rules` en ciblant `TO authenticated` explicitement et en gardant SELECT public:
-  - `SELECT TO public USING (true)`
-  - `INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()))`
-  - `UPDATE TO authenticated USING (public.is_admin(auth.uid())) WITH CHECK (public.is_admin(auth.uid()))`
-  - `DELETE TO authenticated USING (public.is_admin(auth.uid()))`
+1. **Fix function execution rights**
+   - Add a small database migration that grants `authenticated` users permission to execute `public.is_admin(uuid)`.
+   - Keep anonymous/public users from executing it directly.
 
-**Diagnostic front** (en parallèle, dans `addShared`):
-- Logger `auth.uid()` retourné par `supabase.auth.getUser()` avant l'insert pour comparer à l'admin attendu, et logger `error.message`/`error.details`/`error.hint` complets.
+2. **Keep the admin-only publish rule unchanged**
+   - Publishing shared token rules will still only work when `public.is_admin(auth.uid())` returns true.
+   - Non-admin accounts will still be blocked from creating, editing, or deleting shared rules.
 
-## 2. Merge nombre + compteur (九時, 三人, 五分…)
+3. **Verify after migration**
+   - Re-check the function grants in the database.
+   - You can then retry “publish for all accounts” from `mouslim89@gmail.com`.
 
-**Nouveau passage** `mergeCounterCompounds(tokens)` dans `src/lib/merge-tokens.ts`, appliqué **après** `mergeConjugatedTokens` et **avant** `gluePhrasalCompounds`.
+## Technical SQL
 
-Règle:
-- Token courant: nombre — détecté par `p?.startsWith('名詞/数')` **ou** surface entièrement composée de chiffres kanji (`一二三四五六七八九十百千万零〇`) ou de chiffres ascii/halfwidth.
-- Token suivant: 名詞 dont la surface ∈ liste de compteurs autorisés.
-
-Liste de compteurs (initiale, conservatrice):
-
-```
-時 分 秒 日 月 年 週 歳 才
-人 名 匹 頭 羽 個 つ
-本 枚 冊 台 階 軒 件 回 度
-円 元 ドル
-キロ メートル センチ
-番 号 位 章 課 ページ 頁
+```sql
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM anon;
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO authenticated;
 ```
 
-Sortie:
-- `t = a.t + b.t`
-- `r = (a.r ?? '') + (b.r ?? '')` (concaténation Kuromoji simple, comme demandé)
-- `b = a.t + b.t` (base = surface, suffisant pour le dico)
-- `p = '名詞'`
-- `j = true`
-
-Cas spéciaux à éviter:
-- Ne rien fusionner si le compteur est suivi d'une particule étrange ou si le nombre est lui-même déjà composé (laisse la 1ère passe faire son travail; on opère token par token).
-- Si la liste devient gênante plus tard, on pourra exposer une règle partagée pour annuler/remplacer.
-
-## 3. Fichiers touchés
-
-- `supabase/migrations/<ts>_fix_shared_rules_admin.sql` — recreation des policies `shared_token_rules`, garantie `is_admin` propre.
-- `src/stores/shared-rules.ts` — log diagnostique enrichi sur erreur d'insert.
-- `src/lib/merge-tokens.ts` — ajoute `mergeCounterCompounds` + export, et l'appelle dans le pipeline.
-- `src/pages/Reader.tsx` — insère l'appel à `mergeCounterCompounds` à l'endroit où les autres mergers sont appliqués (vérifier l'ordre exact lors de l'implémentation).
-
-## Hors scope
-- Lectures irrégulières (一日=ついたち, 二十歳=はたち…) — peut être ajouté ensuite via une petite table d'overrides, ou via une règle partagée par cas.
-- Realtime sync sur `shared_token_rules`.
+This is smaller and more targeted than recreating all policies again, because the policies are already correct; only the function permission is missing.
