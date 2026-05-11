@@ -25,6 +25,7 @@ import { Switch } from '@/components/ui/switch';
 import { useIsAdmin } from '@/lib/admin';
 import { useTokenEditStore } from '@/stores/token-edit';
 import { useUserRulesStore } from '@/stores/user-rules';
+import { useSharedRulesStore } from '@/stores/shared-rules';
 import { useAuth } from '@/contexts/AuthContext';
 import { TokenEditPanel } from '@/components/TokenEditPanel';
 import { TokenEditFloatingBar } from '@/components/TokenEditFloatingBar';
@@ -158,6 +159,7 @@ export default function Reader() {
   const { enabled: tokenEditMode, setEnabled: setTokenEditMode } = useTokenEditStore();
   const { user } = useAuth();
   const { saved: savedRules, pending: pendingRules, addPending, loadFromCloud } = useUserRulesStore();
+  const { saved: sharedRules, loadShared } = useSharedRulesStore();
 
   // Load user rules from cloud whenever the user changes
   useEffect(() => {
@@ -165,6 +167,11 @@ export default function Reader() {
       loadFromCloud(user.id).catch(() => {});
     }
   }, [user?.id, loadFromCloud]);
+
+  // Load shared rules once on mount (visible to everyone, including guests)
+  useEffect(() => {
+    loadShared().catch(() => {});
+  }, [loadShared]);
   // Selection state for merge & edit panel
   const [selectedIdx, setSelectedIdx] = useState<number[]>([]);
   const [editPanel, setEditPanel] = useState<{ matchedIdx: number[] } | null>(null);
@@ -189,14 +196,16 @@ export default function Reader() {
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
       let out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw)))));
-      // Layer user rules (saved from Cloud + pending local) on top.
-      const userRules = [
+      // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
+      const allRules = [
+        ...((sharedRules[id] ?? []).map((r) => r.rule)),
+        ...((sharedRules['*'] ?? []).map((r) => r.rule)),
         ...((savedRules[id] ?? []).map((r) => r.rule)),
         ...((savedRules['*'] ?? []).map((r) => r.rule)),
         ...(pendingRules[id] ?? []),
         ...(pendingRules['*'] ?? []),
       ];
-      if (userRules.length > 0) out = applyRules(userRules, out);
+      if (allRules.length > 0) out = applyRules(allRules, out);
       return out;
     }
     // Fallback — split text into char-level tokens
@@ -207,7 +216,7 @@ export default function Reader() {
       out.push({ t: ch, j: isJp });
     }
     return out;
-  }, [id, chapterId, difficulty, book, savedRules, pendingRules]);
+  }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules]);
 
   const bookText = useMemo(() => {
     if (!book) return '';
