@@ -955,13 +955,20 @@ export default function Reader() {
           open={!!editPanel}
           onClose={() => setEditPanel(null)}
           matched={editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t)}
+          isAdmin={isAdmin}
           onSubmit={(replacement, opts) => {
             const matched = editPanel.matchedIdx.map((k) => tokenByKey.current.get(k)).filter((t): t is BookToken => !!t);
             if (matched.length > 0 && id) {
               const rule = tokensToRule(matched, replacement);
               const scope = opts.global ? '*' : id;
-              addPending(scope, rule);
-              toast({ title: 'Rule pending', description: opts.global ? 'Global rule — click Apply to save.' : 'Click Apply to save it.' });
+              if (opts.shared && isAdmin && user?.id) {
+                useSharedRulesStore.getState().addShared(scope, rule, user.id)
+                  .then(() => toast({ title: 'Published', description: 'Rule visible to all accounts.' }))
+                  .catch((e) => toast({ title: 'Publish failed', description: (e as Error).message, variant: 'destructive' }));
+              } else {
+                addPending(scope, rule);
+                toast({ title: 'Rule pending', description: opts.global ? 'Global rule — click Apply to save.' : 'Click Apply to save it.' });
+              }
             }
             setEditPanel(null);
             setSelectedIdx([]);
