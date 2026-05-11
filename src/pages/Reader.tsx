@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
-import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns } from '@/lib/merge-tokens';
+import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
@@ -195,7 +195,7 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      let out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw)))));
+      let out = gluePhrasalCompounds(mergeCounterCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw))))));
       // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
       const allRules = [
         ...((sharedRules[id] ?? []).map((r) => r.rule)),

@@ -1,74 +1,56 @@
-# Règles de tokens partagées (admin → tous les comptes)
+## 1. Fix "permission denied" on publish
 
-## Problème actuel
-La table `user_token_rules` est filtrée par RLS sur `auth.uid() = user_id`. Donc une règle créée par ton compte admin (même avec `book_id = '*'`) reste invisible pour les autres comptes connectés. C'est pourquoi `一緒に` ne s'applique nulle part ailleurs.
+**Hypothèse la plus probable**: la policy `WITH CHECK (is_admin(auth.uid()))` est attachée au rôle `public`. Quand PostgREST appelle au nom du JWT, le rôle effectif est `authenticated`, mais `is_admin` est `SECURITY DEFINER` et lit `admin_users` — qui a sa propre RLS `is_admin(auth.uid())` sur `ALL`. Le `SELECT` à l'intérieur de `is_admin` peut être bloqué/vidé selon le contexte.
 
-## Solution
-Introduire une **2ᵉ source de règles**, "shared rules" (règles publiées), gérées uniquement par les admins, lues par tout le monde (même non connecté). Les règles personnelles `user_token_rules` restent intactes pour la flexibilité par utilisateur.
+**Correctif DB (migration)**:
+- Recréer `public.is_admin(uuid)` en `SECURITY DEFINER` avec `SET search_path = public` et un `SELECT` qui passe la RLS (déjà OK car SECURITY DEFINER + owner = postgres, mais on s'assure que le owner a bypass).
+- Ajouter une policy SELECT dédiée non-récursive sur `admin_users`: `USING (true)` est déjà là — OK.
+- Re-créer les policies de `shared_token_rules` en ciblant `TO authenticated` explicitement et en gardant SELECT public:
+  - `SELECT TO public USING (true)`
+  - `INSERT TO authenticated WITH CHECK (public.is_admin(auth.uid()))`
+  - `UPDATE TO authenticated USING (public.is_admin(auth.uid())) WITH CHECK (public.is_admin(auth.uid()))`
+  - `DELETE TO authenticated USING (public.is_admin(auth.uid()))`
 
-## Côté base
+**Diagnostic front** (en parallèle, dans `addShared`):
+- Logger `auth.uid()` retourné par `supabase.auth.getUser()` avant l'insert pour comparer à l'admin attendu, et logger `error.message`/`error.details`/`error.hint` complets.
 
-Nouvelle table `public.shared_token_rules` :
-- `book_id text` (ou `'*'` pour global)
-- `rule jsonb`
-- `position int`
-- `created_by uuid` (admin auteur, audit)
+## 2. Merge nombre + compteur (九時, 三人, 五分…)
 
-Sécurité :
-- RLS activée
-- SELECT public (true) → toute l'app peut lire, même invité
-- INSERT / UPDATE / DELETE réservés aux admins via une **table `admin_users`** + fonction `is_admin(uid)` SECURITY DEFINER (pattern recommandé, évite de hardcoder l'email côté DB)
-- Seed : insérer ton `auth.uid()` dans `admin_users`
+**Nouveau passage** `mergeCounterCompounds(tokens)` dans `src/lib/merge-tokens.ts`, appliqué **après** `mergeConjugatedTokens` et **avant** `gluePhrasalCompounds`.
 
-Migration des règles existantes :
-- Copier toutes les lignes de `user_token_rules` où `user_id = <ton uid admin>` ET `book_id = '*'` vers `shared_token_rules`
-- (Optionnel) supprimer ces lignes de `user_token_rules` pour éviter doublon
+Règle:
+- Token courant: nombre — détecté par `p?.startsWith('名詞/数')` **ou** surface entièrement composée de chiffres kanji (`一二三四五六七八九十百千万零〇`) ou de chiffres ascii/halfwidth.
+- Token suivant: 名詞 dont la surface ∈ liste de compteurs autorisés.
 
-Index unique : `(book_id, md5(rule::text))`.
+Liste de compteurs (initiale, conservatrice):
 
-## Côté front
-
-1. **`src/lib/admin.ts`** : ajouter un hook `useIsAdminAsync` basé sur la table `admin_users` (et garder `ADMIN_EMAILS` en fallback côté UI).
-
-2. **Nouveau store `src/stores/shared-rules.ts`** :
-   - `saved: Record<scope, SharedRule[]>`
-   - `loadShared()` — appelé au mount de Reader, sans dépendance au user
-   - `addShared(scope, rule)` / `deleteShared(id, scope)` — admin uniquement (RLS bloquera sinon)
-
-3. **`src/pages/Reader.tsx`** :
-   - Charger les règles partagées au mount (indépendamment du login)
-   - Combiner dans l'ordre : `applyTokenOverrides` → règles **partagées** (book + `*`) → règles **perso** saved (book + `*`) → règles perso pending
-   - `useEffect` réagit aussi à `sharedRules`
-
-4. **`src/components/TokenEditPanel.tsx`** :
-   - Switch "Apply globally" devient un sélecteur 3 options pour les admins :
-     - `Ce livre (perso)` → user_token_rules / book
-     - `Tous mes livres (perso)` → user_token_rules / `*`
-     - `Publier pour tous les comptes` (admin only) → shared_token_rules / book ou `*`
-   - Pour non-admin, le switch reste binaire perso book/global perso.
-
-5. **`src/components/TokenEditFloatingBar.tsx`** :
-   - Onglet supplémentaire "Shared" affichant les règles publiées
-   - Bouton suppression visible seulement pour les admins (RLS appliquera quand même la sécurité)
-   - "Apply" envoie chaque pending vers la bonne table selon son scope encodé
-
-6. Encoder le scope dans le pending : changer la clé de pending de `string` à `{ table: 'user'|'shared', scope: string }` (ou préfixe `shared:bookId`). Petite refacto de `addPending` / `applyPending`.
-
-## Détails techniques
-
-```text
-applyRules order in Reader:
-  base tokens
-    → applyTokenOverrides (hardcoded book overrides)
-    → shared rules for book_id
-    → shared rules for "*"
-    → user saved rules for book_id
-    → user saved rules for "*"
-    → user pending rules (book + *)
+```
+時 分 秒 日 月 年 週 歳 才
+人 名 匹 頭 羽 個 つ
+本 枚 冊 台 階 軒 件 回 度
+円 元 ドル
+キロ メートル センチ
+番 号 位 章 課 ページ 頁
 ```
 
-Suppression admin d'une règle partagée → DELETE sur `shared_token_rules` → la règle disparaît immédiatement pour tous les comptes au prochain `loadShared()` (au prochain ouverture de livre, ou via Realtime si on l'ajoute plus tard).
+Sortie:
+- `t = a.t + b.t`
+- `r = (a.r ?? '') + (b.r ?? '')` (concaténation Kuromoji simple, comme demandé)
+- `b = a.t + b.t` (base = surface, suffisant pour le dico)
+- `p = '名詞'`
+- `j = true`
 
-## Hors scope (à proposer ensuite si tu veux)
-- Sync Realtime sur `shared_token_rules` pour propagation immédiate sans recharger
-- Versioning / historique des règles publiées
+Cas spéciaux à éviter:
+- Ne rien fusionner si le compteur est suivi d'une particule étrange ou si le nombre est lui-même déjà composé (laisse la 1ère passe faire son travail; on opère token par token).
+- Si la liste devient gênante plus tard, on pourra exposer une règle partagée pour annuler/remplacer.
+
+## 3. Fichiers touchés
+
+- `supabase/migrations/<ts>_fix_shared_rules_admin.sql` — recreation des policies `shared_token_rules`, garantie `is_admin` propre.
+- `src/stores/shared-rules.ts` — log diagnostique enrichi sur erreur d'insert.
+- `src/lib/merge-tokens.ts` — ajoute `mergeCounterCompounds` + export, et l'appelle dans le pipeline.
+- `src/pages/Reader.tsx` — insère l'appel à `mergeCounterCompounds` à l'endroit où les autres mergers sont appliqués (vérifier l'ordre exact lors de l'implémentation).
+
+## Hors scope
+- Lectures irrégulières (一日=ついたち, 二十歳=はたち…) — peut être ajouté ensuite via une petite table d'overrides, ou via une règle partagée par cas.
+- Realtime sync sur `shared_token_rules`.

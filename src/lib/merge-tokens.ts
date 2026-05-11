@@ -265,6 +265,66 @@ export function gluePhrasalCompounds(tokens: BookToken[]): BookToken[] {
 }
 
 // ---------------------------------------------------------------------------
+// Merge number + counter (九 + 時 → 九時, 三 + 人 → 三人, …)
+// ---------------------------------------------------------------------------
+const KANJI_DIGITS = new Set(['一','二','三','四','五','六','七','八','九','十','百','千','万','億','零','〇','两']);
+const ASCII_DIGIT_RE = /^[0-9０-９]+$/;
+
+const COUNTER_SURFACES = new Set([
+  // time
+  '時','分','秒','日','月','年','週','歳','才',
+  // people / animals / generic things
+  '人','名','匹','頭','羽','個','つ',
+  // long/flat/bound objects, machines, floors, …
+  '本','枚','冊','台','階','軒','件','回','度',
+  // money
+  '円','元','ドル',
+  // distance
+  'キロ','メートル','センチ',
+  // ordinals / pages
+  '番','号','位','章','課','ページ','頁',
+]);
+
+function isNumberToken(tok: BookToken): boolean {
+  if (!tok.j) return false;
+  if (tok.p?.startsWith('名詞/数')) return true;
+  if (ASCII_DIGIT_RE.test(tok.t)) return true;
+  if (tok.t.length > 0 && [...tok.t].every((c) => KANJI_DIGITS.has(c))) return true;
+  return false;
+}
+
+function isCounterToken(tok: BookToken): boolean {
+  if (!tok.j) return false;
+  if (!tok.p?.startsWith('名詞')) return false;
+  return COUNTER_SURFACES.has(tok.t);
+}
+
+export function mergeCounterCompounds(tokens: BookToken[]): BookToken[] {
+  const out: BookToken[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const a = tokens[i];
+    const b = tokens[i + 1];
+    if (a && b && isNumberToken(a) && isCounterToken(b)) {
+      const surface = a.t + b.t;
+      const reading = (a.r ?? '') + (b.r ?? '');
+      out.push({
+        t: surface,
+        j: true,
+        p: '名詞',
+        r: reading || undefined,
+        b: surface,
+      });
+      i += 2;
+      continue;
+    }
+    out.push(a);
+    i++;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Split nouns that Kuromoji glued together with an internal の particle
 // (e.g. 桜の樹 → 桜 + の + 樹). Reading is split on の as well.
 // ---------------------------------------------------------------------------
