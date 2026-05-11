@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUserRulesStore } from '@/stores/user-rules';
+import { useSharedRulesStore } from '@/stores/shared-rules';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/lib/admin';
 import { formatRule } from '@/lib/token-edit-rules';
 import { toast } from '@/hooks/use-toast';
 import { Trash2, X, Undo2, Check, Settings2, Loader2 } from 'lucide-react';
@@ -15,10 +17,14 @@ interface Props {
   onExitEditMode: () => void;
 }
 
+type ScopeKey = string; // 'book' | 'global' | 'shared-book' | 'shared-global' encoded as bookId/'*'/'sb'/'sg'
+
 export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearSelection, onExitEditMode }: Props) {
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const { saved, pending, undoPending, clearPending, applyPending, deleteSaved } = useUserRulesStore();
-  const [scope, setScope] = useState<string>(bookId);
+  const { saved: shared, deleteShared } = useSharedRulesStore();
+  const [scope, setScope] = useState<ScopeKey>(bookId);
   const [showManage, setShowManage] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -28,9 +34,13 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
 
   const bookSaved = saved[bookId] ?? [];
   const globalSaved = saved['*'] ?? [];
+  const sharedBook = shared[bookId] ?? [];
+  const sharedGlobal = shared['*'] ?? [];
 
-  const activePending = scope === '*' ? globalPending : bookPending;
-  const activeSaved = scope === '*' ? globalSaved : bookSaved;
+  const isSharedScope = scope === 'sb' || scope === 'sg';
+  const activePending = scope === '*' ? globalPending : scope === bookId ? bookPending : [];
+  const activeSaved = scope === '*' ? globalSaved : scope === bookId ? bookSaved : [];
+  const activeShared = scope === 'sb' ? sharedBook : scope === 'sg' ? sharedGlobal : [];
 
   const handleUndo = () => {
     const targetScope = bookPending.length > 0 ? bookId : globalPending.length > 0 ? '*' : null;
@@ -59,6 +69,15 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
     try {
       await deleteSaved(id, scopeKey);
       toast({ title: 'Deleted' });
+    } catch {
+      toast({ title: 'Delete failed', variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteShared = async (id: string, scopeKey: string) => {
+    try {
+      await deleteShared(id, scopeKey);
+      toast({ title: 'Removed from shared' });
     } catch {
       toast({ title: 'Delete failed', variant: 'destructive' });
     }
@@ -110,7 +129,7 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
             <DialogTitle>Token rules</DialogTitle>
           </DialogHeader>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setScope(bookId)}
               className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === bookId ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
@@ -123,10 +142,22 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
             >
               * global ({globalSaved.length}+{globalPending.length})
             </button>
+            <button
+              onClick={() => setScope('sb')}
+              className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === 'sb' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+            >
+              shared {bookId} ({sharedBook.length})
+            </button>
+            <button
+              onClick={() => setScope('sg')}
+              className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === 'sg' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+            >
+              shared * ({sharedGlobal.length})
+            </button>
           </div>
 
           <div className="max-h-[55vh] space-y-3 overflow-auto">
-            {activePending.length > 0 && (
+            {!isSharedScope && activePending.length > 0 && (
               <section>
                 <div className="mb-1 flex items-center justify-between">
                   <h3 className="text-[10px] font-semibold uppercase tracking-wide text-accent-foreground">Pending</h3>
@@ -145,25 +176,49 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
               </section>
             )}
 
-            <section>
-              <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Saved ({activeSaved.length})
-              </h3>
-              {activeSaved.length === 0 ? (
-                <p className="rounded bg-muted/40 px-2 py-2 text-xs text-muted-foreground">No saved rules yet.</p>
-              ) : (
-                <ul className="space-y-1">
-                  {activeSaved.map((r) => (
-                    <li key={r.id} className="flex items-center gap-2 rounded bg-muted/40 px-2 py-1.5">
-                      <code className="flex-1 truncate text-[11px]">{formatRule(r.rule)}</code>
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDelete(r.id, scope)} title="Delete">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+            {isSharedScope ? (
+              <section>
+                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                  Shared ({activeShared.length}) — visible to all accounts
+                </h3>
+                {activeShared.length === 0 ? (
+                  <p className="rounded bg-muted/40 px-2 py-2 text-xs text-muted-foreground">No shared rules yet.</p>
+                ) : (
+                  <ul className="space-y-1">
+                    {activeShared.map((r) => (
+                      <li key={r.id} className="flex items-center gap-2 rounded bg-primary/5 px-2 py-1.5">
+                        <code className="flex-1 truncate text-[11px]">{formatRule(r.rule)}</code>
+                        {isAdmin && (
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDeleteShared(r.id, scope === 'sb' ? bookId : '*')} title="Remove from shared">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            ) : (
+              <section>
+                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Saved ({activeSaved.length})
+                </h3>
+                {activeSaved.length === 0 ? (
+                  <p className="rounded bg-muted/40 px-2 py-2 text-xs text-muted-foreground">No saved rules yet.</p>
+                ) : (
+                  <ul className="space-y-1">
+                    {activeSaved.map((r) => (
+                      <li key={r.id} className="flex items-center gap-2 rounded bg-muted/40 px-2 py-1.5">
+                        <code className="flex-1 truncate text-[11px]">{formatRule(r.rule)}</code>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDelete(r.id, scope)} title="Delete">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
           </div>
 
           {!user && (

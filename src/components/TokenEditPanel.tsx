@@ -82,12 +82,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   matched: BookToken[];
-  onSubmit: (replacement: BookToken[], opts: { global: boolean }) => void;
+  isAdmin?: boolean;
+  onSubmit: (replacement: BookToken[], opts: { global: boolean; shared: boolean }) => void;
 }
 
-export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
+export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubmit }: Props) {
   const [drafts, setDrafts] = useState<TokenDraft[]>([]);
   const [globalScope, setGlobalScope] = useState(false);
+  const [sharedScope, setSharedScope] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -260,11 +262,20 @@ export function TokenEditPanel({ open, onClose, matched, onSubmit }: Props) {
             </div>
             <Switch checked={globalScope} onCheckedChange={setGlobalScope} />
           </label>
+          {isAdmin && (
+            <label className="flex items-center justify-between rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-primary">Publish for all accounts</span>
+                <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
+              </div>
+              <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
+            </label>
+          )}
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
             <Button
               disabled={!valid}
-              onClick={() => onSubmit(drafts.map(toToken), { global: globalScope })}
+              onClick={() => onSubmit(drafts.map(toToken), { global: globalScope, shared: sharedScope })}
               className="flex-1"
             >
               Save rule
