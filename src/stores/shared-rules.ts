@@ -44,6 +44,8 @@ export const useSharedRulesStore = create<SharedRulesState>((set, get) => ({
 
   addShared: async (scope, rule, createdBy) => {
     const startPos = (get().saved[scope]?.reduce((m, r) => Math.max(m, r.position), 0) ?? 0) + 1;
+    const { data: userData } = await supabase.auth.getUser();
+    console.log('[shared-rules] insert as', userData.user?.id, 'expected', createdBy, 'scope', scope);
     const { data, error } = await supabase
       .from('shared_token_rules')
       .insert({ book_id: scope, rule: rule as never, position: startPos, created_by: createdBy } as never)
@@ -54,7 +56,7 @@ export const useSharedRulesStore = create<SharedRulesState>((set, get) => ({
         await get().loadShared();
         return;
       }
-      console.error('[shared-rules] insert error', error);
+      console.error('[shared-rules] insert error', { message: error.message, details: (error as { details?: string }).details, hint: (error as { hint?: string }).hint, code: (error as { code?: string }).code });
       throw error;
     }
     const next = { ...get().saved };
