@@ -195,7 +195,7 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
     if (raw && raw.length > 0) {
-      let out = gluePhrasalCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw)))));
+      let out = gluePhrasalCompounds(mergeCounterCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw))))));
       // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
       const allRules = [
         ...((sharedRules[id] ?? []).map((r) => r.rule)),
