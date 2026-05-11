@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUserRulesStore } from '@/stores/user-rules';
+import { useSharedRulesStore } from '@/stores/shared-rules';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/lib/admin';
 import { formatRule } from '@/lib/token-edit-rules';
 import { toast } from '@/hooks/use-toast';
 import { Trash2, X, Undo2, Check, Settings2, Loader2 } from 'lucide-react';
@@ -15,10 +17,14 @@ interface Props {
   onExitEditMode: () => void;
 }
 
+type ScopeKey = string; // 'book' | 'global' | 'shared-book' | 'shared-global' encoded as bookId/'*'/'sb'/'sg'
+
 export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearSelection, onExitEditMode }: Props) {
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const { saved, pending, undoPending, clearPending, applyPending, deleteSaved } = useUserRulesStore();
-  const [scope, setScope] = useState<string>(bookId);
+  const { saved: shared, deleteShared } = useSharedRulesStore();
+  const [scope, setScope] = useState<ScopeKey>(bookId);
   const [showManage, setShowManage] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -28,9 +34,13 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
 
   const bookSaved = saved[bookId] ?? [];
   const globalSaved = saved['*'] ?? [];
+  const sharedBook = shared[bookId] ?? [];
+  const sharedGlobal = shared['*'] ?? [];
 
-  const activePending = scope === '*' ? globalPending : bookPending;
-  const activeSaved = scope === '*' ? globalSaved : bookSaved;
+  const isSharedScope = scope === 'sb' || scope === 'sg';
+  const activePending = scope === '*' ? globalPending : scope === bookId ? bookPending : [];
+  const activeSaved = scope === '*' ? globalSaved : scope === bookId ? bookSaved : [];
+  const activeShared = scope === 'sb' ? sharedBook : scope === 'sg' ? sharedGlobal : [];
 
   const handleUndo = () => {
     const targetScope = bookPending.length > 0 ? bookId : globalPending.length > 0 ? '*' : null;
@@ -59,6 +69,15 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
     try {
       await deleteSaved(id, scopeKey);
       toast({ title: 'Deleted' });
+    } catch {
+      toast({ title: 'Delete failed', variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteShared = async (id: string, scopeKey: string) => {
+    try {
+      await deleteShared(id, scopeKey);
+      toast({ title: 'Removed from shared' });
     } catch {
       toast({ title: 'Delete failed', variant: 'destructive' });
     }
