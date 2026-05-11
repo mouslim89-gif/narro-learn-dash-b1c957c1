@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       book_audio_sync: {
         Row: {
           book_id: string
@@ -206,6 +221,36 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_token_rules: {
+        Row: {
+          book_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          position: number
+          rule: Json
+          updated_at: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          position?: number
+          rule: Json
+          updated_at?: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          position?: number
+          rule?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_token_rules: {
         Row: {
           book_id: string
@@ -241,7 +286,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: { _uid: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
