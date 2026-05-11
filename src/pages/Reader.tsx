@@ -194,17 +194,22 @@ export default function Reader() {
     if (!id) return [];
     const tokenKey = chapterKey(id, chapterId);
     const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
+    // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
+    const allRules = [
+      ...((sharedRules[id] ?? []).map((r) => r.rule)),
+      ...((sharedRules['*'] ?? []).map((r) => r.rule)),
+      ...((savedRules[id] ?? []).map((r) => r.rule)),
+      ...((savedRules['*'] ?? []).map((r) => r.rule)),
+      ...(pendingRules[id] ?? []),
+      ...(pendingRules['*'] ?? []),
+    ];
     if (raw && raw.length > 0) {
-      let out = gluePhrasalCompounds(mergeCounterCompounds(mergeConjugatedTokens(splitNoParticleNouns(applyTokenOverrides(id, cleanRubyTokens(raw))))));
-      // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
-      const allRules = [
-        ...((sharedRules[id] ?? []).map((r) => r.rule)),
-        ...((sharedRules['*'] ?? []).map((r) => r.rule)),
-        ...((savedRules[id] ?? []).map((r) => r.rule)),
-        ...((savedRules['*'] ?? []).map((r) => r.rule)),
-        ...(pendingRules[id] ?? []),
-        ...(pendingRules['*'] ?? []),
-      ];
+      let out = applyTokenOverrides(id, cleanRubyTokens(raw));
+      // Apply custom rules before automatic post-processing so rules like
+      // ["九|時", "九時:くじ"] can override the raw Kuromoji split.
+      if (allRules.length > 0) out = applyRules(allRules, out);
+      out = gluePhrasalCompounds(mergeCounterCompounds(mergeConjugatedTokens(splitNoParticleNouns(out))));
+      // Apply them again after post-processing to keep rules targeting displayed tokens working.
       if (allRules.length > 0) out = applyRules(allRules, out);
       return out;
     }
