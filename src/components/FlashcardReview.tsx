@@ -25,7 +25,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [showAllMeanings, setShowAllMeanings] = useState(false);
   const [showReading, setShowReading] = useState(() => {
     if (typeof window === 'undefined') return true;
-    return window.localStorage.getItem('yomimasu-review-show-reading') !== 'false';
+    return window.localStorage.getItem('yomimasu-review-show-reading') === 'true';
   });
   useEffect(() => {
     window.localStorage.setItem('yomimasu-review-show-reading', String(showReading));
