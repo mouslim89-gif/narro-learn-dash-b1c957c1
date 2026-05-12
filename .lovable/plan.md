@@ -1,22 +1,28 @@
-## Changes
+## Refonte du bouton Save (WordMiniPopup)
 
-### 1. Star button → "+" toggle (add/remove)
-In `WordMiniPopup.tsx` and `WordPopup.tsx`:
-- Replace the `Star` icon import/usage with `Plus` (when not saved) and `Check` or `Minus` (when saved) from lucide-react.
-- Wire the click handler so that:
-  - if `hasWord(wordId)` → call `removeWord(wordId)` (with toast "Removed from Flashcards")
-  - else → call `addWord(entry)` (existing behavior)
-- Update label text in `WordPopup` from "Add to Flashcards" / "Added to Flashcards" → "Add to Flashcards" / "Remove from Flashcards".
+Bouton compact icône-seule, inline dans le header, avec changement clair de couleur + icône entre les deux états.
 
-**Icon choice question:** I'll use `Plus` (not saved) and `Check` (saved). If you prefer `Plus` / `Minus`, tell me.
+### Design
+- **Forme** : bouton rond 28×28px (`h-7 w-7 rounded-full`), centré, à côté du PlayWordButton.
+- **Non sauvegardé** :
+  - Fond : `bg-muted/60` avec ring subtil `ring-1 ring-border`
+  - Icône : `BookmarkPlus` en `text-muted-foreground`
+  - Hover : fond passe à `bg-primary/10`, icône `text-primary`, légère scale `hover:scale-110`
+- **Sauvegardé** :
+  - Fond plein : `bg-primary` (teal)
+  - Icône : `Check` en `text-primary-foreground`
+  - Ring `ring-2 ring-primary/30` pour le faire ressortir
+  - Petit pulse à la transition (animation `animate-in zoom-in`)
+- **Feedback tactile** : `active:scale-90 transition-all duration-200`
+- `aria-label` dynamique : "Add to flashcards" / "Remove from flashcards"
+- Texte "Save"/"Saved" supprimé (icône seule).
 
-### 2. Review mode: toggle to show/hide kana reading on front
-In `FlashcardReview.tsx`:
-- Add a local toggle (persisted to localStorage, e.g. `yomimasu-review-show-reading`, default = `true` to keep current behavior).
-- Render a small `Switch` + label ("Show reading") in the review header area.
-- On the front face (line 98), conditionally render the `<p>{card.reading}</p>` based on the toggle. Audio button stays visible.
+### Détails techniques
+- Fichier : `src/components/WordMiniPopup.tsx`
+- Imports : remplacer `BookmarkPlus, BookmarkCheck` par `BookmarkPlus, Check`
+- Remplacer le `<button>` actuel (la grande pill gradient) par le nouveau bouton rond
+- Logique `handleSave` / `saved` inchangée
+- Position inchangée (entre PlayWordButton et le `flex-1`)
 
-### Technical notes
-- No backend / store schema changes.
-- The toggle preference is local-only (per device), not synced.
-- Files touched: `src/components/WordMiniPopup.tsx`, `src/components/WordPopup.tsx`, `src/components/FlashcardReview.tsx`.
+### Hors scope
+- `WordPopup.tsx` (popup détaillé) reste tel quel sauf si tu veux la même refonte là aussi — dis-moi.
