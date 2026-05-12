@@ -31,6 +31,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
     setTimeout(() => {
       setFlipped(false);
       setShowAllMeanings(false);
+      setShowFrontReading(false);
       setCurrentIdx(i => i + 1);
       setAnimClass('animate-card-in');
       setTimeout(() => setAnimClass(''), 260);
