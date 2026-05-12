@@ -1,25 +1,22 @@
-I found the exact cause: the `is_admin` function exists and is `SECURITY DEFINER`, but it is only executable by internal roles. The logged-in admin account reaches the publish policy, then the database blocks the policy itself with: `permission denied for function is_admin`.
+## Changes
 
-## Plan
+### 1. Star button → "+" toggle (add/remove)
+In `WordMiniPopup.tsx` and `WordPopup.tsx`:
+- Replace the `Star` icon import/usage with `Plus` (when not saved) and `Check` or `Minus` (when saved) from lucide-react.
+- Wire the click handler so that:
+  - if `hasWord(wordId)` → call `removeWord(wordId)` (with toast "Removed from Flashcards")
+  - else → call `addWord(entry)` (existing behavior)
+- Update label text in `WordPopup` from "Add to Flashcards" / "Added to Flashcards" → "Add to Flashcards" / "Remove from Flashcards".
 
-1. **Fix function execution rights**
-   - Add a small database migration that grants `authenticated` users permission to execute `public.is_admin(uuid)`.
-   - Keep anonymous/public users from executing it directly.
+**Icon choice question:** I'll use `Plus` (not saved) and `Check` (saved). If you prefer `Plus` / `Minus`, tell me.
 
-2. **Keep the admin-only publish rule unchanged**
-   - Publishing shared token rules will still only work when `public.is_admin(auth.uid())` returns true.
-   - Non-admin accounts will still be blocked from creating, editing, or deleting shared rules.
+### 2. Review mode: toggle to show/hide kana reading on front
+In `FlashcardReview.tsx`:
+- Add a local toggle (persisted to localStorage, e.g. `yomimasu-review-show-reading`, default = `true` to keep current behavior).
+- Render a small `Switch` + label ("Show reading") in the review header area.
+- On the front face (line 98), conditionally render the `<p>{card.reading}</p>` based on the toggle. Audio button stays visible.
 
-3. **Verify after migration**
-   - Re-check the function grants in the database.
-   - You can then retry “publish for all accounts” from `mouslim89@gmail.com`.
-
-## Technical SQL
-
-```sql
-REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM anon;
-GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO authenticated;
-```
-
-This is smaller and more targeted than recreating all policies again, because the policies are already correct; only the function permission is missing.
+### Technical notes
+- No backend / store schema changes.
+- The toggle preference is local-only (per device), not synced.
+- Files touched: `src/components/WordMiniPopup.tsx`, `src/components/WordPopup.tsx`, `src/components/FlashcardReview.tsx`.
