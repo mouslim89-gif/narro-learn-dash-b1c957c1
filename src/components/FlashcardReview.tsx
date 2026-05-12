@@ -23,6 +23,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [animClass, setAnimClass] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAllMeanings, setShowAllMeanings] = useState(false);
+  const [showFrontReading, setShowFrontReading] = useState(false);
 
   const advance = useCallback((action?: () => void) => {
     action?.();
