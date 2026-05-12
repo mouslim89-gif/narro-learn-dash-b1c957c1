@@ -24,7 +24,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAllMeanings, setShowAllMeanings] = useState(false);
   const [showReading, setShowReading] = useState(() => {
-    if (typeof window === 'undefined') return true;
+    if (typeof window === 'undefined') return false;
     return window.localStorage.getItem('yomimasu-review-show-reading') === 'true';
   });
   useEffect(() => {
