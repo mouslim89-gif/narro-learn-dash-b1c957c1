@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { SrsButtons, type SrsQualityLabel } from '@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { Trash2, ArrowLeft, BookOpen, ChevronDown } from 'lucide-react';
+import { Trash2, ArrowLeft, BookOpen, ChevronDown, Eye, EyeOff } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
