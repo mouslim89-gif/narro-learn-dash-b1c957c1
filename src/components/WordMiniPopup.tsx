@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { BookmarkPlus, BookmarkCheck, ChevronRight, Loader2, Languages } from 'lucide-react';
+import { BookmarkPlus, Check, ChevronRight, Loader2, Languages } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
@@ -181,22 +181,16 @@ export function WordMiniPopup({
           <button
             onClick={handleSave}
             aria-label={saved ? 'Remove from flashcards' : 'Add to flashcards'}
-            className={`group relative inline-flex items-center gap-1 overflow-hidden rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all active:scale-95 ${
+            className={`inline-flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${
               saved
-                ? 'bg-primary/15 text-primary ring-1 ring-primary/30'
-                : 'bg-gradient-to-br from-accent via-primary to-accent text-accent-foreground shadow-primary/25 hover:shadow-primary/40 hover:shadow-md'
+                ? 'bg-primary text-primary-foreground ring-2 ring-primary/30 animate-in zoom-in-75'
+                : 'bg-muted/60 text-muted-foreground ring-1 ring-border hover:bg-primary/10 hover:text-primary hover:scale-110'
             }`}
           >
             {saved ? (
-              <>
-                <BookmarkCheck className="h-3 w-3" />
-                <span>Saved</span>
-              </>
+              <Check className="h-3.5 w-3.5" strokeWidth={3} />
             ) : (
-              <>
-                <BookmarkPlus className="h-3 w-3 transition-transform group-hover:-rotate-12 group-hover:scale-110" />
-                <span>Save</span>
-              </>
+              <BookmarkPlus className="h-3.5 w-3.5" />
             )}
           </button>
         )}
