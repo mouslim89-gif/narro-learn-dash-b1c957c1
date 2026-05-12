@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Star, BookOpen } from 'lucide-react';
+import { Plus, Check, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
@@ -158,7 +158,7 @@ function LoadingSkeleton() {
 }
 
 export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, onClose }: WordPopupProps) {
-  const { addWord, hasWord } = useFlashcardStore();
+  const { addWord, hasWord, removeWord } = useFlashcardStore();
   const navigate = useNavigate();
 
   // Try looking up the base form first (more likely to have dictionary entries)
@@ -234,6 +234,10 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
   const handleSave = () => {
     if (!result) return;
+    if (saved) {
+      removeWord(wordId);
+      return;
+    }
     const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {
       id: wordId,
@@ -320,14 +324,13 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
               <div className="mt-2 flex gap-2">
                 <button
                   onClick={handleSave}
-                  disabled={saved}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition-all active:scale-[0.97] ${
                     saved
                       ? 'bg-muted text-muted-foreground'
                       : 'bg-accent text-accent-foreground'
                   }`}
                 >
-                  <Star className="h-4 w-4" /> {saved ? 'Added to Flashcards' : 'Add to Flashcards'}
+                  {saved ? <><Check className="h-4 w-4" /> Remove from Flashcards</> : <><Plus className="h-4 w-4" /> Add to Flashcards</>}
                 </button>
                 <button
                   onClick={() => {
