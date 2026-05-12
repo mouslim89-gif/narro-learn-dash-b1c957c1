@@ -97,8 +97,25 @@ export function FlashcardReview({ deck, onExit }: Props) {
             {/* Front face */}
             <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card shadow-lg p-6">
               <p className="font-japanese text-6xl font-bold tracking-tight">{card.word}</p>
-              <p className="font-japanese text-xl text-muted-foreground mt-3">{card.reading}</p>
-              <PlayWordButton word={card.word} reading={card.reading} size={28} className="mt-4" />
+              <p
+                className={`font-japanese text-xl mt-3 transition-all ${
+                  showFrontReading ? 'text-muted-foreground' : 'text-transparent select-none blur-md'
+                }`}
+                aria-hidden={!showFrontReading}
+              >
+                {card.reading || '???'}
+              </p>
+              <div className="mt-4 flex items-center gap-2" data-no-flip onClick={(e) => e.stopPropagation()}>
+                <PlayWordButton word={card.word} reading={card.reading} size={28} />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowFrontReading((v) => !v)}
+                  aria-label={showFrontReading ? 'Hide furigana' : 'Show furigana'}
+                >
+                  {showFrontReading ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </Button>
+              </div>
               <p className="mt-8 text-xs text-muted-foreground/70 uppercase tracking-wider">Tap to flip</p>
             </div>
 
