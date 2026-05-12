@@ -27,7 +27,7 @@ export function WordMiniPopup({
   onShowMore,
   onTranslateSentence,
 }: WordMiniPopupProps) {
-  const { addWord, hasWord } = useFlashcardStore();
+  const { addWord, hasWord, removeWord } = useFlashcardStore();
   const popupRef = useRef<HTMLDivElement>(null);
 
   const surfaceForMatch = baseForm || word;
@@ -128,6 +128,10 @@ export function WordMiniPopup({
   }, [onClose]);
 
   const handleSave = () => {
+    if (saved) {
+      removeWord(wordId);
+      return;
+    }
     if (!result) return;
     const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {
@@ -176,8 +180,8 @@ export function WordMiniPopup({
         {result && !loading && (
           <button
             onClick={handleSave}
-            disabled={saved}
             className={`p-0.5 transition-colors ${saved ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`}
+            title={saved ? 'Remove from flashcards' : 'Add to flashcards'}
           >
             <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
           </button>
