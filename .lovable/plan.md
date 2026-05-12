@@ -1,28 +1,25 @@
-## Refonte du bouton Save (WordMiniPopup)
+I found the exact cause: the `is_admin` function exists and is `SECURITY DEFINER`, but it is only executable by internal roles. The logged-in admin account reaches the publish policy, then the database blocks the policy itself with: `permission denied for function is_admin`.
 
-Bouton compact icône-seule, inline dans le header, avec changement clair de couleur + icône entre les deux états.
+## Plan
 
-### Design
-- **Forme** : bouton rond 28×28px (`h-7 w-7 rounded-full`), centré, à côté du PlayWordButton.
-- **Non sauvegardé** :
-  - Fond : `bg-muted/60` avec ring subtil `ring-1 ring-border`
-  - Icône : `BookmarkPlus` en `text-muted-foreground`
-  - Hover : fond passe à `bg-primary/10`, icône `text-primary`, légère scale `hover:scale-110`
-- **Sauvegardé** :
-  - Fond plein : `bg-primary` (teal)
-  - Icône : `Check` en `text-primary-foreground`
-  - Ring `ring-2 ring-primary/30` pour le faire ressortir
-  - Petit pulse à la transition (animation `animate-in zoom-in`)
-- **Feedback tactile** : `active:scale-90 transition-all duration-200`
-- `aria-label` dynamique : "Add to flashcards" / "Remove from flashcards"
-- Texte "Save"/"Saved" supprimé (icône seule).
+1. **Fix function execution rights**
+   - Add a small database migration that grants `authenticated` users permission to execute `public.is_admin(uuid)`.
+   - Keep anonymous/public users from executing it directly.
 
-### Détails techniques
-- Fichier : `src/components/WordMiniPopup.tsx`
-- Imports : remplacer `BookmarkPlus, BookmarkCheck` par `BookmarkPlus, Check`
-- Remplacer le `<button>` actuel (la grande pill gradient) par le nouveau bouton rond
-- Logique `handleSave` / `saved` inchangée
-- Position inchangée (entre PlayWordButton et le `flex-1`)
+2. **Keep the admin-only publish rule unchanged**
+   - Publishing shared token rules will still only work when `public.is_admin(auth.uid())` returns true.
+   - Non-admin accounts will still be blocked from creating, editing, or deleting shared rules.
 
-### Hors scope
-- `WordPopup.tsx` (popup détaillé) reste tel quel sauf si tu veux la même refonte là aussi — dis-moi.
+3. **Verify after migration**
+   - Re-check the function grants in the database.
+   - You can then retry “publish for all accounts” from `mouslim89@gmail.com`.
+
+## Technical SQL
+
+```sql
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM anon;
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO authenticated;
+```
+
+This is smaller and more targeted than recreating all policies again, because the policies are already correct; only the function permission is missing.

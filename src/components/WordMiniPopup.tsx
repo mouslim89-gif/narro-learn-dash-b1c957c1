@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { BookmarkPlus, Check, ChevronRight, Loader2, Languages } from 'lucide-react';
+import { Star, ChevronRight, Loader2, Languages } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
@@ -27,7 +27,7 @@ export function WordMiniPopup({
   onShowMore,
   onTranslateSentence,
 }: WordMiniPopupProps) {
-  const { addWord, hasWord, removeWord } = useFlashcardStore();
+  const { addWord, hasWord } = useFlashcardStore();
   const popupRef = useRef<HTMLDivElement>(null);
 
   const surfaceForMatch = baseForm || word;
@@ -129,10 +129,6 @@ export function WordMiniPopup({
 
   const handleSave = () => {
     if (!result) return;
-    if (saved) {
-      removeWord(wordId);
-      return;
-    }
     const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {
       id: wordId,
@@ -180,18 +176,10 @@ export function WordMiniPopup({
         {result && !loading && (
           <button
             onClick={handleSave}
-            aria-label={saved ? 'Remove from flashcards' : 'Add to flashcards'}
-            className={`inline-flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${
-              saved
-                ? 'bg-primary text-primary-foreground ring-2 ring-primary/30 animate-in zoom-in-75'
-                : 'bg-muted/60 text-muted-foreground ring-1 ring-border hover:bg-primary/10 hover:text-primary hover:scale-110'
-            }`}
+            disabled={saved}
+            className={`p-0.5 transition-colors ${saved ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`}
           >
-            {saved ? (
-              <Check className="h-3.5 w-3.5" strokeWidth={3} />
-            ) : (
-              <BookmarkPlus className="h-3.5 w-3.5" />
-            )}
+            <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
           </button>
         )}
         <div className="flex-1" />

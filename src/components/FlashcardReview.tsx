@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { SavedWord, useFlashcardStore } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { SrsButtons, type SrsQualityLabel } from '@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { Trash2, ArrowLeft, BookOpen, ChevronDown, Eye, EyeOff } from 'lucide-react';
+import { Trash2, ArrowLeft, BookOpen, ChevronDown } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
@@ -23,13 +23,6 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [animClass, setAnimClass] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAllMeanings, setShowAllMeanings] = useState(false);
-  const [showReading, setShowReading] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.localStorage.getItem('yomimasu-review-show-reading') === 'true';
-  });
-  useEffect(() => {
-    window.localStorage.setItem('yomimasu-review-show-reading', String(showReading));
-  }, [showReading]);
 
   const advance = useCallback((action?: () => void) => {
     action?.();
@@ -72,15 +65,6 @@ export function FlashcardReview({ deck, onExit }: Props) {
         <Button variant="ghost" size="icon" onClick={onExit}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowReading(v => !v)}
-          aria-label={showReading ? 'Hide reading on front' : 'Show reading on front'}
-          title={showReading ? 'Hide reading on front' : 'Show reading on front'}
-        >
-          {showReading ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5 text-muted-foreground" />}
-        </Button>
         <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
           <Trash2 className="h-5 w-5" />
         </Button>
@@ -111,9 +95,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             {/* Front face */}
             <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card shadow-lg p-6">
               <p className="font-japanese text-6xl font-bold tracking-tight">{card.word}</p>
-              {showReading && (
-                <p className="font-japanese text-xl text-muted-foreground mt-3">{card.reading}</p>
-              )}
+              <p className="font-japanese text-xl text-muted-foreground mt-3">{card.reading}</p>
               <PlayWordButton word={card.word} reading={card.reading} size={28} className="mt-4" />
               <p className="mt-8 text-xs text-muted-foreground/70 uppercase tracking-wider">Tap to flip</p>
             </div>
