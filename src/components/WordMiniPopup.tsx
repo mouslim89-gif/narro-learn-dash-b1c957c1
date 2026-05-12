@@ -181,9 +181,23 @@ export function WordMiniPopup({
           <button
             onClick={handleSave}
             aria-label={saved ? 'Remove from flashcards' : 'Add to flashcards'}
-            className={`p-0.5 transition-colors ${saved ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            className={`group relative inline-flex items-center gap-1 overflow-hidden rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all active:scale-95 ${
+              saved
+                ? 'bg-primary/15 text-primary ring-1 ring-primary/30'
+                : 'bg-gradient-to-br from-accent via-primary to-accent text-accent-foreground shadow-primary/25 hover:shadow-primary/40 hover:shadow-md'
+            }`}
           >
-            {saved ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {saved ? (
+              <>
+                <BookmarkCheck className="h-3 w-3" />
+                <span>Saved</span>
+              </>
+            ) : (
+              <>
+                <BookmarkPlus className="h-3 w-3 transition-transform group-hover:-rotate-12 group-hover:scale-110" />
+                <span>Save</span>
+              </>
+            )}
           </button>
         )}
         <div className="flex-1" />
