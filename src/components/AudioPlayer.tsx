@@ -111,6 +111,7 @@ export function AudioPlayer({
         onPlay={() => { setPlaying(true); onPlay?.(); }}
       />
       <div
+        data-audio-player
         style={{ bottom: `${bottomOffset}px` }}
         className="fixed left-0 right-0 z-40 border-t border-border/50 bg-card/85 px-4 py-3 backdrop-blur-2xl"
       >
