@@ -310,7 +310,7 @@ export default function Reader() {
 
   useEffect(() => {
     restoredScroll.current = false;
-    if (id) hydrateDictionaryForBook(id);
+    if (id) hydrateDictionaryForBook(id, chapterId);
   }, [id, chapterId, difficulty]);
 
   useEffect(() => {
