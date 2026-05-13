@@ -491,13 +491,6 @@ export default function Reader() {
     if (audioCurrentSentence != null) queueSentenceScroll(audioCurrentSentence);
   }, [audioCurrentSentence, queueSentenceScroll, setAutoFollow]);
 
-  // Tapping the "Follow audio" pill re-engages auto-follow and jumps the
-  // viewport back to the sentence currently being played.
-  const handleFollowAudio = useCallback(() => {
-    if (audioCurrentSentence == null) return;
-    setAutoFollow(true);
-    queueSentenceScroll(audioCurrentSentence);
-  }, [audioCurrentSentence, queueSentenceScroll, setAutoFollow]);
 
   // Auto-scroll active sentence into view ONLY when auto-follow is engaged.
   useEffect(() => {
