@@ -51,11 +51,14 @@ export function ReaderToken({
   const knownClass = knownLevel ? KNOWN_CLASS[knownLevel] : '';
   const cls = `${colorClass} ${knownClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`;
 
-  if (showFurigana) {
+  const hasReading = !!token.r;
+
+  if (hasReading) {
     return (
       <FuriganaWord
         text={token.t}
         reading={token.r}
+        furiganaVisible={showFurigana}
         colorClass={cls}
         onClick={handleClick}
         onMouseDown={(e) => { stopDown(e); handlers.onMouseDown(e); }}
