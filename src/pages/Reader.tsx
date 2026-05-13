@@ -413,8 +413,10 @@ export default function Reader() {
   // Listen for genuine user input that scrolls the page. These events fire
   // ONLY for direct user interaction (never for programmatic scrollTo).
   useEffect(() => {
-    const onWheel = () => disengageAutoScroll();
-    const onTouchMove = () => disengageAutoScroll();
+    const isFromAudioPlayer = (e: Event) =>
+      (e.target as HTMLElement | null)?.closest?.('[data-audio-player]') != null;
+    const onWheel = (e: Event) => { if (!isFromAudioPlayer(e)) disengageAutoScroll(); };
+    const onTouchMove = (e: Event) => { if (!isFromAudioPlayer(e)) disengageAutoScroll(); };
     const onKeyDown = (e: KeyboardEvent) => {
       const keys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ', 'Spacebar'];
       if (keys.includes(e.key)) disengageAutoScroll();
