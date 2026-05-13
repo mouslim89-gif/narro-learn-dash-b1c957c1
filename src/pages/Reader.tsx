@@ -138,10 +138,8 @@ export default function Reader() {
   // Auto-scroll is OFF by default. It turns ON when the user plays/resumes audio
   // or scrubs the slider — and turns OFF the moment they scroll the page manually.
   const autoScrollRef = useRef<boolean>(false);
-  
   const setAutoFollow = useCallback((on: boolean) => {
     autoScrollRef.current = on;
-    setIsFollowing(on);
   }, []);
   const programmaticScrollUntilRef = useRef<number>(0);
   const scrollAnimationFrameRef = useRef<number | null>(null);
