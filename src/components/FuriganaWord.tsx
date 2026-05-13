@@ -5,6 +5,8 @@ interface FuriganaWordProps {
   text: string;
   /** Pre-computed reading from Kuromoji (hiragana) */
   reading?: string;
+  /** Whether furigana (rt) is visible — animated via opacity */
+  furiganaVisible?: boolean;
   /** Optional color class for grammar color mode */
   colorClass?: string;
   onClick: (e: MouseEvent<HTMLSpanElement>) => void;
@@ -281,7 +283,7 @@ function segmentsFromReading(text: string, reading: string): FuriganaSegment[] |
 }
 
 export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(function FuriganaWord(
-  { text, reading, colorClass, onClick, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onTouchStart, onTouchMove, onTouchEnd, onTouchCancel },
+  { text, reading, furiganaVisible = true, colorClass, onClick, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onTouchStart, onTouchMove, onTouchEnd, onTouchCancel },
   ref
 ) {
   // Try pre-computed reading first, then fall back to Jisho cache
@@ -313,7 +315,15 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
               <ruby key={`${segment.text}-${index}`}>
                 {segment.text}
                 <rp>(</rp>
-                <rt className="text-[0.45em] font-normal text-muted-foreground leading-none">{segment.reading}</rt>
+                <rt
+                  className="text-[0.45em] font-normal text-muted-foreground leading-none"
+                  style={{
+                    opacity: furiganaVisible ? 1 : 0,
+                    transition: 'opacity 320ms var(--ease-out-soft)',
+                  }}
+                >
+                  {segment.reading}
+                </rt>
                 <rp>)</rp>
               </ruby>
             ) : (
