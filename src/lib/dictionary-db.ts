@@ -74,10 +74,59 @@ async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
   return out;
 }
 
-/** Public: hydrate the jisho in-memory cache for a given book. */
-export async function hydrateDictionaryForBook(bookId: string): Promise<void> {
+/**
+ * Try to hydrate from a pre-built static shard at /dict/<key>.json.
+ * Returns true if the shard was successfully loaded (cache hit or fresh fetch),
+ * false on 404 / network error so the caller can fall back to the DB path.
+ */
+async function hydrateDictionaryFromShard(key: string): Promise<boolean> {
   await ensureCacheVersion();
-  const allWords = collectBookWords(bookId);
+  try {
+    const url = `/dict/${encodeURIComponent(key)}.json`;
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) return false;
+    const payload = (await res.json()) as {
+      v?: number;
+      entries?: Record<string, CacheEntry>;
+    };
+    if (!payload || payload.v !== DICT_CACHE_VERSION || !payload.entries) return false;
+
+    const entries = payload.entries;
+    const seed: Record<string, CacheEntry> = {};
+    const idbPairs: [string, CacheEntry][] = [];
+    for (const [word, entry] of Object.entries(entries)) {
+      if (!entry?.results?.length) continue;
+      seed[word] = entry;
+      idbPairs.push([word, entry]);
+    }
+    if (Object.keys(seed).length === 0) return false;
+    seedCache(seed);
+    // Persist for offline; fire-and-forget — memory cache is already warm.
+    setMany(idbPairs, wordStore).catch(() => {});
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Public: hydrate the jisho in-memory cache for a given book/chapter. */
+export async function hydrateDictionaryForBook(
+  bookId: string,
+  chapterId?: string
+): Promise<void> {
+  await ensureCacheVersion();
+
+  // 1. Prefer the static shard — single fetch, instant warm cache.
+  const key =
+    chapterId && chapterId !== 'main' ? `${bookId}__${chapterId}` : bookId;
+  const shardOk =
+    (await hydrateDictionaryFromShard(key)) ||
+    // Fallback to the bookId-only shard for content that hasn't been split per chapter.
+    (key !== bookId && (await hydrateDictionaryFromShard(bookId)));
+  if (shardOk) return;
+
+  // 2. No shard available → legacy IndexedDB + PostgREST path.
+  const allWords = collectBookWords(key) ;
   if (allWords.length === 0) return;
 
   // 1. Read whatever is already cached in IndexedDB.
