@@ -946,16 +946,6 @@ export default function Reader() {
         onClose={() => setShowGrammar(false)}
       />
 
-      {audioUrl && audioSync && audioCurrentSentence != null && !isFollowing && (
-        <button
-          onClick={handleFollowAudio}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-lg shadow-primary/30 active:scale-95 transition-transform"
-          aria-label="Follow audio"
-        >
-          <ArrowDown className="h-3.5 w-3.5" />
-          Follow audio
-        </button>
-      )}
 
       {audioUrl && (
         <AudioPlayer
