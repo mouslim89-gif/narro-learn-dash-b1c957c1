@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, ArrowDown, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
+import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { bookTokens, type BookToken } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
@@ -138,10 +138,8 @@ export default function Reader() {
   // Auto-scroll is OFF by default. It turns ON when the user plays/resumes audio
   // or scrubs the slider — and turns OFF the moment they scroll the page manually.
   const autoScrollRef = useRef<boolean>(false);
-  const [isFollowing, setIsFollowing] = useState(false);
   const setAutoFollow = useCallback((on: boolean) => {
     autoScrollRef.current = on;
-    setIsFollowing(on);
   }, []);
   const programmaticScrollUntilRef = useRef<number>(0);
   const scrollAnimationFrameRef = useRef<number | null>(null);
@@ -493,13 +491,6 @@ export default function Reader() {
     if (audioCurrentSentence != null) queueSentenceScroll(audioCurrentSentence);
   }, [audioCurrentSentence, queueSentenceScroll, setAutoFollow]);
 
-  // Tapping the "Follow audio" pill re-engages auto-follow and jumps the
-  // viewport back to the sentence currently being played.
-  const handleFollowAudio = useCallback(() => {
-    if (audioCurrentSentence == null) return;
-    setAutoFollow(true);
-    queueSentenceScroll(audioCurrentSentence);
-  }, [audioCurrentSentence, queueSentenceScroll, setAutoFollow]);
 
   // Auto-scroll active sentence into view ONLY when auto-follow is engaged.
   useEffect(() => {
@@ -955,16 +946,6 @@ export default function Reader() {
         onClose={() => setShowGrammar(false)}
       />
 
-      {audioUrl && audioSync && audioCurrentSentence != null && !isFollowing && (
-        <button
-          onClick={handleFollowAudio}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-lg shadow-primary/30 active:scale-95 transition-transform"
-          aria-label="Follow audio"
-        >
-          <ArrowDown className="h-3.5 w-3.5" />
-          Follow audio
-        </button>
-      )}
 
       {audioUrl && (
         <AudioPlayer
