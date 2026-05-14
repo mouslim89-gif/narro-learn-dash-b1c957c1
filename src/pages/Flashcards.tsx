@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2 } from 'lucide-react';
+import { Trash2, RotateCcw, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { FlashcardReview } from '@/components/FlashcardReview';
-import { formatInterval } from '@/lib/srs';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 type StatusFilter = 'all' | 'due' | 'new' | 'learning' | 'known';
-type SortOption = 'added' | 'mastery' | 'jlpt';
+type SortOption = 'added' | 'mastery';
 
 function masteryLevel(m: number): 'new' | 'learning' | 'known' {
   if (m <= 0) return 'new';
@@ -28,18 +29,6 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
   learning: 'bg-sky-500',
   known: 'bg-emerald-500',
 };
-
-function nextReviewLabel(nextReviewAt?: string): string | null {
-  if (!nextReviewAt) return null;
-  const ms = new Date(nextReviewAt).getTime() - Date.now();
-  if (ms <= 0) return 'Due now';
-  const days = Math.round(ms / 86400000);
-  if (days < 1) {
-    const hours = Math.round(ms / 3600000);
-    return `in ${Math.max(1, hours)}h`;
-  }
-  return `in ${formatInterval(days)}`;
-}
 
 export default function Flashcards() {
   const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
@@ -79,14 +68,6 @@ export default function Flashcards() {
     }
 
     if (sortBy === 'mastery') words.sort((a, b) => (b.mastery || 0) - (a.mastery || 0));
-    else if (sortBy === 'jlpt') {
-      const jlptOrder = (w: typeof words[0]) => {
-        const j = w.jlpt?.[0];
-        if (!j) return 99;
-        return parseInt(j.replace('jlpt-n', ''));
-      };
-      words.sort((a, b) => jlptOrder(a) - jlptOrder(b));
-    }
 
     return words;
   }, [savedWords, filter, search, sortBy, dueIds]);
@@ -108,14 +89,14 @@ export default function Flashcards() {
   const sortLabels: Record<SortOption, string> = {
     added: 'Date added',
     mastery: 'Mastery',
-    jlpt: 'JLPT',
   };
 
-  const tiles: { key: StatusFilter; label: string; count: number; Icon: typeof Flame; gradient: string; text: string }[] = [
-    { key: 'due', label: 'Due', count: dueCount, Icon: Flame, gradient: 'from-accent/15 to-accent/5', text: 'text-accent' },
-    { key: 'new', label: 'New', count: newCount, Icon: Sparkles, gradient: 'from-amber-500/15 to-amber-500/5', text: 'text-amber-600 dark:text-amber-400' },
-    { key: 'learning', label: 'Learning', count: learningCount, Icon: GraduationCap, gradient: 'from-sky-500/15 to-sky-500/5', text: 'text-sky-600 dark:text-sky-400' },
-    { key: 'known', label: 'Known', count: knownCount, Icon: CheckCircle2, gradient: 'from-emerald-500/15 to-emerald-500/5', text: 'text-emerald-600 dark:text-emerald-400' },
+  type Tile = { key: StatusFilter; label: string; count: number; Icon: typeof Flame; tint: string; iconColor: string };
+  const tiles: Tile[] = [
+    { key: 'new', label: 'New', count: newCount, Icon: Sparkles, tint: '200 60% 55%', iconColor: 'hsl(200 60% 50%)' },
+    { key: 'learning', label: 'Learning', count: learningCount, Icon: GraduationCap, tint: '36 80% 60%', iconColor: 'hsl(36 80% 50%)' },
+    { key: 'known', label: 'Known', count: knownCount, Icon: CheckCircle2, tint: '150 50% 45%', iconColor: 'hsl(150 50% 40%)' },
+    { key: 'due', label: 'Due', count: dueCount, Icon: Flame, tint: '36 80% 60%', iconColor: 'hsl(36 80% 50%)' },
   ];
 
   const filters: { label: string; value: StatusFilter }[] = [
@@ -127,97 +108,99 @@ export default function Flashcards() {
   ];
 
   return (
-    <div className="pb-20 px-6 pt-8">
-      {/* Hero header */}
-      <div className="flex items-start justify-between gap-3">
+    <div className="pb-24">
+      {/* Masthead */}
+      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Flashcards</h1>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {savedWords.length} card{savedWords.length === 1 ? '' : 's'}
-            {dueCount > 0 && (
-              <> · <span className="font-semibold text-accent">{dueCount} due today</span></>
-            )}
+          <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">Flashcards</h1>
+          <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
+            <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+            {savedWords.length} saved {savedWords.length === 1 ? 'word' : 'words'}
           </p>
         </div>
-        <div className="flex items-center gap-1">
-          <Link to="/settings">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      </div>
+        <Link to="/settings">
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
+            <Settings className="h-[18px] w-[18px]" />
+          </Button>
+        </Link>
+      </header>
 
       {savedWords.length > 0 && (
         <>
           {/* Hero review CTA */}
-          {dueCount > 0 ? (
-            <button
-              onClick={enterReview}
-              className="mt-4 w-full rounded-xl bg-gradient-to-r from-primary to-primary/85 px-5 py-3.5 text-primary-foreground shadow-lg shadow-primary/20 active:scale-[0.99] transition-transform flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="rounded-full bg-white/15 p-1.5">
-                  <RotateCcw className="h-4 w-4" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-bold leading-tight">Start review</p>
-                  <p className="text-[11px] opacity-85 leading-tight">{dueCount} card{dueCount > 1 ? 's' : ''} due</p>
+          <section className="px-6 pt-5">
+            {dueCount > 0 ? (
+              <div
+                className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40 card-lift"
+                style={{ backgroundImage: 'linear-gradient(135deg, hsl(36 80% 60% / 0.18) 0%, hsl(var(--card)) 60%)' }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40">
+                    <Flame className="h-6 w-6" style={{ color: 'hsl(36 80% 55%)' }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Due today</p>
+                    <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
+                    <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
+                  </div>
+                  <Button size="sm" className="rounded-full px-4 shadow-md" onClick={enterReview}>
+                    Review <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                  </Button>
                 </div>
               </div>
-              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold">
-                {dueCount}
-              </span>
-            </button>
-          ) : (
-            <Button variant="outline" size="sm" onClick={enterReview} className="mt-4 w-full font-semibold">
-              <RotateCcw className="mr-1.5 h-4 w-4" /> Review all
-            </Button>
-          )}
+            ) : (
+              <Button variant="outline" className="w-full h-12 rounded-full" onClick={enterReview}>
+                <RotateCcw className="mr-2 h-4 w-4" />Review all words
+              </Button>
+            )}
+          </section>
 
-          {/* 4-tile stats */}
-          <div className="mt-3 grid grid-cols-4 gap-2">
-            {tiles.map(({ key, label, count, Icon, gradient, text }) => {
+          {/* Stat tiles */}
+          <div className="mt-4 px-6 grid grid-cols-4 gap-2">
+            {tiles.map(({ key, label, count, Icon, tint, iconColor }) => {
               const active = filter === key;
               return (
                 <button
                   key={key}
                   onClick={() => setFilter(active ? 'all' : key)}
-                  className={`rounded-xl border bg-gradient-to-br ${gradient} p-2.5 text-center transition-all active:scale-[0.97] ${
-                    active ? 'border-primary/50 ring-1 ring-primary/30' : 'border-border/60'
-                  }`}
+                  className={cn(
+                    'rounded-xl border bg-card p-3 text-left card-lift transition-all',
+                    active ? 'border-primary/40 ring-1 ring-primary/30' : 'border-border/40'
+                  )}
+                  style={{ backgroundImage: `linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)` }}
                 >
-                  <Icon className={`mx-auto h-3.5 w-3.5 ${text}`} />
-                  <p className={`mt-1 text-lg font-bold leading-none ${text}`}>{count}</p>
-                  <p className="mt-1 text-[9px] uppercase tracking-wider text-muted-foreground">{label}</p>
+                  <Icon className="h-4 w-4" style={{ color: iconColor }} />
+                  <p className="mt-1.5 text-2xl font-bold tabular-nums leading-none">{count}</p>
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
                 </button>
               );
             })}
           </div>
 
-          {/* Search */}
-          <div className="mt-3 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          {/* Search pill */}
+          <div className="mt-4 px-6 relative">
+            <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search words..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-9 h-9"
+              className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10"
             />
           </div>
 
-          {/* Filters + Sort */}
-          <div className="mt-3 flex items-center justify-between gap-2">
-            <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+          {/* Filter pills + sort */}
+          <div className="mt-2 flex items-center justify-between gap-2 pl-6 pr-3">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
               {filters.map(f => (
                 <button
                   key={f.value}
                   onClick={() => setFilter(f.value)}
-                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  className={cn(
+                    'shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors',
                     filter === f.value
                       ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                      : 'bg-muted/60 text-foreground/80 hover:bg-muted'
+                  )}
                 >
                   {f.label}
                 </button>
@@ -241,80 +224,56 @@ export default function Flashcards() {
         </>
       )}
 
-      <p className="mt-3 text-xs text-muted-foreground">
-        {filteredWords.length} word{filteredWords.length === 1 ? '' : 's'}
-        {(filter !== 'all' || search) && ` (of ${savedWords.length})`}
-      </p>
-
       {savedWords.length === 0 ? (
-        <div className="mt-20 flex flex-col items-center text-center text-muted-foreground">
-          <span className="text-5xl mb-4">📚</span>
-          <p className="text-lg font-semibold">No flashcards yet</p>
-          <p className="mt-1 text-sm">Tap words while reading to save them.</p>
+        <div className="mt-24 flex flex-col items-center text-center px-6">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+            <Sparkles className="h-9 w-9 text-primary" />
+          </div>
+          <p className="mt-5 font-serif text-lg font-semibold">No flashcards yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">Tap a word while reading to save it here.</p>
+          <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5">Browse Library</Button></Link>
         </div>
       ) : (
-        <div className="mt-3 flex flex-col gap-2">
-          {filteredWords.map((word) => {
-            const mastery = word.mastery || 0;
+        <ul className="mt-2 space-y-2 px-6">
+          {filteredWords.map((w) => {
+            const mastery = w.mastery || 0;
             const level = masteryLevel(mastery);
-            const isDue = dueIds.has(word.id);
-            const masteryPct = Math.min(100, (mastery / 5) * 100);
-            const nextLabel = nextReviewLabel(word.nextReviewAt);
+            const isDue = dueIds.has(w.id);
+            const pct = Math.min(100, (mastery / 5) * 100);
             return (
-              <div
-                key={word.id}
-                className="relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 pl-5 ring-1 ring-transparent transition-all hover:border-primary/30 hover:bg-muted/30 active:scale-[0.99]"
-              >
-                {/* Vertical color indicator */}
-                <span className={`absolute left-0 top-0 bottom-0 w-[3px] ${LEVEL_BAR[level]}`} />
-
-                {/* Due badge */}
-                {isDue && (
-                  <span className="absolute right-3 top-2 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
-                    Due
-                  </span>
-                )}
-
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                    <PlayWordButton word={word.word} reading={word.reading} size={16} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <p className="font-japanese text-lg font-bold truncate">{word.word}</p>
-                        <span className="font-japanese text-xs text-muted-foreground truncate">{word.reading}</span>
-                      </div>
-                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-                        {word.meanings.join(', ')}
-                      </p>
-                      {nextLabel && (
-                        <p className="mt-1 text-[10px] font-medium text-muted-foreground/80">
-                          Next: {nextLabel}
-                        </p>
+              <li key={w.id}>
+                <div className="relative flex items-center gap-3 rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift">
+                  <span className={cn('h-10 w-1.5 flex-shrink-0 rounded-full', LEVEL_BAR[level])} aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-2">
+                      <p className="font-japanese text-[18px] font-bold leading-tight truncate">{w.word}</p>
+                      {w.reading && w.reading !== w.word && (
+                        <p className="font-japanese text-[12px] text-muted-foreground truncate">{w.reading}</p>
                       )}
+                      {isDue && <span className="ml-auto rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">Due</span>}
+                    </div>
+                    <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{w.meanings.join(', ')}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <Progress value={pct} className="h-1 flex-1" />
+                      <span className="text-[10px] font-semibold tabular-nums text-foreground/60">{Math.round(pct)}%</span>
                     </div>
                   </div>
+                  <PlayWordButton word={w.word} reading={w.reading} className="flex-shrink-0" />
                   <button
-                    onClick={() => removeWord(word.id)}
-                    className="shrink-0 rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => removeWord(w.id)}
+                    className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    aria-label="Delete"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
-
-                {/* Mastery progress bar */}
-                <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={`h-full rounded-full transition-all ${LEVEL_BAR[level]}`}
-                    style={{ width: `${masteryPct}%` }}
-                  />
-                </div>
-              </div>
+              </li>
             );
           })}
           {filteredWords.length === 0 && (
             <p className="text-center text-sm text-muted-foreground mt-8">No words match your filters.</p>
           )}
-        </div>
+        </ul>
       )}
     </div>
   );
