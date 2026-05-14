@@ -42,16 +42,21 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   if (currentIdx >= deck.length) {
     return (
-      <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-background px-6">
+      <div
+        className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-6 px-6"
+        style={{ backgroundImage: `linear-gradient(160deg, hsl(150 55% 42% / 0.18) 0%, hsl(var(--background)) 70%)` }}
+      >
         <span className="text-5xl">🎉</span>
-        <p className="text-xl font-bold">Session terminée !</p>
-        <p className="text-sm text-muted-foreground">{deck.length} cartes révisées</p>
-        <Button onClick={onExit}>Retour</Button>
+        <p className="font-serif text-2xl font-bold">Session complete</p>
+        <p className="text-sm text-muted-foreground">{deck.length} cards reviewed</p>
+        <Button onClick={onExit} className="rounded-full px-6">Done</Button>
       </div>
     );
   }
 
   const card = deck[currentIdx];
+  const total = deck.length;
+  const index = currentIdx;
   const progressPct = ((currentIdx + 1) / deck.length) * 100;
   const visibleMeanings = showAllMeanings ? card.meanings : card.meanings.slice(0, DEFAULT_MEANINGS);
   const hiddenMeaningsCount = Math.max(0, card.meanings.length - DEFAULT_MEANINGS);
@@ -61,26 +66,37 @@ export function FlashcardReview({ deck, onExit }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden bg-background">
-      {/* Header */}
-      <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
-        <Button variant="ghost" size="icon" onClick={onExit}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
-          <Trash2 className="h-5 w-5" />
-        </Button>
+    <div
+      className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden"
+      style={{ backgroundImage: `linear-gradient(160deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--background)) 60%)` }}
+    >
+      {/* Header — floating chips */}
+      <div className="flex-none flex items-center justify-between px-5 pt-5 pb-2">
+        <button
+          onClick={onExit}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 hover:bg-background"
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-[18px] w-[18px]" />
+        </button>
+        <button
+          onClick={() => setShowDeleteDialog(true)}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 text-destructive hover:bg-background"
+          aria-label="Delete card"
+        >
+          <Trash2 className="h-[18px] w-[18px]" />
+        </button>
       </div>
 
-      {/* Progress */}
+      {/* Progress strip */}
       <div className="flex-none px-6 pb-2">
         <Progress value={progressPct} className="h-1 w-full" />
-        <p className="text-xs font-medium text-muted-foreground text-center mt-[5px]">
-          {currentIdx + 1} / {deck.length}
+        <p className="mt-1.5 text-center text-[11px] font-semibold tabular-nums tracking-[0.18em] text-muted-foreground">
+          {index + 1} / {total}
         </p>
       </div>
 
-      {/* Card area — fills available space */}
+      {/* Card area */}
       <div className="flex-1 min-h-0 flex items-stretch justify-center px-4 py-3">
         <div
           className={`perspective-800 w-full max-w-md h-full ${animClass}`}
@@ -89,39 +105,44 @@ export function FlashcardReview({ deck, onExit }: Props) {
             setFlipped(!flipped);
           }}
         >
-          <div
-            className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
-              flipped ? 'rotate-y-180' : ''
-            }`}
-          >
+          <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}>
             {/* Front face */}
-            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card shadow-lg p-6">
+            <div
+              className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card shadow-xl ring-1 ring-border/40 p-6"
+              style={{ backgroundImage: `linear-gradient(140deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 70%)` }}
+            >
               <p className="font-japanese text-6xl font-bold tracking-tight">{card.word}</p>
               <p
-                className={`font-japanese text-xl mt-3 transition-all ${
+                className={`font-japanese text-lg mt-3 transition-all ${
                   showFrontReading ? 'text-muted-foreground' : 'text-transparent select-none blur-md'
                 }`}
                 aria-hidden={!showFrontReading}
               >
                 {card.reading || '???'}
               </p>
-              <div className="mt-4 flex items-center gap-2" data-no-flip onClick={(e) => e.stopPropagation()}>
+              <div className="mt-5 flex items-center gap-2" data-no-flip onClick={(e) => e.stopPropagation()}>
                 <PlayWordButton word={card.word} reading={card.reading} size={28} />
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="rounded-full"
                   onClick={() => setShowFrontReading((v) => !v)}
                   aria-label={showFrontReading ? 'Hide furigana' : 'Show furigana'}
                 >
                   {showFrontReading ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </Button>
               </div>
-              <p className="mt-8 text-xs text-muted-foreground/70 uppercase tracking-wider">Tap to flip</p>
+              <p className="absolute bottom-5 left-0 right-0 text-center text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70">
+                Tap to flip
+              </p>
             </div>
 
-            {/* Back face — Anki-style: clean header + body */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-2xl border bg-card shadow-lg overflow-hidden">
-              {/* Header — word + reading + tags */}
+            {/* Back face */}
+            <div
+              className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-2xl border bg-card shadow-xl ring-1 ring-border/40 overflow-hidden"
+              style={{ backgroundImage: `linear-gradient(140deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 70%)` }}
+            >
+              {/* Header */}
               <div className="flex-none px-5 pt-5 pb-3 border-b border-border/50">
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <p className="font-japanese text-3xl font-bold">{card.word}</p>
@@ -130,15 +151,10 @@ export function FlashcardReview({ deck, onExit }: Props) {
                     <PlayWordButton word={card.word} reading={card.reading} size={18} />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground/70 italic mt-0.5">{toRomaji(card.reading || card.word)}</p>
-                {((card.jlpt && card.jlpt.length > 0) || (card.partsOfSpeech && card.partsOfSpeech.length > 0)) && (
+                <p className="text-xs italic text-muted-foreground/70 mt-0.5">{toRomaji(card.reading || card.word)}</p>
+                {card.partsOfSpeech && card.partsOfSpeech.length > 0 && (
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {card.jlpt?.[0] && (
-                      <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-                        {card.jlpt[0].replace('jlpt-', 'JLPT ')}
-                      </span>
-                    )}
-                    {card.partsOfSpeech?.slice(0, 3).map((p, i) => (
+                    {card.partsOfSpeech.slice(0, 3).map((p, i) => (
                       <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
                         {p}
                       </span>
@@ -147,18 +163,22 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 )}
               </div>
 
-              {/* Body — scrollable only when expanded */}
+              {/* Body */}
               <div
                 data-no-flip
                 className={`flex-1 min-h-0 px-5 py-4 ${showAllMeanings ? 'overflow-y-auto' : 'overflow-hidden'}`}
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Meanings */}
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Meanings</p>
-                  <ol className="list-decimal list-inside space-y-1.5">
+                  <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    <span className="section-bullet" />Meanings
+                  </p>
+                  <ol className="mt-2 space-y-1.5">
                     {visibleMeanings.map((m, i) => (
-                      <li key={i} className="text-base font-medium text-foreground leading-snug">{m}</li>
+                      <li key={i} className="flex gap-2 font-serif text-[15px] leading-snug text-foreground">
+                        <span className="font-serif text-muted-foreground/70 tabular-nums">{i + 1}.</span>
+                        <span>{m}</span>
+                      </li>
                     ))}
                   </ol>
                   {hiddenMeaningsCount > 0 && !showAllMeanings && (
@@ -173,12 +193,16 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   )}
                 </div>
 
-                {/* Context sentence */}
+                {/* Context sentence — tinted quote card */}
                 {card.contextSentence && (
-                  <div className="mt-4 rounded-lg border border-primary/10 bg-primary/5 p-3">
+                  <div
+                    className="mt-4 relative rounded-xl border border-primary/10 p-4"
+                    style={{ backgroundImage: `linear-gradient(140deg, hsl(var(--primary) / 0.10) 0%, hsl(var(--card)) 70%)` }}
+                  >
+                    <span className="absolute -top-2 left-3 font-serif text-3xl leading-none text-primary/60">"</span>
                     <div className="mb-1.5 flex items-center gap-1.5">
                       <BookOpen className="h-3 w-3 text-primary shrink-0" />
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">From your reading</span>
                     </div>
                     <p className="font-japanese text-sm leading-relaxed text-foreground">
                       {(() => {
@@ -187,7 +211,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                         return (
                           <>
                             {card.contextSentence!.slice(0, idx)}
-                            <span className="text-accent font-bold">{card.word}</span>
+                            <span className="font-bold text-accent">{card.word}</span>
                             {card.contextSentence!.slice(idx + card.word.length)}
                           </>
                         );
@@ -196,10 +220,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   </div>
                 )}
 
-                {/* Example sentence */}
                 <div className="mt-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Example</p>
-                  <ExampleSentence word={card.word} />
+                  <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    <span className="section-bullet" />Example
+                  </p>
+                  <div className="mt-2">
+                    <ExampleSentence word={card.word} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -207,12 +234,12 @@ export function FlashcardReview({ deck, onExit }: Props) {
         </div>
       </div>
 
-      {/* Action buttons */}
+      {/* Actions */}
       <div className="flex-none flex justify-center gap-2 px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
         {flipped ? (
           <SrsButtons card={card} onAnswer={handleAnswer} />
         ) : (
-          <Button variant="outline" size="sm" onClick={() => advance()}>
+          <Button variant="outline" size="sm" onClick={() => advance()} className="rounded-full px-5">
             Skip →
           </Button>
         )}
