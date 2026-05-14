@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
 import { bookGrammar, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
 interface GrammarPanelProps {
   text: string;
@@ -14,6 +15,7 @@ interface GrammarPanelProps {
 }
 
 export function GrammarPanel({ text, bookId, difficulty, open, onClose }: GrammarPanelProps) {
+  useBodyScrollLock(open);
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
