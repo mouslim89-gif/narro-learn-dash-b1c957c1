@@ -79,26 +79,24 @@ export default function MyBooks() {
 
       {/* Stats */}
       {bookProgressList.length > 0 && (
-        <>
-          <div className="mt-4 grid grid-cols-4 gap-2">
-            <div className="rounded-lg border bg-card p-2.5 text-center">
-              <p className="text-lg font-bold text-primary">{stats.streak}</p>
-              <p className="text-[9px] text-muted-foreground">Day streak</p>
-            </div>
-            <div className="rounded-lg border bg-card p-2.5 text-center">
-              <p className="text-lg font-bold text-accent">{stats.wordsRead}</p>
-              <p className="text-[9px] text-muted-foreground">Words read</p>
-            </div>
-            <div className="rounded-lg border bg-card p-2.5 text-center">
-              <p className="text-lg font-bold text-primary">{stats.wordsSaved}</p>
-              <p className="text-[9px] text-muted-foreground">Saved</p>
-            </div>
-            <div className="rounded-lg border bg-card p-2.5 text-center">
-              <p className="text-lg font-bold text-foreground">{stats.booksCompleted}</p>
-              <p className="text-[9px] text-muted-foreground">Done</p>
-            </div>
+        <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="rounded-lg p-2.5 text-center" style={{ background: 'hsl(12 78% 58% / 0.14)' }}>
+            <p className="text-lg font-bold" style={{ color: 'hsl(12 78% 48%)' }}>{stats.streak}</p>
+            <p className="text-[9px] text-muted-foreground">Day streak</p>
           </div>
-        </>
+          <div className="rounded-lg p-2.5 text-center" style={{ background: 'hsl(168 60% 42% / 0.14)' }}>
+            <p className="text-lg font-bold" style={{ color: 'hsl(168 60% 34%)' }}>{stats.wordsRead}</p>
+            <p className="text-[9px] text-muted-foreground">Words read</p>
+          </div>
+          <div className="rounded-lg p-2.5 text-center" style={{ background: 'hsl(258 70% 62% / 0.14)' }}>
+            <p className="text-lg font-bold" style={{ color: 'hsl(258 70% 55%)' }}>{stats.wordsSaved}</p>
+            <p className="text-[9px] text-muted-foreground">Saved</p>
+          </div>
+          <div className="rounded-lg p-2.5 text-center" style={{ background: 'hsl(36 85% 55% / 0.16)' }}>
+            <p className="text-lg font-bold" style={{ color: 'hsl(36 85% 42%)' }}>{stats.booksCompleted}</p>
+            <p className="text-[9px] text-muted-foreground">Done</p>
+          </div>
+        </div>
       )}
 
       {bookProgressList.length === 0 ? (
@@ -111,7 +109,7 @@ export default function MyBooks() {
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {bookProgressList.map(({ book, progress: p }) => (
             <div key={book.id} className="flex flex-col gap-1">
-              <BookCard book={book} progress={p.progressPercent} />
+              <BookCard book={book} progress={p.progressPercent} variant="grid" />
               <div className="px-0.5">
                 <p className="text-[10px] text-muted-foreground">
                   {difficultyConfig[p.difficulty].label} · {formatDistanceToNow(new Date(p.lastReadAt), { addSuffix: true })}
