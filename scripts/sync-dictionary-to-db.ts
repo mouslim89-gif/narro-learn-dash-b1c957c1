@@ -26,11 +26,16 @@ if (!SERVICE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
-// 1. Load tokens
-const tokensSource = fs.readFileSync(path.join(base, 'src/data/book-tokens.ts'), 'utf-8');
-const tStart = tokensSource.indexOf('= {') + 2;
-const tEnd = tokensSource.lastIndexOf('};') + 1;
-const allTokens = JSON.parse(tokensSource.slice(tStart, tEnd));
+// 1. Load tokens from the per-book directory
+const booksDir = path.join(base, 'src/data/book-tokens/books');
+const allTokens: Record<string, Record<string, { t: string; j: boolean; b?: string }[]>> = {};
+for (const file of fs.readdirSync(booksDir)) {
+  if (!file.endsWith('.ts')) continue;
+  const src = fs.readFileSync(path.join(booksDir, file), 'utf-8');
+  const s = src.indexOf('= {') + 2;
+  const e = src.lastIndexOf('};') + 1;
+  Object.assign(allTokens, JSON.parse(src.slice(s, e)));
+}
 
 // 2. Collect all unique words
 const allWords = new Set<string>();
