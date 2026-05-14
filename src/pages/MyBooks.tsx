@@ -5,7 +5,7 @@ import { useReadingProgressStore } from '@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { difficultyConfig } from '@/data/books';
 import { formatDistanceToNow, startOfDay, format } from 'date-fns';
-import { bookTokens } from '@/data/book-tokens';
+import { tokenWordCounts } from '@/data/book-tokens';
 import { Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,11 +38,8 @@ export default function MyBooks() {
       const book = books.find(b => b.id === bookId);
       if (!book) continue;
       totalMinutes += Math.round(book.readingTimeMin * (p.progressPercent / 100));
-      const tokens = (bookTokens as any)[key]?.[p.difficulty] ?? (bookTokens as any)[bookId]?.[p.difficulty];
-      if (tokens) {
-        const japaneseTokens = (tokens as any[]).filter((t: any) => t.j).length;
-        wordsRead += Math.round(japaneseTokens * (p.progressPercent / 100));
-      }
+      const tokenCount = tokenWordCounts[key]?.[p.difficulty] ?? tokenWordCounts[bookId]?.[p.difficulty] ?? 0;
+      wordsRead += Math.round(tokenCount * (p.progressPercent / 100));
     }
 
     // Calculate streak & read dates

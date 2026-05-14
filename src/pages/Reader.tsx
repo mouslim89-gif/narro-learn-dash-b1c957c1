@@ -240,7 +240,7 @@ export default function Reader() {
       out.push({ t: ch, j: isJp });
     }
     return out;
-  }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules]);
+  }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules, tokensForBook, tokensLoading]);
 
   const bookText = useMemo(() => {
     if (!book) return '';
