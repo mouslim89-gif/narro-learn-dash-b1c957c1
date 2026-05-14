@@ -95,15 +95,6 @@ export const genreLabels: Record<Genre, string> = {
   'horror': 'Horror',
 };
 
-/** Per-genre accent color (HSL string for inline styles). Used for section headers in Library. */
-export const genreAccents: Record<Genre, string> = {
-  'folk-tales': '168 60% 42%',   // teal
-  'fiction': '12 78% 58%',       // coral
-  'sci-fi': '258 70% 62%',       // purple
-  'slice-of-life': '36 85% 55%', // amber
-  'horror': '0 65% 52%',         // rose-red
-};
-
 export const difficultyConfig: Record<Difficulty, { label: string; description: string; color: string }> = {
   simplified: { label: 'Simplified', description: 'Common kanji, simple grammar', color: 'hsl(168, 50%, 35%)' },
   intermediate: { label: 'Intermediate', description: 'More kanji, moderate complexity', color: 'hsl(36, 60%, 45%)' },
