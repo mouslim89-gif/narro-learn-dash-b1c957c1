@@ -14,7 +14,7 @@
 import { get, set, getMany, setMany, createStore } from 'idb-keyval';
 import { supabase } from '@/integrations/supabase/client';
 import { seedCache, type CacheEntry } from '@/lib/jisho';
-import { bookTokens } from '@/data/book-tokens';
+import { loadBookTokens } from '@/data/book-tokens';
 
 const wordStore = createStore('yomimasu-dict', 'words');
 const metaStore = createStore('yomimasu-dict-meta', 'meta');
@@ -38,9 +38,11 @@ async function ensureCacheVersion(): Promise<void> {
 }
 
 /** Collect every unique surface + base form a book actually uses across difficulties. */
-function collectBookWords(bookId: string): string[] {
+async function collectBookWords(bookId: string): Promise<string[]> {
   const set = new Set<string>();
-  const byDiff = bookTokens[bookId];
+  const rootId = bookId.includes('__') ? bookId.split('__')[0] : bookId;
+  const map = await loadBookTokens(rootId);
+  const byDiff = map[bookId];
   if (!byDiff) return [];
   for (const diff of Object.keys(byDiff)) {
     for (const tok of byDiff[diff]) {
@@ -126,7 +128,7 @@ export async function hydrateDictionaryForBook(
   if (shardOk) return;
 
   // 2. No shard available → legacy IndexedDB + PostgREST path.
-  const allWords = collectBookWords(key) ;
+  const allWords = await collectBookWords(key);
   if (allWords.length === 0) return;
 
   // 1. Read whatever is already cached in IndexedDB.

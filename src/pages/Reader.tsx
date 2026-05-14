@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
-import { bookTokens, type BookToken } from '@/data/book-tokens';
+import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
@@ -193,10 +193,26 @@ export default function Reader() {
     return () => { window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp); };
   }, [tokenEditMode]);
 
+  // Lazy-load per-book tokens: ship one chunk per book instead of one giant bundle.
+  const [tokensForBook, setTokensForBook] = useState<BookTokenMap>({});
+  const [tokensLoading, setTokensLoading] = useState(true);
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    setTokensLoading(true);
+    loadBookTokens(id).then((map) => {
+      if (cancelled) return;
+      setTokensForBook(map);
+      setTokensLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [id]);
+
   const tokens = useMemo(() => {
     if (!id) return [];
+    if (tokensLoading) return [];
     const tokenKey = chapterKey(id, chapterId);
-    const raw = bookTokens[tokenKey]?.[difficulty] || bookTokens[id]?.[difficulty];
+    const raw = tokensForBook[tokenKey]?.[difficulty] || tokensForBook[id]?.[difficulty];
     // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
     const allRules = [
       ...((sharedRules[id] ?? []).map((r) => r.rule)),
@@ -224,7 +240,7 @@ export default function Reader() {
       out.push({ t: ch, j: isJp });
     }
     return out;
-  }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules]);
+  }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules, tokensForBook, tokensLoading]);
 
   const bookText = useMemo(() => {
     if (!book) return '';
