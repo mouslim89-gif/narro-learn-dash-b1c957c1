@@ -8,51 +8,30 @@ interface Props {
   onAnswer: (quality: SrsQualityLabel) => void;
 }
 
-const ORDER: { key: SrsQualityLabel; quality: Quality; label: string; Icon: typeof Check; cls: string }[] = [
-  {
-    key: 'again',
-    quality: 0,
-    label: 'Again',
-    Icon: X,
-    cls: 'border-destructive/40 text-destructive bg-destructive/5 hover:bg-destructive/10 active:bg-destructive/15',
-  },
-  {
-    key: 'hard',
-    quality: 3,
-    label: 'Hard',
-    Icon: AlertTriangle,
-    cls: 'border-amber-400/50 text-amber-600 bg-amber-500/5 hover:bg-amber-500/10 active:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/40',
-  },
-  {
-    key: 'good',
-    quality: 4,
-    label: 'Good',
-    Icon: Check,
-    cls: 'border-emerald-400/50 text-emerald-600 bg-emerald-500/5 hover:bg-emerald-500/10 active:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/40',
-  },
-  {
-    key: 'easy',
-    quality: 5,
-    label: 'Easy',
-    Icon: Sparkles,
-    cls: 'border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 active:bg-primary/15',
-  },
+const ORDER: { key: SrsQualityLabel; quality: Quality; label: string; Icon: typeof Check; tint: string; fg: string }[] = [
+  { key: 'again', quality: 0, label: 'Again', Icon: X,             tint: '0 70% 55%',   fg: 'text-rose-600 dark:text-rose-300' },
+  { key: 'hard',  quality: 3, label: 'Hard',  Icon: AlertTriangle, tint: '36 85% 55%',  fg: 'text-amber-600 dark:text-amber-300' },
+  { key: 'good',  quality: 4, label: 'Good',  Icon: Check,         tint: '150 55% 42%', fg: 'text-emerald-600 dark:text-emerald-300' },
+  { key: 'easy',  quality: 5, label: 'Easy',  Icon: Sparkles,      tint: '210 80% 55%', fg: 'text-primary' },
 ];
 
 export function SrsButtons({ card, onAnswer }: Props) {
   return (
-    <div className="grid w-full max-w-sm grid-cols-4 gap-1.5">
-      {ORDER.map(({ key, quality, label, Icon, cls }) => {
+    <div className="grid w-full max-w-md grid-cols-4 gap-2">
+      {ORDER.map(({ key, quality, label, Icon, tint, fg }) => {
         const days = previewIntervalDays(card, quality);
         return (
           <button
             key={key}
             onClick={() => onAnswer(key)}
-            className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-[11px] font-semibold transition-all active:scale-[0.97] ${cls}`}
+            className={`flex h-14 flex-col items-center justify-center gap-0.5 rounded-full border ring-1 ring-border/40 transition-all tap-scale ${fg}`}
+            style={{ backgroundImage: `linear-gradient(140deg, hsl(${tint} / 0.18) 0%, hsl(var(--card)) 70%)` }}
           >
-            <Icon className="h-3.5 w-3.5" />
-            <span className="leading-none">{label}</span>
-            <span className="text-[9px] font-medium opacity-70 leading-none">
+            <div className="flex items-center gap-1.5">
+              <Icon className="h-3.5 w-3.5" />
+              <span className="font-serif text-[13px] font-semibold leading-none">{label}</span>
+            </div>
+            <span className="text-[10px] font-medium tabular-nums text-muted-foreground leading-none">
               {formatInterval(days)}
             </span>
           </button>
