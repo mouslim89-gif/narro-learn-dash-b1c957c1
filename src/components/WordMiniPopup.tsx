@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Star, ChevronRight, Loader2, Languages } from 'lucide-react';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from '@/lib/jisho';
+import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
 interface WordMiniPopupProps {
   word: string;
