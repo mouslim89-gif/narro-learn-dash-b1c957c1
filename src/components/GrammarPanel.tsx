@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
 import { bookGrammar, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
 interface GrammarPanelProps {
   text: string;
