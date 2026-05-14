@@ -6,26 +6,27 @@
 
 @layer base {
   :root {
-    --background: 36 33% 97%;
-    --foreground: 210 22% 15%;
+    /* Washi & Sumi — cream paper, ink black, vermillion accent */
+    --background: 38 47% 93%;
+    --foreground: 0 0% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 210 22% 15%;
+    --card: 38 50% 96%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 22% 15%;
+    --popover: 38 50% 96%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 210 29% 24%;
-    --primary-foreground: 36 33% 97%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 38 47% 95%;
 
-    --secondary: 36 20% 88%;
-    --secondary-foreground: 210 22% 15%;
+    --secondary: 38 39% 86%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 36 15% 93%;
-    --muted-foreground: 210 10% 50%;
+    --muted: 38 30% 90%;
+    --muted-foreground: 0 0% 38%;
 
-    --accent: 36 76% 40%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 9 57% 51%;
+    --accent-foreground: 38 47% 95%;
 
     --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
