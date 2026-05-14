@@ -1,51 +1,35 @@
-## Problème
+# Library & My Books — UI refresh
 
-Cliquer / scrubber la barre de progression audio **ne ramène pas le texte** à la phrase correspondante, alors que la logique existe déjà (`handleAudioScrub` dans `src/pages/Reader.tsx:475` appelle `setAutoFollow(true)` + `queueSentenceScroll(idx)`).
+## Objectifs
+- Library: supprimer **Featured** et le **badge JLPT**. Garder uniquement Continue Reading + carrousels horizontaux par genre.
+- My Books: passer en **grille 2 colonnes** propre (3-4 colonnes en md+), garder les stats en haut.
+- BookCard: enlever toute la meta (JLPT, durée, audio) — uniquement **titre EN + auteur** sous la couverture.
+- Vibe: garder le style actuel mais **plus coloré** (couvertures plus vives, accents teal/coral/purple par genre, headers de section colorés).
 
-### Cause racine
+## Library (`src/pages/Library.tsx`)
+- Supprimer le bloc Featured (lignes 118–152) et l'import `jlptColors` / `Headphones` / `Clock` / `hasAnyAudio` devenus inutiles.
+- Retirer `const featured = books[0]`.
+- Simplifier le placeholder du search: « Search by title or author… ».
+- Colorer les titres de section par genre: chaque genre reçoit une couleur d'accent (teal/coral/purple/amber/rose/indigo), la `section-bullet` prend cette teinte et le label passe d'`uppercase muted` à un titre plus vivant (Nunito bold, taille ~13px, couleur d'accent).
+- Continue Reading: garder, mais accent plus marqué (gradient subtil teal→coral en background du card, bouton Resume en `variant="default"` coloré).
 
-Dans `src/pages/Reader.tsx:416-424`, des listeners globaux `wheel` / `touchmove` appellent `disengageAutoScroll()` dès qu'un input de scroll utilisateur est détecté :
+## My Books (`src/pages/MyBooks.tsx`)
+- Passer la grille à `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4`.
+- BookCard sans largeur fixe (voir plus bas) → s'étire sur la colonne.
+- Stats: ajouter une touche de couleur (chaque tuile prend son accent: streak=coral, words=teal, saved=purple, done=amber) au lieu du `border bg-card` uniforme. Garder les valeurs/labels actuels.
+- Sous chaque carte, garder la ligne `Difficulty · time ago` (utile ici pour la progression).
 
-```ts
-const onTouchMove = () => disengageAutoScroll();
-window.addEventListener('touchmove', onTouchMove, { passive: true });
-```
+## BookCard (`src/components/BookCard.tsx`)
+- Largeur: remplacer `w-36 md:w-44 flex-shrink-0` par un mode responsive: si utilisée dans un carrousel (Library), garder `w-36`; si dans grille (My Books), `w-full`. Solution: prop optionnelle `variant?: 'carousel' | 'grid'` (défaut `carousel`), ou simplement passer `className` override depuis le parent.
+- Supprimer le bloc `jlptColors` badge + durée + l'import `Clock`.
+- Garder l'icône audio (casque) en overlay sur la couverture — discrète, pas une meta texte. (Si tu préfères vraiment 0 meta, dis-le et on l'enlève aussi.)
+- Sous la couverture: titre EN (medium 12px) + auteur (10px muted). Rien d'autre.
+- Couvertures: pousser la saturation — ajouter un léger gradient diagonal coloré au-dessus de `coverColor` pour plus de vibrance.
 
-Quand on touche / glisse sur le `Slider` Radix de l'`AudioPlayer`, l'événement `touchmove` se propage jusqu'à `window` → `disengageAutoScroll()` annule l'animation déclenchée par `handleAudioScrub` juste avant. Résultat : le texte ne suit pas.
+## Détails techniques
+- Pas de changement de data model, pas de migration.
+- Pas de nouveau composant — tout en édition des 3 fichiers existants.
+- Couleurs des genres: mapper `Genre → token CSS` dans `src/data/books.ts` (ajouter `genreAccents: Record<Genre, string>` en HSL via tokens existants `--primary`, `--accent`, `--secondary` + 3 nouveaux tokens `--genre-amber`, `--genre-rose`, `--genre-indigo` dans `index.css` & `tailwind.config.ts`).
 
-Sur desktop, le simple click sur la track fonctionne (pas de touchmove), mais sur mobile le drag tue l'auto-scroll, et même un tap rapide peut déclencher un touchmove parasite.
-
-## Plan
-
-**Objectif** : ignorer les événements `wheel` / `touchmove` qui originent de l'`AudioPlayer`, pour que le scrub puisse re-engager auto-follow sans être immédiatement annulé.
-
-### Étapes
-
-1. **`src/components/AudioPlayer.tsx`** — ajouter `data-audio-player` sur le conteneur fixed (ligne ~113) :
-   ```tsx
-   <div data-audio-player ... className="fixed left-0 right-0 ...">
-   ```
-
-2. **`src/pages/Reader.tsx`** (lignes 416-424) — filtrer les handlers globaux :
-   ```ts
-   const isFromAudioPlayer = (e: Event) =>
-     (e.target as HTMLElement | null)?.closest?.('[data-audio-player]') != null;
-   const onWheel = (e: Event) => { if (!isFromAudioPlayer(e)) disengageAutoScroll(); };
-   const onTouchMove = (e: Event) => { if (!isFromAudioPlayer(e)) disengageAutoScroll(); };
-   ```
-
-3. **Vérification** : sur mobile, tap/drag sur la barre audio → texte glisse en douceur jusqu'à la phrase correspondante (via l'animation `animateScrollToTarget` déjà en place). Le scroll manuel sur le texte continue de désactiver l'auto-follow comme avant.
-
-### Détails techniques
-
-- `handleAudioScrub` reste tel quel : il sait déjà ré-engager auto-follow et appeler `queueSentenceScroll`.
-- Le `Slider` Radix appelle bien `onValueChange` aussi bien sur click que sur drag → `onScrub` se déclenche dans les deux cas.
-- Aucune autre logique modifiée (highlight de phrase, pill "Follow audio", etc.).
-
-### Variantes envisagées
-
-- **A. Filtrage par `data-audio-player`** (recommandé, ci-dessus) — minimal, ciblé, n'impacte pas le reste.
-- **B. `e.stopPropagation()` sur le wrapper de l'AudioPlayer** — plus brutal, peut casser des handlers Radix internes (drag).
-- **C. Flag `scrubbingRef` armé sur `pointerdown` du slider, désarmé sur `pointerup`** — plus de code, équivalent fonctionnellement.
-
-Je pars sur **A** sauf objection.
+## Question résiduelle
+Sur la BookCard je garde l'**icône casque** discrète sur la couverture pour les livres avec audio (utile pour scanner visuellement) — OK ou je retire vraiment tout ?
