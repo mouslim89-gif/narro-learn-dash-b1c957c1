@@ -22,7 +22,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
-import { bookTokens, type BookToken } from '../src/data/book-tokens';
+import type { BookToken } from '../src/data/book-tokens';
 import { applyTokenOverrides, applyRules, type Rule } from '../src/data/token-overrides';
 import {
   splitNoParticleNouns,
@@ -222,6 +222,17 @@ const manifest: Record<
   string,
   { file: string; size: number; hash: string; words: number; covered: number; filled: number }
 > = {};
+
+// Load all per-book token files at build time.
+const booksDir = path.join(base, 'src/data/book-tokens/books');
+const bookTokens: Record<string, Record<string, BookToken[]>> = {};
+for (const file of fs.readdirSync(booksDir)) {
+  if (!file.endsWith('.ts')) continue;
+  const src = fs.readFileSync(path.join(booksDir, file), 'utf-8');
+  const s = src.indexOf('= {') + 2;
+  const e = src.lastIndexOf('};') + 1;
+  Object.assign(bookTokens, JSON.parse(src.slice(s, e)));
+}
 
 const keys = Object.keys(bookTokens);
 console.log(`Generating shards for ${keys.length} book/chapter keys…\n`);
