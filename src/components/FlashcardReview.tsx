@@ -150,7 +150,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
               {/* Body — scrollable only when expanded */}
               <div
                 data-no-flip
-                className={`flex-1 min-h-0 px-5 py-4 ${showAllMeanings ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                className="flex-1 min-h-0 px-5 py-4 overflow-y-auto overscroll-contain"
+                style={{ touchAction: 'pan-y' }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Meanings */}
