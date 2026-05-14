@@ -108,7 +108,7 @@ export default function Library() {
                     backgroundImage: `linear-gradient(135deg, ${continueBook.book.coverColor}22 0%, hsl(var(--card)) 60%)`,
                   }}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-start gap-4">
                     <div
                       className="book-paper relative flex h-28 w-20 flex-shrink-0 items-end overflow-hidden rounded-md p-2.5 shadow-lg ring-1 ring-black/5 rotate-[-3deg]"
                       style={{ backgroundColor: continueBook.book.coverColor }}
@@ -122,15 +122,15 @@ export default function Library() {
                     <div className="flex-1 min-w-0">
                       <h2 className="font-serif text-lg font-bold leading-snug truncate">{continueBook.book.titleEn}</h2>
                       <p className="text-[12px] text-muted-foreground truncate">{continueBook.book.author}</p>
-                      <div className="mt-3 flex items-center gap-3">
+                      <div className="mt-3 flex items-center gap-2">
                         <Progress value={continueBook.progress.progressPercent} className="h-1.5 flex-1" />
                         <span className="text-[11px] font-semibold tabular-nums text-foreground/70">
-                          {continueBook.progress.progressPercent}%
+                          {Math.round(continueBook.progress.progressPercent)}%
                         </span>
                       </div>
                     </div>
                   </div>
-                  <Button size="sm" className="absolute right-4 bottom-4 rounded-full px-4 shadow-md">
+                  <Button size="sm" className="mt-4 w-full rounded-full shadow-md">
                     Resume <ArrowRight className="ml-1 h-3.5 w-3.5" />
                   </Button>
                 </div>
