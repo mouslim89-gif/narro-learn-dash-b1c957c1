@@ -128,11 +128,11 @@ export default function Library() {
                           {Math.round(continueBook.progress.progressPercent)}%
                         </span>
                       </div>
+                      <Button size="sm" className="mt-3 w-full rounded-full shadow-md">
+                        Resume <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </div>
-                  <Button size="sm" className="mt-4 w-full rounded-full shadow-md">
-                    Resume <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
                 </div>
               </Link>
             </section>
