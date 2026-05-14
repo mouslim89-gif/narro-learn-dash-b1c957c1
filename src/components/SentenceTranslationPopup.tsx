@@ -36,7 +36,8 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
     return () => { cancelled = true; };
   }, [japanese]);
 
-  useEffect(() => {
+  useBodyScrollLock();
+  useLayoutEffect(() => {
     if (!ref.current) return;
     const popup = ref.current;
     const rect = popup.getBoundingClientRect();
@@ -44,6 +45,7 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
     const vh = window.innerHeight;
     const PADDING = 8;
     const GAP = 6;
+    const BOTTOM_RESERVE = 88;
 
     const center = (sentenceRect.left + sentenceRect.right) / 2;
     let left = center - rect.width / 2;
@@ -55,8 +57,19 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
       placement = 'below';
       top = sentenceRect.bottom + GAP;
     }
-    if (top + rect.height > vh - PADDING) {
-      top = vh - rect.height - PADDING;
+    const bottomLimit = vh - BOTTOM_RESERVE;
+    if (top + rect.height > bottomLimit) {
+      if (placement === 'below') {
+        const above = sentenceRect.top - rect.height - GAP;
+        if (above >= PADDING + 56) {
+          placement = 'above';
+          top = above;
+        } else {
+          top = Math.max(PADDING + 56, bottomLimit - rect.height);
+        }
+      } else {
+        top = Math.max(PADDING + 56, bottomLimit - rect.height);
+      }
     }
     setPosition({ top, left, placement });
   }, [sentenceRect, loading, english, error]);
