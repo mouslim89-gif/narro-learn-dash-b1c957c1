@@ -21,6 +21,8 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [fetched, setFetched] = useState(false);
 
+  useBodyScrollLock(open);
+
   useEffect(() => {
     if (!open || fetched || !text) return;
 
