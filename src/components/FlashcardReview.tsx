@@ -3,11 +3,10 @@ import { SavedWord, useFlashcardStore } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { SrsButtons, type SrsQualityLabel } from '@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { Trash2, ArrowLeft, BookOpen, ChevronDown, Eye, EyeOff } from 'lucide-react';
+import { Trash2, X, BookOpen, ChevronDown, Eye, EyeOff } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
@@ -42,11 +41,11 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   if (currentIdx >= deck.length) {
     return (
-      <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-background px-6">
-        <span className="text-5xl">🎉</span>
-        <p className="text-xl font-bold">Session terminée !</p>
-        <p className="text-sm text-muted-foreground">{deck.length} cartes révisées</p>
-        <Button onClick={onExit}>Retour</Button>
+      <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-6">
+        <span className="text-6xl">🎉</span>
+        <p className="font-serif text-3xl tracking-tight">Session complete</p>
+        <p className="text-sm text-muted-foreground">{deck.length} cards reviewed</p>
+        <Button onClick={onExit} className="mt-2 rounded-full px-8">Done</Button>
       </div>
     );
   }
@@ -62,26 +61,39 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   return (
     <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden bg-background">
-      {/* Header */}
-      <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
-        <Button variant="ghost" size="icon" onClick={onExit}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setShowDeleteDialog(true)}>
-          <Trash2 className="h-5 w-5" />
-        </Button>
+      {/* Header — minimal: close, counter, delete */}
+      <div className="flex-none flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-2">
+        <button
+          onClick={onExit}
+          aria-label="Exit review"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:scale-95"
+        >
+          <X className="h-[18px] w-[18px]" />
+        </button>
+
+        <div className="flex-1 flex items-center gap-3">
+          <div className="flex-1 h-[3px] rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full bg-foreground/80 transition-[width] duration-500 ease-out"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <span className="font-mono text-[11px] tabular-nums text-muted-foreground tracking-tight">
+            {currentIdx + 1}<span className="opacity-40"> / {deck.length}</span>
+          </span>
+        </div>
+
+        <button
+          onClick={() => setShowDeleteDialog(true)}
+          aria-label="Delete card"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+        >
+          <Trash2 className="h-[16px] w-[16px]" />
+        </button>
       </div>
 
-      {/* Progress */}
-      <div className="flex-none px-6 pb-2">
-        <Progress value={progressPct} className="h-1 w-full" />
-        <p className="text-xs font-medium text-muted-foreground text-center mt-[5px]">
-          {currentIdx + 1} / {deck.length}
-        </p>
-      </div>
-
-      {/* Card area — fills available space */}
-      <div className="flex-1 min-h-0 flex items-stretch justify-center px-4 py-3">
+      {/* Card area */}
+      <div className="flex-1 min-h-0 flex items-stretch justify-center px-4 py-4">
         <div
           className={`perspective-800 w-full max-w-md h-full ${animClass}`}
           onClick={(e) => {
@@ -94,127 +106,151 @@ export function FlashcardReview({ deck, onExit }: Props) {
               flipped ? 'rotate-y-180' : ''
             }`}
           >
-            {/* Front face */}
-            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-2xl border bg-card shadow-lg p-6">
-              <p className="font-japanese text-6xl font-bold tracking-tight">{card.word}</p>
-              <p
-                className={`font-japanese text-xl mt-3 transition-all ${
-                  showFrontReading ? 'text-muted-foreground' : 'text-transparent select-none blur-md'
-                }`}
-                aria-hidden={!showFrontReading}
-              >
-                {card.reading || '???'}
-              </p>
-              <div className="mt-4 flex items-center gap-2" data-no-flip onClick={(e) => e.stopPropagation()}>
-                <PlayWordButton word={card.word} reading={card.reading} size={28} />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowFrontReading((v) => !v)}
-                  aria-label={showFrontReading ? 'Hide furigana' : 'Show furigana'}
+            {/* Front face — ultra clean, focus on the word */}
+            <div className="backface-hidden absolute inset-0 flex flex-col rounded-3xl bg-card">
+              <div className="flex-1 flex flex-col items-center justify-center px-6">
+                <p className="font-japanese text-[64px] leading-none font-semibold tracking-tight text-foreground select-none">
+                  {card.word}
+                </p>
+                <div className="mt-6 h-px w-10 bg-border" />
+                <p
+                  className={`font-japanese text-lg mt-6 transition-all duration-300 ${
+                    showFrontReading ? 'text-muted-foreground opacity-100' : 'text-muted-foreground opacity-0 blur-md select-none'
+                  }`}
+                  aria-hidden={!showFrontReading}
                 >
-                  {showFrontReading ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </Button>
+                  {card.reading || '—'}
+                </p>
               </div>
-              <p className="mt-8 text-xs text-muted-foreground/70 uppercase tracking-wider">Tap to flip</p>
+
+              <div
+                className="flex-none flex items-center justify-center gap-1 pb-6"
+                data-no-flip
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setShowFrontReading((v) => !v)}
+                  aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+                >
+                  {showFrontReading ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                </button>
+                <PlayWordButton word={card.word} reading={card.reading} size={26} />
+              </div>
+
+              <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] uppercase tracking-[0.2em] text-muted-foreground/40 pointer-events-none">
+                Tap to reveal
+              </p>
             </div>
 
-            {/* Back face — Anki-style: clean header + body */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-2xl border bg-card shadow-lg overflow-hidden">
-              {/* Header — word + reading + tags */}
-              <div className="flex-none px-5 pt-5 pb-3 border-b border-border/50">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <p className="font-japanese text-3xl font-bold">{card.word}</p>
-                  <span className="font-japanese text-base text-muted-foreground">{card.reading}</span>
-                  <div data-no-flip className="ml-auto shrink-0">
-                    <PlayWordButton word={card.word} reading={card.reading} size={18} />
+            {/* Back face — refined typographic answer */}
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-3xl bg-card overflow-hidden">
+              {/* Header — word + reading */}
+              <div className="flex-none px-6 pt-6 pb-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-japanese text-[34px] leading-none font-semibold tracking-tight">{card.word}</p>
+                    <p className="font-japanese text-[15px] text-muted-foreground mt-2">{card.reading}</p>
+                    <p className="text-[11px] text-muted-foreground/60 italic mt-1 tracking-wide">
+                      {toRomaji(card.reading || card.word)}
+                    </p>
+                  </div>
+                  <div data-no-flip className="shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
+                    <PlayWordButton word={card.word} reading={card.reading} size={22} />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground/70 italic mt-0.5">{toRomaji(card.reading || card.word)}</p>
-                {((card.jlpt && card.jlpt.length > 0) || (card.partsOfSpeech && card.partsOfSpeech.length > 0)) && (
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {card.jlpt?.[0] && (
-                      <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-                        {card.jlpt[0].replace('jlpt-', 'JLPT ')}
-                      </span>
-                    )}
-                    {card.partsOfSpeech?.slice(0, 3).map((p, i) => (
-                      <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                        {p}
-                      </span>
-                    ))}
-                  </div>
+
+                {card.partsOfSpeech?.[0] && (
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
+                    {card.partsOfSpeech.slice(0, 2).join(' · ')}
+                  </p>
                 )}
               </div>
 
-              {/* Body — scrollable only when expanded */}
+              <div className="mx-6 h-px bg-border/60" />
+
+              {/* Body — scrollable */}
               <div
                 data-no-flip
-                className="flex-1 min-h-0 px-5 py-4 overflow-y-auto overscroll-contain"
+                className="flex-1 min-h-0 px-6 py-5 overflow-y-auto overscroll-contain"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Meanings */}
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Meanings</p>
-                  <ol className="list-decimal list-inside space-y-1.5">
+                <section>
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70 mb-3">
+                    Meaning
+                  </p>
+                  <ol className="space-y-2">
                     {visibleMeanings.map((m, i) => (
-                      <li key={i} className="text-base font-medium text-foreground leading-snug">{m}</li>
+                      <li key={i} className="flex gap-3 text-[15px] leading-snug text-foreground">
+                        <span className="font-mono text-xs text-muted-foreground/50 pt-1 tabular-nums w-3 shrink-0">
+                          {i + 1}
+                        </span>
+                        <span>{m}</span>
+                      </li>
                     ))}
                   </ol>
                   {hiddenMeaningsCount > 0 && !showAllMeanings && (
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setShowAllMeanings(true); }}
-                      className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                      className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronDown className="h-3 w-3" />
-                      Show {hiddenMeaningsCount} more
+                      {hiddenMeaningsCount} more
                     </button>
                   )}
-                </div>
+                </section>
 
                 {/* Context sentence */}
                 {card.contextSentence && (
-                  <div className="mt-4 rounded-lg border border-primary/10 bg-primary/5 p-3">
-                    <div className="mb-1.5 flex items-center gap-1.5">
-                      <BookOpen className="h-3 w-3 text-primary shrink-0" />
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">From your reading</span>
+                  <section className="mt-7">
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <BookOpen className="h-3 w-3 text-muted-foreground/70 shrink-0" />
+                      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
+                        From your reading
+                      </p>
                     </div>
-                    <p className="font-japanese text-sm leading-relaxed text-foreground">
+                    <p className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-2 border-border pl-3">
                       {(() => {
                         const idx = card.contextSentence!.indexOf(card.word);
                         if (idx === -1) return card.contextSentence;
                         return (
                           <>
                             {card.contextSentence!.slice(0, idx)}
-                            <span className="text-accent font-bold">{card.word}</span>
+                            <span className="text-foreground font-semibold underline decoration-dotted underline-offset-4">{card.word}</span>
                             {card.contextSentence!.slice(idx + card.word.length)}
                           </>
                         );
                       })()}
                     </p>
-                  </div>
+                  </section>
                 )}
 
                 {/* Example sentence */}
-                <div className="mt-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Example</p>
+                <section className="mt-7 pb-2">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70 mb-2.5">
+                    Example
+                  </p>
                   <ExampleSentence word={card.word} />
-                </div>
+                </section>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className="flex-none flex justify-center gap-2 px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
+      {/* Action area */}
+      <div className="flex-none flex justify-center gap-2 px-4 pt-2 pb-[max(env(safe-area-inset-bottom),12px)]">
         {flipped ? (
           <SrsButtons card={card} onAnswer={handleAnswer} />
         ) : (
-          <Button variant="outline" size="sm" onClick={() => advance()}>
-            Skip →
-          </Button>
+          <button
+            onClick={() => advance()}
+            className="text-xs font-medium text-muted-foreground/70 hover:text-foreground transition-colors px-4 py-2"
+          >
+            Skip
+          </button>
         )}
       </div>
 
