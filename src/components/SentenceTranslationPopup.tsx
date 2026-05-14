@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Languages, X, Loader2 } from 'lucide-react';
 import { translateSentence } from '@/lib/translate';
+import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
 interface Props {
   japanese: string;
