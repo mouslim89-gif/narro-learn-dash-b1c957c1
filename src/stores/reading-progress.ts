@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type Difficulty, DEFAULT_CHAPTER_ID, chapterKey } from '@/data/books';
-import { pushProgress, deleteFlashcard as cloudDeleteFlashcard } from '@/lib/sync/cloud-sync';
+import { pushProgress, pushPreferences, deleteFlashcard as cloudDeleteFlashcard, type UserPreferences } from '@/lib/sync/cloud-sync';
 
 // ============================================================
 // PREFERENCES (local-only, per device)
@@ -79,6 +79,47 @@ interface ReadingProgressState {
   // Sync helpers
   hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
   clearProgress: () => void;
+  hydratePreferences: (prefs: UserPreferences, userId: string) => void;
+  clearPreferences: () => void;
+}
+
+const DEFAULT_PREFS: UserPreferences = {
+  fontSize: 'medium',
+  readerDarkMode: false,
+  darkMode: false,
+  showFurigana: false,
+  displayMode: 'normal',
+  japaneseFont: 'sans',
+  hasSeenLongPressHint: false,
+  showKnownHighlights: true,
+  highlightNew: true,
+  highlightLearning: true,
+  highlightKnown: false,
+};
+
+export function currentPrefs(state: ReadingProgressState): UserPreferences {
+  return {
+    fontSize: state.fontSize,
+    readerDarkMode: state.readerDarkMode,
+    darkMode: state.darkMode,
+    showFurigana: state.showFurigana,
+    displayMode: state.displayMode,
+    japaneseFont: state.japaneseFont,
+    hasSeenLongPressHint: state.hasSeenLongPressHint,
+    showKnownHighlights: state.showKnownHighlights,
+    highlightNew: state.highlightNew,
+    highlightLearning: state.highlightLearning,
+    highlightKnown: state.highlightKnown,
+  };
+}
+
+let prefsTimer: number | null = null;
+function schedulePrefsPush(userId: string, prefs: UserPreferences) {
+  if (prefsTimer) clearTimeout(prefsTimer);
+  prefsTimer = window.setTimeout(() => {
+    pushPreferences(userId, prefs).catch(() => {});
+    prefsTimer = null;
+  }, 1500);
 }
 
 // Debounce per (book, chapter)
@@ -154,22 +195,27 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
         }
         return out;
       },
-      setFontSize: (fontSize) => set({ fontSize }),
-      setReaderDarkMode: (readerDarkMode) => set({ readerDarkMode }),
-      setDarkMode: (darkMode) => set({ darkMode }),
-      setShowFurigana: (showFurigana) => set({ showFurigana }),
-      setDisplayMode: (displayMode) => set({ displayMode }),
-      setJapaneseFont: (japaneseFont) => set({ japaneseFont }),
-      setHasSeenLongPressHint: (hasSeenLongPressHint) => set({ hasSeenLongPressHint }),
-      setShowKnownHighlights: (showKnownHighlights) => set({ showKnownHighlights }),
-      setHighlightNew: (highlightNew) => set({ highlightNew }),
-      setHighlightLearning: (highlightLearning) => set({ highlightLearning }),
-      setHighlightKnown: (highlightKnown) => set({ highlightKnown }),
+      setFontSize: (fontSize) => { set({ fontSize }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setReaderDarkMode: (readerDarkMode) => { set({ readerDarkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setDarkMode: (darkMode) => { set({ darkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setShowFurigana: (showFurigana) => { set({ showFurigana }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setDisplayMode: (displayMode) => { set({ displayMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setJapaneseFont: (japaneseFont) => { set({ japaneseFont }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setHasSeenLongPressHint: (hasSeenLongPressHint) => { set({ hasSeenLongPressHint }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setShowKnownHighlights: (showKnownHighlights) => { set({ showKnownHighlights }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setHighlightNew: (highlightNew) => { set({ highlightNew }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setHighlightLearning: (highlightLearning) => { set({ highlightLearning }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       hydrateProgress: (progress, userId) => set({ progress, syncUserId: userId }),
       clearProgress: () => {
         pushTimers.forEach((t) => clearTimeout(t));
         pushTimers.clear();
         set({ progress: {}, syncUserId: null });
+      },
+      hydratePreferences: (prefs, userId) => set({ ...prefs, syncUserId: userId }),
+      clearPreferences: () => {
+        if (prefsTimer) { clearTimeout(prefsTimer); prefsTimer = null; }
+        set({ ...DEFAULT_PREFS });
       },
     }),
     {

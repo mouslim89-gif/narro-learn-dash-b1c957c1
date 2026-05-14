@@ -221,6 +221,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          dark_mode: boolean
+          display_mode: string
+          font_size: string
+          has_seen_long_press_hint: boolean
+          highlight_known: boolean
+          highlight_learning: boolean
+          highlight_new: boolean
+          japanese_font: string
+          reader_dark_mode: boolean
+          show_furigana: boolean
+          show_known_highlights: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          dark_mode?: boolean
+          display_mode?: string
+          font_size?: string
+          has_seen_long_press_hint?: boolean
+          highlight_known?: boolean
+          highlight_learning?: boolean
+          highlight_new?: boolean
+          japanese_font?: string
+          reader_dark_mode?: boolean
+          show_furigana?: boolean
+          show_known_highlights?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          dark_mode?: boolean
+          display_mode?: string
+          font_size?: string
+          has_seen_long_press_hint?: boolean
+          highlight_known?: boolean
+          highlight_learning?: boolean
+          highlight_new?: boolean
+          japanese_font?: string
+          reader_dark_mode?: boolean
+          show_furigana?: boolean
+          show_known_highlights?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shared_token_rules: {
         Row: {
           book_id: string
