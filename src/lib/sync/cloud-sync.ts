@@ -118,11 +118,78 @@ export async function pushProgress(
   }
 }
 
+// ============ USER PREFERENCES ============
+
+export interface UserPreferences {
+  fontSize: 'small' | 'medium' | 'large';
+  readerDarkMode: boolean;
+  darkMode: boolean;
+  showFurigana: boolean;
+  displayMode: 'normal' | 'grammar';
+  japaneseFont: 'sans' | 'serif' | 'handwriting';
+  hasSeenLongPressHint: boolean;
+  showKnownHighlights: boolean;
+  highlightNew: boolean;
+  highlightLearning: boolean;
+  highlightKnown: boolean;
+}
+
+export async function pullPreferences(userId: string): Promise<UserPreferences | null> {
+  const { data, error } = await supabase
+    .from('user_preferences')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    fontSize: data.font_size as UserPreferences['fontSize'],
+    readerDarkMode: data.reader_dark_mode,
+    darkMode: data.dark_mode,
+    showFurigana: data.show_furigana,
+    displayMode: data.display_mode as UserPreferences['displayMode'],
+    japaneseFont: data.japanese_font as UserPreferences['japaneseFont'],
+    hasSeenLongPressHint: data.has_seen_long_press_hint,
+    showKnownHighlights: data.show_known_highlights,
+    highlightNew: data.highlight_new,
+    highlightLearning: data.highlight_learning,
+    highlightKnown: data.highlight_known,
+  };
+}
+
+export async function pushPreferences(userId: string, prefs: UserPreferences): Promise<void> {
+  useSyncStatus.getState().startSync();
+  try {
+    const { error } = await supabase.from('user_preferences').upsert({
+      user_id: userId,
+      font_size: prefs.fontSize,
+      reader_dark_mode: prefs.readerDarkMode,
+      dark_mode: prefs.darkMode,
+      show_furigana: prefs.showFurigana,
+      display_mode: prefs.displayMode,
+      japanese_font: prefs.japaneseFont,
+      has_seen_long_press_hint: prefs.hasSeenLongPressHint,
+      show_known_highlights: prefs.showKnownHighlights,
+      highlight_new: prefs.highlightNew,
+      highlight_learning: prefs.highlightLearning,
+      highlight_known: prefs.highlightKnown,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) throw error;
+    useSyncStatus.getState().endSync(true);
+  } catch (e) {
+    console.error('pushPreferences error', e);
+    useSyncStatus.getState().endSync(false);
+    throw e;
+  }
+}
+
 // ============ REALTIME ============
 
 type RealtimeHandlers = {
   onFlashcardChange: () => void;
   onProgressChange: () => void;
+  onPreferencesChange: () => void;
 };
 
 export function subscribeRealtime(userId: string, handlers: RealtimeHandlers) {
@@ -137,6 +204,11 @@ export function subscribeRealtime(userId: string, handlers: RealtimeHandlers) {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'reading_progress', filter: `user_id=eq.${userId}` },
       () => handlers.onProgressChange(),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'user_preferences', filter: `user_id=eq.${userId}` },
+      () => handlers.onPreferencesChange(),
     )
     .subscribe();
   return () => {
