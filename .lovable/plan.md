@@ -1,60 +1,46 @@
-# Back face — flip-anywhere + richer typography
+# Fix: bottom nav disappears and doesn't come back on refresh
 
-Scope strictly limited to the **back face text** shown in the screenshot (word, reading, romaji, POS, meanings, "from your reading"). No content added/removed, no layout sections added, no decorative blobs/watermarks/cards.
+## Root cause
 
-## 1. Flip on tap anywhere on the back face
+In `src/App.tsx`, the bottom nav is hidden whenever `isReviewing` from the flashcard store is `true`:
 
-Today, the back body has `data-no-flip` + `stopPropagation`, so taps on the text don't flip back.
+```ts
+const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
+```
 
-- Remove `data-no-flip` and `onClick stopPropagation` from the back body container.
-- Keep flip-blocking only on truly interactive controls: `PlayWordButton` wrapper and the "{n} more" button.
-- Guard against scroll-vs-tap: on the perspective container, track `pointerdown` X/Y and only call `setFlipped` on `click` if movement ≤ 8px. Preserves vertical scrolling without flipping.
+`isReviewing` lives in `src/stores/flashcards.ts`, which uses Zustand's `persist` middleware **without a `partialize`**. That means the entire state — including `isReviewing: true` — gets written to `localStorage` under `yomimasu-flashcards`.
 
-## 2. Make the back text less thin and empty (typography only)
+If a review session ends abnormally (navigation away mid-review, tab close, crash, hot reload during review, etc.) without `setIsReviewing(false)` firing, the `true` value is persisted. On reload, the store rehydrates `isReviewing = true`, so the nav stays hidden on every page until something flips it back — which today only happens by entering and leaving the Flashcards review flow again (or any edit that resets the store shape).
 
-All edits in the back face header + meanings list. No new sections, icons, chips, cards, or watermarks.
+This matches the symptom exactly: nav gone, refresh doesn't fix it, next "edit" makes it come back.
 
-Word (`card.word`):
-- `34px` → `44px`, `font-semibold` → `font-bold`, tighter `tracking-tight`, `leading-[0.95]`.
+## Fix
 
-Reading (`card.reading`):
-- `15px` → `18px`, weight `400` → `500`, color `text-muted-foreground` → `text-foreground/70`.
-- Margin top `2` → `2.5`.
+Two small, complementary changes in `src/stores/flashcards.ts`:
 
-Romaji:
-- `11px` italic muted → `12px` non-italic, `text-muted-foreground` (drop the `/60`), `tracking-wide` kept.
-- Margin top `1` → `1.5`.
+1. **Add a `partialize`** to the `persist` config so only `savedWords` is written to `localStorage`. `isReviewing` and `syncUserId` are pure runtime/session state and shouldn't be persisted.
+2. As a safety belt, **add an `onRehydrateStorage`** that forces `isReviewing = false` after rehydration. Cheap insurance against any old persisted value already sitting in users' browsers.
 
-POS line:
-- `10px` uppercase muted/70 → `11px` uppercase, weight `font-semibold`, color `text-foreground/60`, `tracking-[0.2em]`.
-- Margin top `3` → `4`.
+```ts
+persist(
+  (set, get) => ({ /* unchanged */ }),
+  {
+    name: 'yomimasu-flashcards',
+    partialize: (state) => ({ savedWords: state.savedWords }),
+    onRehydrateStorage: () => (state) => {
+      if (state) state.isReviewing = false;
+    },
+  }
+)
+```
 
-Section eyebrows ("Meaning", "From your reading", "Example") — keep as-is in markup, just bump:
-- `10px` → `11px`, weight `font-medium` → `font-semibold`, color `text-muted-foreground/70` → `text-foreground/55`.
+No changes to `App.tsx` or `BottomNav.tsx` needed.
 
-Meanings list:
-- Item text `15px` → `17px`, `leading-snug` → `leading-relaxed`.
-- Numbers `font-mono text-xs text-muted-foreground/50` → `font-semibold text-[13px] text-foreground/50`, width `w-3` → `w-4`.
-- `space-y-2` → `space-y-2.5`.
+## Why not other approaches
 
-"{n} more" button:
-- `text-xs` → `text-[13px]`, `font-medium` → `font-semibold`.
+- **Resetting `isReviewing` in a `useEffect` on mount in `App.tsx`** would also work, but it leaks store concerns into the app shell and runs on every mount. Fixing it at the store boundary is cleaner.
+- **Removing the `isReviewing` check from `hideNav`** would break the intentional fullscreen review UI.
 
-Context sentence (the「そうしてその客と…」line):
-- `15px` → `17px`, `leading-relaxed` kept.
-- Border accent `border-border` → `border-primary/40`, `border-l-2` → `border-l-[3px]`.
-- Highlighted word: keep dotted underline, add `text-primary` so it pops vs. surrounding text.
+## Files touched
 
-Romaji + reading + POS line stay in their current positions; nothing structural changes.
-
-## Out of scope
-
-- Front face (untouched).
-- Header (close/progress/delete) — untouched.
-- SRS / Skip buttons — untouched.
-- Example sentence component internals — untouched.
-- Store, business logic, data — untouched.
-
-## File touched
-
-- `src/components/FlashcardReview.tsx` only.
+- `src/stores/flashcards.ts` — extend the `persist` options object only.
