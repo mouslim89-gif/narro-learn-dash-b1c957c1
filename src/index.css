@@ -265,10 +265,10 @@
 .library-kanji-watermark {
   font-family: 'Noto Serif JP', serif;
   position: absolute;
-  bottom: -20px;
-  right: -10px;
+  bottom: 8px;
+  right: 12px;
   font-weight: 900;
-  font-size: clamp(140px, 36vw, 220px);
+  font-size: clamp(96px, 24vw, 160px);
   line-height: 0.85;
   color: hsl(var(--foreground) / 0.06);
   pointer-events: none;
