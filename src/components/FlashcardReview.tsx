@@ -250,13 +250,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
       </div>
 
       {/* Action area */}
-      <div className="flex-none flex justify-center gap-2 px-4 pt-2 pb-[max(env(safe-area-inset-bottom),12px)]">
+      <div className="relative flex-none flex justify-center gap-2 px-4 pt-3 pb-[max(env(safe-area-inset-bottom),14px)]">
         {flipped ? (
           <SrsButtons card={card} onAnswer={handleAnswer} />
         ) : (
           <button
             onClick={() => advance()}
-            className="text-xs font-medium text-muted-foreground/70 hover:text-foreground transition-colors px-4 py-2"
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/70 hover:text-foreground transition-colors px-5 py-2.5 rounded-full border border-border/60 bg-card/60 backdrop-blur-sm"
           >
             Skip
           </button>
