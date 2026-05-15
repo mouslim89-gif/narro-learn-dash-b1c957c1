@@ -119,7 +119,7 @@ export default function BookDetail() {
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             <span className="section-bullet" />Reading Level
           </p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
             {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
               const cfg = difficultyConfig[d];
               const selected = difficulty === d;
@@ -128,19 +128,20 @@ export default function BookDetail() {
                   key={d}
                   onClick={() => setDifficulty(d)}
                   className={cn(
-                    'rounded-xl border p-3 text-left transition-all tap-scale',
+                    'rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide transition-all tap-scale',
                     selected
-                      ? 'ring-2 ring-primary/40 border-transparent shadow-sm'
-                      : 'border-border/40 bg-card hover:border-border'
+                      ? 'bg-card text-foreground shadow-sm ring-1 ring-border/50'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
-                  style={selected ? { backgroundImage: `linear-gradient(140deg, ${book.coverColor}26 0%, hsl(var(--card)) 70%)` } : undefined}
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{cfg.label}</p>
-                  <p className="mt-1 font-serif text-sm font-semibold line-clamp-2 leading-snug">{cfg.description}</p>
+                  {cfg.label}
                 </button>
               );
             })}
           </div>
+          <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+            {difficultyConfig[difficulty].description}
+          </p>
         </section>
 
         {isMultiChapter && (
