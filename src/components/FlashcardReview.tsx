@@ -60,40 +60,44 @@ export function FlashcardReview({ deck, onExit }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden bg-background">
-      {/* Header — minimal: close, counter, delete */}
-      <div className="flex-none flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-2">
+    <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden bg-gradient-to-b from-muted/40 via-background to-background">
+      {/* Ambient blobs */}
+      <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-24 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+
+      {/* Header */}
+      <div className="relative flex-none flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),14px)] pb-3">
         <button
           onClick={onExit}
           aria-label="Exit review"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
         >
           <X className="h-[18px] w-[18px]" />
         </button>
 
         <div className="flex-1 flex items-center gap-3">
-          <div className="flex-1 h-[3px] rounded-full bg-muted overflow-hidden">
+          <div className="flex-1 h-2 rounded-full bg-muted/70 overflow-hidden ring-1 ring-border/50">
             <div
-              className="h-full bg-foreground/80 transition-[width] duration-500 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-[width] duration-500 ease-out"
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <span className="font-mono text-[11px] tabular-nums text-muted-foreground tracking-tight">
-            {currentIdx + 1}<span className="opacity-40"> / {deck.length}</span>
+          <span className="font-mono text-[12px] tabular-nums font-semibold text-foreground/80 tracking-tight">
+            {currentIdx + 1}<span className="text-muted-foreground/60 font-normal"> / {deck.length}</span>
           </span>
         </div>
 
         <button
           onClick={() => setShowDeleteDialog(true)}
           aria-label="Delete card"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm transition-all hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 active:scale-95"
         >
           <Trash2 className="h-[16px] w-[16px]" />
         </button>
       </div>
 
       {/* Card area */}
-      <div className="flex-1 min-h-0 flex items-stretch justify-center px-4 py-4">
+      <div className="relative flex-1 min-h-0 flex items-stretch justify-center px-4 py-3">
         <div
           className={`perspective-800 w-full max-w-md h-full ${animClass}`}
           onClick={(e) => {
@@ -106,15 +110,20 @@ export function FlashcardReview({ deck, onExit }: Props) {
               flipped ? 'rotate-y-180' : ''
             }`}
           >
-            {/* Front face — ultra clean, focus on the word */}
-            <div className="backface-hidden absolute inset-0 flex flex-col rounded-3xl bg-card">
-              <div className="flex-1 flex flex-col items-center justify-center px-6">
-                <p className="font-japanese text-[64px] leading-none font-semibold tracking-tight text-foreground select-none">
+            {/* Front face */}
+            <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
+              {/* decorative kanji watermark */}
+              <span className="pointer-events-none select-none absolute -top-10 -right-6 font-japanese text-[220px] leading-none font-bold text-foreground/[0.025]">
+                {card.word.charAt(0)}
+              </span>
+
+              <div className="relative flex-1 flex flex-col items-center justify-center px-6">
+                <p className="font-japanese text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm">
                   {card.word}
                 </p>
-                <div className="mt-6 h-px w-10 bg-border" />
+                <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
                 <p
-                  className={`font-japanese text-lg mt-6 transition-all duration-300 ${
+                  className={`font-japanese text-xl mt-7 font-medium transition-all duration-300 ${
                     showFrontReading ? 'text-muted-foreground opacity-100' : 'text-muted-foreground opacity-0 blur-md select-none'
                   }`}
                   aria-hidden={!showFrontReading}
@@ -124,27 +133,27 @@ export function FlashcardReview({ deck, onExit }: Props) {
               </div>
 
               <div
-                className="flex-none flex items-center justify-center gap-1 pb-6"
+                className="relative flex-none flex items-center justify-center gap-2 pb-7"
                 data-no-flip
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   onClick={() => setShowFrontReading((v) => !v)}
                   aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground active:scale-95"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
                 >
                   {showFrontReading ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
                 </button>
                 <PlayWordButton word={card.word} reading={card.reading} size={26} />
               </div>
 
-              <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] uppercase tracking-[0.2em] text-muted-foreground/40 pointer-events-none">
+              <p className="absolute bottom-2.5 left-0 right-0 text-center text-[10px] uppercase tracking-[0.25em] font-medium text-muted-foreground/50 pointer-events-none">
                 Tap to reveal
               </p>
             </div>
 
-            {/* Back face — refined typographic answer */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-3xl bg-card overflow-hidden">
+            {/* Back face */}
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
               {/* Header — word + reading */}
               <div className="flex-none px-6 pt-6 pb-4">
                 <div className="flex items-start justify-between gap-3">
