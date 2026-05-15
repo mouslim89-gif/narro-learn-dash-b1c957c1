@@ -25,9 +25,9 @@ import ResetPassword from "./pages/ResetPassword";
 const queryClient = new QueryClient();
 
 const pageVariants = {
-  initial: { opacity: 0, y: 6 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -4 },
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
 };
 
 // Apple-like spring easing (matches --ease-out-soft in index.css)
@@ -54,7 +54,7 @@ function AnimatedRoutes() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="sync">
         <motion.div
           key={location.pathname}
           variants={pageVariants}
