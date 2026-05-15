@@ -142,6 +142,12 @@ export const useFlashcardStore = create<FlashcardStore>()(
         set({ savedWords: [], syncUserId: null });
       },
     }),
-    { name: 'yomimasu-flashcards' }
+    {
+      name: 'yomimasu-flashcards',
+      partialize: (state) => ({ savedWords: state.savedWords }),
+      onRehydrateStorage: () => (state) => {
+        if (state) state.isReviewing = false;
+      },
+    }
   )
 );
