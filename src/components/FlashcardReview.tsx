@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { SavedWord, useFlashcardStore } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
@@ -23,6 +23,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAllMeanings, setShowAllMeanings] = useState(false);
   const [showFrontReading, setShowFrontReading] = useState(false);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const advance = useCallback((action?: () => void) => {
     action?.();
@@ -100,8 +101,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
       <div className="relative flex-1 min-h-0 flex items-stretch justify-center px-4 py-3">
         <div
           className={`perspective-800 w-full max-w-md h-full ${animClass}`}
+          onPointerDown={(e) => {
+            pointerStartRef.current = { x: e.clientX, y: e.clientY };
+          }}
           onClick={(e) => {
             if ((e.target as HTMLElement).closest('[data-no-flip]')) return;
+            const start = pointerStartRef.current;
+            if (start && (Math.abs(e.clientX - start.x) > 8 || Math.abs(e.clientY - start.y) > 8)) return;
             setFlipped(!flipped);
           }}
         >
@@ -158,9 +164,9 @@ export function FlashcardReview({ deck, onExit }: Props) {
               <div className="flex-none px-6 pt-6 pb-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-japanese text-[34px] leading-none font-semibold tracking-tight">{card.word}</p>
-                    <p className="font-japanese text-[15px] text-muted-foreground mt-2">{card.reading}</p>
-                    <p className="text-[11px] text-muted-foreground/60 italic mt-1 tracking-wide">
+                    <p className="font-japanese text-[44px] leading-[0.95] font-bold tracking-tight">{card.word}</p>
+                    <p className="font-japanese text-[18px] font-medium text-foreground/70 mt-2.5">{card.reading}</p>
+                    <p className="text-[12px] text-muted-foreground mt-1.5 tracking-wide">
                       {toRomaji(card.reading || card.word)}
                     </p>
                   </div>
@@ -170,7 +176,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 </div>
 
                 {card.partsOfSpeech?.[0] && (
-                  <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
+                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/60">
                     {card.partsOfSpeech.slice(0, 2).join(' · ')}
                   </p>
                 )}
@@ -179,20 +185,16 @@ export function FlashcardReview({ deck, onExit }: Props) {
               <div className="mx-6 h-px bg-border/60" />
 
               {/* Body — scrollable */}
-              <div
-                data-no-flip
-                className="flex-1 min-h-0 px-6 py-5 overflow-y-auto overscroll-contain"
-                onClick={(e) => e.stopPropagation()}
-              >
+              <div className="flex-1 min-h-0 px-6 py-5 overflow-y-auto overscroll-contain">
                 {/* Meanings */}
                 <section>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70 mb-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-3">
                     Meaning
                   </p>
-                  <ol className="space-y-2">
+                  <ol className="space-y-2.5">
                     {visibleMeanings.map((m, i) => (
-                      <li key={i} className="flex gap-3 text-[15px] leading-snug text-foreground">
-                        <span className="font-mono text-xs text-muted-foreground/50 pt-1 tabular-nums w-3 shrink-0">
+                      <li key={i} className="flex gap-3 text-[17px] leading-relaxed text-foreground">
+                        <span className="font-semibold text-[13px] text-foreground/50 pt-1 tabular-nums w-4 shrink-0">
                           {i + 1}
                         </span>
                         <span>{m}</span>
@@ -201,9 +203,10 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   </ol>
                   {hiddenMeaningsCount > 0 && !showAllMeanings && (
                     <button
+                      data-no-flip
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setShowAllMeanings(true); }}
-                      className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronDown className="h-3 w-3" />
                       {hiddenMeaningsCount} more
@@ -215,19 +218,19 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 {card.contextSentence && (
                   <section className="mt-7">
                     <div className="flex items-center gap-1.5 mb-2.5">
-                      <BookOpen className="h-3 w-3 text-muted-foreground/70 shrink-0" />
-                      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
+                      <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55">
                         From your reading
                       </p>
                     </div>
-                    <p className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-2 border-border pl-3">
+                    <p className="font-japanese text-[17px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
                       {(() => {
                         const idx = card.contextSentence!.indexOf(card.word);
                         if (idx === -1) return card.contextSentence;
                         return (
                           <>
                             {card.contextSentence!.slice(0, idx)}
-                            <span className="text-foreground font-semibold underline decoration-dotted underline-offset-4">{card.word}</span>
+                            <span className="text-primary font-semibold underline decoration-dotted underline-offset-4">{card.word}</span>
                             {card.contextSentence!.slice(idx + card.word.length)}
                           </>
                         );
@@ -238,7 +241,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
                 {/* Example sentence */}
                 <section className="mt-7 pb-2">
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70 mb-2.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-2.5">
                     Example
                   </p>
                   <ExampleSentence word={card.word} />
