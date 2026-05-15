@@ -8,10 +8,12 @@ import { Link } from 'react-router-dom';
 import { Settings, Flame, BookOpen, Bookmark, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BookShelfRow } from '@/components/my-books/BookShelfRow';
+import { useDelayed } from '@/hooks/use-delayed';
 
 export default function MyBooks() {
   const { progress, getBookProgress } = useReadingProgressStore();
   const savedWords = useFlashcardStore(s => s.savedWords);
+  const showEmpty = useDelayed(300);
 
   const bookProgressList = useMemo(() => {
     const list: { book: typeof books[number]; progress: NonNullable<ReturnType<typeof getBookProgress>> }[] = [];
@@ -100,7 +102,7 @@ export default function MyBooks() {
         )}
 
         {bookProgressList.length === 0 ? (
-          <div className="mt-24 flex flex-col items-center text-center">
+          <div className={`mt-24 flex flex-col items-center text-center transition-opacity duration-200 ${showEmpty ? 'opacity-100' : 'opacity-0'}`}>
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
               <BookOpen className="h-9 w-9 text-primary" />
             </div>
