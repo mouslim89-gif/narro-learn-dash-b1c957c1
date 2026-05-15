@@ -155,44 +155,44 @@ export function FlashcardReview({ deck, onExit }: Props) {
             {/* Back face */}
             <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
               {/* Header — word + reading */}
-              <div className="flex-none px-7 pt-8 pb-5">
+              <div className="flex-none px-6 pt-6 pb-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-japanese text-[44px] leading-[1.05] font-bold tracking-tight">{card.word}</p>
-                    <p className="font-japanese text-[19px] text-muted-foreground mt-3 font-medium">{card.reading}</p>
-                    <p className="text-[12px] text-muted-foreground/60 italic mt-1.5 tracking-wide">
+                    <p className="font-japanese text-[34px] leading-none font-semibold tracking-tight">{card.word}</p>
+                    <p className="font-japanese text-[15px] text-muted-foreground mt-2">{card.reading}</p>
+                    <p className="text-[11px] text-muted-foreground/60 italic mt-1 tracking-wide">
                       {toRomaji(card.reading || card.word)}
                     </p>
                   </div>
-                  <div data-no-flip className="shrink-0 -mr-1 mt-1" onClick={(e) => e.stopPropagation()}>
-                    <PlayWordButton word={card.word} reading={card.reading} size={26} />
+                  <div data-no-flip className="shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
+                    <PlayWordButton word={card.word} reading={card.reading} size={22} />
                   </div>
                 </div>
 
                 {card.partsOfSpeech?.[0] && (
-                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
                     {card.partsOfSpeech.slice(0, 2).join(' · ')}
                   </p>
                 )}
               </div>
 
-              <div className="mx-7 h-[2px] rounded-full bg-gradient-to-r from-transparent via-border to-transparent" />
+              <div className="mx-6 h-px bg-border/60" />
 
               {/* Body — scrollable */}
               <div
                 data-no-flip
-                className="flex-1 min-h-0 px-7 py-7 overflow-y-auto overscroll-contain"
+                className="flex-1 min-h-0 px-6 py-5 overflow-y-auto overscroll-contain"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Meanings */}
                 <section>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/80 mb-4">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70 mb-3">
                     Meaning
                   </p>
-                  <ol className="space-y-3">
+                  <ol className="space-y-2">
                     {visibleMeanings.map((m, i) => (
-                      <li key={i} className="flex gap-4 text-[17px] leading-snug text-foreground font-medium">
-                        <span className="font-mono text-sm text-muted-foreground/60 pt-1 tabular-nums w-4 shrink-0">
+                      <li key={i} className="flex gap-3 text-[15px] leading-snug text-foreground">
+                        <span className="font-mono text-xs text-muted-foreground/50 pt-1 tabular-nums w-3 shrink-0">
                           {i + 1}
                         </span>
                         <span>{m}</span>
@@ -203,9 +203,9 @@ export function FlashcardReview({ deck, onExit }: Props) {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setShowAllMeanings(true); }}
-                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                      className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-3 w-3" />
                       {hiddenMeaningsCount} more
                     </button>
                   )}
@@ -213,21 +213,21 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
                 {/* Context sentence */}
                 {card.contextSentence && (
-                  <section className="mt-9">
-                    <div className="flex items-center gap-2 mb-3.5">
-                      <BookOpen className="h-3.5 w-3.5 text-muted-foreground/80 shrink-0" />
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                  <section className="mt-7">
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <BookOpen className="h-3 w-3 text-muted-foreground/70 shrink-0" />
+                      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70">
                         From your reading
                       </p>
                     </div>
-                    <p className="font-japanese text-[17px] leading-relaxed text-foreground/95 border-l-[3px] border-primary/40 pl-4 font-medium">
+                    <p className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-2 border-border pl-3">
                       {(() => {
                         const idx = card.contextSentence!.indexOf(card.word);
                         if (idx === -1) return card.contextSentence;
                         return (
                           <>
                             {card.contextSentence!.slice(0, idx)}
-                            <span className="text-foreground font-bold underline decoration-dotted underline-offset-4">{card.word}</span>
+                            <span className="text-foreground font-semibold underline decoration-dotted underline-offset-4">{card.word}</span>
                             {card.contextSentence!.slice(idx + card.word.length)}
                           </>
                         );
@@ -237,8 +237,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 )}
 
                 {/* Example sentence */}
-                <section className="mt-9 pb-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/80 mb-3.5">
+                <section className="mt-7 pb-2">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/70 mb-2.5">
                     Example
                   </p>
                   <ExampleSentence word={card.word} />
