@@ -54,7 +54,7 @@ function AnimatedRoutes() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="sync">
         <motion.div
           key={location.pathname}
           variants={pageVariants}
