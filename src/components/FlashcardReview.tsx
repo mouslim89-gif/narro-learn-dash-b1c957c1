@@ -100,8 +100,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
       <div className="relative flex-1 min-h-0 flex items-stretch justify-center px-4 py-3">
         <div
           className={`perspective-800 w-full max-w-md h-full ${animClass}`}
+          onPointerDown={(e) => {
+            pointerStartRef.current = { x: e.clientX, y: e.clientY };
+          }}
           onClick={(e) => {
             if ((e.target as HTMLElement).closest('[data-no-flip]')) return;
+            const start = pointerStartRef.current;
+            if (start && (Math.abs(e.clientX - start.x) > 8 || Math.abs(e.clientY - start.y) > 8)) return;
             setFlipped(!flipped);
           }}
         >
