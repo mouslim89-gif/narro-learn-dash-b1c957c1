@@ -161,40 +161,40 @@ export function FlashcardReview({ deck, onExit }: Props) {
             {/* Back face */}
             <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
               {/* Header — word + reading */}
-              <div className="flex-none px-6 pt-6 pb-4">
+              <div className="flex-none px-5 pt-5 pb-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-japanese text-[44px] leading-[0.95] font-bold tracking-tight">{card.word}</p>
-                    <p className="font-japanese text-[18px] font-medium text-foreground/70 mt-2.5">{card.reading}</p>
-                    <p className="text-[12px] text-muted-foreground mt-1.5 tracking-wide">
+                    <p className="font-japanese text-[34px] leading-[0.95] font-bold tracking-tight">{card.word}</p>
+                    <p className="font-japanese text-[15px] font-medium text-foreground/70 mt-1.5">{card.reading}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">
                       {toRomaji(card.reading || card.word)}
                     </p>
                   </div>
                   <div data-no-flip className="shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
-                    <PlayWordButton word={card.word} reading={card.reading} size={22} />
+                    <PlayWordButton word={card.word} reading={card.reading} size={20} />
                   </div>
                 </div>
 
                 {card.partsOfSpeech?.[0] && (
-                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/60">
+                  <p className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/60">
                     {card.partsOfSpeech.slice(0, 2).join(' · ')}
                   </p>
                 )}
               </div>
 
-              <div className="mx-6 h-px bg-border/60" />
+              <div className="mx-5 h-px bg-border/60" />
 
               {/* Body — scrollable */}
-              <div className="flex-1 min-h-0 px-6 py-5 overflow-y-auto overscroll-contain">
+              <div className="flex-1 min-h-0 px-5 py-4 overflow-y-auto overscroll-contain">
                 {/* Meanings */}
                 <section>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-2">
                     Meaning
                   </p>
-                  <ol className="space-y-2.5">
+                  <ol className="space-y-1.5">
                     {visibleMeanings.map((m, i) => (
-                      <li key={i} className="flex gap-3 text-[17px] leading-relaxed text-foreground">
-                        <span className="font-semibold text-[13px] text-foreground/50 pt-1 tabular-nums w-4 shrink-0">
+                      <li key={i} className="flex gap-2.5 text-[15px] leading-snug text-foreground">
+                        <span className="font-semibold text-[12px] text-foreground/50 pt-0.5 tabular-nums w-3.5 shrink-0">
                           {i + 1}
                         </span>
                         <span>{m}</span>
@@ -206,7 +206,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                       data-no-flip
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setShowAllMeanings(true); }}
-                      className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                      className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronDown className="h-3 w-3" />
                       {hiddenMeaningsCount} more
@@ -216,14 +216,14 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
                 {/* Context sentence */}
                 {card.contextSentence && (
-                  <section className="mt-7">
-                    <div className="flex items-center gap-1.5 mb-2.5">
+                  <section className="mt-4">
+                    <div className="flex items-center gap-1.5 mb-1.5">
                       <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">
                         From your reading
                       </p>
                     </div>
-                    <p className="font-japanese text-[17px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
+                    <p className="font-japanese text-[15px] leading-snug text-foreground/90 border-l-[3px] border-primary/40 pl-3">
                       {(() => {
                         const idx = card.contextSentence!.indexOf(card.word);
                         if (idx === -1) return card.contextSentence;
@@ -240,8 +240,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 )}
 
                 {/* Example sentence */}
-                <section className="mt-7 pb-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-2.5">
+                <section className="mt-4 pb-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-1.5">
                     Example
                   </p>
                   <ExampleSentence word={card.word} />
