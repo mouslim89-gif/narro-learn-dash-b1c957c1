@@ -44,7 +44,7 @@ export default function BookDetail() {
         className="relative overflow-hidden px-6 pt-10 pb-6"
         style={{ backgroundImage: `linear-gradient(160deg, ${book.coverColor}1f 0%, hsl(var(--background)) 65%)` }}
       >
-        <span aria-hidden className="library-kanji-watermark">本</span>
+        
         <button
           onClick={() => navigate(-1)}
           className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 hover:bg-background"
@@ -102,19 +102,6 @@ export default function BookDetail() {
       <div className="px-6">
         <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
-        <Link to={continueLink}>
-          <Button size="lg" className="mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md">
-            {hasProgress
-              ? isMultiChapter
-                ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
-                : 'Continue Reading'
-              : isMultiChapter
-                ? 'Start Chapter 1'
-                : 'Start Reading'}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </Link>
-
         <section className="mt-8">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             <span className="section-bullet" />Reading Level
@@ -143,6 +130,19 @@ export default function BookDetail() {
             {difficultyConfig[difficulty].description}
           </p>
         </section>
+
+        <Link to={continueLink}>
+          <Button size="lg" className="mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md">
+            {hasProgress
+              ? isMultiChapter
+                ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
+                : 'Continue Reading'
+              : isMultiChapter
+                ? 'Start Chapter 1'
+                : 'Start Reading'}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
 
         {isMultiChapter && (
           <section className="mt-8">
