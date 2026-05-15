@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { SavedWord, useFlashcardStore } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
