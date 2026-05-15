@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useDelayed } from '@/hooks/use-delayed';
 
 type StatusFilter = 'all' | 'due' | 'new' | 'learning' | 'known';
 type SortOption = 'added' | 'mastery';
@@ -33,6 +34,7 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
 export default function Flashcards() {
   const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
   const [reviewMode, setReviewMode] = useState(false);
+  const showEmpty = useDelayed(300);
 
   const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
   const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
@@ -225,7 +227,7 @@ export default function Flashcards() {
       )}
 
       {savedWords.length === 0 ? (
-        <div className="mt-24 flex flex-col items-center text-center px-6">
+        <div className={`mt-24 flex flex-col items-center text-center px-6 transition-opacity duration-200 ${showEmpty ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
             <Sparkles className="h-9 w-9 text-primary" />
           </div>
