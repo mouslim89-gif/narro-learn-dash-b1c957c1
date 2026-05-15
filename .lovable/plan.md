@@ -1,46 +1,33 @@
-# Fix: bottom nav disappears and doesn't come back on refresh
+## Objectif
+Aligner la BottomNav sur l'esthétique éditoriale de la page Library (Tsundoku) : capsule flottante, typographie serif sur l'actif, indicateur "section-bullet".
 
-## Root cause
+## Changements
 
-In `src/App.tsx`, the bottom nav is hidden whenever `isReviewing` from the flashcard store is `true`:
+### `src/components/BottomNav.tsx`
+- Remplacer la barre edge-to-edge par une **pill flottante** :
+  - Conteneur fixé en bas, centré, `max-w-sm`, marges latérales (`mx-4`), `mb-[calc(env(safe-area-inset-bottom)+12px)]`.
+  - Capsule : `rounded-full bg-card/85 backdrop-blur-xl ring-1 ring-border/40 shadow-[0_8px_30px_-8px_hsl(var(--foreground)/0.18)]`.
+  - Padding interne réduit, items répartis `justify-around`.
+- **Items** :
+  - Icône légèrement plus petite, `strokeWidth` 1.8 / 2.2 (déjà en place).
+  - Label : `font-serif` + `tracking-tight` quand actif ; sinon masqué ou en `text-[10px] text-muted-foreground` (à confirmer mais on garde toujours visible pour cohérence).
+  - Actif : couleur `text-foreground` (pas primary teal — Library est neutre/éditorial), petite **`section-bullet`** (point coloré déjà défini en CSS) sous l'icône à la place du trait `layoutId="bottom-nav-indicator"`.
+- **Animation** : conserver `motion.div` scale sur icône active ; remplacer l'indicateur trait par un `motion.span` rond (4px) avec `layoutId` pour transition fluide entre items.
+- Badge "due cards" : conserver, ajuster position pour la nouvelle taille.
+- Sync indicator : repositionner discrètement au-dessus à droite de la capsule (petit dot flottant).
 
-```ts
-const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
-```
+### `src/index.css` (si besoin)
+- Vérifier que `.section-bullet` est utilisable hors Library ; sinon extraire variante `.nav-bullet` (même style : dot 4px, accent color).
+- Ajuster padding bas global (les pages utilisent `pb-20` → garder, la pill flottante reste dans cette zone).
 
-`isReviewing` lives in `src/stores/flashcards.ts`, which uses Zustand's `persist` middleware **without a `partialize`**. That means the entire state — including `isReviewing: true` — gets written to `localStorage` under `yomimasu-flashcards`.
+### Aucun changement
+- Routes, logique de navigation, store, `App.tsx`.
+- Autres pages (le `pb-20` existant suffit pour la pill flottante).
 
-If a review session ends abnormally (navigation away mid-review, tab close, crash, hot reload during review, etc.) without `setIsReviewing(false)` firing, the `true` value is persisted. On reload, the store rehydrates `isReviewing = true`, so the nav stays hidden on every page until something flips it back — which today only happens by entering and leaving the Flashcards review flow again (or any edit that resets the store shape).
+## Détails techniques
+- La pill est plus étroite que la barre actuelle ; vérifier sur 390px de large que les 4 items + labels tiennent (icône 18px + label 10px serif). Si trop serré, masquer le label des items inactifs et n'afficher que sur l'actif (option éditoriale plus propre).
+- `font-serif` est déjà défini dans Tailwind config (utilisé par Library wordmark).
+- Garder `tap-scale-sm` et `smooth-colors` pour la cohérence des micro-interactions.
 
-This matches the symptom exactly: nav gone, refresh doesn't fix it, next "edit" makes it come back.
-
-## Fix
-
-Two small, complementary changes in `src/stores/flashcards.ts`:
-
-1. **Add a `partialize`** to the `persist` config so only `savedWords` is written to `localStorage`. `isReviewing` and `syncUserId` are pure runtime/session state and shouldn't be persisted.
-2. As a safety belt, **add an `onRehydrateStorage`** that forces `isReviewing = false` after rehydration. Cheap insurance against any old persisted value already sitting in users' browsers.
-
-```ts
-persist(
-  (set, get) => ({ /* unchanged */ }),
-  {
-    name: 'yomimasu-flashcards',
-    partialize: (state) => ({ savedWords: state.savedWords }),
-    onRehydrateStorage: () => (state) => {
-      if (state) state.isReviewing = false;
-    },
-  }
-)
-```
-
-No changes to `App.tsx` or `BottomNav.tsx` needed.
-
-## Why not other approaches
-
-- **Resetting `isReviewing` in a `useEffect` on mount in `App.tsx`** would also work, but it leaks store concerns into the app shell and runs on every mount. Fixing it at the store boundary is cleaner.
-- **Removing the `isReviewing` check from `hideNav`** would break the intentional fullscreen review UI.
-
-## Files touched
-
-- `src/stores/flashcards.ts` — extend the `persist` options object only.
+## Résultat visuel
+Capsule blanche translucide flottante en bas, icônes minimalistes neutres, point coloré sous l'item actif, label serif en italique-feeling sous l'actif uniquement — exactement le langage visuel de la Library.
