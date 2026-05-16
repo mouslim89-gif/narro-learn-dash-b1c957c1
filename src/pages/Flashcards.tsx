@@ -70,10 +70,14 @@ export default function Flashcards() {
       );
     }
 
-    if (sortBy === 'mastery') words.sort((a, b) => (b.mastery || 0) - (a.mastery || 0));
+    if (sortBy === 'mastery') {
+      words.sort((a, b) => (a.mastery || 0) - (b.mastery || 0));
+    }
+    // 'added' uses insertion order (oldest → newest)
+    if (sortDir === 'desc') words.reverse();
 
     return words;
-  }, [savedWords, filter, search, sortBy, dueIds]);
+  }, [savedWords, filter, search, sortBy, sortDir, dueIds]);
 
   const knownCount = savedWords.filter(w => (w.mastery || 0) >= 3).length;
   const learningCount = savedWords.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3).length;
