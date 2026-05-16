@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
