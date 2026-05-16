@@ -40,6 +40,7 @@ export default function Flashcards() {
   const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('added');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [search, setSearch] = useState('');
 
   const reviewDeck = useMemo(() => {
