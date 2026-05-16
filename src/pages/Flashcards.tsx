@@ -106,13 +106,6 @@ export default function Flashcards() {
     { key: 'due', label: 'Due', count: dueCount, Icon: Flame, tint: '36 80% 60%', iconColor: 'hsl(36 80% 50%)' },
   ];
 
-  const filters: { label: string; value: StatusFilter }[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Due', value: 'due' },
-    { label: 'New', value: 'new' },
-    { label: 'Learning', value: 'learning' },
-    { label: 'Known', value: 'known' },
-  ];
 
   return (
     <div className="pb-24">
