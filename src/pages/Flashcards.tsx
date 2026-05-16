@@ -215,16 +215,39 @@ export default function Flashcards() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground text-xs gap-1 shrink-0">
-                  <ArrowUpDown className="h-3 w-3" /> {sortLabels[sortBy]}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Sort: ${sortLabels[sortBy]} ${sortDir === 'asc' ? 'ascending' : 'descending'}`}
+                  className="h-9 w-9 shrink-0 text-muted-foreground"
+                >
+                  {sortDir === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {(Object.keys(sortLabels) as SortOption[]).map(key => (
-                  <DropdownMenuItem key={key} onClick={() => setSortBy(key)}>
-                    {sortLabels[key]}
-                  </DropdownMenuItem>
-                ))}
+              <DropdownMenuContent align="end" className="w-44">
+                {(Object.keys(sortLabels) as SortOption[]).map(key => {
+                  const active = sortBy === key;
+                  return (
+                    <DropdownMenuItem
+                      key={key}
+                      onClick={() => {
+                        if (active) setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+                        else setSortBy(key);
+                      }}
+                      className="flex items-center justify-between gap-2"
+                    >
+                      <span className="flex items-center gap-2">
+                        {active ? <Check className="h-3.5 w-3.5" /> : <span className="w-3.5" />}
+                        {sortLabels[key]}
+                      </span>
+                      {active && (
+                        sortDir === 'asc'
+                          ? <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+                          : <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
