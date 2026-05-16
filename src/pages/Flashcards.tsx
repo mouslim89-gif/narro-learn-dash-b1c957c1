@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { Trash2, RotateCcw, Search, ArrowUpDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ export default function Flashcards() {
   const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('added');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [search, setSearch] = useState('');
 
   const reviewDeck = useMemo(() => {
@@ -69,10 +70,14 @@ export default function Flashcards() {
       );
     }
 
-    if (sortBy === 'mastery') words.sort((a, b) => (b.mastery || 0) - (a.mastery || 0));
+    if (sortBy === 'mastery') {
+      words.sort((a, b) => (a.mastery || 0) - (b.mastery || 0));
+    }
+    // 'added' uses insertion order (oldest → newest)
+    if (sortDir === 'desc') words.reverse();
 
     return words;
-  }, [savedWords, filter, search, sortBy, dueIds]);
+  }, [savedWords, filter, search, sortBy, sortDir, dueIds]);
 
   const knownCount = savedWords.filter(w => (w.mastery || 0) >= 3).length;
   const learningCount = savedWords.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3).length;
@@ -210,16 +215,39 @@ export default function Flashcards() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground text-xs gap-1 shrink-0">
-                  <ArrowUpDown className="h-3 w-3" /> {sortLabels[sortBy]}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Sort: ${sortLabels[sortBy]} ${sortDir === 'asc' ? 'ascending' : 'descending'}`}
+                  className="h-9 w-9 shrink-0 text-muted-foreground"
+                >
+                  {sortDir === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {(Object.keys(sortLabels) as SortOption[]).map(key => (
-                  <DropdownMenuItem key={key} onClick={() => setSortBy(key)}>
-                    {sortLabels[key]}
-                  </DropdownMenuItem>
-                ))}
+              <DropdownMenuContent align="end" className="w-44">
+                {(Object.keys(sortLabels) as SortOption[]).map(key => {
+                  const active = sortBy === key;
+                  return (
+                    <DropdownMenuItem
+                      key={key}
+                      onClick={() => {
+                        if (active) setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+                        else setSortBy(key);
+                      }}
+                      className="flex items-center justify-between gap-2"
+                    >
+                      <span className="flex items-center gap-2">
+                        {active ? <Check className="h-3.5 w-3.5" /> : <span className="w-3.5" />}
+                        {sortLabels[key]}
+                      </span>
+                      {active && (
+                        sortDir === 'asc'
+                          ? <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+                          : <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
