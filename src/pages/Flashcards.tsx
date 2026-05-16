@@ -106,13 +106,6 @@ export default function Flashcards() {
     { key: 'due', label: 'Due', count: dueCount, Icon: Flame, tint: '36 80% 60%', iconColor: 'hsl(36 80% 50%)' },
   ];
 
-  const filters: { label: string; value: StatusFilter }[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Due', value: 'due' },
-    { label: 'New', value: 'new' },
-    { label: 'Learning', value: 'learning' },
-    { label: 'Known', value: 'known' },
-  ];
 
   return (
     <div className="pb-24">
@@ -195,24 +188,8 @@ export default function Flashcards() {
             />
           </div>
 
-          {/* Filter pills + sort */}
-          <div className="mt-2 flex items-center justify-between gap-2 pl-6 pr-3">
-            <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
-              {filters.map(f => (
-                <button
-                  key={f.value}
-                  onClick={() => setFilter(f.value)}
-                  className={cn(
-                    'shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors',
-                    filter === f.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted/60 text-foreground/80 hover:bg-muted'
-                  )}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
+          {/* Sort */}
+          <div className="mt-2 flex items-center justify-end pl-6 pr-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
