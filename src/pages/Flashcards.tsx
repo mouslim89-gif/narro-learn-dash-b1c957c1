@@ -194,11 +194,11 @@ export default function Flashcards() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
                   aria-label={`Sort: ${sortLabels[sortBy]} ${sortDir === 'asc' ? 'ascending' : 'descending'}`}
-                  className="h-9 w-9 shrink-0 text-muted-foreground"
+                  className="h-9 shrink-0 gap-1.5 text-muted-foreground"
                 >
                   {sortDir === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                  Sort
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
