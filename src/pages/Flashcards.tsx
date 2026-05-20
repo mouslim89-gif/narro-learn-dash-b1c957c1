@@ -189,17 +189,17 @@ export default function Flashcards() {
           </div>
 
           {/* Sort */}
-          <div className="mt-2 flex items-center justify-end pl-6 pr-3">
+          <div className="mt-3 flex items-center justify-end px-6 gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  aria-label={`Sort: ${sortLabels[sortBy]} ${sortDir === 'asc' ? 'ascending' : 'descending'}`}
-                  className="h-9 shrink-0 gap-1.5 text-muted-foreground"
+                <button
+                  aria-label={`Sort by ${sortLabels[sortBy]}`}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 transition-colors hover:bg-muted active:scale-[0.97]"
                 >
-                  {sortDir === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                  Sort
-                </Button>
+                  <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Sort by</span>
+                  <span>{sortLabels[sortBy]}</span>
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
                 {(Object.keys(sortLabels) as SortOption[]).map(key => {
@@ -207,26 +207,25 @@ export default function Flashcards() {
                   return (
                     <DropdownMenuItem
                       key={key}
-                      onClick={() => {
-                        if (active) setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
-                        else setSortBy(key);
-                      }}
+                      onClick={() => setSortBy(key)}
                       className="flex items-center justify-between gap-2"
                     >
-                      <span className="flex items-center gap-2">
-                        {active ? <Check className="h-3.5 w-3.5" /> : <span className="w-3.5" />}
-                        {sortLabels[key]}
-                      </span>
-                      {active && (
-                        sortDir === 'asc'
-                          ? <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
-                          : <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
-                      )}
+                      <span>{sortLabels[key]}</span>
+                      {active && <Check className="h-3.5 w-3.5 text-primary" />}
                     </DropdownMenuItem>
                   );
                 })}
               </DropdownMenuContent>
             </DropdownMenu>
+            <button
+              onClick={() => setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))}
+              aria-label={sortDir === 'asc' ? 'Ascending — tap to reverse' : 'Descending — tap to reverse'}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 transition-colors hover:bg-muted active:scale-[0.94]"
+            >
+              {sortDir === 'asc'
+                ? <ArrowUp className="h-4 w-4" />
+                : <ArrowDown className="h-4 w-4" />}
+            </button>
           </div>
         </>
       )}
