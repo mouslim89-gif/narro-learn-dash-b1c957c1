@@ -95,7 +95,7 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
   return (
     <div
       ref={ref}
-      className={`fixed z-[60] w-[min(340px,calc(100vw-16px))] rounded-2xl ring-1 ring-border/50 shadow-xl ${
+      className={`fixed z-[60] w-[min(340px,calc(100vw-16px))] rounded-2xl bg-card ring-1 ring-border/50 shadow-xl ${
         position
           ? position.placement === 'above'
             ? 'animate-mini-slide-up'
@@ -106,7 +106,6 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
-        backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 50%)',
       }}
     >
       <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1.5">
