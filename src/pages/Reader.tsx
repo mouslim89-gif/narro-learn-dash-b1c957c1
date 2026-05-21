@@ -645,60 +645,60 @@ export default function Reader() {
 
   return (
     <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-20' : 'pb-8'} dark:bg-background`}>
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/40 bg-card/80 px-3 py-2.5 backdrop-blur-xl">
-        <button
-          onClick={() => navigate(-1)}
-          className="reader-icon-btn"
-          aria-label="Back"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div className="text-center">
-          <p className="font-japanese text-sm font-bold">{book.titleJp}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {difficultyConfig[difficulty].label}
-            {timeRemaining && ` · ~${timeRemaining} min left`}
-          </p>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <button
-            onClick={() => setShowFurigana(!showFurigana)}
-            className="reader-icon-btn"
-            data-active={showFurigana ? 'true' : undefined}
-            title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
-          >
-            {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
-          </button>
-          <button
-            onClick={() => setShowGrammar(true)}
-            className="reader-icon-btn"
-            title="Grammar Notes"
-          >
-            <BookType className="h-5 w-5" />
-          </button>
-          {isAdmin && (
-            <button
-              onClick={() => {
-                setTokenEditMode(!tokenEditMode);
-                setSelectedIdx([]);
-                setMiniPopup(null);
-                setSentenceTranslation(null);
-              }}
-              className="reader-icon-btn"
-              data-active={tokenEditMode ? 'true' : undefined}
-              title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
+      <header
+        className="sticky top-0 z-30 backdrop-blur-xl"
+        style={{ backgroundImage: `linear-gradient(180deg, ${book.coverColor}1f 0%, hsl(var(--background) / 0.85) 100%)` }}
+      >
+        <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+          <HeaderChip onClick={() => navigate(-1)} aria-label="Back">
+            <ArrowLeft className="h-5 w-5" />
+          </HeaderChip>
+          <div className="min-w-0 flex-1 text-center">
+            <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
+            <p className="text-[10px] text-muted-foreground">
+              {difficultyConfig[difficulty].label}
+              {timeRemaining && ` · ~${timeRemaining}m left`}
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <HeaderChip
+              onClick={() => setShowFurigana(!showFurigana)}
+              active={showFurigana}
+              title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
             >
-              <Wrench className="h-5 w-5" />
-            </button>
-          )}
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="reader-icon-btn"
-            data-active={showSettings ? 'true' : undefined}
-            title="Settings"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
+              {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
+            </HeaderChip>
+            <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
+              <BookType className="h-5 w-5" />
+            </HeaderChip>
+            <HeaderChip
+              onClick={() => setShowSettings(!showSettings)}
+              active={showSettings}
+              title="Settings"
+            >
+              <Settings className="h-5 w-5" />
+            </HeaderChip>
+            {isAdmin && (
+              <HeaderChip
+                onClick={() => {
+                  setTokenEditMode(!tokenEditMode);
+                  setSelectedIdx([]);
+                  setMiniPopup(null);
+                  setSentenceTranslation(null);
+                }}
+                active={tokenEditMode}
+                title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
+              >
+                <Wrench className="h-5 w-5" />
+              </HeaderChip>
+            )}
+          </div>
+        </div>
+        <div className="h-[2px] w-full bg-border/30">
+          <div
+            className="h-full transition-[width] duration-200"
+            style={{ width: `${scrollPercent}%`, backgroundColor: book.coverColor }}
+          />
         </div>
       </header>
 
