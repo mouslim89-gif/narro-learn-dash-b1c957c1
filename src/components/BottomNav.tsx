@@ -32,11 +32,7 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 pb-[calc(env(safe-area-inset-bottom)+0.625rem)] pt-3 px-4 pointer-events-none">
-      {/* soft halo behind the pill */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background via-background/60 to-transparent pointer-events-none"
-      />
+
       <nav
         className="pointer-events-auto relative mx-auto max-w-sm flex items-center justify-between rounded-[28px] bg-card/80 backdrop-blur-2xl ring-1 ring-border/60 border border-white/40 dark:border-white/5 shadow-[0_10px_40px_-12px_hsl(var(--foreground)/0.25),0_2px_6px_-2px_hsl(var(--foreground)/0.08),inset_0_1px_0_0_hsl(0_0%_100%/0.5)] px-1.5 py-1.5"
       >
