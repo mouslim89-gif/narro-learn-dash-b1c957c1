@@ -287,44 +287,53 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
               </div>
 
               {/* Tags */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                {isCommon && (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 border border-primary/15">
-                    ✦ Common
-                  </span>
-                )}
-                {result.jlpt.length > 0 && (
-                  <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
-                    {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
-                  </span>
-                )}
-                {result.senses[0]?.parts_of_speech?.map((pos, i) => (
-                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                    {pos}
-                  </span>
-                ))}
-              </div>
-
-              {/* Meanings */}
-              <div className="space-y-1">
-                {result.senses.slice(0, 3).map((sense, i) => (
-                  <p key={i} className="text-sm leading-relaxed">
-                    <span className="text-muted-foreground mr-1">{i + 1}.</span>
-                    <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
-                  </p>
-                ))}
-              </div>
-
-              <ExampleSentence word={displayWord} />
-
-              {wordType && (
-                <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
+              {(isCommon || (result.senses[0]?.parts_of_speech?.length ?? 0) > 0) && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {isCommon && (
+                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 border border-primary/15">
+                      ✦ Common
+                    </span>
+                  )}
+                  {result.senses[0]?.parts_of_speech?.map((pos, i) => (
+                    <span key={i} className="font-serif italic text-[11px] text-muted-foreground">
+                      {pos}{i < (result.senses[0]?.parts_of_speech?.length ?? 0) - 1 ? ' ·' : ''}
+                    </span>
+                  ))}
+                </div>
               )}
 
-              <div className="mt-2 flex gap-2">
+              {/* Meanings */}
+              <section className="mt-4">
+                <p className="font-serif text-[13px] font-semibold text-foreground/80">Meanings</p>
+                <span className="mt-1 mb-2 block h-px w-6 bg-foreground/30" />
+                <ol className="space-y-1.5">
+                  {result.senses.slice(0, 3).map((sense, i) => (
+                    <li key={i} className="flex gap-3 text-[14px] leading-relaxed">
+                      <span className="font-serif text-foreground/40 tabular-nums">{i + 1}.</span>
+                      <span className="flex-1 font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+
+              <section className="mt-5">
+                <p className="font-serif text-[13px] font-semibold text-foreground/80">Examples</p>
+                <span className="mt-1 mb-2 block h-px w-6 bg-foreground/30" />
+                <ExampleSentence word={displayWord} />
+              </section>
+
+              {wordType && (
+                <section className="mt-5">
+                  <p className="font-serif text-[13px] font-semibold text-foreground/80">Conjugations</p>
+                  <span className="mt-1 mb-2 block h-px w-6 bg-foreground/30" />
+                  <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
+                </section>
+              )}
+
+              <div className="mt-5 flex gap-2">
                 <button
                   onClick={handleSave}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition-all active:scale-[0.97] ${
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold shadow-sm transition-all active:scale-[0.97] ${
                     saved
                       ? 'bg-muted text-muted-foreground'
                       : 'bg-accent text-accent-foreground'
@@ -337,7 +346,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                     onClose();
                     navigate(`/dictionary?q=${encodeURIComponent(dictForm)}`);
                   }}
-                  className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
+                  className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
                 >
                   <BookOpen className="h-4 w-4" /> Dictionary
                 </button>

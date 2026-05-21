@@ -185,24 +185,24 @@ export function ConjugationTable({ dictForm, partsOfSpeech }: ConjugationTablePr
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5 text-sm font-semibold text-foreground transition-colors active:bg-muted my-[10px]">
+      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-full bg-muted/50 px-4 py-2 font-serif text-[12px] uppercase tracking-[0.15em] text-muted-foreground transition-colors active:bg-muted">
         <span>{tableLabel}</span>
-        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="mt-2 rounded-lg border border-border overflow-hidden">
+        <div className="mt-3 rounded-xl bg-muted/30 ring-1 ring-border/30 overflow-hidden">
           {rows.map((row, i) => (
             <div
               key={row.label}
-              className={`flex items-center justify-between px-3 py-2 text-sm ${
-                i % 2 === 0 ? 'bg-muted/30' : 'bg-background'
-              } ${i === 0 ? 'bg-primary/10' : ''}`}
+              className={`flex items-center justify-between px-3.5 py-2 ${
+                i === 0 ? 'bg-primary/10' : i % 2 === 0 ? 'bg-muted/20' : 'bg-transparent'
+              }`}
             >
               <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">{row.label}</span>
-                <span className="text-[10px] text-muted-foreground/70">{row.labelJp}</span>
+                <span className="font-serif text-[11px] uppercase tracking-[0.12em] text-muted-foreground">{row.label}</span>
+                <span className="font-japanese text-[10px] text-muted-foreground/70">{row.labelJp}</span>
               </div>
-              <span className={`font-japanese text-base ${i === 0 ? 'font-bold text-primary' : 'text-foreground'}`}>
+              <span className={`font-japanese tabular-nums text-[14px] ${i === 0 ? 'font-bold text-primary' : 'text-foreground'}`}>
                 {row.form}
               </span>
             </div>
