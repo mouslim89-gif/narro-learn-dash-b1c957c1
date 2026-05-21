@@ -343,24 +343,6 @@
 .reader-settings-panel {
   box-shadow: 0 6px 20px -6px hsl(220 15% 8% / 0.10);
 }
-.reader-settings-section {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: hsl(var(--muted-foreground));
-}
-.reader-settings-bullet {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 9999px;
-  background: hsl(var(--accent));
-}
 
 /* Reader progress — slim gradient bar */
 .reader-progress-track {
