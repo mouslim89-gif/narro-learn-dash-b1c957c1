@@ -1012,6 +1012,7 @@ export default function Reader() {
             </p>
           ))}
         </div>
+        </div>
       </article>
 
       {miniPopup && (
