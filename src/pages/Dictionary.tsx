@@ -83,13 +83,13 @@ export default function DictionaryPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search in Japanese or English..."
-          className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-11"
+          className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10 text-sm shadow-inner-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
         />
         {query && (
           <button
             onClick={clearQuery}
             aria-label="Clear search"
-            className="absolute right-9 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-background/70 ring-1 ring-border/40 flex items-center justify-center text-muted-foreground hover:text-foreground active:scale-[0.94] transition-transform"
+            className="absolute right-9 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:text-foreground"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -116,14 +116,9 @@ export default function DictionaryPage() {
           return (
             <div
               key={idx}
-              className="relative rounded-2xl p-5 ring-1 ring-border/40 card-lift overflow-hidden"
-              style={
-                isCommon
-                  ? { backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.10) 0%, hsl(var(--card)) 55%)' }
-                  : undefined
-              }
+              className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden"
             >
-              {!isCommon && <div className="absolute inset-0 bg-card -z-10" aria-hidden />}
+
 
               {/* Save button */}
               <button

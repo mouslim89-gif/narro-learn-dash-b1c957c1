@@ -184,7 +184,7 @@ export default function Flashcards() {
               placeholder="Search words..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10"
+              className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10 text-sm shadow-inner-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
             />
           </div>
 
