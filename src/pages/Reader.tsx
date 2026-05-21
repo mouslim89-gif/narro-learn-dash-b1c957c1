@@ -859,7 +859,27 @@ export default function Reader() {
         </div>
       )}
 
-      <article ref={articleRef} className="mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12">
+      <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+        <div
+          className="h-3 w-full"
+          aria-hidden
+          style={{ backgroundImage: `linear-gradient(to bottom, ${book.coverColor}1f, transparent)` }}
+        />
+        {book.chapters && book.chapters.length > 1 && (() => {
+          const chapter = book.chapters.find((c) => c.id === chapterId);
+          const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
+          if (!chapter || chapterIndex < 0) return null;
+          return (
+            <div className="px-6 pt-6 pb-2 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Chapter {chapterIndex + 1}
+              </p>
+              <p className="mt-1 font-serif text-lg font-bold">{chapter.title}</p>
+              <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
+            </div>
+          );
+        })()}
+        <div className="px-6 py-8 sm:px-12 sm:py-12">
         <div
           className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]}`}
           style={{
