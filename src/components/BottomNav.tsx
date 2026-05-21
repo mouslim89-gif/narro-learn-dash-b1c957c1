@@ -41,13 +41,13 @@ export function BottomNav() {
                 key={path}
                 to={path}
                 className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 text-[11px] font-medium tap-scale-sm smooth-colors ${
-                  active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                  active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {active && (
                   <motion.span
                     layoutId="bottom-nav-pill"
-                    className="absolute inset-0 rounded-full bg-primary shadow-md"
+                    className="absolute inset-0 rounded-full bg-foreground/10"
                     transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
