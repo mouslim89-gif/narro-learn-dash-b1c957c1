@@ -95,7 +95,7 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
   return (
     <div
       ref={ref}
-      className={`fixed z-[60] w-[min(340px,calc(100vw-16px))] rounded-2xl ring-1 ring-border/50 shadow-xl ${
+      className={`fixed z-[60] w-[min(340px,calc(100vw-16px))] rounded-2xl bg-card ring-1 ring-border/50 shadow-xl ${
         position
           ? position.placement === 'above'
             ? 'animate-mini-slide-up'
@@ -106,7 +106,6 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
-        backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 50%)',
       }}
     >
       <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1.5">
@@ -123,13 +122,12 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
       </div>
 
       <div className="px-3 pb-3 space-y-2">
-        <div className="relative rounded-xl bg-muted/40 ring-1 ring-border/30 px-4 py-3">
-          <span className="absolute left-1.5 top-0 font-serif text-2xl text-muted-foreground/40 select-none leading-none">"</span>
-          <p className="font-japanese text-[13px] leading-relaxed pl-3 text-foreground/90">
+        <div>
+          <p className="font-japanese text-[13px] leading-relaxed text-foreground/90">
             {japanese}
           </p>
           {english && !loading && (
-            <p className="mt-1.5 text-[12px] text-muted-foreground pl-3 leading-snug">
+            <p className="mt-1.5 text-[12px] text-muted-foreground leading-snug">
               {english}
             </p>
           )}
