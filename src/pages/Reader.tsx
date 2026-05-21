@@ -105,6 +105,82 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
   return out;
 };
 
+// ============= Inline editorial UI helpers (Reader-only) =============
+
+interface HeaderChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  active?: boolean;
+  children: ReactNode;
+}
+
+const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
+  ({ active, children, className, ...props }, ref) => (
+    <button
+      ref={ref}
+      className={cn(
+        'flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 transition-colors active:scale-[0.94]',
+        active
+          ? 'bg-primary/15 text-primary ring-primary/25'
+          : 'bg-background/70 text-foreground/70 ring-border/40 hover:bg-background',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  ),
+);
+HeaderChip.displayName = 'HeaderChip';
+
+const SettingsSection = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div>
+    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground font-serif">
+      {label}
+    </p>
+    <div className="mt-1 h-px w-8 bg-border/60" />
+    <div className="mt-3">{children}</div>
+  </div>
+);
+
+interface SegmentedRowProps<T extends string> {
+  value: T;
+  options: T[];
+  labels: ReactNode[];
+  onChange: (v: T) => void;
+  coverColor: string;
+}
+
+function SegmentedRow<T extends string>({ value, options, labels, onChange, coverColor }: SegmentedRowProps<T>) {
+  return (
+    <div
+      className="grid gap-2"
+      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+    >
+      {options.map((opt, i) => {
+        const selected = value === opt;
+        return (
+          <button
+            key={opt}
+            onClick={() => onChange(opt)}
+            className={cn(
+              'rounded-xl border p-2.5 text-center text-[12px] font-semibold transition-all active:scale-[0.97]',
+              selected
+                ? 'ring-2 ring-primary/40 border-transparent shadow-sm text-foreground'
+                : 'border-border/40 bg-background text-muted-foreground hover:border-border',
+            )}
+            style={
+              selected
+                ? { backgroundImage: `linear-gradient(140deg, ${coverColor}26 0%, hsl(var(--card)) 70%)` }
+                : undefined
+            }
+          >
+            {labels[i]}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Reader() {
   const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
