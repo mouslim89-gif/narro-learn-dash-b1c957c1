@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface AudioPlayerProps {
   src: string;
@@ -12,7 +14,7 @@ interface AudioPlayerProps {
   onPlay?: () => void;
 }
 
-const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
+const SPEEDS = [0.75, 1, 1.25, 1.5];
 
 function formatTime(sec: number): string {
   if (!isFinite(sec) || sec < 0) sec = 0;
@@ -23,7 +25,7 @@ function formatTime(sec: number): string {
 
 export function AudioPlayer({
   src,
-  bottomOffset = 60,
+  bottomOffset = 0,
   onTimeUpdate,
   onLoadedMetadata,
   seekRequestRef,
@@ -70,11 +72,6 @@ export function AudioPlayer({
     }
   };
 
-  const nextSpeed = () => {
-    const idx = SPEEDS.indexOf(speed);
-    setSpeed(SPEEDS[(idx + 1) % SPEEDS.length]);
-  };
-
   const handleSliderChange = (val: number[]) => {
     if (audioRef.current && duration > 0) {
       const newTime = (val[0] / 100) * duration;
@@ -112,39 +109,63 @@ export function AudioPlayer({
       />
       <div
         data-audio-player
-        style={{ bottom: `${bottomOffset}px` }}
-        className="fixed left-0 right-0 z-40 border-t border-border/50 bg-card/85 px-4 py-3 backdrop-blur-2xl"
+        style={{ bottom: `${bottomOffset + 12}px` }}
+        className="fixed inset-x-0 z-40 px-3 pointer-events-none"
       >
-        <div className="mx-auto flex max-w-lg items-center gap-2.5">
-          <button
-            onClick={togglePlay}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30 active:scale-95 transition-transform"
-            aria-label={playing ? 'Pause' : 'Play'}
-          >
-            {playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
-          </button>
-          <span className="shrink-0 text-[11px] font-mono font-medium tabular-nums text-muted-foreground w-9">
-            {formatTime(currentTime)}
-          </span>
-          <Slider
-            value={[progressPct]}
-            onValueChange={handleSliderChange}
-            max={100}
-            step={0.1}
-            className="flex-1 audio-slider"
-          />
-          <button
-            onClick={() => setShowRemaining(v => !v)}
-            className="shrink-0 hidden xs:block text-[11px] font-mono font-medium tabular-nums text-muted-foreground w-10 text-right"
-          >
-            {rightTime}
-          </button>
-          <button
-            onClick={nextSpeed}
-            className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold text-foreground hover:bg-muted/80 active:scale-95 transition-transform"
-          >
-            {speed}×
-          </button>
+        <div className="mx-auto max-w-md pointer-events-auto rounded-2xl bg-background/85 backdrop-blur-xl ring-1 ring-border/40 shadow-lg">
+          <div className="flex items-center gap-3 px-3 py-2">
+            <button
+              onClick={togglePlay}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/25 active:scale-95 transition-transform"
+              aria-label={playing ? 'Pause' : 'Play'}
+            >
+              {playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
+            </button>
+            <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground w-9">
+              {formatTime(currentTime)}
+            </span>
+            <Slider
+              value={[progressPct]}
+              onValueChange={handleSliderChange}
+              max={100}
+              step={0.1}
+              className="flex-1 audio-slider"
+            />
+            <button
+              onClick={() => setShowRemaining(v => !v)}
+              className="shrink-0 hidden xs:block text-[11px] tabular-nums text-muted-foreground w-10 text-right"
+            >
+              {rightTime}
+            </button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="shrink-0 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] font-semibold text-foreground/80 ring-1 ring-border/40 hover:bg-muted active:scale-95 transition"
+                  aria-label="Playback speed"
+                >
+                  {speed}×
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" side="top" className="w-24 p-1">
+                <div className="flex flex-col">
+                  {SPEEDS.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSpeed(s)}
+                      className={cn(
+                        'rounded-md px-2.5 py-1.5 text-[12px] font-semibold text-left transition-colors',
+                        s === speed
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-foreground/70 hover:bg-muted'
+                      )}
+                    >
+                      {s}×
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
@@ -103,6 +104,82 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
 
   return out;
 };
+
+// ============= Inline editorial UI helpers (Reader-only) =============
+
+interface HeaderChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  active?: boolean;
+  children: ReactNode;
+}
+
+const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
+  ({ active, children, className, ...props }, ref) => (
+    <button
+      ref={ref}
+      className={cn(
+        'flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 transition-colors active:scale-[0.94]',
+        active
+          ? 'bg-primary/15 text-primary ring-primary/25'
+          : 'bg-background/70 text-foreground/70 ring-border/40 hover:bg-background',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  ),
+);
+HeaderChip.displayName = 'HeaderChip';
+
+const SettingsSection = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div>
+    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground font-serif">
+      {label}
+    </p>
+    <div className="mt-1 h-px w-8 bg-border/60" />
+    <div className="mt-3">{children}</div>
+  </div>
+);
+
+interface SegmentedRowProps<T extends string> {
+  value: T;
+  options: T[];
+  labels: ReactNode[];
+  onChange: (v: T) => void;
+  coverColor: string;
+}
+
+function SegmentedRow<T extends string>({ value, options, labels, onChange, coverColor }: SegmentedRowProps<T>) {
+  return (
+    <div
+      className="grid gap-2"
+      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+    >
+      {options.map((opt, i) => {
+        const selected = value === opt;
+        return (
+          <button
+            key={opt}
+            onClick={() => onChange(opt)}
+            className={cn(
+              'rounded-xl border p-2.5 text-center text-[12px] font-semibold transition-all active:scale-[0.97]',
+              selected
+                ? 'ring-2 ring-primary/40 border-transparent shadow-sm text-foreground'
+                : 'border-border/40 bg-background text-muted-foreground hover:border-border',
+            )}
+            style={
+              selected
+                ? { backgroundImage: `linear-gradient(140deg, ${coverColor}26 0%, hsl(var(--card)) 70%)` }
+                : undefined
+            }
+          >
+            {labels[i]}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Reader() {
   const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
@@ -568,60 +645,60 @@ export default function Reader() {
 
   return (
     <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ? 'pb-20' : 'pb-8'} dark:bg-background`}>
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/40 bg-card/80 px-3 py-2.5 backdrop-blur-xl">
-        <button
-          onClick={() => navigate(-1)}
-          className="reader-icon-btn"
-          aria-label="Back"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div className="text-center">
-          <p className="font-japanese text-sm font-bold">{book.titleJp}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {difficultyConfig[difficulty].label}
-            {timeRemaining && ` · ~${timeRemaining} min left`}
-          </p>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <button
-            onClick={() => setShowFurigana(!showFurigana)}
-            className="reader-icon-btn"
-            data-active={showFurigana ? 'true' : undefined}
-            title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
-          >
-            {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
-          </button>
-          <button
-            onClick={() => setShowGrammar(true)}
-            className="reader-icon-btn"
-            title="Grammar Notes"
-          >
-            <BookType className="h-5 w-5" />
-          </button>
-          {isAdmin && (
-            <button
-              onClick={() => {
-                setTokenEditMode(!tokenEditMode);
-                setSelectedIdx([]);
-                setMiniPopup(null);
-                setSentenceTranslation(null);
-              }}
-              className="reader-icon-btn"
-              data-active={tokenEditMode ? 'true' : undefined}
-              title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
+      <header
+        className="sticky top-0 z-30 backdrop-blur-xl"
+        style={{ backgroundImage: `linear-gradient(180deg, ${book.coverColor}1f 0%, hsl(var(--background) / 0.85) 100%)` }}
+      >
+        <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+          <HeaderChip onClick={() => navigate(-1)} aria-label="Back">
+            <ArrowLeft className="h-5 w-5" />
+          </HeaderChip>
+          <div className="min-w-0 flex-1 text-center">
+            <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
+            <p className="text-[10px] text-muted-foreground">
+              {difficultyConfig[difficulty].label}
+              {timeRemaining && ` · ~${timeRemaining}m left`}
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <HeaderChip
+              onClick={() => setShowFurigana(!showFurigana)}
+              active={showFurigana}
+              title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
             >
-              <Wrench className="h-5 w-5" />
-            </button>
-          )}
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="reader-icon-btn"
-            data-active={showSettings ? 'true' : undefined}
-            title="Settings"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
+              {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
+            </HeaderChip>
+            <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
+              <BookType className="h-5 w-5" />
+            </HeaderChip>
+            <HeaderChip
+              onClick={() => setShowSettings(!showSettings)}
+              active={showSettings}
+              title="Settings"
+            >
+              <Settings className="h-5 w-5" />
+            </HeaderChip>
+            {isAdmin && (
+              <HeaderChip
+                onClick={() => {
+                  setTokenEditMode(!tokenEditMode);
+                  setSelectedIdx([]);
+                  setMiniPopup(null);
+                  setSentenceTranslation(null);
+                }}
+                active={tokenEditMode}
+                title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
+              >
+                <Wrench className="h-5 w-5" />
+              </HeaderChip>
+            )}
+          </div>
+        </div>
+        <div className="h-[2px] w-full bg-border/30">
+          <div
+            className="h-full transition-[width] duration-200"
+            style={{ width: `${scrollPercent}%`, backgroundColor: book.coverColor }}
+          />
         </div>
       </header>
 
@@ -761,10 +838,7 @@ export default function Reader() {
 
 
 
-      {/* Slim gradient progress bar */}
-      <div className="reader-progress-track">
-        <div className="reader-progress-fill" style={{ width: `${scrollPercent}%` }} />
-      </div>
+      {/* progress hairline now lives in the header */}
 
       {displayMode === 'grammar' && (
         <div className="sticky top-14 z-10 border-b bg-card/95 px-3 py-2.5 backdrop-blur-lg">
@@ -782,7 +856,27 @@ export default function Reader() {
         </div>
       )}
 
-      <article ref={articleRef} className="mx-3 my-5 rounded-2xl bg-card px-6 py-8 shadow-sm sm:mx-auto sm:max-w-2xl sm:px-12 sm:py-12">
+      <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+        <div
+          className="h-3 w-full"
+          aria-hidden
+          style={{ backgroundImage: `linear-gradient(to bottom, ${book.coverColor}1f, transparent)` }}
+        />
+        {book.chapters && book.chapters.length > 1 && (() => {
+          const chapter = book.chapters.find((c) => c.id === chapterId);
+          const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
+          if (!chapter || chapterIndex < 0) return null;
+          return (
+            <div className="px-6 pt-6 pb-2 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Chapter {chapterIndex + 1}
+              </p>
+              <p className="mt-1 font-serif text-lg font-bold">{chapter.title}</p>
+              <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
+            </div>
+          );
+        })()}
+        <div className="px-6 py-8 sm:px-12 sm:py-12">
         <div
           className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]}`}
           style={{
@@ -934,6 +1028,7 @@ export default function Reader() {
               })}
             </p>
           ))}
+        </div>
         </div>
       </article>
 

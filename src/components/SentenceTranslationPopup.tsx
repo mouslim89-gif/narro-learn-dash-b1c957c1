@@ -95,7 +95,7 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
   return (
     <div
       ref={ref}
-      className={`fixed z-[60] w-[min(340px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl ${
+      className={`fixed z-[60] w-[min(340px,calc(100vw-16px))] rounded-2xl ring-1 ring-border/50 shadow-xl ${
         position
           ? position.placement === 'above'
             ? 'animate-mini-slide-up'
@@ -106,11 +106,12 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
+        backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 50%)',
       }}
     >
-      <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-1 border-b border-border/50">
+      <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1.5">
         <Languages className="h-3.5 w-3.5 text-primary" />
-        <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Translation</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">Translation</span>
         <div className="flex-1" />
         <button
           onClick={onClose}
@@ -121,13 +122,21 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
         </button>
       </div>
 
-      <div className="px-2.5 py-2 space-y-1.5">
-        <p className="font-japanese text-xs text-muted-foreground leading-relaxed">
-          {japanese}
-        </p>
+      <div className="px-3 pb-3 space-y-2">
+        <div className="relative rounded-xl bg-muted/40 ring-1 ring-border/30 px-4 py-3">
+          <span className="absolute left-1.5 top-0 font-serif text-2xl text-muted-foreground/40 select-none leading-none">"</span>
+          <p className="font-japanese text-[13px] leading-relaxed pl-3 text-foreground/90">
+            {japanese}
+          </p>
+          {english && !loading && (
+            <p className="mt-1.5 text-[12px] text-muted-foreground pl-3 leading-snug">
+              {english}
+            </p>
+          )}
+        </div>
 
         {loading && (
-          <div className="flex items-center gap-2 py-1 text-muted-foreground">
+          <div className="flex items-center gap-2 py-0.5 text-muted-foreground">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
             <span className="text-[11px]">Translating…</span>
           </div>
@@ -136,13 +145,8 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
         {error && !loading && (
           <p className="text-[11px] text-destructive py-0.5">{error}</p>
         )}
-
-        {english && !loading && (
-          <p className="text-[13px] font-semibold text-accent leading-snug">
-            {english}
-          </p>
-        )}
       </div>
     </div>
   );
 }
+
