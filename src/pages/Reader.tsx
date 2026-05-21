@@ -704,110 +704,116 @@ export default function Reader() {
 
       {(() => {
         const settingsBody = (
-          <div className="flex flex-col gap-5">
-            <SettingsSection label="Reading level">
-              <SegmentedRow<Difficulty>
-                value={difficulty}
-                options={Object.keys(difficultyConfig) as Difficulty[]}
-                labels={(Object.keys(difficultyConfig) as Difficulty[]).map((d) => difficultyConfig[d].label)}
-                onChange={(d) => setDifficulty(d)}
-                coverColor={book.coverColor}
-              />
-            </SettingsSection>
+          <>
+            <p className="reader-settings-section"><span className="reader-settings-bullet" />Reading Level</p>
+            <div className="flex gap-2">
+              {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => { setDifficulty(d); }}
+                  className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                    d === difficulty ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
+                  }`}
+                >
+                  {difficultyConfig[d].label}
+                </button>
+              ))}
+            </div>
 
-            <SettingsSection label="Font size">
-              <SegmentedRow<FontSize>
-                value={fontSize}
-                options={[...fontSizes]}
-                labels={fontSizes.map((s) => (
-                  <span key={s} className="inline-flex items-center justify-center gap-1">
-                    <Type className="h-3 w-3" /> {fontSizeLabels[s]}
-                  </span>
-                ))}
-                onChange={setFontSize}
-                coverColor={book.coverColor}
-              />
-            </SettingsSection>
+            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Font Size</p>
+            <div className="flex gap-2">
+              {fontSizes.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setFontSize(s)}
+                  className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                    s === fontSize ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
+                  }`}
+                >
+                  <Type className="h-3 w-3" /> {fontSizeLabels[s]}
+                </button>
+              ))}
+            </div>
 
-            <SettingsSection label="Japanese font">
-              <SegmentedRow<JapaneseFont>
-                value={japaneseFont}
-                options={japaneseFonts.map((f) => f.value)}
-                labels={japaneseFonts.map((f) => (
-                  <span key={f.value} className="inline-flex items-center justify-center gap-1.5">
-                    <span className={`text-base leading-none ${japaneseFontClassMap[f.value]}`}>あ</span>
-                    {f.label}
-                  </span>
-                ))}
-                onChange={setJapaneseFont}
-                coverColor={book.coverColor}
-              />
-            </SettingsSection>
+            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Japanese Font</p>
+            <div className="flex gap-2">
+              {japaneseFonts.map((f) => (
+                <button
+                  key={f.value}
+                  onClick={() => setJapaneseFont(f.value)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                    f.value === japaneseFont ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
+                  }`}
+                >
+                  <span className={`text-base leading-none ${japaneseFontClassMap[f.value]}`}>あ</span>
+                  {f.label}
+                </button>
+              ))}
+            </div>
 
-            <SettingsSection label="Theme">
-              <SegmentedRow<'light' | 'dark'>
-                value={readerDarkMode ? 'dark' : 'light'}
-                options={['light', 'dark']}
-                labels={[
-                  <span key="l" className="inline-flex items-center justify-center gap-1.5"><Sun className="h-3.5 w-3.5" /> Light</span>,
-                  <span key="d" className="inline-flex items-center justify-center gap-1.5"><Moon className="h-3.5 w-3.5" /> Dark</span>,
-                ]}
-                onChange={(v) => setReaderDarkMode(v === 'dark')}
-                coverColor={book.coverColor}
-              />
-            </SettingsSection>
+            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Theme</p>
+            <button
+              onClick={() => setReaderDarkMode(!readerDarkMode)}
+              className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
+            >
+              {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+              {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
 
-            <SettingsSection label="Display mode">
-              <SegmentedRow<DisplayMode>
-                value={displayMode}
-                options={['normal', 'grammar']}
-                labels={[
-                  'Normal',
-                  <span key="g" className="inline-flex items-center justify-center gap-1.5"><Palette className="h-3 w-3" /> Grammar</span>,
-                ]}
-                onChange={setDisplayMode}
-                coverColor={book.coverColor}
-              />
-            </SettingsSection>
+            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Display Mode</p>
+            <div className="flex gap-2">
+              {(['normal', 'grammar'] as DisplayMode[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setDisplayMode(m)}
+                  className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                    m === displayMode ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
+                  }`}
+                >
+                  {m === 'grammar' && <Palette className="h-3 w-3" />}
+                  {m === 'normal' ? 'Normal' : 'Grammar'}
+                </button>
+              ))}
+            </div>
 
-            <SettingsSection label="Highlights">
-              <div className="space-y-2">
-                <label className="flex items-center justify-between gap-3 rounded-xl border border-border/40 bg-background px-3 py-2">
-                  <span className="text-[12px] font-semibold">Highlight saved words</span>
-                  <Switch
-                    checked={showKnownHighlights}
-                    onCheckedChange={setShowKnownHighlights}
-                    aria-label="Toggle saved-word highlights"
-                  />
-                </label>
-                {showKnownHighlights && (
-                  <div className="space-y-1.5 pl-1">
-                    <label className="flex items-center justify-between gap-3 px-2 py-1">
-                      <span className="flex items-center gap-2 text-[12px]">
-                        <span className="color-dot color-dot-new" />
-                        New words
-                      </span>
-                      <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
-                    </label>
-                    <label className="flex items-center justify-between gap-3 px-2 py-1">
-                      <span className="flex items-center gap-2 text-[12px]">
-                        <span className="color-dot color-dot-learning" />
-                        Learning
-                      </span>
-                      <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
-                    </label>
-                    <label className="flex items-center justify-between gap-3 px-2 py-1">
-                      <span className="flex items-center gap-2 text-[12px]">
-                        <span className="color-dot color-dot-known" />
-                        Known
-                      </span>
-                      <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
-                    </label>
-                  </div>
-                )}
-              </div>
-            </SettingsSection>
-          </div>
+            {/* Highlights — saved words */}
+            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Highlights</p>
+            <div className="space-y-2.5">
+              <label className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2">
+                <span className="text-xs font-semibold">Highlight saved words</span>
+                <Switch
+                  checked={showKnownHighlights}
+                  onCheckedChange={setShowKnownHighlights}
+                  aria-label="Toggle saved-word highlights"
+                />
+              </label>
+              {showKnownHighlights && (
+                <div className="space-y-1.5 pl-1">
+                  <label className="flex items-center justify-between gap-3 px-2 py-1">
+                    <span className="flex items-center gap-2 text-xs">
+                      <span className="color-dot color-dot-new" />
+                      New words
+                    </span>
+                    <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
+                  </label>
+                  <label className="flex items-center justify-between gap-3 px-2 py-1">
+                    <span className="flex items-center gap-2 text-xs">
+                      <span className="color-dot color-dot-learning" />
+                      Learning
+                    </span>
+                    <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
+                  </label>
+                  <label className="flex items-center justify-between gap-3 px-2 py-1">
+                    <span className="flex items-center gap-2 text-xs">
+                      <span className="color-dot color-dot-known" />
+                      Known
+                    </span>
+                    <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
+                  </label>
+                </div>
+              )}
+            </div>
+          </>
         );
 
         if (isMobile) {
@@ -1067,7 +1073,6 @@ export default function Reader() {
         text={bookText}
         bookId={id || ''}
         difficulty={difficulty}
-        coverColor={book.coverColor}
         open={showGrammar}
         onClose={() => setShowGrammar(false)}
       />

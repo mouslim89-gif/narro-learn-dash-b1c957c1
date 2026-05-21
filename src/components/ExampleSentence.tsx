@@ -26,8 +26,9 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
 
   if (loading) {
     return (
-      <div className={`space-y-1 ${className}`}>
-        <Skeleton className="h-16 w-full rounded-xl" />
+      <div className={`mt-2 space-y-1 ${className}`}>
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
       </div>
     );
   }
@@ -37,7 +38,7 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
   const highlightWord = (text: string) => {
     const index = text.indexOf(word);
     if (index === -1) return text;
-
+    
     return (
       <>
         {text.slice(0, index)}
@@ -48,19 +49,18 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
   };
 
   return (
-    <blockquote className={`rounded-xl bg-muted/40 ring-1 ring-border/40 p-4 ${className}`}>
-      <div className="flex items-start gap-2">
-        <span className="font-serif text-2xl text-foreground/30 leading-none shrink-0 -mt-1">&ldquo;</span>
-        <p className="font-japanese text-[15px] leading-relaxed flex-1">
+    <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
+      <div className="flex items-start gap-1">
+        <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
           {highlightWord(example.japanese)}
         </p>
         <PlayWordButton word={example.japanese} size={14} className="mt-0.5 shrink-0" />
       </div>
       {example.english && (
-        <p className="mt-1 text-[12px] text-muted-foreground">
+        <p className="mt-0.5 text-xs text-muted-foreground italic">
           {example.english}
         </p>
       )}
-    </blockquote>
+    </div>
   );
 }

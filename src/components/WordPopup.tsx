@@ -306,14 +306,14 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
               <section>
                 <p className="font-serif text-[13px] font-semibold text-foreground/80">Meanings</p>
                 <div className="mt-1 h-px w-8 bg-border/60" />
-                <ol className="mt-2 space-y-1.5">
+                <div className="mt-2 space-y-1">
                   {result.senses.slice(0, 3).map((sense, i) => (
-                    <li key={i} className="flex gap-3 text-[14px] leading-relaxed">
-                      <span className="font-serif text-foreground/40 tabular-nums">{i + 1}.</span>
-                      <span className="flex-1 font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
-                    </li>
+                    <p key={i} className="font-serif text-sm leading-relaxed">
+                      <span className="text-muted-foreground tabular-nums mr-1">{i + 1}.</span>
+                      <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
+                    </p>
                   ))}
-                </ol>
+                </div>
               </section>
 
               {/* Examples */}
@@ -330,7 +330,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                 <section>
                   <p className="font-serif text-[13px] font-semibold text-foreground/80">Conjugations</p>
                   <div className="mt-1 h-px w-8 bg-border/60" />
-                  <div className="mt-2">
+                  <div className="mt-2 rounded-xl bg-muted/30 p-3 ring-1 ring-border/30">
                     <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
                   </div>
                 </section>
