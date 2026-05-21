@@ -29,46 +29,41 @@ export function BottomNav() {
   const dueCount = useFlashcardStore(s => s.getDueCount());
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
       <SyncIndicator />
-      <div className="mx-auto flex max-w-lg items-center justify-around py-2">
-        {tabs.map(({ path, label, icon: Icon }) => {
-          const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
-          const showBadge = path === '/flashcards' && dueCount > 0;
-          return (
-            <Link
-              key={path}
-              to={path}
-              className={`relative flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium tap-scale-sm smooth-colors ${
-                active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <div className="relative">
-                <motion.div
-                  animate={{ scale: active ? 1.08 : 1 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                >
-                  <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
-                </motion.div>
-                {showBadge && (
-                  <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white animate-scale-pop">
-                    {dueCount > 9 ? '9+' : dueCount}
-                  </span>
-                )}
-              </div>
-              {label}
-              <span className="relative mt-0.5 h-1 w-1">
+      <div className="mx-auto max-w-lg px-3 pb-2 pt-1">
+        <div className="relative flex items-center justify-between rounded-full border border-border/40 bg-card/80 px-1.5 py-1.5 shadow-lg backdrop-blur-xl">
+          {tabs.map(({ path, label, icon: Icon }) => {
+            const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
+            const showBadge = path === '/flashcards' && dueCount > 0;
+            return (
+              <Link
+                key={path}
+                to={path}
+                className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 text-[11px] font-medium tap-scale-sm smooth-colors ${
+                  active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
                 {active && (
                   <motion.span
-                    layoutId="bottom-nav-indicator"
-                    className="absolute inset-0 rounded-full bg-primary"
-                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                    layoutId="bottom-nav-pill"
+                    className="absolute inset-0 rounded-full bg-primary shadow-md"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
-              </span>
-            </Link>
-          );
-        })}
+                <div className="relative z-10">
+                  <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+                  {showBadge && (
+                    <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white animate-scale-pop">
+                      {dueCount > 9 ? '9+' : dueCount}
+                    </span>
+                  )}
+                </div>
+                <span className="relative z-10 leading-none">{label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
