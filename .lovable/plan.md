@@ -1,46 +1,46 @@
-# Fix: bottom nav disappears and doesn't come back on refresh
+# Bottom nav: editorial floating pill
 
-## Root cause
+Style-only refresh of `src/components/BottomNav.tsx` to match the editorial language used on Library, My Books, Book Detail, and Flashcards (rounded-full pills, `ring-1 ring-border/40`, warm shadows, serif accents). No data, routing, store, or sync logic changes.
 
-In `src/App.tsx`, the bottom nav is hidden whenever `isReviewing` from the flashcard store is `true`:
+## Scope
 
-```ts
-const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
-```
+- **Modify**: `src/components/BottomNav.tsx` only.
+- **Verify**: `rg -n 'pb-(8|12|16)\b' src/pages` and bump only the offending pages to `pb-24`. Skip pages already at `pb-20`/`pb-24`+.
+- **Untouched**: tabs array, `useFlashcardStore`, `useSyncStatus`, routing, every other component.
 
-`isReviewing` lives in `src/stores/flashcards.ts`, which uses Zustand's `persist` middleware **without a `partialize`**. That means the entire state — including `isReviewing: true` — gets written to `localStorage` under `yomimasu-flashcards`.
+## Changes
 
-If a review session ends abnormally (navigation away mid-review, tab close, crash, hot reload during review, etc.) without `setIsReviewing(false)` firing, the `true` value is persisted. On reload, the store rehydrates `isReviewing = true`, so the nav stays hidden on every page until something flips it back — which today only happens by entering and leaving the Flashcards review flow again (or any edit that resets the store shape).
+### 1. Floating pill container
+Replace the full-bleed `border-t bg-card/95` strip with a centered floating pill:
+- `fixed left-1/2 -translate-x-1/2 z-50`, anchored via `bottom: max(0.75rem, env(safe-area-inset-bottom))`.
+- `max-w-md`, `rounded-full bg-background/85 backdrop-blur-xl`, `ring-1 ring-border/40`.
+- Soft adaptive shadow: `0 10px 30px -10px hsl(var(--foreground) / 0.25)`.
 
-This matches the symptom exactly: nav gone, refresh doesn't fix it, next "edit" makes it come back.
+### 2. Active tab pill (replaces dot indicator)
+- Drop the 1×1 dot + its `layoutId="bottom-nav-indicator"` span.
+- Wrap the active tab's icon+label with a `motion.span` using the same `layoutId`, rendered as a tinted `bg-primary/10` rounded-full backdrop sliding between tabs.
+- Inactive tabs: icon only (stroke 1.8, muted). Active tab: icon (stroke 2.2, primary) + inline serif label (`font-serif text-[12px]`).
+- Remove the icon `scale: 1.08` framer animation — the pill backdrop is now the affordance.
+- Tab container becomes horizontal `flex items-center gap-1.5` instead of `flex-col`.
+- Keep `tap-scale-sm`, `smooth-colors`, `cn` from `@/lib/utils` (add import).
 
-## Fix
+### 3. Cards badge — warm, not red
+Switch the `dueCount` badge from `bg-destructive` to the warm flame orange (`hsl(36 80% 55%)`) used by the Flashcards "Due today" hero. Inline style is fine for this single use.
 
-Two small, complementary changes in `src/stores/flashcards.ts`:
+### 4. Sync indicator — pill above the bar
+Move the absolute corner dot to a centered text+dot pill sitting just above the nav:
+- `absolute -top-7 left-1/2 -translate-x-1/2`, `rounded-full bg-background/90 ring-1 ring-border/40`, `text-[10px]`, with a 1.5×1.5 colored dot.
+- Renders only when `status !== 'idle'`. "Syncing" uses `bg-primary animate-soft-pulse`; error uses `bg-destructive`.
 
-1. **Add a `partialize`** to the `persist` config so only `savedWords` is written to `localStorage`. `isReviewing` and `syncUserId` are pure runtime/session state and shouldn't be persisted.
-2. As a safety belt, **add an `onRehydrateStorage`** that forces `isReviewing = false` after rehydration. Cheap insurance against any old persisted value already sitting in users' browsers.
+### 5. Theming + a11y
+- All colors via semantic tokens (`background`, `foreground`, `primary`, `border`, `muted-foreground`).
+- Shadow keyed off `--foreground` adapts to light/dark.
+- `z-50` preserved (study modal at `z-[60]` still covers it).
+- `prefers-reduced-motion` handled natively by Framer Motion's `layoutId` cross-fade fallback.
 
-```ts
-persist(
-  (set, get) => ({ /* unchanged */ }),
-  {
-    name: 'yomimasu-flashcards',
-    partialize: (state) => ({ savedWords: state.savedWords }),
-    onRehydrateStorage: () => (state) => {
-      if (state) state.isReviewing = false;
-    },
-  }
-)
-```
+## Technical notes
 
-No changes to `App.tsx` or `BottomNav.tsx` needed.
-
-## Why not other approaches
-
-- **Resetting `isReviewing` in a `useEffect` on mount in `App.tsx`** would also work, but it leaks store concerns into the app shell and runs on every mount. Fixing it at the store boundary is cleaner.
-- **Removing the `isReviewing` check from `hideNav`** would break the intentional fullscreen review UI.
-
-## Files touched
-
-- `src/stores/flashcards.ts` — extend the `persist` options object only.
+- Single import addition: `cn` from `@/lib/utils`.
+- No new tokens added to `index.css` (flame color inlined).
+- `getDueCount` and `useSyncStatus` selectors used verbatim.
+- The floating pill footprint (~56px + 12px gap) is within current `pb-20`/`pb-24` page paddings; only pages found with `pb-8`/`pb-12`/`pb-16` get bumped.
