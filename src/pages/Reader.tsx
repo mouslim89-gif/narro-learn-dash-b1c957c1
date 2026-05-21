@@ -857,11 +857,7 @@ export default function Reader() {
       )}
 
       <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
-        <div
-          className="h-3 w-full"
-          aria-hidden
-          style={{ backgroundImage: `linear-gradient(to bottom, ${book.coverColor}1f, transparent)` }}
-        />
+
         {book.chapters && book.chapters.length > 1 && (() => {
           const chapter = book.chapters.find((c) => c.id === chapterId);
           const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
