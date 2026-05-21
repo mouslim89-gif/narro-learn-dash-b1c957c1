@@ -75,19 +75,8 @@ export function BottomNav() {
                     </span>
                   )}
                 </div>
-                <motion.span
-                  initial={false}
-                  animate={{
-                    width: active ? 'auto' : 0,
-                    opacity: active ? 1 : 0,
-                    marginLeft: active ? 2 : 0,
-                  }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                  className="overflow-hidden text-[12px] font-bold tracking-tight text-primary whitespace-nowrap"
-                >
-                  {label}
-                </motion.span>
               </motion.div>
+
             </Link>
           );
         })}
