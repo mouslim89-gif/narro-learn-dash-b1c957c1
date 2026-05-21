@@ -838,10 +838,7 @@ export default function Reader() {
 
 
 
-      {/* Slim gradient progress bar */}
-      <div className="reader-progress-track">
-        <div className="reader-progress-fill" style={{ width: `${scrollPercent}%` }} />
-      </div>
+      {/* progress hairline now lives in the header */}
 
       {displayMode === 'grammar' && (
         <div className="sticky top-14 z-10 border-b bg-card/95 px-3 py-2.5 backdrop-blur-lg">
