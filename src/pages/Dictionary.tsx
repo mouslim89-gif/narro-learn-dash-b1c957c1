@@ -116,14 +116,9 @@ export default function DictionaryPage() {
           return (
             <div
               key={idx}
-              className="relative rounded-2xl p-5 ring-1 ring-border/40 card-lift overflow-hidden"
-              style={
-                isCommon
-                  ? { backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.10) 0%, hsl(var(--card)) 55%)' }
-                  : undefined
-              }
+              className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden"
             >
-              {!isCommon && <div className="absolute inset-0 bg-card -z-10" aria-hidden />}
+
 
               {/* Save button */}
               <button
