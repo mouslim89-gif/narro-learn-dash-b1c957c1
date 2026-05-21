@@ -169,7 +169,7 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-2xl ring-1 ring-border/50 shadow-xl ${
+      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-2xl bg-card ring-1 ring-border/50 shadow-xl ${
         position
           ? position.placement === 'above'
             ? 'animate-mini-slide-up'
@@ -180,9 +180,9 @@ export function WordMiniPopup({
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
-        backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 50%)',
       }}
     >
+
       {/* Header: word + actions inline */}
       <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-0.5">
         <span className="font-japanese text-base font-bold truncate min-w-0">
