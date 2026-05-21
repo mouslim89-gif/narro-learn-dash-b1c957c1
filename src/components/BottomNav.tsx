@@ -6,22 +6,20 @@ import { useSyncStatus } from '@/lib/sync/sync-status';
 
 const tabs = [
   { path: '/', label: 'Library', icon: Library },
-  { path: '/my-books', label: 'Books', icon: BookOpen },
+  { path: '/my-books', label: 'My Books', icon: BookOpen },
   { path: '/flashcards', label: 'Cards', icon: Layers },
-  { path: '/dictionary', label: 'Dict', icon: Search },
+  { path: '/dictionary', label: 'Dictionary', icon: Search },
 ];
 
 function SyncIndicator() {
   const status = useSyncStatus(s => s.status);
   if (status === 'idle') return null;
   const color =
-    status === 'syncing'
-      ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.6)] animate-soft-pulse'
-      : 'bg-destructive shadow-[0_0_8px_hsl(var(--destructive)/0.6)]';
+    status === 'syncing' ? 'bg-primary animate-soft-pulse' : 'bg-destructive';
   return (
     <span
       aria-label={status === 'syncing' ? 'Syncing' : 'Sync error'}
-      className={`absolute -top-1 left-1/2 -translate-x-1/2 h-1 w-8 rounded-full ${color}`}
+      className={`absolute right-3 top-1.5 h-1.5 w-1.5 rounded-full ${color}`}
     />
   );
 }
@@ -31,11 +29,9 @@ export function BottomNav() {
   const dueCount = useFlashcardStore(s => s.getDueCount());
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pb-[calc(env(safe-area-inset-bottom)+0.625rem)] pt-3 px-4 pointer-events-none">
-      <nav
-        className="pointer-events-auto relative mx-auto max-w-sm flex items-stretch justify-between rounded-[26px] bg-card/85 backdrop-blur-2xl ring-1 ring-border/60 border border-white/40 dark:border-white/5 shadow-[0_10px_40px_-12px_hsl(var(--foreground)/0.25),0_2px_6px_-2px_hsl(var(--foreground)/0.08),inset_0_1px_0_0_hsl(0_0%_100%/0.5)] px-1.5 py-1.5"
-      >
-        <SyncIndicator />
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
+      <SyncIndicator />
+      <div className="mx-auto flex max-w-lg items-center justify-around py-2">
         {tabs.map(({ path, label, icon: Icon }) => {
           const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
           const showBadge = path === '/flashcards' && dueCount > 0;
@@ -43,49 +39,37 @@ export function BottomNav() {
             <Link
               key={path}
               to={path}
-              aria-label={label}
-              aria-current={active ? 'page' : undefined}
-              className="relative flex-1 flex items-center justify-center h-14 tap-scale-sm group"
+              className={`relative flex flex-col items-center gap-0.5 px-3 py-1 text-[11px] font-medium tap-scale-sm smooth-colors ${
+                active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
-              {active && (
+              <div className="relative">
                 <motion.div
-                  layoutId="bottom-nav-pill"
-                  className="absolute inset-y-1 inset-x-1 rounded-[20px] bg-gradient-to-b from-primary/15 to-primary/8 ring-1 ring-primary/15 shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.4),0_4px_12px_-4px_hsl(var(--primary)/0.35)]"
-                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                />
-              )}
-              <motion.div
-                className="relative z-10 flex flex-col items-center justify-center gap-1"
-                animate={{ scale: active ? 1 : 0.96 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-              >
-                <div className="relative">
-                  <Icon
-                    className={`h-[22px] w-[22px] transition-colors duration-200 ${
-                      active
-                        ? 'text-primary drop-shadow-[0_1px_2px_hsl(var(--primary)/0.35)]'
-                        : 'text-muted-foreground/70 group-hover:text-foreground/80'
-                    }`}
-                    strokeWidth={active ? 2.4 : 2}
-                  />
-                  {showBadge && (
-                    <span className="absolute -right-1.5 -top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-gradient-to-b from-destructive to-destructive/85 px-1 text-[9px] font-bold leading-none text-white ring-2 ring-card shadow-[0_2px_6px_-1px_hsl(var(--destructive)/0.6)] animate-scale-pop">
-                      {dueCount > 9 ? '9+' : dueCount}
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={`text-[10.5px] font-semibold leading-none tracking-tight transition-colors duration-200 ${
-                    active ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground/80'
-                  }`}
+                  animate={{ scale: active ? 1.08 : 1 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                 >
-                  {label}
-                </span>
-              </motion.div>
+                  <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+                </motion.div>
+                {showBadge && (
+                  <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white animate-scale-pop">
+                    {dueCount > 9 ? '9+' : dueCount}
+                  </span>
+                )}
+              </div>
+              {label}
+              <span className="relative mt-0.5 h-1 w-1">
+                {active && (
+                  <motion.span
+                    layoutId="bottom-nav-indicator"
+                    className="absolute inset-0 rounded-full bg-primary"
+                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                  />
+                )}
+              </span>
             </Link>
           );
         })}
-      </nav>
-    </div>
+      </div>
+    </nav>
   );
 }
