@@ -265,7 +265,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
           <DrawerTitle>{displayWord}</DrawerTitle>
         </DrawerHeader>
 
-        <div className="px-5 pb-6 space-y-5 overflow-y-auto">
+        <div className="px-4 pb-6 space-y-3 overflow-y-auto">
           {loading && <LoadingSkeleton />}
 
           {error && !loading && (
@@ -274,86 +274,71 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
           {result && !loading && (
             <>
+
               {/* Word + reading + romaji + audio */}
-              <div className="space-y-1">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <p className="font-japanese text-3xl font-bold leading-none">{displayWord}</p>
-                  <PlayWordButton word={displayWord} reading={displayReading} size={18} />
-                </div>
-                {(displayReading || isCommon) && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {displayReading && displayReading !== displayWord && (
-                      <span className="font-japanese text-base text-muted-foreground">{displayReading}</span>
-                    )}
-                    {displayReading && (
-                      <span className="text-xs italic text-muted-foreground/70">{toRomaji(displayReading)}</span>
-                    )}
-                    {isCommon && (
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
-                        ✦ Common
-                      </span>
-                    )}
-                  </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="font-japanese text-2xl font-bold">{displayWord}</p>
+                {displayReading && displayReading !== displayWord && (
+                  <span className="font-japanese text-base text-muted-foreground">{displayReading}</span>
                 )}
-                {result.senses[0]?.parts_of_speech && result.senses[0].parts_of_speech.length > 0 && (
-                  <p className="font-serif italic text-[12px] text-muted-foreground pt-0.5">
-                    {result.senses[0].parts_of_speech.join(', ')}
-                  </p>
+                {displayReading && (
+                  <span className="text-xs text-muted-foreground/70 italic">{toRomaji(displayReading)}</span>
                 )}
+                <PlayWordButton word={displayWord} reading={displayReading} size={18} />
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                {isCommon && (
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 border border-primary/15">
+                    ✦ Common
+                  </span>
+                )}
+                {result.jlpt.length > 0 && (
+                  <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
+                    {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
+                  </span>
+                )}
+                {result.senses[0]?.parts_of_speech?.map((pos, i) => (
+                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                    {pos}
+                  </span>
+                ))}
               </div>
 
               {/* Meanings */}
-              <section>
-                <p className="font-serif text-[13px] font-semibold text-foreground/80">Meanings</p>
-                <div className="mt-1 h-px w-8 bg-border/60" />
-                <div className="mt-2 space-y-1">
-                  {result.senses.slice(0, 3).map((sense, i) => (
-                    <p key={i} className="font-serif text-sm leading-relaxed">
-                      <span className="text-muted-foreground tabular-nums mr-1">{i + 1}.</span>
-                      <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
-                    </p>
-                  ))}
-                </div>
-              </section>
+              <div className="space-y-1">
+                {result.senses.slice(0, 3).map((sense, i) => (
+                  <p key={i} className="text-sm leading-relaxed">
+                    <span className="text-muted-foreground mr-1">{i + 1}.</span>
+                    <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
+                  </p>
+                ))}
+              </div>
 
-              {/* Examples */}
-              <section>
-                <p className="font-serif text-[13px] font-semibold text-foreground/80">Examples</p>
-                <div className="mt-1 h-px w-8 bg-border/60" />
-                <div className="mt-2">
-                  <ExampleSentence word={displayWord} />
-                </div>
-              </section>
+              <ExampleSentence word={displayWord} />
 
-              {/* Conjugations */}
               {wordType && (
-                <section>
-                  <p className="font-serif text-[13px] font-semibold text-foreground/80">Conjugations</p>
-                  <div className="mt-1 h-px w-8 bg-border/60" />
-                  <div className="mt-2 rounded-xl bg-muted/30 p-3 ring-1 ring-border/30">
-                    <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
-                  </div>
-                </section>
+                <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
               )}
 
               <div className="mt-2 flex gap-2">
                 <button
                   onClick={handleSave}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold transition-all active:scale-[0.97] shadow-md ${
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold transition-all active:scale-[0.97] ${
                     saved
-                      ? 'bg-muted text-muted-foreground shadow-none'
+                      ? 'bg-muted text-muted-foreground'
                       : 'bg-accent text-accent-foreground'
                   }`}
                 >
-                  <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
-                  {saved ? 'Saved' : 'Add to Flashcards'}
+                  <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} /> {saved ? 'Remove from Flashcards' : 'Add to Flashcards'}
                 </button>
                 <button
                   onClick={() => {
                     onClose();
                     navigate(`/dictionary?q=${encodeURIComponent(dictForm)}`);
                   }}
-                  className="flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
+                  className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
                 >
                   <BookOpen className="h-4 w-4" /> Dictionary
                 </button>
@@ -365,4 +350,3 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
     </Drawer>
   );
 }
-

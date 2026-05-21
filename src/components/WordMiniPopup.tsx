@@ -169,7 +169,7 @@ export function WordMiniPopup({
   return (
     <div
       ref={popupRef}
-      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-2xl ring-1 ring-border/50 shadow-xl ${
+      className={`fixed z-[60] w-[min(300px,calc(100vw-16px))] rounded-xl border bg-card shadow-xl ${
         position
           ? position.placement === 'above'
             ? 'animate-mini-slide-up'
@@ -180,12 +180,11 @@ export function WordMiniPopup({
         top: position?.top ?? -9999,
         left: position?.left ?? -9999,
         opacity: position ? 1 : 0,
-        backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--card)) 50%)',
       }}
     >
       {/* Header: word + actions inline */}
       <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-0.5">
-        <span className="font-japanese text-base font-bold truncate min-w-0">
+        <span className="font-japanese text-lg font-bold truncate min-w-0">
           {headerWord}
         </span>
         <PlayWordButton
@@ -196,20 +195,21 @@ export function WordMiniPopup({
         {result && !loading && (
           <button
             onClick={handleSave}
-            className={`h-7 w-7 flex items-center justify-center rounded-full transition-colors ${
-              saved
-                ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                : 'bg-muted/60 text-muted-foreground hover:text-amber-600'
-            }`}
+            className={`p-0.5 transition-colors ${saved ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'}`}
             title={saved ? 'Remove from flashcards' : 'Add to flashcards'}
           >
-            <Star className="h-3.5 w-3.5" fill={saved ? 'currentColor' : 'none'} />
+            <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
           </button>
         )}
         <div className="flex-1" />
         {(result as any)?.is_common && (
-          <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary/80 ring-1 ring-primary/15">
+          <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary/80 border border-primary/15">
             ✦
+          </span>
+        )}
+        {result?.jlpt && result.jlpt.length > 0 && (
+          <span className="shrink-0 rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent">
+            {result.jlpt[0]?.replace('jlpt-', '')}
           </span>
         )}
         {result && !loading && onTranslateSentence && contextSentence && (
@@ -224,7 +224,7 @@ export function WordMiniPopup({
         {result && !loading && (
           <button
             onClick={onShowMore}
-            className="flex items-center gap-0.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+            className="flex items-center gap-0.5 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
           >
             More <ChevronRight className="h-3 w-3" />
           </button>
@@ -233,13 +233,13 @@ export function WordMiniPopup({
 
       {/* Reading */}
       {headerReading && headerReading !== headerWord && (
-        <p className="font-japanese text-[11px] text-muted-foreground px-2.5 -mt-0.5">
+        <p className="font-japanese text-xs text-muted-foreground px-2.5 -mt-0.5">
           {headerReading}
         </p>
       )}
 
       {/* Content */}
-      <div className="px-2.5 pt-1 pb-2">
+      <div className="px-2.5 pt-1 pb-1.5">
         {loading && (
           <div className="flex items-center gap-2 py-2 text-muted-foreground">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -261,7 +261,7 @@ export function WordMiniPopup({
               ))}
             </div>
             {result.senses[0]?.parts_of_speech && (
-              <p className="font-serif italic text-[11px] text-muted-foreground mt-1">
+              <p className="text-[9px] text-muted-foreground italic mt-0.5">
                 {result.senses[0].parts_of_speech.join(', ')}
               </p>
             )}
@@ -271,4 +271,3 @@ export function WordMiniPopup({
     </div>
   );
 }
-
