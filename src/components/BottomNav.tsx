@@ -32,13 +32,8 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 pb-[calc(env(safe-area-inset-bottom)+0.625rem)] pt-3 px-4 pointer-events-none">
-      {/* soft halo behind the pill */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background via-background/60 to-transparent pointer-events-none"
-      />
       <nav
-        className="pointer-events-auto relative mx-auto max-w-sm flex items-center justify-between rounded-[28px] bg-card/80 backdrop-blur-2xl ring-1 ring-border/60 border border-white/40 dark:border-white/5 shadow-[0_10px_40px_-12px_hsl(var(--foreground)/0.25),0_2px_6px_-2px_hsl(var(--foreground)/0.08),inset_0_1px_0_0_hsl(0_0%_100%/0.5)] px-1.5 py-1.5"
+        className="pointer-events-auto relative mx-auto max-w-sm flex items-stretch justify-between rounded-[26px] bg-card/85 backdrop-blur-2xl ring-1 ring-border/60 border border-white/40 dark:border-white/5 shadow-[0_10px_40px_-12px_hsl(var(--foreground)/0.25),0_2px_6px_-2px_hsl(var(--foreground)/0.08),inset_0_1px_0_0_hsl(0_0%_100%/0.5)] px-1.5 py-1.5"
       >
         <SyncIndicator />
         {tabs.map(({ path, label, icon: Icon }) => {
@@ -50,7 +45,7 @@ export function BottomNav() {
               to={path}
               aria-label={label}
               aria-current={active ? 'page' : undefined}
-              className="relative flex-1 flex items-center justify-center h-11 tap-scale-sm group"
+              className="relative flex-1 flex items-center justify-center h-14 tap-scale-sm group"
             >
               {active && (
                 <motion.div
@@ -60,7 +55,7 @@ export function BottomNav() {
                 />
               )}
               <motion.div
-                className="relative z-10 flex items-center gap-1.5 px-2"
+                className="relative z-10 flex flex-col items-center justify-center gap-1"
                 animate={{ scale: active ? 1 : 0.96 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 26 }}
               >
@@ -79,18 +74,13 @@ export function BottomNav() {
                     </span>
                   )}
                 </div>
-                <motion.span
-                  initial={false}
-                  animate={{
-                    width: active ? 'auto' : 0,
-                    opacity: active ? 1 : 0,
-                    marginLeft: active ? 2 : 0,
-                  }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                  className="overflow-hidden text-[12px] font-bold tracking-tight text-primary whitespace-nowrap"
+                <span
+                  className={`text-[10.5px] font-semibold leading-none tracking-tight transition-colors duration-200 ${
+                    active ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground/80'
+                  }`}
                 >
                   {label}
-                </motion.span>
+                </span>
               </motion.div>
             </Link>
           );
