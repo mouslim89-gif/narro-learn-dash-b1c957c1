@@ -122,13 +122,12 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
       </div>
 
       <div className="px-3 pb-3 space-y-2">
-        <div className="relative rounded-xl bg-muted/40 ring-1 ring-border/30 px-4 py-3">
-          <span className="absolute left-1.5 top-0 font-serif text-2xl text-muted-foreground/40 select-none leading-none">"</span>
-          <p className="font-japanese text-[13px] leading-relaxed pl-3 text-foreground/90">
+        <div>
+          <p className="font-japanese text-[13px] leading-relaxed text-foreground/90">
             {japanese}
           </p>
           {english && !loading && (
-            <p className="mt-1.5 text-[12px] text-muted-foreground pl-3 leading-snug">
+            <p className="mt-1.5 text-[12px] text-muted-foreground leading-snug">
               {english}
             </p>
           )}
