@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams } from 'react-router-dom';
-import { dictionary } from '@/data/dictionary';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
 import { Search, Star, Loader2, X, Settings } from 'lucide-react';
@@ -61,43 +60,52 @@ export default function DictionaryPage() {
   };
 
   return (
-    <div className="pb-20 px-6 pt-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dictionary</h1>
+    <div className="pb-24">
+      {/* Masthead */}
+      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
+        <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">Dictionary</h1>
         <Link to="/settings">
-          <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
+          >
+            <Settings className="h-[18px] w-[18px]" />
           </Button>
         </Link>
-      </div>
+      </header>
 
-      <div className="relative mt-4">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      {/* Search pill */}
+      <div className="mt-5 px-6 relative">
+        <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search in Japanese or English..."
-          className="pl-10 pr-9"
+          className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-11"
         />
         {query && (
           <button
             onClick={clearQuery}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Clear search"
+            className="absolute right-9 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-background/70 ring-1 ring-border/40 flex items-center justify-center text-muted-foreground hover:text-foreground active:scale-[0.94] transition-transform"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
 
       {searching && (
-        <div className="mt-6 flex items-center justify-center gap-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">Searching…</span>
+        <div className="mt-6 flex justify-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3.5 py-1.5 ring-1 ring-border/40">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">Searching…</span>
+          </div>
         </div>
       )}
 
-      <div className="mt-4 flex flex-col gap-3">
+      <div className="mt-5 flex flex-col gap-3 px-6">
         {jishoResults.map((result, idx) => {
           const disp = getDisplayWord(result);
           const word = disp.word || result.slug;
@@ -108,13 +116,21 @@ export default function DictionaryPage() {
           return (
             <div
               key={idx}
-              className={`relative rounded-lg border bg-card p-5 ${isCommon ? 'border-l-4 border-l-primary' : ''}`}
+              className="relative rounded-2xl p-5 ring-1 ring-border/40 card-lift overflow-hidden"
+              style={
+                isCommon
+                  ? { backgroundImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.10) 0%, hsl(var(--card)) 55%)' }
+                  : undefined
+              }
             >
+              {!isCommon && <div className="absolute inset-0 bg-card -z-10" aria-hidden />}
+
               {/* Save button */}
               <button
                 onClick={() => handleSave(result)}
                 disabled={saved}
-                className={`absolute top-4 right-4 rounded p-1.5 transition-colors ${
+                aria-label={saved ? 'Saved' : 'Save word'}
+                className={`absolute top-4 right-4 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center transition-colors ${
                   saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
                 }`}
               >
@@ -122,7 +138,7 @@ export default function DictionaryPage() {
               </button>
 
               {/* Word + reading inline */}
-              <div className="flex items-center gap-1.5 pr-8">
+              <div className="flex items-center gap-1.5 pr-12">
                 <p className="font-japanese text-xl font-bold">{word}</p>
                 {reading && reading !== word && (
                   <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
@@ -134,19 +150,22 @@ export default function DictionaryPage() {
               </div>
 
               {/* Tags row */}
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 {isCommon && (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 border border-primary/15">
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
                     ✦ Common
                   </span>
                 )}
                 {result.jlpt.length > 0 && (
-                  <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
+                  <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/20">
                     {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
                   </span>
                 )}
                 {result.senses[0]?.parts_of_speech?.map((pos, i) => (
-                  <span key={i} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                  <span
+                    key={i}
+                    className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground ring-1 ring-border/40"
+                  >
                     {pos}
                   </span>
                 ))}
@@ -171,12 +190,18 @@ export default function DictionaryPage() {
           );
         })}
         {!searching && query.trim() && jishoResults.length === 0 && (
-          <p className="mt-8 text-center text-muted-foreground">No results found.</p>
+          <p className="mt-8 text-center text-sm text-muted-foreground">No results found.</p>
         )}
         {!query.trim() && (
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Type a word in Japanese or English to search the dictionary.
-          </p>
+          <div className="mt-16 flex flex-col items-center text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+              <Search className="h-9 w-9 text-primary" />
+            </div>
+            <p className="mt-5 font-serif text-lg font-semibold">Search the dictionary</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Type a word in Japanese or English to get started.
+            </p>
+          </div>
         )}
       </div>
     </div>
