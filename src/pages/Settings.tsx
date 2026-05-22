@@ -1,11 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, Loader2 } from 'lucide-react';
+import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,17 @@ const fontSizeOptions: { label: string; value: FontSize }[] = [
   { label: 'L', value: 'large' },
 ];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-3 px-1">
+      <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
+        {children}
+      </h2>
+      <div className="flex-1 h-px bg-border/60" />
+    </div>
+  );
+}
+
 export default function Settings() {
   const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
     useReadingProgressStore();
@@ -42,7 +54,6 @@ export default function Settings() {
     if (!user) return;
     setDeleting(true);
     try {
-      // Delete profile row → cascade removes flashcards & reading_progress
       const { error } = await supabase.from('profiles').delete().eq('id', user.id);
       if (error) throw error;
       await signOut();
@@ -54,97 +65,138 @@ export default function Settings() {
     }
   };
 
-  return (
-    <div className="pb-20 px-6 pt-8">
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => window.history.back()} aria-label="Back">
-          <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-        </button>
-        <h1 className="text-2xl font-bold">Settings</h1>
-      </div>
+  const initial = (user?.email ?? '?').slice(0, 1).toUpperCase();
 
-      <div className="space-y-8">
-        {/* Section: Account */}
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-            Account
-          </h2>
-          <div className="space-y-4">
-            <div className="rounded-lg border bg-card px-4 py-3">
-              <div className="text-xs text-muted-foreground">Signed in as</div>
-              <div className="text-sm font-medium truncate">{user?.email ?? '—'}</div>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full justify-center gap-2"
-              onClick={handleSignOut}
-            >
-              <LogOut className="h-4 w-4" />
-              Sign out
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
-                  Delete account
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This permanently deletes your account, flashcards, and reading progress. This cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDeleteAccount}
-                    disabled={deleting}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete'}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+  return (
+    <div className="pb-24 min-h-screen">
+      {/* Editorial header */}
+      <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
+        <span className="library-kanji-watermark" aria-hidden="true">設</span>
+        <div className="relative z-10 flex items-center gap-3">
+          <button
+            onClick={() => window.history.back()}
+            aria-label="Back"
+            className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 flex items-center justify-center hover:bg-background smooth-colors tap-scale-sm"
+          >
+            <ArrowLeft className="h-[18px] w-[18px]" />
+          </button>
+          <div>
+            <h1 className="wordmark font-serif text-[32px] leading-none text-foreground">Settings</h1>
+            <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
+              <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+              Make it yours
+            </p>
           </div>
         </div>
+      </header>
+      <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
 
-        {/* Section: Appearance */}
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-            Appearance
-          </h2>
+      <div className="px-5 pt-2 space-y-7">
+        {/* Account */}
+        <section>
+          <SectionLabel>Account</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-4">
+              <div className="h-11 w-11 rounded-full bg-accent/15 text-accent flex items-center justify-center font-serif text-lg font-bold ring-1 ring-accent/20">
+                {initial}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Signed in as</div>
+                <div className="text-sm font-medium truncate">{user?.email ?? '—'}</div>
+              </div>
+            </div>
+            <div className="border-t border-border/40">
+              <button
+                onClick={handleSignOut}
+                className="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-muted/40 smooth-colors tap-scale-sm"
+              >
+                <span className="flex items-center gap-2.5">
+                  <LogOut className="h-4 w-4 text-muted-foreground" />
+                  Sign out
+                </span>
+              </button>
+            </div>
+          </div>
+        </section>
 
-          <div className="space-y-5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dark-mode" className="text-base font-medium">Dark mode</Label>
+        {/* Appearance */}
+        <section>
+          <SectionLabel>Appearance</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <div className="flex items-center justify-between px-4 py-4">
+              <Label htmlFor="dark-mode" className="text-[15px] font-medium">Dark mode</Label>
               <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-medium">Default font size</Label>
-              <div className="flex gap-1">
+            <div className="flex items-center justify-between px-4 py-4">
+              <Label className="text-[15px] font-medium">Font size</Label>
+              <div className="flex gap-1 rounded-full bg-muted p-1">
                 {fontSizeOptions.map((opt) => (
-                  <Button
+                  <button
                     key={opt.value}
-                    variant={fontSize === opt.value ? 'default' : 'outline'}
-                    size="sm"
-                    className="w-10 h-8 text-sm font-semibold"
                     onClick={() => setFontSize(opt.value)}
+                    className={cn(
+                      'h-7 w-9 rounded-full text-sm font-semibold smooth-colors tap-scale-sm',
+                      fontSize === opt.value
+                        ? 'bg-card text-foreground shadow-sm ring-1 ring-border/40'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
                   >
                     {opt.label}
-                  </Button>
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="furigana" className="text-base font-medium">Show furigana</Label>
+            <div className="flex items-center justify-between px-4 py-4">
+              <Label htmlFor="furigana" className="text-[15px] font-medium">Show furigana</Label>
               <Switch id="furigana" checked={showFurigana} onCheckedChange={setShowFurigana} />
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* About */}
+        <section>
+          <SectionLabel>About</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-serif text-base">Tsundoku</div>
+                <div className="text-xs text-muted-foreground mt-0.5">Learn Japanese through reading</div>
+              </div>
+              <div className="text-xs text-muted-foreground font-mono">v1.0</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Danger zone */}
+        <section className="pt-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="w-full text-center text-sm font-medium text-destructive/80 hover:text-destructive py-2 smooth-colors">
+                Delete account
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This permanently deletes your account, flashcards, and reading progress. This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </section>
       </div>
     </div>
   );

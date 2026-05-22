@@ -16,8 +16,6 @@ export default function ResetPassword() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase will exchange the recovery link for a session automatically.
-    // Wait for an auth state event before allowing password update.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY' || session) {
         setReady(true);
@@ -49,52 +47,61 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
+    <div className="library-header-bg relative flex min-h-screen items-center justify-center px-6 py-12 overflow-hidden">
+      <span className="library-kanji-watermark" aria-hidden="true">鍵</span>
+
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm"
+        transition={{ duration: 0.35 }}
+        className="relative z-10 w-full max-w-sm"
       >
-        <h1 className="mb-2 text-center text-3xl font-bold">Set new password</h1>
-        <p className="mb-8 text-center text-sm text-muted-foreground">
-          Enter a new password for your account.
-        </p>
+        <div className="mb-6 text-center">
+          <h1 className="wordmark font-serif text-[32px] leading-none text-foreground">Set new password</h1>
+          <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
+            <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+            Choose something memorable
+            <span className="inline-block h-px w-6 bg-foreground/30 align-middle ml-2" />
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="pw" className="text-sm">New password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="pw"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-9 h-11"
-              />
+        <div className="rounded-3xl bg-card/95 backdrop-blur-md ring-1 ring-border/40 shadow-lg p-7">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pw" className="text-xs uppercase tracking-wider text-muted-foreground">New password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="pw"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/50 border-transparent focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
+                />
+              </div>
             </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pw2" className="text-sm">Confirm password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="pw2"
-                type="password"
-                required
-                minLength={6}
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className="pl-9 h-11"
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="pw2" className="text-xs uppercase tracking-wider text-muted-foreground">Confirm password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="pw2"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/50 border-transparent focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
+                />
+              </div>
             </div>
-          </div>
-          <Button type="submit" className="h-11 w-full" disabled={submitting || !ready}>
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update password'}
-          </Button>
-        </form>
+            <Button type="submit" className="h-12 w-full rounded-xl text-[15px] font-semibold tap-scale-sm" disabled={submitting || !ready}>
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update password'}
+            </Button>
+          </form>
+        </div>
       </motion.div>
     </div>
   );
