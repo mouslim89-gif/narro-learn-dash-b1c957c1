@@ -140,10 +140,14 @@ export default function BookDetail() {
             {hasProgress
               ? isMultiChapter
                 ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
-                : 'Continue Reading'
+                : isMultiPart
+                  ? `Continue Part ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
+                  : 'Continue Reading'
               : isMultiChapter
                 ? 'Start Chapter 1'
-                : 'Start Reading'}
+                : isMultiPart
+                  ? 'Start Part 1'
+                  : 'Start Reading'}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -190,33 +194,49 @@ export default function BookDetail() {
           </section>
         )}
 
-        {!isMultiChapter && book.anchors && book.anchors.length > 0 && (
+        {isMultiPart && (
           <section className="mt-8">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="font-serif text-lg font-semibold">Chapters</h2>
-              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors.length} parts</span>
+              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} parts</span>
             </div>
             <ul className="space-y-2">
-              {book.anchors.map((title, idx) => (
-                <li key={idx}>
-                  <Link to={continueLink} className="block">
-                    <div className="card-lift tap-scale w-full rounded-xl border bg-card p-4 text-left ring-1 ring-border/30">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted text-[12px] font-bold tabular-nums text-muted-foreground ring-1 ring-border/40">
-                          {idx + 1}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-serif text-[15px] font-semibold leading-snug">{title}</p>
+              {book.anchors!.map((title, idx) => {
+                const partId = partChapterId(idx);
+                const cp = chapterProgressMap[partId];
+                const pct = cp?.progressPercent ?? 0;
+                const done = pct >= 100;
+                return (
+                  <li key={partId}>
+                    <Link to={`/reader/${book.id}/${difficulty}/${partId}`} className="block">
+                      <div className="card-lift tap-scale w-full rounded-xl border bg-card p-4 text-left ring-1 ring-border/30">
+                        <div className="flex items-center gap-3">
+                          <span className={cn(
+                            'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
+                            done ? 'bg-primary/15 text-primary ring-primary/20' : 'bg-muted text-muted-foreground ring-border/40'
+                          )}>
+                            {done ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-serif text-[15px] font-semibold leading-snug">{title}</p>
+                            {pct > 0 && !done && (
+                              <div className="mt-1.5 flex items-center gap-2">
+                                <Progress value={pct} className="h-1 flex-1" />
+                                <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
+                              </div>
+                            )}
+                          </div>
+                          <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                         </div>
-                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                       </div>
-                    </div>
-                  </Link>
-                </li>
-              ))}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}
+
       </div>
     </div>
   );
