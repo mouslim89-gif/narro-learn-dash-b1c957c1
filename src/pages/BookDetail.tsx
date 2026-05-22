@@ -141,13 +141,12 @@ export default function BookDetail() {
               ? isMultiChapter
                 ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
                 : isMultiPart
-                  ? `Continue Part ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
+                  ? `Continue Chapter ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
                   : 'Continue Reading'
-              : isMultiChapter
+              : (isMultiChapter || isMultiPart)
                 ? 'Start Chapter 1'
-                : isMultiPart
-                  ? 'Start Part 1'
-                  : 'Start Reading'}
+                : 'Start Reading'}
+
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
