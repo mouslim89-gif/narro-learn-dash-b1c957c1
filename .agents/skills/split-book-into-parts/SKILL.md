@@ -24,12 +24,7 @@ Read the `original` version end-to-end. Identify narrative ruptures: scene chang
 
 ### Step B — Name each boundary (anchor)
 
-For every cut, write a short anchor describing the event that opens that part. You need both:
-
-- **English** (used in `<id>Anchors` — what the UI displays): e.g. `"The servant climbs the stairs"`.
-- **Japanese** (working note, used only to align the two other versions): e.g. `「下人が梯子を登る」`.
-
-The anchors are the spine shared by all three levels.
+For every cut, write a short **English** anchor describing the event that opens that part (e.g. `"The servant climbs the stairs"`). These anchors are stored in `<id>Anchors`, displayed in the UI, and used as the spine to align the two other versions.
 
 ### Step C — Align intermediate + simplified to those anchors
 
