@@ -288,7 +288,7 @@ export default function Reader() {
     return () => { cancelled = true; };
   }, [id]);
 
-  const tokens = useMemo(() => {
+  const tokensFull = useMemo(() => {
     if (!id) return [];
     if (tokensLoading) return [];
     const tokenKey = chapterKey(id, chapterId);
@@ -322,10 +322,36 @@ export default function Reader() {
     return out;
   }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules, tokensForBook, tokensLoading]);
 
+  // Part-based slicing: when the URL points at part-N of a parts-book, slice the
+  // full flat token stream down to that part's char window. Tokens are stored as
+  // a single array per difficulty; their concatenated `.t` matches `parts.join("\n\n")`.
+  const partIdx = parsePartId(chapterId);
+  const tokens = useMemo(() => {
+    if (partIdx === null || !book?.parts) return tokensFull;
+    const partsArr = book.parts[difficulty];
+    if (!partsArr || !partsArr[partIdx]) return tokensFull;
+    const sep = '\n\n';
+    let start = 0;
+    for (let i = 0; i < partIdx; i++) start += partsArr[i].length + sep.length;
+    const end = start + partsArr[partIdx].length;
+    const out: BookToken[] = [];
+    let pos = 0;
+    for (const t of tokensFull) {
+      const tStart = pos;
+      const tEnd = pos + t.t.length;
+      pos = tEnd;
+      if (tEnd <= start) continue;
+      if (tStart >= end) break;
+      out.push(t);
+    }
+    return out;
+  }, [tokensFull, partIdx, book, difficulty]);
+
   const bookText = useMemo(() => {
     if (!book) return '';
     return stripParens(getChapterContent(book, chapterId, difficulty));
   }, [book, chapterId, difficulty]);
+
 
   // Split tokens into sentences. A sentence breaks on 。！？ OR on a newline
   // (newlines in source are authoritative paragraph hints from the book).
