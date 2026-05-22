@@ -32,12 +32,15 @@ export default function BookDetail() {
   }
 
   const isMultiChapter = hasChapters(book);
+  const isMultiPart = !isMultiChapter && hasParts(book);
   const chapterProgressMap = id ? getChapterProgress(id) : {};
 
-  const continueChapterId = bookProgress?.chapterId || DEFAULT_CHAPTER_ID;
-  const continueLink = isMultiChapter
+  const defaultPartId = isMultiPart ? partChapterId(0) : DEFAULT_CHAPTER_ID;
+  const continueChapterId = bookProgress?.chapterId || defaultPartId;
+  const continueLink = (isMultiChapter || isMultiPart)
     ? `/reader/${book.id}/${difficulty}/${continueChapterId}`
     : `/reader/${book.id}/${difficulty}`;
+
 
   return (
     <div className="pb-24">
