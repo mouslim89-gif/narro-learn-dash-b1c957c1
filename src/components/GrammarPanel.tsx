@@ -26,9 +26,9 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
   useEffect(() => {
     if (!open || fetched || !text) return;
 
-    // Check pre-baked data first
-    const prebaked = bookGrammar[bookId]?.[difficulty];
-    if (prebaked && prebaked.length > 0) {
+    // Check pre-baked data first (all parts flattened for now; per-part filtering comes with the chaptered Reader).
+    const prebaked = getGrammarFlat(bookId, difficulty);
+    if (prebaked.length > 0) {
       setNotes(prebaked);
       setFetched(true);
       return;
