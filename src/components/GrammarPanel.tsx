@@ -65,7 +65,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
         }
       })
       .finally(() => setLoading(false));
-  }, [open, fetched, text, bookId, difficulty]);
+  }, [open, fetched, text, bookId, difficulty, partIdx]);
 
   if (!open) return null;
 
