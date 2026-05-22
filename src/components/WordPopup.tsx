@@ -258,9 +258,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
   const displayReading = (isShowingSurface ? overrideReading : undefined) || disp.reading;
   const isCommon = (result as any)?.is_common;
 
+  const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
+
   return (
     <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
         <DrawerHeader className="text-left pb-2 sr-only">
           <DrawerTitle>{displayWord}</DrawerTitle>
         </DrawerHeader>
@@ -289,7 +291,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                       <span className="text-xs italic text-muted-foreground/70">{toRomaji(displayReading)}</span>
                     )}
                     {isCommon && (
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
+                      <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold text-accent ring-1 ring-accent/20">
                         ✦ Common
                       </span>
                     )}
@@ -304,8 +306,8 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
               {/* Meanings */}
               <section>
-                <p className="font-serif text-[13px] font-semibold text-foreground/80">Meanings</p>
-                <div className="mt-1 h-px w-8 bg-border/60" />
+                <p className={sectionLabel}>Meanings</p>
+                <div className="mt-1 h-px w-8 bg-accent/60" />
                 <div className="mt-2 space-y-1">
                   {result.senses.slice(0, 3).map((sense, i) => (
                     <p key={i} className="font-serif text-sm leading-relaxed">
@@ -318,8 +320,8 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
               {/* Examples */}
               <section>
-                <p className="font-serif text-[13px] font-semibold text-foreground/80">Examples</p>
-                <div className="mt-1 h-px w-8 bg-border/60" />
+                <p className={sectionLabel}>Examples</p>
+                <div className="mt-1 h-px w-8 bg-accent/60" />
                 <div className="mt-2">
                   <ExampleSentence word={displayWord} />
                 </div>
@@ -328,9 +330,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
               {/* Conjugations */}
               {wordType && (
                 <section>
-                  <p className="font-serif text-[13px] font-semibold text-foreground/80">Conjugations</p>
-                  <div className="mt-1 h-px w-8 bg-border/60" />
-                  <div className="mt-2 rounded-xl bg-muted/30 p-3 ring-1 ring-border/30">
+                  <p className={sectionLabel}>Conjugations</p>
+                  <div className="mt-1 h-px w-8 bg-accent/60" />
+                  <div className="mt-2 rounded-2xl bg-muted/40 p-3 ring-1 ring-border/30">
                     <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
                   </div>
                 </section>
@@ -339,10 +341,10 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
               <div className="mt-2 flex gap-2">
                 <button
                   onClick={handleSave}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold transition-all active:scale-[0.97] shadow-md ${
+                  className={`tap-scale-sm flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold smooth-colors ring-1 ${
                     saved
-                      ? 'bg-muted text-muted-foreground shadow-none'
-                      : 'bg-accent text-accent-foreground'
+                      ? 'bg-muted/40 text-muted-foreground ring-border/40'
+                      : 'bg-card text-accent ring-accent/40 hover:bg-accent/5'
                   }`}
                 >
                   <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
@@ -353,7 +355,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                     onClose();
                     navigate(`/dictionary?q=${encodeURIComponent(dictForm)}`);
                   }}
-                  className="flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-primary/10 text-primary transition-all active:scale-[0.97] hover:bg-primary/20"
+                  className="tap-scale-sm flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-muted/40 text-foreground ring-1 ring-border/40 smooth-colors hover:bg-muted/60"
                 >
                   <BookOpen className="h-4 w-4" /> Dictionary
                 </button>

@@ -1,55 +1,32 @@
-# Habiller Settings et Auth dans le thème éditorial
+## Editorial polish — GrammarPanel & WordPopup
 
-## Objectif
-Aligner `Settings`, `Auth` et `ResetPassword` sur le langage visuel de Library / MyBooks / BookDetail : fond papier chaud, wordmark serif, kanji watermark, chips flottants `rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40`, cartes `rounded-2xl bg-card ring-1 ring-border/30 shadow-sm`.
+Both components work but feel less "editorial" than the rest of the app. Goal: align them with the same paper/card/ring/serif language used on Library, Reader, Settings, Auth — without changing behavior.
 
-## Settings (`src/pages/Settings.tsx`)
+### 1. `src/components/WordPopup.tsx`
 
-Header éditorial cohérent avec Library/MyBooks :
-- Bandeau `library-header-bg` avec kanji watermark `設` (settings) en filigrane.
-- Titre en serif `wordmark font-serif`, sous-titre fin gris avec liseré.
-- Bouton retour en chip rond flottant (`rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40`), aligné sur le pattern Library.
+Already serif/editorial in the body. Small tightening only:
 
-Sections :
-- Remplacer les rangées plates par des cartes `rounded-2xl bg-card ring-1 ring-border/30 shadow-sm` regroupant Account / Appearance / Reading.
-- Titres de section : petite étiquette serif + filet horizontal (au lieu du `uppercase tracking-wider` actuel).
-- Carte "Signed in as" : avatar circulaire avec initiale, email tronqué, accent doré subtil.
-- Boutons Sign out / Delete : Sign out en `variant="outline"` arrondi (`rounded-xl`), Delete déplacé en bas, plus discret (lien `text-destructive`).
+- Wrap the whole sheet in the same surface treatment as `WordMiniPopup` / `SentenceTranslationPopup`: solid `bg-card`, full opacity, `ring-1 ring-border/40`, `shadow-lg`, no gradient strip at the top.
+- Replace the bold action buttons (`Add to Flashcards` / `Dictionary`) with calmer editorial pills: `rounded-full`, `ring-1 ring-border/40`, `bg-card` / `bg-muted/40`, `tap-scale-sm`, gold `text-accent` for the primary save state instead of saturated `bg-accent`.
+- Section labels (`Meanings`, `Examples`, `Conjugations`) → reuse the small uppercase-tracked `SectionLabel` style used in Settings (`text-[10px] uppercase tracking-[0.2em] text-muted-foreground`) with the short gold underline.
+- `Common` chip → `bg-accent/10 text-accent ring-accent/20` to match gold accent system.
+- Conjugation card → `rounded-2xl bg-muted/40 ring-1 ring-border/30` (currently already close; just unify radius/ring tokens).
 
-Améliorations possibles tant qu'on y est :
-- Regrouper les 3 réglages d'apparence (dark mode, font size, furigana) dans une seule carte avec séparateurs `border-border/40`.
-- Le sélecteur de taille de police passe en segmented control `rounded-full bg-muted p-1` (option active = `bg-card shadow-sm`).
-- Ajouter une carte "About" en bas avec version de l'app et lien GitHub (placeholder), pour donner de la matière.
+### 2. `src/components/GrammarPanel.tsx`
 
-## Auth (`src/pages/Auth.tsx`)
+Currently very flat (border + shadow-xl, primary purple sparkle, raw `bg-muted/50` blocks). Bring it in line:
 
-Fond et structure :
-- Remplacer `bg-background` plat par le même fond papier que Library (`library-header-bg` en plein écran ou variante simplifiée), avec kanji watermark `読` (lire) très discret en arrière-plan.
-- Carte centrale : `rounded-3xl bg-card/95 backdrop-blur-md ring-1 ring-border/40 shadow-lg p-8` au lieu d'un bloc nu sur fond uni — donne le côté "page éditoriale".
+- Sheet container: `rounded-t-3xl sm:rounded-3xl bg-card ring-1 ring-border/40 shadow-lg`, remove the heavy `border` + `shadow-xl`.
+- Header: lose the sticky bar styling, use a thin editorial header — small drag handle on mobile (`h-1.5 w-10 rounded-full bg-border/60 mx-auto mt-2`), title in `wordmark font-serif text-base`, replace `Sparkles` icon with a kanji glyph `文` in `text-accent/70 font-serif`. Close button → `rounded-full bg-muted/50 hover:bg-muted ring-1 ring-border/30`.
+- Each grammar note card: `rounded-2xl bg-card ring-1 ring-border/30 shadow-sm` instead of `rounded-lg border bg-background`. Replace bright JLPT pill background with a soft chip `bg-accent/10 text-accent ring-1 ring-accent/20` (keeping JLPT-aware color as a tiny dot on the left rather than full-bleed) — or keep the colored pill but reduce it to `rounded-full px-2 py-0.5 text-[10px]` with the JLPT color at 90% opacity for consistency.
+- "Example from text" block → `rounded-xl bg-muted/40 ring-1 ring-border/30`, label in the same small uppercase-tracked style with gold underline.
+- "Tip" block → `rounded-xl bg-accent/5 ring-1 ring-accent/20`, label `text-accent`, drop the emoji or keep as `・` separator.
+- Loading skeletons → `rounded-2xl` to match.
+- Error state → same `rounded-2xl bg-card ring-1 ring-destructive/30` treatment.
 
-Wordmark :
-- Titre "Tsundoku" en `wordmark font-serif` (cohérent avec Library) au lieu de `font-bold` Inter.
-- Sous-titre avec petit liseré comme dans Library.
+### Scope
 
-Champs et boutons :
-- Inputs en `h-12 rounded-xl bg-muted/50 border-transparent` avec focus ring doré (`focus-visible:ring-primary/40`), même esprit que la barre de recherche Library.
-- Boutons OAuth : `rounded-xl h-12` avec hover `bg-muted/60`.
-- Bouton principal : `rounded-xl h-12 bg-primary` avec micro-anim `tap-scale-sm`.
-- Séparateur "or" : remplacer le texte uppercase par un filet fin + petit caractère japonais `・` au centre (touche éditoriale).
+- CSS/className changes only. No prop changes, no logic changes, no shared UI component edits, no new dependencies.
+- Files touched: `src/components/WordPopup.tsx`, `src/components/GrammarPanel.tsx`.
 
-Switcher signin/signup/forgot :
-- Garder en l'état mais styliser les liens en `text-accent` (doré) plutôt que `text-primary`.
-
-## ResetPassword (`src/pages/ResetPassword.tsx`)
-- Même habillage que Auth : fond papier + carte `rounded-3xl ring-1 shadow-lg`, wordmark serif, mêmes styles d'inputs/boutons.
-- Sous-titre court et liseré identique.
-
-## Hors scope
-- Pas de changement de logique (auth, profile, RLS, navigation).
-- Pas de modification des composants UI partagés (`Input`, `Button`, etc.) — uniquement classNames au site d'utilisation.
-- Pas de nouveau token de couleur ; on réutilise `--card`, `--accent`, `--muted` et les utilitaires existants (`library-header-bg`, `library-kanji-watermark`, `wordmark`, `tap-scale-sm`, `smooth-colors`).
-
-## Fichiers modifiés
-- `src/pages/Settings.tsx`
-- `src/pages/Auth.tsx`
-- `src/pages/ResetPassword.tsx`
+Want me to also propose 2–3 visual variants per component (e.g. one more minimal, one more decorative with a kanji watermark inside the sheet) before implementing, or proceed straight with the unified plan above?
