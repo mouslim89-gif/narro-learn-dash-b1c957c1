@@ -65,6 +65,13 @@ export interface Book {
   content: Record<Difficulty, string>;
   /** Optional list of chapters. Presence of this field switches the BookDetail UI to chapter mode. */
   chapters?: Chapter[];
+  /**
+   * Optional narrative parts (synchronized across difficulties). When present,
+   * `parts[difficulty].join("\n\n")` must equal `content[difficulty]` byte-for-byte.
+   * `anchors[i]` is the English title of part i; same length as each parts array.
+   */
+  parts?: Record<Difficulty, string[]>;
+  anchors?: string[];
 }
 
 /** True if the book has audio for at least one difficulty. */
