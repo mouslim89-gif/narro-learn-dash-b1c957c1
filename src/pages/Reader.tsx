@@ -1067,27 +1067,42 @@ export default function Reader() {
       </article>
 
       {hasParts(book) && partIdx !== null && book.anchors && (
-        <nav className="mx-3 mb-8 flex items-center justify-between gap-3 sm:mx-auto sm:max-w-2xl">
+        <nav className="mx-3 mb-10 mt-2 flex items-stretch gap-3 sm:mx-auto sm:max-w-2xl">
           {partIdx > 0 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
-              className="tap-scale flex-1 rounded-full border bg-card px-4 py-3 text-left ring-1 ring-border/30"
+              className="tap-scale group flex flex-1 items-center gap-3 rounded-2xl bg-card px-4 py-3.5 text-left ring-1 ring-border/40 shadow-sm transition-colors hover:bg-muted/40"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">← Previous</p>
-              <p className="mt-0.5 truncate font-serif text-sm font-semibold">{book.anchors[partIdx - 1]}</p>
+              <ArrowLeft className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Chapter {partIdx}
+                </p>
+                <p className="mt-0.5 truncate font-serif text-[13px] font-semibold text-foreground/80">
+                  {book.anchors[partIdx - 1]}
+                </p>
+              </div>
             </button>
           ) : <div className="flex-1" />}
           {partIdx < book.anchors.length - 1 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
-              className="tap-scale flex-1 rounded-full border bg-primary/10 px-4 py-3 text-right ring-1 ring-primary/30"
+              className="tap-scale group flex flex-1 items-center gap-3 rounded-2xl bg-primary px-4 py-3.5 text-right text-primary-foreground shadow-md transition-transform hover:shadow-lg"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Next →</p>
-              <p className="mt-0.5 truncate font-serif text-sm font-semibold">{book.anchors[partIdx + 1]}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">
+                  Chapter {partIdx + 2}
+                </p>
+                <p className="mt-0.5 truncate font-serif text-[13px] font-semibold">
+                  {book.anchors[partIdx + 1]}
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
             </button>
           ) : <div className="flex-1" />}
         </nav>
       )}
+
 
 
       {miniPopup && (
