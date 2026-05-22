@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
+import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
