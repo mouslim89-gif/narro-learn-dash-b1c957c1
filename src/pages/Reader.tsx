@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { ArrowLeft, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID } from '@/data/books';
+import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
@@ -288,7 +288,7 @@ export default function Reader() {
     return () => { cancelled = true; };
   }, [id]);
 
-  const tokens = useMemo(() => {
+  const tokensFull = useMemo(() => {
     if (!id) return [];
     if (tokensLoading) return [];
     const tokenKey = chapterKey(id, chapterId);
@@ -322,10 +322,36 @@ export default function Reader() {
     return out;
   }, [id, chapterId, difficulty, book, savedRules, pendingRules, sharedRules, tokensForBook, tokensLoading]);
 
+  // Part-based slicing: when the URL points at part-N of a parts-book, slice the
+  // full flat token stream down to that part's char window. Tokens are stored as
+  // a single array per difficulty; their concatenated `.t` matches `parts.join("\n\n")`.
+  const partIdx = parsePartId(chapterId);
+  const tokens = useMemo(() => {
+    if (partIdx === null || !book?.parts) return tokensFull;
+    const partsArr = book.parts[difficulty];
+    if (!partsArr || !partsArr[partIdx]) return tokensFull;
+    const sep = '\n\n';
+    let start = 0;
+    for (let i = 0; i < partIdx; i++) start += partsArr[i].length + sep.length;
+    const end = start + partsArr[partIdx].length;
+    const out: BookToken[] = [];
+    let pos = 0;
+    for (const t of tokensFull) {
+      const tStart = pos;
+      const tEnd = pos + t.t.length;
+      pos = tEnd;
+      if (tEnd <= start) continue;
+      if (tStart >= end) break;
+      out.push(t);
+    }
+    return out;
+  }, [tokensFull, partIdx, book, difficulty]);
+
   const bookText = useMemo(() => {
     if (!book) return '';
     return stripParens(getChapterContent(book, chapterId, difficulty));
   }, [book, chapterId, difficulty]);
+
 
   // Split tokens into sentences. A sentence breaks on 。！？ OR on a newline
   // (newlines in source are authoritative paragraph hints from the book).
@@ -872,6 +898,17 @@ export default function Reader() {
             </div>
           );
         })()}
+
+        {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
+          <div className="px-6 pt-6 pb-2 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Part {partIdx + 1} / {book.anchors.length}
+            </p>
+            <p className="mt-1 font-serif text-lg font-bold">{book.anchors[partIdx]}</p>
+            <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
+          </div>
+        )}
+
         <div className="px-6 py-8 sm:px-12 sm:py-12">
         <div
           className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]}`}
@@ -1028,6 +1065,30 @@ export default function Reader() {
         </div>
       </article>
 
+      {hasParts(book) && partIdx !== null && book.anchors && (
+        <nav className="mx-3 mb-8 flex items-center justify-between gap-3 sm:mx-auto sm:max-w-2xl">
+          {partIdx > 0 ? (
+            <button
+              onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
+              className="tap-scale flex-1 rounded-full border bg-card px-4 py-3 text-left ring-1 ring-border/30"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">← Previous</p>
+              <p className="mt-0.5 truncate font-serif text-sm font-semibold">{book.anchors[partIdx - 1]}</p>
+            </button>
+          ) : <div className="flex-1" />}
+          {partIdx < book.anchors.length - 1 ? (
+            <button
+              onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
+              className="tap-scale flex-1 rounded-full border bg-primary/10 px-4 py-3 text-right ring-1 ring-primary/30"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Next →</p>
+              <p className="mt-0.5 truncate font-serif text-sm font-semibold">{book.anchors[partIdx + 1]}</p>
+            </button>
+          ) : <div className="flex-1" />}
+        </nav>
+      )}
+
+
       {miniPopup && (
         <WordMiniPopup
           word={miniPopup.text}
@@ -1073,9 +1134,11 @@ export default function Reader() {
         text={bookText}
         bookId={id || ''}
         difficulty={difficulty}
+        partIdx={partIdx}
         open={showGrammar}
         onClose={() => setShowGrammar(false)}
       />
+
 
 
       {audioUrl && (

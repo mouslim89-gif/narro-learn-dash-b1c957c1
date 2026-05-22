@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BookOpen, ChevronDown, ChevronUp, Sparkles, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
-import { getGrammarFlat, type GrammarNote } from '@/data/book-grammar';
+import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
@@ -10,11 +10,14 @@ interface GrammarPanelProps {
   text: string;
   bookId: string;
   difficulty: string;
+  /** When set, only show grammar for this 0-indexed narrative part. */
+  partIdx?: number | null;
   open: boolean;
   onClose: () => void;
 }
 
-export function GrammarPanel({ text, bookId, difficulty, open, onClose }: GrammarPanelProps) {
+
+export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose }: GrammarPanelProps) {
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,16 +26,26 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
 
   useBodyScrollLock(open);
 
+  // Reset when the part changes so the panel re-pulls the matching subset.
+  useEffect(() => {
+    setFetched(false);
+    setNotes([]);
+    setExpandedIdx(null);
+  }, [bookId, difficulty, partIdx]);
+
   useEffect(() => {
     if (!open || fetched || !text) return;
 
-    // Check pre-baked data first (all parts flattened for now; per-part filtering comes with the chaptered Reader).
-    const prebaked = getGrammarFlat(bookId, difficulty);
+    // Pre-baked data: per-part subset when available, otherwise the flat list.
+    const prebaked = (partIdx !== null && partIdx !== undefined)
+      ? getGrammarForPart(bookId, difficulty, partIdx)
+      : getGrammarFlat(bookId, difficulty);
     if (prebaked.length > 0) {
       setNotes(prebaked);
       setFetched(true);
       return;
     }
+
 
     // Fallback to edge function
     setLoading(true);
@@ -52,7 +65,7 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
         }
       })
       .finally(() => setLoading(false));
-  }, [open, fetched, text, bookId, difficulty]);
+  }, [open, fetched, text, bookId, difficulty, partIdx]);
 
   if (!open) return null;
 

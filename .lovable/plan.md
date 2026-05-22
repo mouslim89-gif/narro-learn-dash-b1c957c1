@@ -1,115 +1,74 @@
+# Per-part navigation for Lemon
 
-# Lemon — synchronized 3-part split
+Each narrative part becomes a real page, the same way multi-chapter books like Konbini already work.
 
-## Narrative anchors (shared spine across the 3 levels)
+## Routing
 
-| # | Title (English) | Starting event |
-|---|---|---|
-| **A1** | *Malaise and the lure of decay* | Opening line « えたいの知れない不吉な塊… » |
-| **A2** | *Wandering, the fruit shop, the lemon* | After aimless wandering, the narrator stops in front of the 八百卯 fruit stand |
-| **A3** | *Maruzen — the book tower and the lemon-bomb* | Approaches/enters Maruzen, joy fades, builds the tower |
+- New URL shape: `/reader/:bookId/:difficulty/part-:idx` (1-indexed, e.g. `part-1`, `part-2`, `part-3`).
+- BookDetail's "Chapters" list links each anchor to its own part URL.
+- "Start / Continue Reading" CTA also targets the right part (saved progress's `chapterId` or `part-1` by default).
+- Existing `/reader/:id/:diff` URL (no part) keeps working for books without `parts` — unchanged.
 
-All cuts fall on **existing paragraph boundaries** (so each part ends on 。 or 」). No mid-sentence breaks, no furigana splits.
+## Data plumbing (no regeneration needed)
 
-## Exact cuts (paragraphs separated by `\n\n` in the source)
+- `books.ts`:
+  - `hasParts(book)` helper — true when `book.parts && book.anchors`.
+  - `getPartContent(book, partIdx, difficulty)` — returns `book.parts[difficulty][partIdx-1]`.
+  - Extend `getChapterContent` so a `chapterId` matching `/^part-(\d+)$/` on a parts-book returns that part's text.
+  - Extend `chapterKey` similarly so token cache lookups stay coherent (`lemon__part-1`, etc.).
+- `book-tokens`: tokens are still a single flat array per difficulty (kept as decided). The Reader slices that array by cumulative `.t` char count to match `parts[diff][0..idx-1].join("\n\n").length`. Separator is `\n\n` (verified). The slice runs once per `(book, difficulty, partIdx)` via `useMemo`.
+- `book-grammar`: already `GrammarNote[][]` per part. `GrammarPanel` switches from `getGrammarFlat` to `getGrammarForPart(bookId, difficulty, partIdx)` when on a parts-book; falls back to flat otherwise.
+- `book-dictionary` / hydration: unchanged. `hydrateDictionaryForBook(id, chapterId)` is called with the part id so it can later be specialized; for now it just hydrates the book as it does today.
 
-### Original (5015 chars, 30 paragraphs)
-- **Part 1** = §1 → §7 (~1578 chars) — ends « 借金取りの亡霊のように私には見えるのだった。 »
-- **Part 2** = §8 → §18 (~2058 chars) — starts « ある朝――… », ends « そして私はずかずか入って行った。 »
-- **Part 3** = §19 → §30 (~1379 chars) — starts « しかしどうしたことだろう… », ends « 京極を下って行った。 »
+## Reader changes (`src/pages/Reader.tsx`)
 
-(P2 exceeds ~1700 target but the lemon arc is narratively indivisible.)
+- Parse `chapterParam`: if it matches `part-N` and the book has parts, set `partIdx`.
+- `bookText` and `tokens` memos: when `partIdx` is set, slice the flat tokens array to the part's char window and feed only that slice to the existing sentence/paragraph pipeline. All downstream logic (sentence refs, popups, audio scrolling, scroll progress) stays untouched because it operates on the already-sliced `tokens`.
+- Header chip: show `Part {idx} / {total} — {anchor title}` for parts-books (mirrors the existing chapter chip).
+- Bottom "Prev part / Next part" buttons — same component used by chapter books, just driven by part indices. Hidden on first/last.
+- Progress: `updateProgress(id, "part-N", difficulty, pct)` — gives a real per-part progress bar in BookDetail's list (like chapters already do).
 
-### Intermediate (2804 chars, 12 paragraphs)
-- **Part 1** = §1 → §3 (~812 chars)
-- **Part 2** = §4 → §7 (~1205 chars) — starts « 私は、自分がどこを歩いているのか分からなくなるまで… »
-- **Part 3** = §8 → §12 (~765 chars) — starts « 私は丸善に入っていった。しかし、どうしたことだろう。… »
+## BookDetail changes (`src/pages/BookDetail.tsx`)
 
-### Beginner / simplified (1851 chars, 9 paragraphs)
-- **Part 1** = §1 → §2 (~481 chars)
-- **Part 2** = §3 → §5 (~620 chars) — starts « 寺町通りや、二条通りを歩きました。… »
-- **Part 3** = §6 → §9 (~734 chars) — starts « 「今日は、あの丸善に入ってみよう」と私は思いました。… »
+- When `hasParts(book)`:
+  - Treat `anchors` like a chapters list: read `getChapterProgress(id)` keyed by `part-N`, show per-part progress + checkmark when 100 %.
+  - "Continue" CTA → `/reader/:id/:diff/part-{bookProgress?.chapterId or 'part-1'}`.
+- Remove the temporary "all parts link to the same place" code added in the previous step.
 
-Integrity check: `parts.join("\n\n")` per level reproduces the currently exported string byte-for-byte (titles are metadata, NOT injected in the prose).
+## GrammarPanel
 
-## Technical changes
+- Accept an optional `partIdx`. When provided + grammar is per-part, render only that part's notes. Otherwise keep `getGrammarFlat` behavior.
 
-### 1. `src/data/books/lemon.ts`
-```ts
-export const lemonSimplifiedParts: string[] = [ "...", "...", "..." ];
-export const lemonIntermediateParts: string[] = [ ... ];
-export const lemonOriginalParts:    string[] = [ ... ];
+## Out of scope
 
-export const lemonAnchors: string[] = [
-  "Malaise and the lure of decay",
-  "Wandering, the fruit shop, the lemon",
-  "Maruzen — the book tower and the lemon-bomb",
-];
+- Audio per part (user said: skip for now).
+- Resplitting any other book.
+- Continuous "Read all parts" scroll mode.
 
-// Back-compat aliases — kept until the Reader is migrated
-export const lemonSimplified   = lemonSimplifiedParts.join("\n\n");
-export const lemonIntermediate = lemonIntermediateParts.join("\n\n");
-export const lemonOriginal     = lemonOriginalParts.join("\n\n");
+## Technical notes
+
+```text
+URL                            chapterId stored in progress
+/reader/lemon/simplified/part-1   "part-1"
+/reader/lemon/simplified/part-2   "part-2"
+/reader/lemon/simplified/part-3   "part-3"
+/reader/kumo-no-ito/simplified    "main"   (unchanged)
+/reader/konbini-ningen/.../ch-2   "ch-2"   (unchanged)
 ```
 
-### 2. `src/data/books.ts`
-Extend `BookContent`, keep back-compat:
-```ts
-type LevelContent = string | { parts: string[] };
-type BookContent = {
-  simplified:   LevelContent;
-  intermediate: LevelContent;
-  original:     LevelContent;
-};
+Token slice boundaries (computed once per render):
 
-// Lemon entry:
-content: {
-  simplified:   { parts: lemonSimplifiedParts },
-  intermediate: { parts: lemonIntermediateParts },
-  original:     { parts: lemonOriginalParts },
-},
-anchors: lemonAnchors,
+```text
+sep   = "\n\n"           // 2 chars
+end[i]   = sum(parts[diff][0..i].length) + i * sep.length
+start[i] = i === 0 ? 0 : end[i-1] + sep.length
 ```
 
-### 3. Tokens — **no change** (decision: keep flat)
-The Kuromoji token list per difficulty stays flat. Because `parts.join("\n\n")` is byte-identical to the original string, the existing tokens still align perfectly. Splitting by part will be done at render time later (cumulative char-offset slicing). No regen, no touch to `src/data/book-tokens/books/lemon.ts`.
+Walk tokens cumulatively: include tokens whose char window falls inside `[start, end)`. The `\n\n` separator lives as either a newline token or an embedded `\n` inside a token — both already handled by the existing sentence splitter, so a token straddling the boundary is rare; if it happens we keep it with the earlier part (deterministic, no visual artifact).
 
-### 4. Grammar — **segmented by part**
-Change the shape of `bookGrammar[bookId][difficulty]` from `GrammarNote[]` to `GrammarNote[][]` (one sub-array per part).
+## Files touched
 
-- `src/data/book-grammar.ts`
-  - Update the type: `Record<string, Record<string, GrammarNote[][]>>`
-  - For Lemon, replace the current flat arrays with 3 sub-arrays (one per part). **In this iteration we just split Lemon's existing flat notes by re-running generation per part** (see step 4b).
-  - All other books temporarily wrapped as `[existingArray]` (single-part) so the new type is uniform without regenerating them now. A follow-up will resplit them as they get chaptered.
-
-- 4b. Update `scripts/generate-grammar-for-lemon.ts` to:
-  - Import `lemonSimplifiedParts` / `lemonIntermediateParts` / `lemonOriginalParts`.
-  - Call the `grammar-notes` edge function once per `(difficulty, partIndex)` (= 9 calls total for Lemon).
-  - Write back as `GrammarNote[][]` keyed `lemon → difficulty → [part0Notes, part1Notes, part2Notes]`.
-  - Run the script once now to materialize Lemon's per-part notes.
-
-- Any consumer of `bookGrammar[id][diff]` (e.g., `GrammarPanel`) keeps working because the back-compat helper:
-  ```ts
-  export function getGrammarFlat(bookId: string, diff: string): GrammarNote[] {
-    const v = bookGrammar[bookId]?.[diff];
-    if (!v) return [];
-    return Array.isArray(v[0]) ? (v as GrammarNote[][]).flat() : (v as unknown as GrammarNote[]);
-  }
-  ```
-  And the new chapter-aware helper:
-  ```ts
-  export function getGrammarForPart(bookId, diff, partIndex): GrammarNote[] {
-    const v = bookGrammar[bookId]?.[diff];
-    if (!v) return [];
-    return Array.isArray(v[0]) ? v[partIndex] ?? [] : (v as unknown as GrammarNote[]);
-  }
-  ```
-
-### 5. Dictionary — **no change**
-The dictionary already lives in Supabase + IndexedDB, hydrated by encountered words. No per-part indexing now.
-
-## Out of scope (intentionally)
-- Reader UI (chapter navigation, title rendering, per-part grammar panel filtering)
-- Per-part reading progress persistence
-- Resplitting tokens / grammar for the other 11 books (will follow as each gets chaptered)
-- Dictionary per-part prefetch index
+- `src/data/books.ts` (helpers: `hasParts`, `getPartContent`, extend `getChapterContent` + `chapterKey`)
+- `src/pages/BookDetail.tsx` (parts-aware chapter list + CTA)
+- `src/pages/Reader.tsx` (part param parsing, token slicing, header chip, Prev/Next)
+- `src/components/GrammarPanel.tsx` (per-part filtering when applicable)

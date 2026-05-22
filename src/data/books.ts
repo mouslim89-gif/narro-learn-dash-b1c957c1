@@ -84,11 +84,36 @@ export function hasChapters(book: Book): boolean {
   return Array.isArray(book.chapters) && book.chapters.length > 0;
 }
 
+/** True if the book is split into multiple narrative parts (shared anchors across difficulties). */
+export function hasParts(book: Book): boolean {
+  return !!book.parts && !!book.anchors && book.anchors.length > 0;
+}
+
 /** Default chapter id used for single-chapter books (mirrors DB default). */
 export const DEFAULT_CHAPTER_ID = 'main';
 
-/** Get the content for a given chapter (or main content for single-chapter books). */
+/** Parse a part chapterId (`part-N`, 1-indexed). Returns 0-indexed idx, or null. */
+export function parsePartId(chapterId: string | undefined): number | null {
+  if (!chapterId) return null;
+  const m = /^part-(\d+)$/.exec(chapterId);
+  if (!m) return null;
+  const idx = parseInt(m[1], 10) - 1;
+  return idx >= 0 ? idx : null;
+}
+
+/** Build a part chapterId from a 0-indexed part number. */
+export function partChapterId(partIdx: number): string {
+  return `part-${partIdx + 1}`;
+}
+
+/** Get the content for a given chapter / part (or main content otherwise). */
 export function getChapterContent(book: Book, chapterId: string | undefined, difficulty: Difficulty): string {
+  // Part-based books: chapterId of the form `part-N`.
+  const partIdx = parsePartId(chapterId);
+  if (partIdx !== null && book.parts) {
+    const arr = book.parts[difficulty];
+    if (arr && arr[partIdx] !== undefined) return arr[partIdx];
+  }
   if (book.chapters && chapterId && chapterId !== DEFAULT_CHAPTER_ID) {
     const ch = book.chapters.find((c) => c.id === chapterId);
     if (ch) return ch.content[difficulty];
@@ -101,6 +126,7 @@ export function chapterKey(bookId: string, chapterId?: string): string {
   if (!chapterId || chapterId === DEFAULT_CHAPTER_ID) return bookId;
   return `${bookId}__${chapterId}`;
 }
+
 
 export const genreLabels: Record<Genre, string> = {
   'folk-tales': 'Folk Tales',
