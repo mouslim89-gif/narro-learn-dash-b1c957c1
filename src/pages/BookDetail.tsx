@@ -50,7 +50,7 @@ export default function BookDetail() {
       >
         
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 hover:bg-background"
           aria-label="Back"
         >
