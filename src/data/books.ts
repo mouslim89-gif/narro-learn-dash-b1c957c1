@@ -2,7 +2,15 @@ import { konbiniChapters } from './books/konbini-ningen';
 import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
 import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
-import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon';
+import {
+  lemonSimplified,
+  lemonIntermediate,
+  lemonOriginal,
+  lemonSimplifiedParts,
+  lemonIntermediateParts,
+  lemonOriginalParts,
+  lemonAnchors,
+} from './books/lemon';
 import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
