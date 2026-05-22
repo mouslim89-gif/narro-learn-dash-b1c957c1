@@ -185,6 +185,34 @@ export default function BookDetail() {
             </ul>
           </section>
         )}
+
+        {!isMultiChapter && book.anchors && book.anchors.length > 0 && (
+          <section className="mt-8">
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="font-serif text-lg font-semibold">Chapters</h2>
+              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors.length} parts</span>
+            </div>
+            <ul className="space-y-2">
+              {book.anchors.map((title, idx) => (
+                <li key={idx}>
+                  <Link to={continueLink} className="block">
+                    <div className="card-lift tap-scale w-full rounded-xl border bg-card p-4 text-left ring-1 ring-border/30">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted text-[12px] font-bold tabular-nums text-muted-foreground ring-1 ring-border/40">
+                          {idx + 1}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-serif text-[15px] font-semibold leading-snug">{title}</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );
