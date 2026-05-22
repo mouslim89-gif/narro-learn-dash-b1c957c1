@@ -141,13 +141,12 @@ export default function BookDetail() {
               ? isMultiChapter
                 ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
                 : isMultiPart
-                  ? `Continue Part ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
+                  ? `Continue Chapter ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
                   : 'Continue Reading'
-              : isMultiChapter
+              : (isMultiChapter || isMultiPart)
                 ? 'Start Chapter 1'
-                : isMultiPart
-                  ? 'Start Part 1'
-                  : 'Start Reading'}
+                : 'Start Reading'}
+
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -198,7 +197,7 @@ export default function BookDetail() {
           <section className="mt-8">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="font-serif text-lg font-semibold">Chapters</h2>
-              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} parts</span>
+              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
             </div>
             <ul className="space-y-2">
               {book.anchors!.map((title, idx) => {
