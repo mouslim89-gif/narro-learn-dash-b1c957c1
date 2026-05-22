@@ -197,7 +197,7 @@ export default function BookDetail() {
           <section className="mt-8">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="font-serif text-lg font-semibold">Chapters</h2>
-              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} parts</span>
+              <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
             </div>
             <ul className="space-y-2">
               {book.anchors!.map((title, idx) => {
