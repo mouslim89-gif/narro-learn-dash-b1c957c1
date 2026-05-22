@@ -676,7 +676,7 @@ export default function Reader() {
         style={{ backgroundImage: `linear-gradient(180deg, ${book.coverColor}1f 0%, hsl(var(--background) / 0.85) 100%)` }}
       >
         <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-          <HeaderChip onClick={() => navigate(-1)} aria-label="Back">
+          <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
             <ArrowLeft className="h-5 w-5" />
           </HeaderChip>
           <div className="min-w-0 flex-1 text-center">
