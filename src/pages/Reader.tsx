@@ -898,6 +898,17 @@ export default function Reader() {
             </div>
           );
         })()}
+
+        {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
+          <div className="px-6 pt-6 pb-2 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Part {partIdx + 1} / {book.anchors.length}
+            </p>
+            <p className="mt-1 font-serif text-lg font-bold">{book.anchors[partIdx]}</p>
+            <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
+          </div>
+        )}
+
         <div className="px-6 py-8 sm:px-12 sm:py-12">
         <div
           className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]}`}
