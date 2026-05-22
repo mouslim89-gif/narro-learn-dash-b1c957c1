@@ -1065,6 +1065,30 @@ export default function Reader() {
         </div>
       </article>
 
+      {hasParts(book) && partIdx !== null && book.anchors && (
+        <nav className="mx-3 mb-8 flex items-center justify-between gap-3 sm:mx-auto sm:max-w-2xl">
+          {partIdx > 0 ? (
+            <button
+              onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
+              className="tap-scale flex-1 rounded-full border bg-card px-4 py-3 text-left ring-1 ring-border/30"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">← Previous</p>
+              <p className="mt-0.5 truncate font-serif text-sm font-semibold">{book.anchors[partIdx - 1]}</p>
+            </button>
+          ) : <div className="flex-1" />}
+          {partIdx < book.anchors.length - 1 ? (
+            <button
+              onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
+              className="tap-scale flex-1 rounded-full border bg-primary/10 px-4 py-3 text-right ring-1 ring-primary/30"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Next →</p>
+              <p className="mt-0.5 truncate font-serif text-sm font-semibold">{book.anchors[partIdx + 1]}</p>
+            </button>
+          ) : <div className="flex-1" />}
+        </nav>
+      )}
+
+
       {miniPopup && (
         <WordMiniPopup
           word={miniPopup.text}
