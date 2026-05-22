@@ -1134,9 +1134,11 @@ export default function Reader() {
         text={bookText}
         bookId={id || ''}
         difficulty={difficulty}
+        partIdx={partIdx}
         open={showGrammar}
         onClose={() => setShowGrammar(false)}
       />
+
 
 
       {audioUrl && (
