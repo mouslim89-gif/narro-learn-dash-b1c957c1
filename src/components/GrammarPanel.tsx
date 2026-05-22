@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BookOpen, ChevronDown, ChevronUp, Sparkles, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
-import { getGrammarFlat, type GrammarNote } from '@/data/book-grammar';
+import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
@@ -10,9 +10,12 @@ interface GrammarPanelProps {
   text: string;
   bookId: string;
   difficulty: string;
+  /** When set, only show grammar for this 0-indexed narrative part. */
+  partIdx?: number | null;
   open: boolean;
   onClose: () => void;
 }
+
 
 export function GrammarPanel({ text, bookId, difficulty, open, onClose }: GrammarPanelProps) {
   const [notes, setNotes] = useState<GrammarNote[]>([]);
