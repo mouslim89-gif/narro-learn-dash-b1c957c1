@@ -2,7 +2,15 @@ import { konbiniChapters } from './books/konbini-ningen';
 import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
 import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
-import { lemonSimplified, lemonIntermediate, lemonOriginal } from './books/lemon';
+import {
+  lemonSimplified,
+  lemonIntermediate,
+  lemonOriginal,
+  lemonSimplifiedParts,
+  lemonIntermediateParts,
+  lemonOriginalParts,
+  lemonAnchors,
+} from './books/lemon';
 import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
@@ -57,6 +65,13 @@ export interface Book {
   content: Record<Difficulty, string>;
   /** Optional list of chapters. Presence of this field switches the BookDetail UI to chapter mode. */
   chapters?: Chapter[];
+  /**
+   * Optional narrative parts (synchronized across difficulties). When present,
+   * `parts[difficulty].join("\n\n")` must equal `content[difficulty]` byte-for-byte.
+   * `anchors[i]` is the English title of part i; same length as each parts array.
+   */
+  parts?: Record<Difficulty, string[]>;
+  anchors?: string[];
 }
 
 /** True if the book has audio for at least one difficulty. */
@@ -244,6 +259,8 @@ export const books: Book[] = [
     readingTimeMin: 12,
     synopsis: "A young man weighed down by illness, debt, and an unnameable malaise wanders the back streets of Kyoto. A single lemon at a fruit stand transfigures his mood — and at the Maruzen bookstore, he leaves it perched atop a tower of art books, imagining it as a bright yellow bomb. Kajii's luminous Taishō-era prose poem on beauty, melancholy, and small acts of mischief.",
     content: { simplified: lemonSimplified, intermediate: lemonIntermediate, original: lemonOriginal },
+    parts: { simplified: lemonSimplifiedParts, intermediate: lemonIntermediateParts, original: lemonOriginalParts },
+    anchors: lemonAnchors,
   },
   {
     id: 'hana',
