@@ -56,27 +56,37 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
 
   if (!open) return null;
 
+  const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
+
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative z-50 w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-t-xl sm:rounded-xl border bg-card shadow-xl animate-fade-in">
+      <div className="relative z-50 w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-card ring-1 ring-border/40 shadow-lg animate-fade-in">
+        {/* Drag handle */}
+        <div className="sm:hidden flex justify-center pt-2">
+          <div className="h-1.5 w-10 rounded-full bg-border/60" />
+        </div>
+
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-card px-5 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-card/95 backdrop-blur-md px-5 py-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-bold">Grammar Notes</h2>
+            <span className="font-serif text-base text-accent/80">文</span>
+            <h2 className="wordmark font-serif text-base">Grammar Notes</h2>
           </div>
-          <button onClick={onClose} className="rounded p-1 hover:bg-muted">
-            <X className="h-4 w-4" />
+          <button
+            onClick={onClose}
+            className="tap-scale-sm rounded-full bg-muted/50 p-1.5 ring-1 ring-border/30 smooth-colors hover:bg-muted"
+          >
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
 
-        <div className="p-5">
+        <div className="p-5 pt-3">
           {loading && (
             <div className="flex flex-col gap-3">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full rounded-2xl" />
+              <Skeleton className="h-16 w-full rounded-2xl" />
+              <Skeleton className="h-16 w-full rounded-2xl" />
               <p className="text-center text-xs text-muted-foreground mt-2">
                 Analyzing grammar patterns…
               </p>
@@ -84,11 +94,11 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
           )}
 
           {error && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-center">
+            <div className="rounded-2xl bg-card ring-1 ring-destructive/30 p-4 text-center shadow-sm">
               <p className="text-sm text-destructive">{error}</p>
               <button
                 onClick={() => { setFetched(false); setError(null); }}
-                className="mt-2 text-xs text-primary underline"
+                className="mt-2 text-xs text-accent underline"
               >
                 Retry
               </button>
@@ -96,24 +106,24 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
           )}
 
           {!loading && !error && notes.length > 0 && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               {notes.map((note, i) => {
                 const expanded = expandedIdx === i;
                 return (
                   <button
                     key={i}
                     onClick={() => setExpandedIdx(expanded ? null : i)}
-                    className="w-full rounded-lg border bg-background p-4 text-left transition-all hover:shadow-sm"
+                    className="w-full rounded-2xl bg-card ring-1 ring-border/30 shadow-sm p-4 text-left smooth-colors hover:ring-border/60"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
                         <span
-                          className="rounded px-1.5 py-0.5 text-[10px] font-bold text-white"
+                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shrink-0"
                           style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
                         >
                           {note.jlpt}
                         </span>
-                        <span className="font-japanese text-base font-bold">{note.pattern}</span>
+                        <span className="font-japanese text-base font-bold truncate">{note.pattern}</span>
                       </div>
                       {expanded ? (
                         <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -121,21 +131,19 @@ export function GrammarPanel({ text, bookId, difficulty, open, onClose }: Gramma
                         <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">{note.meaning}</p>
+                    <p className="mt-1 font-serif text-sm text-muted-foreground">{note.meaning}</p>
 
                     {expanded && (
-                      <div className="mt-3 space-y-2 animate-in fade-in">
-                        <div className="rounded bg-muted/50 p-3">
-                          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
-                            Example from text
-                          </p>
-                          <p className="font-japanese text-sm">{note.example}</p>
+                      <div className="mt-3 space-y-2.5 animate-in fade-in">
+                        <div className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3">
+                          <p className={sectionLabel}>Example from text</p>
+                          <div className="mt-1 h-px w-8 bg-accent/60" />
+                          <p className="mt-2 font-japanese text-sm">{note.example}</p>
                         </div>
-                        <div className="rounded bg-primary/5 p-3">
-                          <p className="text-[10px] font-semibold uppercase tracking-widest text-primary mb-1">
-                            💡 Tip
-                          </p>
-                          <p className="text-sm text-foreground">{note.tip}</p>
+                        <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Tip</p>
+                          <div className="mt-1 h-px w-8 bg-accent/60" />
+                          <p className="mt-2 font-serif text-sm text-foreground">{note.tip}</p>
                         </div>
                       </div>
                     )}
