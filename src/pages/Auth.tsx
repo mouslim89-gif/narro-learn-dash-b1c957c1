@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Navigate, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,6 @@ export default function Auth() {
         toast.error(`${provider === 'google' ? 'Google' : 'Apple'} sign-in failed`);
         setSubmitting(false);
       }
-      // If redirected, browser will navigate away
     } catch (e) {
       toast.error('Sign-in failed');
       setSubmitting(false);
@@ -74,117 +73,123 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
+    <div className="library-header-bg relative flex min-h-screen items-center justify-center px-6 py-12 overflow-hidden">
+      <span className="library-kanji-watermark" aria-hidden="true">読</span>
+
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-sm"
+        transition={{ duration: 0.35 }}
+        className="relative z-10 w-full max-w-sm"
       >
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Tsundoku</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <div className="mb-6 text-center">
+          <h1 className="wordmark font-serif text-[44px] leading-none text-foreground">Tsundoku</h1>
+          <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
+            <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
             {mode === 'signup' ? 'Create your account' : mode === 'forgot' ? 'Reset your password' : 'Welcome back'}
+            <span className="inline-block h-px w-6 bg-foreground/30 align-middle ml-2" />
           </p>
         </div>
 
-        {mode !== 'forgot' && (
-          <>
-            <div className="space-y-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 w-full justify-center gap-3 font-medium"
-                onClick={() => handleOAuth('google')}
-                disabled={submitting}
-              >
-                <GoogleIcon />
-                Continue with Google
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 w-full justify-center gap-3 font-medium"
-                onClick={() => handleOAuth('apple')}
-                disabled={submitting}
-              >
-                <AppleIcon />
-                Continue with Apple
-              </Button>
-            </div>
-
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">or</span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-          </>
-        )}
-
-        <form onSubmit={handleEmail} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-sm">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-9 h-11"
-                placeholder="you@example.com"
-              />
-            </div>
-          </div>
-
+        <div className="rounded-3xl bg-card/95 backdrop-blur-md ring-1 ring-border/40 shadow-lg p-7">
           {mode !== 'forgot' && (
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm">Password</Label>
-                {mode === 'signin' && (
-                  <button
-                    type="button"
-                    onClick={() => setMode('forgot')}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    Forgot?
-                  </button>
-                )}
+            <>
+              <div className="space-y-2.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 w-full justify-center gap-3 font-medium rounded-xl tap-scale-sm"
+                  onClick={() => handleOAuth('google')}
+                  disabled={submitting}
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 w-full justify-center gap-3 font-medium rounded-xl tap-scale-sm"
+                  onClick={() => handleOAuth('apple')}
+                  disabled={submitting}
+                >
+                  <AppleIcon />
+                  Continue with Apple
+                </Button>
               </div>
+
+              <div className="my-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-border" />
+                <span className="font-serif text-xs text-muted-foreground">・</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+            </>
+          )}
+
+          <form onSubmit={handleEmail} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs uppercase tracking-wider text-muted-foreground">Email</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  id="password"
-                  type="password"
+                  id="email"
+                  type="email"
                   required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-9 h-11"
-                  placeholder="••••••••"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/50 border-transparent focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
+                  placeholder="you@example.com"
                 />
               </div>
             </div>
-          )}
 
-          <Button type="submit" className="h-11 w-full gap-2" disabled={submitting}>
-            {submitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                {mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Sign in'}
-                <ArrowRight className="h-4 w-4" />
-              </>
+            {mode !== 'forgot' && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-xs uppercase tracking-wider text-muted-foreground">Password</Label>
+                  {mode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => setMode('forgot')}
+                      className="text-xs text-accent hover:underline"
+                    >
+                      Forgot?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 h-12 rounded-xl bg-muted/50 border-transparent focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
             )}
-          </Button>
-        </form>
+
+            <Button type="submit" className="h-12 w-full gap-2 rounded-xl text-[15px] font-semibold tap-scale-sm" disabled={submitting}>
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  {mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Sign in'}
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           {mode === 'signin' && (
             <>
               No account?{' '}
-              <button onClick={() => setMode('signup')} className="font-medium text-primary hover:underline">
+              <button onClick={() => setMode('signup')} className="font-medium text-accent hover:underline">
                 Sign up
               </button>
             </>
@@ -192,13 +197,13 @@ export default function Auth() {
           {mode === 'signup' && (
             <>
               Already have one?{' '}
-              <button onClick={() => setMode('signin')} className="font-medium text-primary hover:underline">
+              <button onClick={() => setMode('signin')} className="font-medium text-accent hover:underline">
                 Sign in
               </button>
             </>
           )}
           {mode === 'forgot' && (
-            <button onClick={() => setMode('signin')} className="font-medium text-primary hover:underline">
+            <button onClick={() => setMode('signin')} className="font-medium text-accent hover:underline">
               Back to sign in
             </button>
           )}
