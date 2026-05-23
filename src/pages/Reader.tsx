@@ -950,15 +950,14 @@ export default function Reader() {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
+                      const colorClass = '';
                       const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
                       const tokKey = globalIdx * 10000 + i;
                       if (tokenEditMode) tokenByKey.current.set(tokKey, token);
                       const isSelected = tokenEditMode && selectedIdx.includes(tokKey);
 
-                      // Known-word highlight: disabled in grammar mode (POS colors prevail).
                       let knownLevel: KnownLevel | null = null;
-                      if (!tokenEditMode && displayMode !== 'grammar' && showKnownHighlights) {
+                      if (!tokenEditMode && showKnownHighlights) {
                         const lvl = getKnownLevel(token, knownIndex);
                         if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
                       }
