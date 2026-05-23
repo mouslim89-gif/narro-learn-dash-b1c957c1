@@ -17,9 +17,8 @@ const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
   const { adjustMastery, removeWord } = useFlashcardStore();
-  // Snapshot the deck once so store mutations (delete) don't shift indices mid-session.
-  const deckRef = useRef<SavedWord[]>(deck);
-  const localDeck = deckRef.current;
+  // Snapshot the deck once, then manage review-session deletions locally.
+  const [localDeck, setLocalDeck] = useState<SavedWord[]>(() => deck);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
@@ -41,8 +40,6 @@ export function FlashcardReview({ deck, onExit }: Props) {
     }, 200);
   }, []);
 
-  if (localDeck.length === 0) return null;
-
   if (currentIdx >= localDeck.length) {
     return (
       <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-6">
@@ -61,6 +58,24 @@ export function FlashcardReview({ deck, onExit }: Props) {
 
   const handleAnswer = (quality: SrsQualityLabel) => {
     advance(() => adjustMastery(card.id, quality));
+  };
+
+  const handleDeleteCurrent = () => {
+    const deletedId = card.id;
+    setShowDeleteDialog(false);
+    removeWord(deletedId);
+    setAnimClass('animate-card-out');
+
+    window.setTimeout(() => {
+      const nextDeck = localDeck.filter((word) => word.id !== deletedId);
+      setLocalDeck(nextDeck);
+      setCurrentIdx((index) => Math.min(index, nextDeck.length));
+      setFlipped(false);
+      setShowAllMeanings(false);
+      setShowFrontReading(false);
+      setAnimClass('animate-card-in');
+      window.setTimeout(() => setAnimClass(''), 260);
+    }, 200);
   };
 
   return (
@@ -281,11 +296,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                removeWord(card.id);
-                setShowDeleteDialog(false);
-                advance();
-              }}
+              onClick={handleDeleteCurrent}
             >
               Delete
             </AlertDialogAction>
