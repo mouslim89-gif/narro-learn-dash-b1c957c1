@@ -120,7 +120,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             }`}
           >
             {/* Front face */}
-            <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
+            <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
               {/* decorative kanji watermark */}
               <span className="pointer-events-none select-none absolute -top-10 -right-6 font-japanese text-[220px] leading-none font-bold text-foreground/[0.025]">
                 {card.word.charAt(0)}
@@ -162,7 +162,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             </div>
 
             {/* Back face */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
               {/* Header — word + reading */}
               <div className="flex-none px-5 pt-5 pb-3">
                 <div className="flex items-start justify-between gap-3">
