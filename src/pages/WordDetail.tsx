@@ -4,7 +4,7 @@ import { ArrowLeft, Star, Loader2 } from 'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
-import { ConjugationTable } from '@/components/ConjugationTable';
+import { ConjugationTable, getConjugations } from '@/components/ConjugationTable';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toRomaji } from 'wanakana';
