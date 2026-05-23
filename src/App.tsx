@@ -15,6 +15,7 @@ import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
 import DictionaryPage from "./pages/Dictionary";
+import WordDetail from "./pages/WordDetail";
 import BookDetail from "./pages/BookDetail";
 import Reader from "./pages/Reader";
 import NotFound from "./pages/NotFound";
