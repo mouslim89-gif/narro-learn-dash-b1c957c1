@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ConjugationTable } from '@/components/ConjugationTable';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
 import { Search, Star, Loader2, X, Settings } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { toRomaji } from 'wanakana';
