@@ -151,7 +151,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
                 >
-                  {showFrontReading ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                  {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeOff className="h-[18px] w-[18px]" />}
                 </button>
                 <PlayWordButton word={card.word} reading={card.reading} size={26} />
               </div>
