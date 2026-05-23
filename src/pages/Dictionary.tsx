@@ -15,7 +15,7 @@ export default function DictionaryPage() {
   const [searchParams] = useSearchParams();
   const initial = searchParams.get('q') || '';
   const [query, setQuery] = useState(initial);
-  const { addWord, hasWord } = useFlashcardStore();
+  const { addWord, removeWord, hasWord } = useFlashcardStore();
   const [jishoResults, setJishoResults] = useState<JishoResult[]>([]);
   const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
