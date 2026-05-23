@@ -93,16 +93,31 @@ export default function WordDetail() {
   return (
     <div className="pb-24">
       {/* Top bar */}
-      <header className="px-4 pt-4 pb-2">
+      <header className="sticky top-0 z-20 flex items-center gap-3 px-4 pt-4 pb-3 bg-background/80 backdrop-blur-md">
         <Button
           variant="ghost"
           size="icon"
           onClick={handleBack}
-          className="h-9 w-9 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
+          className="h-9 w-9 rounded-full bg-muted/60 ring-1 ring-border/40 shrink-0"
           aria-label="Back"
         >
           <ArrowLeft className="h-[18px] w-[18px]" />
         </Button>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">Dictionary</p>
+          <p className="font-japanese text-base font-bold truncate mt-0.5">{display || word}</p>
+        </div>
+        {result && (
+          <button
+            onClick={toggleSave}
+            aria-label={saved ? 'Remove from flashcards' : 'Save word'}
+            className={`h-9 w-9 rounded-full ring-1 ring-border/40 bg-muted/60 flex items-center justify-center shrink-0 transition-colors ${
+              saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
+            }`}
+          >
+            <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
+          </button>
+        )}
       </header>
 
       {loading && (
