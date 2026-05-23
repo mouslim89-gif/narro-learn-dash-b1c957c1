@@ -17,6 +17,9 @@ const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
   const { adjustMastery, removeWord } = useFlashcardStore();
+  // Snapshot the deck once so store mutations (delete) don't shift indices mid-session.
+  const deckRef = useRef<SavedWord[]>(deck);
+  const localDeck = deckRef.current;
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
@@ -38,21 +41,21 @@ export function FlashcardReview({ deck, onExit }: Props) {
     }, 200);
   }, []);
 
-  if (deck.length === 0) return null;
+  if (localDeck.length === 0) return null;
 
-  if (currentIdx >= deck.length) {
+  if (currentIdx >= localDeck.length) {
     return (
       <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-6">
         <span className="text-6xl">🎉</span>
         <p className="font-serif text-3xl tracking-tight">Session complete</p>
-        <p className="text-sm text-muted-foreground">{deck.length} cards reviewed</p>
+        <p className="text-sm text-muted-foreground">{localDeck.length} cards reviewed</p>
         <Button onClick={onExit} className="mt-2 rounded-full px-8">Done</Button>
       </div>
     );
   }
 
-  const card = deck[currentIdx];
-  const progressPct = ((currentIdx + 1) / deck.length) * 100;
+  const card = localDeck[currentIdx];
+  const progressPct = ((currentIdx + 1) / localDeck.length) * 100;
   const visibleMeanings = showAllMeanings ? card.meanings : card.meanings.slice(0, DEFAULT_MEANINGS);
   const hiddenMeaningsCount = Math.max(0, card.meanings.length - DEFAULT_MEANINGS);
 
@@ -84,7 +87,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             />
           </div>
           <span className="font-mono text-[12px] tabular-nums font-semibold text-foreground/80 tracking-tight">
-            {currentIdx + 1}<span className="text-muted-foreground/60 font-normal"> / {deck.length}</span>
+            {currentIdx + 1}<span className="text-muted-foreground/60 font-normal"> / {localDeck.length}</span>
           </span>
         </div>
 
@@ -117,7 +120,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             }`}
           >
             {/* Front face */}
-            <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
+            <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
               {/* decorative kanji watermark */}
               <span className="pointer-events-none select-none absolute -top-10 -right-6 font-japanese text-[220px] leading-none font-bold text-foreground/[0.025]">
                 {card.word.charAt(0)}
@@ -148,7 +151,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
                 >
-                  {showFrontReading ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                  {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeOff className="h-[18px] w-[18px]" />}
                 </button>
                 <PlayWordButton word={card.word} reading={card.reading} size={26} />
               </div>
@@ -159,7 +162,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
             </div>
 
             {/* Back face */}
-            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_20px_60px_-20px_hsl(var(--foreground)/0.18),0_4px_12px_-4px_hsl(var(--foreground)/0.08)] overflow-hidden">
+            <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
               {/* Header — word + reading */}
               <div className="flex-none px-5 pt-5 pb-3">
                 <div className="flex items-start justify-between gap-3">
