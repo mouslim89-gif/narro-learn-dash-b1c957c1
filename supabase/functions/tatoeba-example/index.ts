@@ -10,13 +10,18 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 );
 
+interface Sentence { japanese: string; english: string }
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { word } = await req.json();
+    const body = await req.json();
+    const word: unknown = body.word;
+    const rawLimit = Number(body.limit ?? 1);
+    const limit = Math.max(1, Math.min(5, Number.isFinite(rawLimit) ? rawLimit : 1));
 
     if (!word || typeof word !== 'string' || word.length > 50) {
       return new Response(
@@ -25,65 +30,76 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 1. Check DB cache first
+    // 1. DB cache
     const { data: cached } = await supabase
       .from('example_sentences')
-      .select('japanese, english')
+      .select('japanese, english, sentences')
       .eq('word', word)
       .maybeSingle();
 
     if (cached) {
-      return new Response(
-        JSON.stringify({ japanese: cached.japanese, english: cached.english }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
-      );
+      const cachedSentences: Sentence[] = Array.isArray(cached.sentences) && cached.sentences.length
+        ? cached.sentences as Sentence[]
+        : cached.japanese
+          ? [{ japanese: cached.japanese, english: cached.english || '' }]
+          : [];
+
+      if (cachedSentences.length >= limit || limit === 1) {
+        const sliced = cachedSentences.slice(0, limit);
+        return new Response(
+          JSON.stringify({
+            japanese: sliced[0]?.japanese ?? null,
+            english: sliced[0]?.english ?? null,
+            sentences: sliced,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
+        );
+      }
+      // else fall through to refetch with bigger limit
     }
 
-    // 2. Fetch from Tatoeba
-    const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(word)}&limit=3`;
+    const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(word)}&limit=${Math.max(3, limit + 2)}`;
     const res = await fetch(url);
-
     if (!res.ok) {
       console.error('Tatoeba API error:', res.status);
       return new Response(
-        JSON.stringify({ japanese: null, english: null }),
+        JSON.stringify({ japanese: null, english: null, sentences: [] }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const data = await res.json();
-    const results = data.results;
+    const results = Array.isArray(data.results) ? data.results : [];
 
-    let bestJapanese: string | null = null;
-    let bestEnglish: string | null = null;
-
-    if (Array.isArray(results)) {
-      for (const sentence of results) {
-        const jpText = sentence.text;
-        if (!jpText) continue;
-        const directTranslations = sentence.translations?.[0] || [];
-        for (const t of directTranslations) {
-          if (t?.lang === 'eng' && t?.text) {
-            bestJapanese = jpText;
-            bestEnglish = t.text;
-            break;
-          }
+    const collected: Sentence[] = [];
+    for (const sentence of results) {
+      const jpText = sentence.text;
+      if (!jpText) continue;
+      const directTranslations = sentence.translations?.[0] || [];
+      for (const t of directTranslations) {
+        if (t?.lang === 'eng' && t?.text) {
+          collected.push({ japanese: jpText, english: t.text });
+          break;
         }
-        if (bestEnglish) break;
       }
+      if (collected.length >= limit) break;
     }
 
-    // 3. Store in DB cache (even null results to avoid re-fetching)
-    if (bestJapanese) {
+    if (collected.length > 0) {
       await supabase.from('example_sentences').upsert({
         word,
-        japanese: bestJapanese,
-        english: bestEnglish || '',
+        japanese: collected[0].japanese,
+        english: collected[0].english,
+        sentences: collected,
       });
     }
 
     return new Response(
-      JSON.stringify({ japanese: bestJapanese, english: bestEnglish }),
+      JSON.stringify({
+        japanese: collected[0]?.japanese ?? null,
+        english: collected[0]?.english ?? null,
+        sentences: collected,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
     );
   } catch (err) {
