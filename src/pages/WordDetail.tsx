@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Star, Loader2, Check, Plus } from 'lucide-react';
+import { ArrowLeft, Star, Loader2 } from 'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
-import { ConjugationTable } from '@/components/ConjugationTable';
+import { ConjugationTable, getConjugations } from '@/components/ConjugationTable';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toRomaji } from 'wanakana';
@@ -93,12 +93,12 @@ export default function WordDetail() {
   return (
     <div className="pb-24">
       {/* Top bar */}
-      <header className="px-6 pt-10 pb-2 flex items-center">
+      <header className="px-4 pt-4 pb-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={handleBack}
-          className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
+          className="h-9 w-9 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
           aria-label="Back"
         >
           <ArrowLeft className="h-[18px] w-[18px]" />
@@ -172,45 +172,14 @@ export default function WordDetail() {
             >
               {saved ? (
                 <>
-                  <Check className="h-4 w-4 mr-1.5" /> Saved to flashcards
+                  <Star className="h-4 w-4 mr-1.5" fill="currentColor" /> Saved to flashcards
                 </>
               ) : (
                 <>
-                  <Plus className="h-4 w-4 mr-1.5" /> Add to flashcards
+                  <Star className="h-4 w-4 mr-1.5" /> Add to flashcards
                 </>
               )}
             </Button>
-          </section>
-
-          {/* All meanings */}
-          <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
-            <h2 className="font-serif text-lg font-bold mb-3">Meanings</h2>
-            <ol className="space-y-3">
-              {result.senses.map((sense, i) => (
-                <li key={i} className="text-sm">
-                  <div className="flex gap-2">
-                    <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground leading-relaxed">
-                        {sense.english_definitions.join('; ')}
-                      </p>
-                      {sense.parts_of_speech.length > 0 && (
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {sense.parts_of_speech.map((pos, j) => (
-                            <span
-                              key={j}
-                              className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
-                            >
-                              {pos}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
           </section>
 
           {/* Kanji breakdown */}
@@ -274,6 +243,37 @@ export default function WordDetail() {
             </section>
           )}
 
+          {/* All meanings */}
+          <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
+            <h2 className="font-serif text-lg font-bold mb-3">Meanings</h2>
+            <ol className="space-y-3">
+              {result.senses.map((sense, i) => (
+                <li key={i} className="text-sm">
+                  <div className="flex gap-2">
+                    <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground leading-relaxed">
+                        {sense.english_definitions.join('; ')}
+                      </p>
+                      {sense.parts_of_speech.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {sense.parts_of_speech.map((pos, j) => (
+                            <span
+                              key={j}
+                              className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
+                            >
+                              {pos}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
           {/* Examples */}
           <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
             <h2 className="font-serif text-lg font-bold mb-3">Examples</h2>
@@ -305,12 +305,19 @@ export default function WordDetail() {
             )}
           </section>
 
-          {/* Conjugation — always open */}
-          <ConjugationTable
-            dictForm={display}
-            partsOfSpeech={result.senses.flatMap((s) => s.parts_of_speech)}
-            alwaysOpen
-          />
+          {/* Conjugation — wrapped card */}
+          {getConjugations(display, result.senses.flatMap((s) => s.parts_of_speech)) && (
+            <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
+              <h2 className="font-serif text-lg font-bold mb-3">Conjugation</h2>
+              <ConjugationTable
+                dictForm={display}
+                partsOfSpeech={result.senses.flatMap((s) => s.parts_of_speech)}
+                alwaysOpen
+                hideLabel
+              />
+            </section>
+          )}
+
         </div>
       )}
     </div>
