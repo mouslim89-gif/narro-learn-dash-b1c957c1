@@ -182,37 +182,6 @@ export default function WordDetail() {
             </Button>
           </section>
 
-          {/* All meanings */}
-          <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
-            <h2 className="font-serif text-lg font-bold mb-3">Meanings</h2>
-            <ol className="space-y-3">
-              {result.senses.map((sense, i) => (
-                <li key={i} className="text-sm">
-                  <div className="flex gap-2">
-                    <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground leading-relaxed">
-                        {sense.english_definitions.join('; ')}
-                      </p>
-                      {sense.parts_of_speech.length > 0 && (
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {sense.parts_of_speech.map((pos, j) => (
-                            <span
-                              key={j}
-                              className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
-                            >
-                              {pos}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </section>
-
           {/* Kanji breakdown */}
           {kanjiList && kanjiList.length > 0 && (
             <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
@@ -274,6 +243,37 @@ export default function WordDetail() {
             </section>
           )}
 
+          {/* All meanings */}
+          <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
+            <h2 className="font-serif text-lg font-bold mb-3">Meanings</h2>
+            <ol className="space-y-3">
+              {result.senses.map((sense, i) => (
+                <li key={i} className="text-sm">
+                  <div className="flex gap-2">
+                    <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground leading-relaxed">
+                        {sense.english_definitions.join('; ')}
+                      </p>
+                      {sense.parts_of_speech.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {sense.parts_of_speech.map((pos, j) => (
+                            <span
+                              key={j}
+                              className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
+                            >
+                              {pos}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
           {/* Examples */}
           <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
             <h2 className="font-serif text-lg font-bold mb-3">Examples</h2>
@@ -305,12 +305,19 @@ export default function WordDetail() {
             )}
           </section>
 
-          {/* Conjugation — always open */}
-          <ConjugationTable
-            dictForm={display}
-            partsOfSpeech={result.senses.flatMap((s) => s.parts_of_speech)}
-            alwaysOpen
-          />
+          {/* Conjugation — wrapped card */}
+          {getConjugations(display, result.senses.flatMap((s) => s.parts_of_speech)) && (
+            <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
+              <h2 className="font-serif text-lg font-bold mb-3">Conjugation</h2>
+              <ConjugationTable
+                dictForm={display}
+                partsOfSpeech={result.senses.flatMap((s) => s.parts_of_speech)}
+                alwaysOpen
+                hideLabel
+              />
+            </section>
+          )}
+
         </div>
       )}
     </div>
