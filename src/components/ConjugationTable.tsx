@@ -208,8 +208,8 @@ export function ConjugationTable({ dictForm, partsOfSpeech, alwaysOpen = false, 
 
   if (alwaysOpen) {
     return (
-      <div className="my-[10px]">
-        <div className="px-1 py-1 text-sm font-semibold text-foreground">{tableLabel}</div>
+      <div className={hideLabel ? '' : 'my-[10px]'}>
+        {!hideLabel && <div className="px-1 py-1 text-sm font-semibold text-foreground">{tableLabel}</div>}
         {tableBody}
       </div>
     );
