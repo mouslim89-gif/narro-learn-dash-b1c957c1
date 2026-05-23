@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Star, Loader2, Check, Plus } from 'lucide-react';
+import { ArrowLeft, Star, Loader2 } from 'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
