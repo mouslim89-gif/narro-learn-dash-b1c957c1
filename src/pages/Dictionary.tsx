@@ -121,15 +121,26 @@ export default function DictionaryPage() {
           return (
             <div
               key={idx}
-              className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden"
+              role="link"
+              tabIndex={0}
+              onClick={() => navigate(`/dictionary/${encodeURIComponent(word)}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(`/dictionary/${encodeURIComponent(word)}`);
+                }
+              }}
+              className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden cursor-pointer"
             >
 
 
-              {/* Save button */}
+              {/* Save / unsave button */}
               <button
-                onClick={() => handleSave(result)}
-                disabled={saved}
-                aria-label={saved ? 'Saved' : 'Save word'}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleSave(result);
+                }}
+                aria-label={saved ? 'Remove from flashcards' : 'Save word'}
                 className={`absolute top-4 right-4 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center transition-colors ${
                   saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
                 }`}
