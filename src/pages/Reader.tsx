@@ -19,7 +19,7 @@ import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
 import { useLongPress } from '@/hooks/use-long-press';
 import { toast } from '@/hooks/use-toast';
-import { getPosColorClass } from '@/lib/pos-colors';
+
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
 import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from '@/lib/known-words';
 import { Switch } from '@/components/ui/switch';
