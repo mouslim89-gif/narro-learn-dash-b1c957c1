@@ -40,8 +40,6 @@ export function FlashcardReview({ deck, onExit }: Props) {
     }, 200);
   }, []);
 
-  if (localDeck.length === 0) return null;
-
   if (currentIdx >= localDeck.length) {
     return (
       <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-6">
