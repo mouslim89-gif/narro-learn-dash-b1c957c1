@@ -67,3 +67,36 @@ export async function fetchExample(word: string): Promise<ExampleSentence | null
   }
 }
 
+const multiCache = new Map<string, ExampleSentence[]>();
+
+export async function fetchExamples(word: string, limit = 3): Promise<ExampleSentence[]> {
+  const key = `${word}::${limit}`;
+  if (multiCache.has(key)) return multiCache.get(key)!;
+
+  if (CURATED[word]) {
+    const arr = [CURATED[word]];
+    multiCache.set(key, arr);
+    return arr;
+  }
+
+  try {
+    const { data, error } = await supabase.functions.invoke('tatoeba-example', {
+      body: { word, limit },
+    });
+    if (error) {
+      multiCache.set(key, []);
+      return [];
+    }
+    const sentences: ExampleSentence[] = Array.isArray(data?.sentences) && data.sentences.length
+      ? data.sentences
+      : data?.japanese
+        ? [{ japanese: data.japanese, english: data.english || '' }]
+        : [];
+    multiCache.set(key, sentences);
+    return sentences;
+  } catch {
+    multiCache.set(key, []);
+    return [];
+  }
+}
+

@@ -76,18 +76,21 @@ export type Database = {
           created_at: string
           english: string
           japanese: string
+          sentences: Json | null
           word: string
         }
         Insert: {
           created_at?: string
           english?: string
           japanese: string
+          sentences?: Json | null
           word: string
         }
         Update: {
           created_at?: string
           english?: string
           japanese?: string
+          sentences?: Json | null
           word?: string
         }
         Relationships: []
@@ -137,6 +140,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           word?: string
+        }
+        Relationships: []
+      }
+      kanji_details: {
+        Row: {
+          character: string
+          created_at: string
+          grade: number | null
+          jlpt: number | null
+          kun_readings: Json
+          meanings: Json
+          on_readings: Json
+          stroke_count: number | null
+        }
+        Insert: {
+          character: string
+          created_at?: string
+          grade?: number | null
+          jlpt?: number | null
+          kun_readings?: Json
+          meanings?: Json
+          on_readings?: Json
+          stroke_count?: number | null
+        }
+        Update: {
+          character?: string
+          created_at?: string
+          grade?: number | null
+          jlpt?: number | null
+          kun_readings?: Json
+          meanings?: Json
+          on_readings?: Json
+          stroke_count?: number | null
         }
         Relationships: []
       }

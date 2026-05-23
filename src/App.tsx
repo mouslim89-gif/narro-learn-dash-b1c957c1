@@ -15,6 +15,7 @@ import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
 import DictionaryPage from "./pages/Dictionary";
+import WordDetail from "./pages/WordDetail";
 import BookDetail from "./pages/BookDetail";
 import Reader from "./pages/Reader";
 import NotFound from "./pages/NotFound";
@@ -70,6 +71,7 @@ function AnimatedRoutes() {
             <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
             <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
             <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+            <Route path="/dictionary/:word" element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
             <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
             <Route path="/reader/:id/:difficulty" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
             <Route path="/reader/:id/:difficulty/:chapterId" element={<ProtectedRoute><Reader /></ProtectedRoute>} />

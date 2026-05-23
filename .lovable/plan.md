@@ -1,38 +1,39 @@
-## Goal
+## Plan: Word detail page + star toggle fix
 
-1. Refondre le panneau **Settings du Reader** pour utiliser exactement le style "paper UI" de la page `Settings.tsx` (cards `rounded-2xl bg-card ring-1 ring-border/30 shadow-sm`, `SectionLabel` serif uppercase avec hairline, contrôles pill-segmented dans `rounded-full bg-muted p-1`, rangées séparées par `divide-y divide-border/40`).
-2. Supprimer le toggle **Display Mode** (Normal / Grammar) du panneau.
+### 1. Star toggle (Dictionary list)
+**`src/pages/Dictionary.tsx`** — remove `disabled={saved}`; on click, if `saved` call `removeWord(word)`, else `addWord(entry)`. `e.stopPropagation()` + `e.preventDefault()` so it doesn't trigger card navigation. Use existing `removeWord` from `useFlashcardStore`.
 
-## Changes — `src/pages/Reader.tsx`
+### 2. Card → word detail route
+**`src/App.tsx`** — add route `/dictionary/:word` → `WordDetail`.
+**`src/pages/Dictionary.tsx`** — wrap each card in `<Link to={`/dictionary/${encodeURIComponent(word)}`}>` (block link). Star button inside uses stopPropagation.
 
-### Settings panel (lignes ~731–863)
+### 3. New page `src/pages/WordDetail.tsx`
+Paper UI consistent with the rest of the app. Sections, top to bottom:
+- **Back button** (top-left) → `navigate(-1)` with `/dictionary` fallback.
+- **Header card**: word (large, font-japanese) + reading + romaji + `PlayWordButton`.
+- **Primary CTA**: prominent "Add to flashcards" / "Saved ✓" button (pill, accent color, full-width on mobile). Toggles save state — same logic as the list star. Plus a secondary star icon button for symmetry (optional, but the primary CTA is the explicit ask).
+- **Tags row**: Common, JLPT, parts of speech.
+- **All meanings**: every `result.senses` entry (no slicing) numbered, with per-sense POS chips and tags.
+- **Kanji breakdown**: one card per kanji char in the word. Shows large char, meanings, on'yomi, kun'yomi, JLPT, grade. Skips kana.
+- **Examples**: 3 sentences via Tatoeba.
+- **Conjugation**: `ConjugationTable` rendered **always expanded** — no accordion / collapsible. Update `ConjugationTable` to accept a `defaultOpen` / `alwaysOpen` prop (or render its inner table directly without the toggle wrapper on this page).
 
-Garder le pattern actuel (Sheet bottom sur mobile, sticky panel sur desktop) — c'est juste le **contenu** qui change. Réécrire `settingsBody` en suivant Settings.tsx :
+### 4. New edge function `kanji-lookup`
+Uses `https://kanjiapi.dev/v1/kanji/{char}` (free, no key). Returns meanings, kun_readings, on_readings, jlpt, grade, stroke_count. Cached in new `kanji_details` table. Zod-validated single-char input.
 
-- Composant local `SectionLabel` identique à celui de Settings.tsx : `font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground` + hairline `flex-1 h-px bg-border/60`.
-- Chaque section dans une card `rounded-2xl bg-card ring-1 ring-border/30 shadow-sm`, rangées séparées par `divide-y divide-border/40`, padding `px-4 py-4`, label gauche / contrôle droite.
-- Sections, dans cet ordre :
-  1. **Reading** (card) → Reading Level (3 pills), Font Size (pills S/M/L dans `rounded-full bg-muted p-1`), Japanese Font (pills Sans/Serif/Hand avec sample あ).
-  2. **Display** (card) → Dark mode (Switch), Show furigana (Switch), Theme accent si pertinent — Display Mode supprimé.
-  3. **Highlights** (card) → Highlight saved words (Switch). Quand activé : 3 sous-rangées indentées avec dot couleur + Switch (New, Learning, Known), séparées par hairline.
-- Sheet wrapper : changer `bg-background` du SheetContent pour `bg-background` neutre + spacing `space-y-7` entre sections, comme la page Settings.
-- Conserver `useBodyScrollLock` via le composant Sheet existant (déjà géré par Radix).
+**New table `kanji_details`** (public read, no client write):
+```
+character text pk, meanings jsonb, kun_readings jsonb, on_readings jsonb,
+jlpt int null, grade int null, stroke_count int null, created_at timestamptz default now()
+```
 
-### Suppression Display Mode
+Client helper `src/lib/kanji.ts` with in-memory Map cache.
 
-- Retirer la sous-section "Display Mode" (lignes 789–803).
-- Retirer la bannière `displayMode === 'grammar'` (lignes ~869+) avec sa légende POS.
-- Retirer les branches `displayMode === 'grammar'` qui pilotent `getPosColorClass` et désactivent les highlights (lignes ~950, ~958).
-- Retirer `displayMode`, `setDisplayMode`, `DisplayMode` de la destructuration + import.
-- Retirer `Palette` de l'import lucide.
-- Le store garde le champ `displayMode` pour compat (aucune migration nécessaire) — juste plus utilisé côté UI.
+### 5. Examples (3 sentences)
+Extend `supabase/functions/tatoeba-example/index.ts`: optional `limit` (1–5, default 1). Add `sentences jsonb` column to `example_sentences` (nullable, back-compat with `japanese`/`english`). Helper `fetchExamples(word, limit)` in `src/lib/tatoeba.ts`.
 
-### Hors scope
-- `GrammarPanel` et le bouton 文 dans le header restent (suppression = juste le toggle Display Mode).
-- Aucune modification à `src/pages/Settings.tsx`, au store, ou ailleurs.
+### 6. ConjugationTable change
+**`src/components/ConjugationTable.tsx`** — add `alwaysOpen?: boolean` prop. When true, render the table directly without the expandable wrapper. Dictionary list keeps current behavior; WordDetail passes `alwaysOpen`.
 
-## Technical notes
-
-- Réutiliser exactement les classes/tokens de Settings.tsx pour cohérence visuelle parfaite — pas de variations.
-- Les pills segmentées (Font Size, Japanese Font, Reading Level) suivent le pattern Settings.tsx : container `rounded-full bg-muted p-1`, item actif `bg-card text-foreground shadow-sm ring-1 ring-border/40`, inactif `text-muted-foreground`.
-- Le header sheet mobile peut accueillir un petit titre serif "Reader Settings" en haut, suivi du contenu en sections paper UI.
+### Out of scope
+Reader, flashcard schema, kanji stroke animations.

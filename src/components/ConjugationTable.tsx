@@ -172,9 +172,10 @@ export function getConjugations(dictForm: string, partsOfSpeech: string[]): Conj
 interface ConjugationTableProps {
   dictForm: string;
   partsOfSpeech: string[];
+  alwaysOpen?: boolean;
 }
 
-export function ConjugationTable({ dictForm, partsOfSpeech }: ConjugationTableProps) {
+export function ConjugationTable({ dictForm, partsOfSpeech, alwaysOpen = false }: ConjugationTableProps) {
   const [open, setOpen] = useState(false);
   const rows = getConjugations(dictForm, partsOfSpeech);
   const wordType = getWordType(partsOfSpeech);
@@ -183,6 +184,36 @@ export function ConjugationTable({ dictForm, partsOfSpeech }: ConjugationTablePr
 
   const tableLabel = wordType === 'i-adjective' ? 'Declension table' : 'Conjugation table';
 
+  const tableBody = (
+    <div className="mt-2 rounded-lg border border-border overflow-hidden">
+      {rows.map((row, i) => (
+        <div
+          key={row.label}
+          className={`flex items-center justify-between px-3 py-2 text-sm ${
+            i % 2 === 0 ? 'bg-muted/30' : 'bg-background'
+          } ${i === 0 ? 'bg-primary/10' : ''}`}
+        >
+          <div className="flex flex-col">
+            <span className="text-xs text-muted-foreground">{row.label}</span>
+            <span className="text-[10px] text-muted-foreground/70">{row.labelJp}</span>
+          </div>
+          <span className={`font-japanese text-base ${i === 0 ? 'font-bold text-primary' : 'text-foreground'}`}>
+            {row.form}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (alwaysOpen) {
+    return (
+      <div className="my-[10px]">
+        <div className="px-1 py-1 text-sm font-semibold text-foreground">{tableLabel}</div>
+        {tableBody}
+      </div>
+    );
+  }
+
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5 text-sm font-semibold text-foreground transition-colors active:bg-muted my-[10px]">
@@ -190,24 +221,7 @@ export function ConjugationTable({ dictForm, partsOfSpeech }: ConjugationTablePr
         <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="mt-2 rounded-lg border border-border overflow-hidden">
-          {rows.map((row, i) => (
-            <div
-              key={row.label}
-              className={`flex items-center justify-between px-3 py-2 text-sm ${
-                i % 2 === 0 ? 'bg-muted/30' : 'bg-background'
-              } ${i === 0 ? 'bg-primary/10' : ''}`}
-            >
-              <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">{row.label}</span>
-                <span className="text-[10px] text-muted-foreground/70">{row.labelJp}</span>
-              </div>
-              <span className={`font-japanese text-base ${i === 0 ? 'font-bold text-primary' : 'text-foreground'}`}>
-                {row.form}
-              </span>
-            </div>
-          ))}
-        </div>
+        {tableBody}
       </CollapsibleContent>
     </Collapsible>
   );
