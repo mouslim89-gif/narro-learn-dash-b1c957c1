@@ -173,9 +173,10 @@ interface ConjugationTableProps {
   dictForm: string;
   partsOfSpeech: string[];
   alwaysOpen?: boolean;
+  hideLabel?: boolean;
 }
 
-export function ConjugationTable({ dictForm, partsOfSpeech, alwaysOpen = false }: ConjugationTableProps) {
+export function ConjugationTable({ dictForm, partsOfSpeech, alwaysOpen = false, hideLabel = false }: ConjugationTableProps) {
   const [open, setOpen] = useState(false);
   const rows = getConjugations(dictForm, partsOfSpeech);
   const wordType = getWordType(partsOfSpeech);

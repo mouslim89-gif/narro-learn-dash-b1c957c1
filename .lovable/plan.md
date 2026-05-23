@@ -1,39 +1,25 @@
-## Plan: Word detail page + star toggle fix
+## Changes to `src/pages/WordDetail.tsx`
 
-### 1. Star toggle (Dictionary list)
-**`src/pages/Dictionary.tsx`** — remove `disabled={saved}`; on click, if `saved` call `removeWord(word)`, else `addWord(entry)`. `e.stopPropagation()` + `e.preventDefault()` so it doesn't trigger card navigation. Use existing `removeWord` from `useFlashcardStore`.
+**1. Remove empty top bar gap**
+Currently a separate `<header>` with only the back button sits above the header card, leaving the awkward empty space visible in the screenshot. Move the back button inside the header card (top-left, floating above the word) OR collapse the spacing so the back button sits inline. Approach: place a compact back button as a small icon at the top of the page (px-4 pt-4 pb-0), then the header card starts immediately after (mt-3 instead of pt-10 + mt-2).
 
-### 2. Card → word detail route
-**`src/App.tsx`** — add route `/dictionary/:word` → `WordDetail`.
-**`src/pages/Dictionary.tsx`** — wrap each card in `<Link to={`/dictionary/${encodeURIComponent(word)}`}>` (block link). Star button inside uses stopPropagation.
+**2. Unify add-to-flashcards icon to Star**
+- Replace `Plus` + `Check` in the CTA button with `Star` (filled when saved, outlined when not).
+- Label stays: "Add to flashcards" / "Saved to flashcards".
+- Remove `Plus`, `Check` imports; keep `Star`.
+- This matches `Dictionary.tsx`, `WordMiniPopup.tsx`, `WordPopup.tsx` which already use Star.
 
-### 3. New page `src/pages/WordDetail.tsx`
-Paper UI consistent with the rest of the app. Sections, top to bottom:
-- **Back button** (top-left) → `navigate(-1)` with `/dictionary` fallback.
-- **Header card**: word (large, font-japanese) + reading + romaji + `PlayWordButton`.
-- **Primary CTA**: prominent "Add to flashcards" / "Saved ✓" button (pill, accent color, full-width on mobile). Toggles save state — same logic as the list star. Plus a secondary star icon button for symmetry (optional, but the primary CTA is the explicit ask).
-- **Tags row**: Common, JLPT, parts of speech.
-- **All meanings**: every `result.senses` entry (no slicing) numbered, with per-sense POS chips and tags.
-- **Kanji breakdown**: one card per kanji char in the word. Shows large char, meanings, on'yomi, kun'yomi, JLPT, grade. Skips kana.
-- **Examples**: 3 sentences via Tatoeba.
-- **Conjugation**: `ConjugationTable` rendered **always expanded** — no accordion / collapsible. Update `ConjugationTable` to accept a `defaultOpen` / `alwaysOpen` prop (or render its inner table directly without the toggle wrapper on this page).
+**3. Reorder sections: Kanji before Meanings**
+Move the Kanji breakdown `<section>` above the Meanings `<section>`.
 
-### 4. New edge function `kanji-lookup`
-Uses `https://kanjiapi.dev/v1/kanji/{char}` (free, no key). Returns meanings, kun_readings, on_readings, jlpt, grade, stroke_count. Cached in new `kanji_details` table. Zod-validated single-char input.
+**4. Wrap ConjugationTable in a card**
+The table currently renders bare (just a label + bordered rows), inconsistent with other sections that use `rounded-2xl bg-card p-5 ring-1 ring-border/40`. Wrap the `<ConjugationTable alwaysOpen />` inside a section card with the same styling, and give it a "Conjugation" heading using the same `font-serif text-lg font-bold mb-3` as other section headings.
 
-**New table `kanji_details`** (public read, no client write):
-```
-character text pk, meanings jsonb, kun_readings jsonb, on_readings jsonb,
-jlpt int null, grade int null, stroke_count int null, created_at timestamptz default now()
-```
+To avoid double-labeling (the table already prints "Conjugation table" when `alwaysOpen`), add a new prop `hideLabel?: boolean` to `ConjugationTable` so the wrapper section provides the heading instead.
 
-Client helper `src/lib/kanji.ts` with in-memory Map cache.
+## Changes to `src/components/ConjugationTable.tsx`
 
-### 5. Examples (3 sentences)
-Extend `supabase/functions/tatoeba-example/index.ts`: optional `limit` (1–5, default 1). Add `sentences jsonb` column to `example_sentences` (nullable, back-compat with `japanese`/`english`). Helper `fetchExamples(word, limit)` in `src/lib/tatoeba.ts`.
+Add `hideLabel?: boolean` prop. When `alwaysOpen && hideLabel`, render only `tableBody` without the inner label div.
 
-### 6. ConjugationTable change
-**`src/components/ConjugationTable.tsx`** — add `alwaysOpen?: boolean` prop. When true, render the table directly without the expandable wrapper. Dictionary list keeps current behavior; WordDetail passes `alwaysOpen`.
-
-### Out of scope
-Reader, flashcard schema, kanji stroke animations.
+## Out of scope
+No changes to Dictionary star behavior, no changes to popups (already use Star), no backend changes.
