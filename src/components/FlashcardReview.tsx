@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { SrsButtons, type SrsQualityLabel } from '@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toRomaji } from 'wanakana';
-import { Trash2, X, BookOpen, ChevronDown, Eye, EyeOff } from 'lucide-react';
+import { Trash2, X, BookOpen, ChevronDown, Eye, EyeClosed } from 'lucide-react';
 
 interface Props {
   deck: SavedWord[];
@@ -166,7 +166,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
                 >
-                  {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeOff className="h-[18px] w-[18px]" />}
+                  {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeClosed className="h-[18px] w-[18px]" />}
                 </button>
                 <PlayWordButton word={card.word} reading={card.reading} size={26} />
               </div>
