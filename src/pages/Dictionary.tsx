@@ -11,6 +11,7 @@ import { ExampleSentence } from '@/components/ExampleSentence';
 import { Input } from '@/components/ui/input';
 
 export default function DictionaryPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initial = searchParams.get('q') || '';
   const [query, setQuery] = useState(initial);
