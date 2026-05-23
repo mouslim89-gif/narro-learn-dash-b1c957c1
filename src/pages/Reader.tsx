@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Palette, Eye, EyeClosed, Wrench } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
@@ -16,10 +16,10 @@ import { ReaderToken } from '@/components/ReaderToken';
 import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
 import { Progress } from '@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type DisplayMode, type JapaneseFont } from '@/stores/reading-progress';
+import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
 import { useLongPress } from '@/hooks/use-long-press';
 import { toast } from '@/hooks/use-toast';
-import { getPosColorClass, LEGEND } from '@/lib/pos-colors';
+
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from '@/lib/audio-sync';
 import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from '@/lib/known-words';
 import { Switch } from '@/components/ui/switch';
@@ -184,7 +184,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 export default function Reader() {
   const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
   const knownIndex = useKnownWordsIndex();
   const knownTogglesByLevel: Record<KnownLevel, boolean> = {
     new: highlightNew,
@@ -729,117 +729,128 @@ export default function Reader() {
       </header>
 
       {(() => {
+        const SectionLabel = ({ children }: { children: ReactNode }) => (
+          <div className="flex items-center gap-3 mb-3 px-1">
+            <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
+              {children}
+            </h2>
+            <div className="flex-1 h-px bg-border/60" />
+          </div>
+        );
+
+        const pillBase = 'h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
+        const pillActive = 'bg-card text-foreground shadow-sm ring-1 ring-border/40';
+        const pillIdle = 'text-muted-foreground hover:text-foreground';
+
         const settingsBody = (
-          <>
-            <p className="reader-settings-section"><span className="reader-settings-bullet" />Reading Level</p>
-            <div className="flex gap-2">
-              {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
-                <button
-                  key={d}
-                  onClick={() => { setDifficulty(d); }}
-                  className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                    d === difficulty ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
-                  }`}
-                >
-                  {difficultyConfig[d].label}
-                </button>
-              ))}
-            </div>
-
-            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Font Size</p>
-            <div className="flex gap-2">
-              {fontSizes.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setFontSize(s)}
-                  className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                    s === fontSize ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
-                  }`}
-                >
-                  <Type className="h-3 w-3" /> {fontSizeLabels[s]}
-                </button>
-              ))}
-            </div>
-
-            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Japanese Font</p>
-            <div className="flex gap-2">
-              {japaneseFonts.map((f) => (
-                <button
-                  key={f.value}
-                  onClick={() => setJapaneseFont(f.value)}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                    f.value === japaneseFont ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
-                  }`}
-                >
-                  <span className={`text-base leading-none ${japaneseFontClassMap[f.value]}`}>あ</span>
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Theme</p>
-            <button
-              onClick={() => setReaderDarkMode(!readerDarkMode)}
-              className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs font-semibold transition-all"
-            >
-              {readerDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-              {readerDarkMode ? 'Light Mode' : 'Dark Mode'}
-            </button>
-
-            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Display Mode</p>
-            <div className="flex gap-2">
-              {(['normal', 'grammar'] as DisplayMode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setDisplayMode(m)}
-                  className={`flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                    m === displayMode ? 'bg-primary text-primary-foreground shadow-sm btn-primary-glow' : 'bg-muted text-foreground'
-                  }`}
-                >
-                  {m === 'grammar' && <Palette className="h-3 w-3" />}
-                  {m === 'normal' ? 'Normal' : 'Grammar'}
-                </button>
-              ))}
-            </div>
-
-            {/* Highlights — saved words */}
-            <p className="reader-settings-section mt-5"><span className="reader-settings-bullet" />Highlights</p>
-            <div className="space-y-2.5">
-              <label className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2">
-                <span className="text-xs font-semibold">Highlight saved words</span>
-                <Switch
-                  checked={showKnownHighlights}
-                  onCheckedChange={setShowKnownHighlights}
-                  aria-label="Toggle saved-word highlights"
-                />
-              </label>
-              {showKnownHighlights && (
-                <div className="space-y-1.5 pl-1">
-                  <label className="flex items-center justify-between gap-3 px-2 py-1">
-                    <span className="flex items-center gap-2 text-xs">
-                      <span className="color-dot color-dot-new" />
-                      New words
-                    </span>
-                    <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
-                  </label>
-                  <label className="flex items-center justify-between gap-3 px-2 py-1">
-                    <span className="flex items-center gap-2 text-xs">
-                      <span className="color-dot color-dot-learning" />
-                      Learning
-                    </span>
-                    <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
-                  </label>
-                  <label className="flex items-center justify-between gap-3 px-2 py-1">
-                    <span className="flex items-center gap-2 text-xs">
-                      <span className="color-dot color-dot-known" />
-                      Known
-                    </span>
-                    <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
-                  </label>
+          <div className="space-y-7">
+            {/* Reading */}
+            <section>
+              <SectionLabel>Reading</SectionLabel>
+              <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="text-[15px] font-medium">Reading level</span>
+                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                    {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+                      <button
+                        key={d}
+                        onClick={() => setDifficulty(d)}
+                        className={cn(pillBase, d === difficulty ? pillActive : pillIdle)}
+                      >
+                        {difficultyConfig[d].label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </div>
-          </>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="text-[15px] font-medium">Font size</span>
+                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                    {fontSizes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setFontSize(s)}
+                        className={cn('h-7 w-9 rounded-full text-sm font-semibold smooth-colors tap-scale-sm', s === fontSize ? pillActive : pillIdle)}
+                      >
+                        {fontSizeLabels[s]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="text-[15px] font-medium">Japanese font</span>
+                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                    {japaneseFonts.map((f) => (
+                      <button
+                        key={f.value}
+                        onClick={() => setJapaneseFont(f.value)}
+                        className={cn(pillBase, f.value === japaneseFont ? pillActive : pillIdle)}
+                      >
+                        <span className={cn('text-base leading-none', japaneseFontClassMap[f.value])}>あ</span>
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Display */}
+            <section>
+              <SectionLabel>Display</SectionLabel>
+              <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="flex items-center gap-2 text-[15px] font-medium">
+                    {readerDarkMode ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-muted-foreground" />}
+                    Dark mode
+                  </span>
+                  <Switch checked={readerDarkMode} onCheckedChange={setReaderDarkMode} />
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="flex items-center gap-2 text-[15px] font-medium">
+                    {showFurigana ? <Eye className="h-4 w-4 text-muted-foreground" /> : <EyeClosed className="h-4 w-4 text-muted-foreground" />}
+                    Show furigana
+                  </span>
+                  <Switch checked={showFurigana} onCheckedChange={setShowFurigana} />
+                </div>
+              </div>
+            </section>
+
+            {/* Highlights */}
+            <section>
+              <SectionLabel>Highlights</SectionLabel>
+              <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="text-[15px] font-medium">Highlight saved words</span>
+                  <Switch checked={showKnownHighlights} onCheckedChange={setShowKnownHighlights} />
+                </div>
+                {showKnownHighlights && (
+                  <>
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
+                      <span className="flex items-center gap-2.5 text-sm">
+                        <span className="color-dot color-dot-new" />
+                        New words
+                      </span>
+                      <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
+                      <span className="flex items-center gap-2.5 text-sm">
+                        <span className="color-dot color-dot-learning" />
+                        Learning
+                      </span>
+                      <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
+                      <span className="flex items-center gap-2.5 text-sm">
+                        <span className="color-dot color-dot-known" />
+                        Known
+                      </span>
+                      <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
+                    </div>
+                  </>
+                )}
+              </div>
+            </section>
+          </div>
         );
 
         if (isMobile) {
@@ -847,8 +858,12 @@ export default function Reader() {
             <Sheet open={showSettings} onOpenChange={setShowSettings}>
               <SheetContent
                 side="bottom"
-                className="max-h-[85vh] overflow-y-auto rounded-t-xl px-4 py-5 pb-[calc(env(safe-area-inset-bottom)+1rem)]"
+                className="max-h-[85vh] overflow-y-auto rounded-t-3xl bg-background px-5 pt-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
               >
+                <div className="mb-5 flex items-center gap-3">
+                  <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
+                  <div className="flex-1 h-px bg-border/60" />
+                </div>
                 {settingsBody}
               </SheetContent>
             </Sheet>
@@ -856,31 +871,19 @@ export default function Reader() {
         }
 
         return showSettings ? (
-          <div className="reader-settings-panel sticky top-[3.25rem] z-20 border-b border-border/40 bg-card px-4 py-5 animate-fade-in">
-            {settingsBody}
+          <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in">
+            <div className="mx-auto max-w-2xl">
+              <div className="mb-5 flex items-center gap-3">
+                <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
+                <div className="flex-1 h-px bg-border/60" />
+              </div>
+              {settingsBody}
+            </div>
           </div>
         ) : null;
       })()}
 
 
-
-      {/* progress hairline now lives in the header */}
-
-      {displayMode === 'grammar' && (
-        <div className="sticky top-14 z-10 border-b bg-card/95 px-3 py-2.5 backdrop-blur-lg">
-          <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Color guide
-            </span>
-            {LEGEND.map((item) => (
-              <span key={item.category} className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                <span className={`inline-block h-3 w-3 rounded-full ${item.color}`} />
-                {item.label}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
 
       <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
 
@@ -947,15 +950,14 @@ export default function Reader() {
                         return <span key={i}>{token.t}</span>;
                       }
 
-                      const colorClass = displayMode === 'grammar' ? getPosColorClass(token.p) : '';
+                      const colorClass = '';
                       const isHighlighted = !!(miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i);
                       const tokKey = globalIdx * 10000 + i;
                       if (tokenEditMode) tokenByKey.current.set(tokKey, token);
                       const isSelected = tokenEditMode && selectedIdx.includes(tokKey);
 
-                      // Known-word highlight: disabled in grammar mode (POS colors prevail).
                       let knownLevel: KnownLevel | null = null;
-                      if (!tokenEditMode && displayMode !== 'grammar' && showKnownHighlights) {
+                      if (!tokenEditMode && showKnownHighlights) {
                         const lvl = getKnownLevel(token, knownIndex);
                         if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
                       }
