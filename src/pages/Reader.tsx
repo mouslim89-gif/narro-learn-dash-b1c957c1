@@ -184,7 +184,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 export default function Reader() {
   const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, displayMode, setDisplayMode, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
   const knownIndex = useKnownWordsIndex();
   const knownTogglesByLevel: Record<KnownLevel, boolean> = {
     new: highlightNew,
