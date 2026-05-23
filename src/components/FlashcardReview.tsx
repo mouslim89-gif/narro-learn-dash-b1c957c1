@@ -17,6 +17,9 @@ const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
   const { adjustMastery, removeWord } = useFlashcardStore();
+  // Snapshot the deck once so store mutations (delete) don't shift indices mid-session.
+  const deckRef = useRef<SavedWord[]>(deck);
+  const [localDeck, setLocalDeck] = useState<SavedWord[]>(() => deckRef.current);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [animClass, setAnimClass] = useState('');
