@@ -93,12 +93,12 @@ export default function WordDetail() {
   return (
     <div className="pb-24">
       {/* Top bar */}
-      <header className="px-6 pt-10 pb-2 flex items-center">
+      <header className="px-4 pt-4 pb-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={handleBack}
-          className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
+          className="h-9 w-9 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
           aria-label="Back"
         >
           <ArrowLeft className="h-[18px] w-[18px]" />
