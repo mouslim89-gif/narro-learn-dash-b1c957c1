@@ -121,75 +121,77 @@ export default function DictionaryPage() {
           return (
             <div
               key={idx}
-              role="link"
-              tabIndex={0}
-              onClick={() => navigate(`/dictionary/${encodeURIComponent(word)}`)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate(`/dictionary/${encodeURIComponent(word)}`);
-                }
-              }}
-              className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden cursor-pointer"
+              className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden"
             >
-
-
               {/* Save / unsave button */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleSave(result);
-                }}
+                onClick={() => handleToggleSave(result)}
                 aria-label={saved ? 'Remove from flashcards' : 'Save word'}
-                className={`absolute top-4 right-4 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center transition-colors ${
+                className={`absolute top-4 right-4 z-10 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center transition-colors ${
                   saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
                 }`}
               >
                 <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
               </button>
 
-              {/* Word + reading inline */}
-              <div className="flex items-center gap-1.5 pr-12">
-                <p className="font-japanese text-xl font-bold">{word}</p>
-                {reading && reading !== word && (
-                  <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
-                )}
-                {reading && (
-                  <span className="text-xs text-muted-foreground/70 italic">{toRomaji(reading)}</span>
-                )}
-                <PlayWordButton word={word} reading={reading} size={16} />
-              </div>
+              {/* Clickable summary → word detail */}
+              <div
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(`/dictionary/${encodeURIComponent(word)}`)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate(`/dictionary/${encodeURIComponent(word)}`);
+                  }
+                }}
+                className="cursor-pointer -m-1 p-1 rounded-lg"
+              >
+                {/* Word + reading inline */}
+                <div className="flex items-center gap-1.5 pr-12">
+                  <p className="font-japanese text-xl font-bold">{word}</p>
+                  {reading && reading !== word && (
+                    <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
+                  )}
+                  {reading && (
+                    <span className="text-xs text-muted-foreground/70 italic">{toRomaji(reading)}</span>
+                  )}
+                  <span onClick={(e) => e.stopPropagation()}>
+                    <PlayWordButton word={word} reading={reading} size={16} />
+                  </span>
+                </div>
 
-              {/* Tags row */}
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                {isCommon && (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
-                    ✦ Common
-                  </span>
-                )}
-                {result.jlpt.length > 0 && (
-                  <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/20">
-                    {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
-                  </span>
-                )}
-                {result.senses[0]?.parts_of_speech?.map((pos, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground ring-1 ring-border/40"
-                  >
-                    {pos}
-                  </span>
-                ))}
-              </div>
+                {/* Tags row */}
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {isCommon && (
+                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
+                      ✦ Common
+                    </span>
+                  )}
+                  {result.jlpt.length > 0 && (
+                    <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/20">
+                      {result.jlpt[0]?.replace('jlpt-', 'JLPT ')}
+                    </span>
+                  )}
+                  {result.senses[0]?.parts_of_speech?.map((pos, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground ring-1 ring-border/40"
+                    >
+                      {pos}
+                    </span>
+                  ))}
+                </div>
 
-              {/* Meanings */}
-              <div className="mt-3 space-y-1">
-                {result.senses.slice(0, 3).map((sense, i) => (
-                  <p key={i} className="text-sm leading-relaxed">
-                    <span className="text-muted-foreground mr-1">{i + 1}.</span>
-                    <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
-                  </p>
-                ))}
+                {/* Meanings */}
+                <div className="mt-3 space-y-1">
+                  {result.senses.slice(0, 3).map((sense, i) => (
+                    <p key={i} className="text-sm leading-relaxed">
+                      <span className="text-muted-foreground mr-1">{i + 1}.</span>
+                      <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
+                    </p>
+                  ))}
+                </div>
               </div>
 
               <ExampleSentence word={word} />
