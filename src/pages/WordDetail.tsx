@@ -172,11 +172,11 @@ export default function WordDetail() {
             >
               {saved ? (
                 <>
-                  <Check className="h-4 w-4 mr-1.5" /> Saved to flashcards
+                  <Star className="h-4 w-4 mr-1.5" fill="currentColor" /> Saved to flashcards
                 </>
               ) : (
                 <>
-                  <Plus className="h-4 w-4 mr-1.5" /> Add to flashcards
+                  <Star className="h-4 w-4 mr-1.5" /> Add to flashcards
                 </>
               )}
             </Button>
