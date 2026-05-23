@@ -71,6 +71,7 @@ function AnimatedRoutes() {
             <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
             <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
             <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+            <Route path="/dictionary/:word" element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
             <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
             <Route path="/reader/:id/:difficulty" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
             <Route path="/reader/:id/:difficulty/:chapterId" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
