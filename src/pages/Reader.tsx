@@ -887,6 +887,22 @@ export default function Reader() {
 
       <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
 
+        {(() => {
+          const isFirstChapter = book.chapters && book.chapters.length > 1
+            ? book.chapters.findIndex((c) => c.id === chapterId) === 0
+            : hasParts(book)
+              ? partIdx === 0
+              : true;
+          if (!isFirstChapter) return null;
+          return (
+            <div className="px-6 pt-8 pb-2 text-center">
+              <h1 className="font-serif text-3xl font-bold leading-tight sm:text-4xl">{book.titleJp}</h1>
+              <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">{book.titleEn}</p>
+              <div className="mx-auto mt-4 h-px w-16 bg-border/60" />
+            </div>
+          );
+        })()}
+
         {book.chapters && book.chapters.length > 1 && (() => {
           const chapter = book.chapters.find((c) => c.id === chapterId);
           const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
@@ -911,6 +927,7 @@ export default function Reader() {
             <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
           </div>
         )}
+
 
 
         <div className="px-6 py-8 sm:px-12 sm:py-12">
