@@ -897,8 +897,11 @@ export default function Reader() {
           return (
             <div className="px-6 pt-8 pb-2 text-center">
               <h1 className="font-serif text-3xl font-bold leading-tight sm:text-4xl">{book.titleJp}</h1>
-              <p className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">{book.titleEn}</p>
-              <div className="mx-auto mt-4 h-px w-16 bg-border/60" />
+              <div className="mx-auto mt-4 flex items-center justify-center gap-3 text-muted-foreground">
+                <span className="h-px w-8 bg-border/60" />
+                <p className="font-serif italic text-sm tracking-wide">{book.titleEn}</p>
+                <span className="h-px w-8 bg-border/60" />
+              </div>
             </div>
           );
         })()}
