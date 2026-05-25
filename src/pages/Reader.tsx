@@ -942,7 +942,7 @@ export default function Reader() {
           }}
         >
           {paragraphs.map((paragraph, pIdx) => (
-            <p key={pIdx} className="mb-6 indent-[1em]">
+            <p key={pIdx} className="mb-6">
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 const sentenceText = sentence.tokens.map(t => t.t).join('');
