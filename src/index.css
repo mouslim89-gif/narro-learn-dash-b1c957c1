@@ -212,6 +212,9 @@
   word-spacing: 0 !important;
   text-align: left;
   font-feature-settings: "palt" 0; /* full-width metrics → even spacing */
+  word-break: normal;
+  overflow-wrap: break-word;
+  line-break: strict; /* respect Japanese kinsoku line-break rules */
 }
 .reader-text ruby {
   ruby-align: center;

@@ -924,7 +924,7 @@ export default function Reader() {
         {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
           <div className="px-6 pt-6 pb-2 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Chapter {partIdx + 1} / {book.anchors.length}
+              Chapter {partIdx + 1}
             </p>
             <p className="mt-1 font-serif text-lg font-bold">{book.anchors[partIdx]}</p>
             <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
@@ -942,7 +942,7 @@ export default function Reader() {
           }}
         >
           {paragraphs.map((paragraph, pIdx) => (
-            <p key={pIdx} className="mb-6 indent-[1em]">
+            <p key={pIdx} className="mb-6">
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 const sentenceText = sentence.tokens.map(t => t.t).join('');
