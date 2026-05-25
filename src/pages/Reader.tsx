@@ -748,42 +748,42 @@ export default function Reader() {
             <section>
               <SectionLabel>Reading</SectionLabel>
               <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-[15px] font-medium">Reading level</span>
-                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
                     {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
                       <button
                         key={d}
                         onClick={() => setDifficulty(d)}
-                        className={cn(pillBase, d === difficulty ? pillActive : pillIdle)}
+                        className={cn(pillBase, 'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
                       >
                         {difficultyConfig[d].label}
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-[15px] font-medium">Font size</span>
-                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
                     {fontSizes.map((s) => (
                       <button
                         key={s}
                         onClick={() => setFontSize(s)}
-                        className={cn('h-7 w-9 rounded-full text-sm font-semibold smooth-colors tap-scale-sm', s === fontSize ? pillActive : pillIdle)}
+                        className={cn('h-7 rounded-full text-sm font-semibold smooth-colors tap-scale-sm flex-1 sm:w-9 sm:flex-none', s === fontSize ? pillActive : pillIdle)}
                       >
                         {fontSizeLabels[s]}
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-[15px] font-medium">Japanese font</span>
-                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
                     {japaneseFonts.map((f) => (
                       <button
                         key={f.value}
                         onClick={() => setJapaneseFont(f.value)}
-                        className={cn(pillBase, f.value === japaneseFont ? pillActive : pillIdle)}
+                        className={cn(pillBase, 'flex-1 sm:flex-none', f.value === japaneseFont ? pillActive : pillIdle)}
                       >
                         <span className={cn('text-base leading-none', japaneseFontClassMap[f.value])}>あ</span>
                         {f.label}
