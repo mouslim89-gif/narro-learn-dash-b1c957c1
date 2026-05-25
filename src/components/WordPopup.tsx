@@ -333,7 +333,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                   <p className={sectionLabel}>Conjugations</p>
                   <div className="mt-1 h-px w-8 bg-accent/60" />
                   <div className="mt-2 rounded-2xl bg-muted/40 p-3 ring-1 ring-border/30">
-                    <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} />
+                    <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} alwaysOpen hideLabel />
                   </div>
                 </section>
               )}
