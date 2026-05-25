@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Star, BookOpen } from 'lucide-react';
+import { Star, BookOpen, ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useNavigate } from 'react-router-dom';
 import { toRomaji } from 'wanakana';
 import { PlayWordButton } from '@/components/PlayWordButton';
