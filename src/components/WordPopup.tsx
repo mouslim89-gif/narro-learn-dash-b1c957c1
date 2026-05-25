@@ -329,13 +329,22 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
               {/* Conjugations */}
               {wordType && (
-                <section>
-                  <p className={sectionLabel}>Conjugations</p>
-                  <div className="mt-1 h-px w-8 bg-accent/60" />
-                  <div className="mt-2 rounded-2xl bg-muted/40 p-3 ring-1 ring-border/30">
-                    <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} alwaysOpen hideLabel />
-                  </div>
-                </section>
+                <Collapsible asChild>
+                  <section>
+                    <CollapsibleTrigger className="group flex w-full items-center justify-between">
+                      <div>
+                        <p className={sectionLabel}>Conjugations</p>
+                        <div className="mt-1 h-px w-8 bg-accent/60" />
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="mt-2 rounded-2xl bg-muted/40 p-3 ring-1 ring-border/30">
+                        <ConjugationTable dictForm={dictForm} partsOfSpeech={allPartsOfSpeech} alwaysOpen hideLabel />
+                      </div>
+                    </CollapsibleContent>
+                  </section>
+                </Collapsible>
               )}
 
               <div className="mt-2 flex gap-2">
