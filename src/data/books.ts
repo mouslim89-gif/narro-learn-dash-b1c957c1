@@ -1,5 +1,13 @@
 import { konbiniChapters } from './books/konbini-ningen';
-import { kumoSimplified, kumoIntermediate, kumoOriginal } from './books/kumo-no-ito';
+import {
+  kumoSimplified,
+  kumoIntermediate,
+  kumoOriginal,
+  kumoSimplifiedParts,
+  kumoIntermediateParts,
+  kumoOriginalParts,
+  kumoAnchors,
+} from './books/kumo-no-ito';
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
 import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
 import {
@@ -249,6 +257,8 @@ export const books: Book[] = [
     readingTimeMin: 10,
     synopsis: "A Buddhist parable by Akutagawa. One morning in paradise, the Buddha lowers a single spider's thread into hell to save Kandata, a murderer who once spared the life of a spider. As Kandata climbs, other sinners follow him up the thread — and his reaction decides his fate. A short, luminous meditation on selfishness and compassion.",
     content: { simplified: kumoSimplified, intermediate: kumoIntermediate, original: kumoOriginal },
+    parts: { simplified: kumoSimplifiedParts, intermediate: kumoIntermediateParts, original: kumoOriginalParts },
+    anchors: kumoAnchors,
   },
   {
     id: 'rashomon',
