@@ -49,7 +49,7 @@ export const lemonIntermediateParts: string[] = [
 ];
 
 export const lemonOriginalParts: string[] = [
-  `えたいの知れない不吉な塊が私の心を始終圧えつけていた。焦躁と言おうか、嫌悪と言おうか――酒を飲んだあとに宿酔があるように、酒を毎日飲んでいると宿酔に相当した時期がやって来る。それが来たのだ。これはちょっといけなかった。結果した肺尖カタルや神経衰弱がいけないのではない。また背を焼くような借金などがいけないのではない。いけないのはその不吉な塊だ。以前私を喜ばせたどんな美しい音楽も、どんな美しい詩の一節も辛抱がならなくなった。蓄音器を聴かせてもらいにわざわざ出かけて行っても、最初の二三小節で不意に立ち上がってしまいたくなる。何かが私を居堪らずさせるのだ。それで始終私は街から街を浮浪し続けていた。
+  `えたいの知れない不吉な塊が私の心を始終押さえつけていた。焦躁と言おうか、嫌悪と言おうか――酒を飲んだあとに宿酔があるように、酒を毎日飲んでいると宿酔に相当した時期がやって来る。それが来たのだ。これはちょっといけなかった。結果した肺尖カタルや神経衰弱がいけないのではない。また背を焼くような借金などがいけないのではない。いけないのはその不吉な塊だ。以前私を喜ばせたどんな美しい音楽も、どんな美しい詩の一節も辛抱がならなくなった。蓄音器を聴かせてもらいにわざわざ出かけて行っても、最初の二三小節で不意に立ち上がってしまいたくなる。何かが私を居堪らずさせるのだ。それで始終私は街から街を浮浪し続けていた。
 
 何故だかその頃私は見すぼらしくて美しいものに強くひきつけられたのを覚えている。風景にしても壊れかかった街だとか、その街にしてもよそよそしい表通りよりもどこか親しみのある、汚い洗濯物が干してあったりがらくたが転がしてあったりむさくるしい部屋が覗いていたりする裏通りが好きであった。雨や風が蝕んでやがて土に帰ってしまう、と言ったような趣きのある街で、土塀が崩れていたり家並が傾きかかっていたり――勢いのいいのは植物だけで、時とするとびっくりさせるような向日葵があったりカンナが咲いていたりする。
 
@@ -111,12 +111,12 @@ export const lemonOriginalParts: string[] = [
 ];
 
 export const lemonAnchors: string[] = [
-  'Malaise and the lure of decay',
-  'Wandering, the fruit shop, the lemon',
-  'Maruzen — the book tower and the lemon-bomb',
+  "Malaise and the lure of decay",
+  "Wandering, the fruit shop, the lemon",
+  "Maruzen — the book tower and the lemon-bomb",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts
-export const lemonSimplified = lemonSimplifiedParts.join('\n\n');
-export const lemonIntermediate = lemonIntermediateParts.join('\n\n');
-export const lemonOriginal = lemonOriginalParts.join('\n\n');
+export const lemonSimplified = lemonSimplifiedParts.join("\n\n");
+export const lemonIntermediate = lemonIntermediateParts.join("\n\n");
+export const lemonOriginal = lemonOriginalParts.join("\n\n");
