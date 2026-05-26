@@ -49,7 +49,7 @@ export function ReaderToken({
   const stopDown = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
 
   const knownClass = knownLevel ? KNOWN_CLASS[knownLevel] : '';
-  const cls = `jp-token ${colorClass} ${knownClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`;
+  const cls = `${colorClass} ${knownClass} ${isHighlighted ? 'bg-accent/25 rounded-sm' : ''}`;
 
   const hasReading = !!token.r;
 
