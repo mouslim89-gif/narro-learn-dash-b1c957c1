@@ -896,7 +896,8 @@ export default function Reader() {
           if (!isFirstChapter) return null;
           return (
             <div className="px-6 pt-8 pb-2 text-center">
-              <h1 className="font-serif text-3xl font-bold leading-tight sm:text-4xl">{book.titleJp}</h1>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{book.author}</p>
+              <h1 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-4xl">{book.titleJp}</h1>
               <div className="mx-auto mt-4 flex items-center justify-center gap-3 text-muted-foreground">
                 <span className="h-px w-8 bg-border/60" />
                 <p className="font-serif italic text-sm tracking-wide">{book.titleEn}</p>

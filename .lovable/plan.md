@@ -1,25 +1,25 @@
-## Changes to `src/pages/WordDetail.tsx`
+## Changes
 
-**1. Remove empty top bar gap**
-Currently a separate `<header>` with only the back button sits above the header card, leaving the awkward empty space visible in the screenshot. Move the back button inside the header card (top-left, floating above the word) OR collapse the spacing so the back button sits inline. Approach: place a compact back button as a small icon at the top of the page (px-4 pt-4 pb-0), then the header card starts immediately after (mt-3 instead of pt-10 + mt-2).
+### 1. Book title block — add author above Japanese title
+In `src/pages/Reader.tsx` (the title block around lines 897-906), prepend the author name above the Japanese title, in small caps style matching the existing decorative theme.
 
-**2. Unify add-to-flashcards icon to Star**
-- Replace `Plus` + `Check` in the CTA button with `Star` (filled when saved, outlined when not).
-- Label stays: "Add to flashcards" / "Saved to flashcards".
-- Remove `Plus`, `Check` imports; keep `Star`.
-- This matches `Dictionary.tsx`, `WordMiniPopup.tsx`, `WordPopup.tsx` which already use Star.
+New structure:
+```
+[author name — small, muted, tracked uppercase]
+[大きい 日本語 タイトル]
+— English Title —  (existing italic serif with side rules)
+```
 
-**3. Reorder sections: Kanji before Meanings**
-Move the Kanji breakdown `<section>` above the Meanings `<section>`.
+The author comes from `book.author` (already exists on every book in `src/data/books.ts`, e.g. "Kajii Motojirō", "Dazai Osamu").
 
-**4. Wrap ConjugationTable in a card**
-The table currently renders bare (just a label + bordered rows), inconsistent with other sections that use `rounded-2xl bg-card p-5 ring-1 ring-border/40`. Wrap the `<ConjugationTable alwaysOpen />` inside a section card with the same styling, and give it a "Conjugation" heading using the same `font-serif text-lg font-bold mb-3` as other section headings.
+### 2. Kinsoku — prevent mid-token breaks
+In `src/index.css`, update `.reader-text`:
+- Replace `word-break: normal` with `word-break: keep-all` so the browser only breaks at whitespace/punctuation boundaries, never inside a CJK token.
+- Keep `line-break: strict` for proper kinsoku punctuation rules (no 。、！？ at line start, no opening brackets at line end).
+- Keep `overflow-wrap: break-word` as a safety fallback for unusually long latin strings.
 
-To avoid double-labeling (the table already prints "Conjugation table" when `alwaysOpen`), add a new prop `hideLabel?: boolean` to `ConjugationTable` so the wrapper section provides the heading instead.
+This combination is the standard CSS pattern for Japanese typography and respects kinsoku properly.
 
-## Changes to `src/components/ConjugationTable.tsx`
-
-Add `hideLabel?: boolean` prop. When `alwaysOpen && hideLabel`, render only `tableBody` without the inner label div.
-
-## Out of scope
-No changes to Dictionary star behavior, no changes to popups (already use Star), no backend changes.
+## Files
+- `src/pages/Reader.tsx` — add author line in book title block
+- `src/index.css` — switch `.reader-text` to `word-break: keep-all`
