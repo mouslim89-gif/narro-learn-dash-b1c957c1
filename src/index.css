@@ -216,10 +216,7 @@
   overflow-wrap: break-word; /* fallback for long latin strings */
   line-break: strict; /* respect Japanese kinsoku line-break rules */
 }
-/* Each tokenized Japanese word stays unbreakable; breaks happen between tokens */
-.reader-text .jp-token {
-  white-space: nowrap;
-}
+/* Japanese text breaks naturally between characters; line-break: strict enforces kinsoku */
 .reader-text ruby {
   ruby-align: center;
 }
