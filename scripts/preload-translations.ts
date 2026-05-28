@@ -89,20 +89,23 @@ async function fetchCachedHashes(hashes: string[]): Promise<Set<string>> {
   return out;
 }
 
-async function callBatch(sentences: string[]): Promise<number> {
+async function callBatch(sentences: string[]): Promise<{ count: number; rateLimited: boolean }> {
   const { data, error } = await supabase.functions.invoke('translate-sentences-batch', {
     body: { sentences },
   });
   if (error) {
     console.error('  batch error:', error.message);
-    return 0;
+    return { count: 0, rateLimited: false };
   }
   const results = (data as any)?.results ?? [];
-  if ((data as any)?.rateLimited) console.warn('  rate-limited');
-  if ((data as any)?.creditsExhausted) console.error('  CREDITS EXHAUSTED');
-  return results.length;
+  if ((data as any)?.creditsExhausted) {
+    console.error('  CREDITS EXHAUSTED — stopping');
+    process.exit(2);
+  }
+  return { count: results.length, rateLimited: !!(data as any)?.rateLimited };
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function main() {
   console.log('Collecting texts…');
   const blobs = collectAllTexts();
