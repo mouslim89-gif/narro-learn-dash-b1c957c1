@@ -48,7 +48,15 @@ import {
 } from './books/asa';
 import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
 import { sakuraSimplified, sakuraIntermediate, sakuraOriginal } from './books/sakura';
-import { urashimaSimplified, urashimaIntermediate, urashimaOriginal } from './books/urashima';
+import {
+  urashimaSimplified,
+  urashimaIntermediate,
+  urashimaOriginal,
+  urashimaSimplifiedParts,
+  urashimaIntermediateParts,
+  urashimaOriginalParts,
+  urashimaAnchors,
+} from './books/urashima';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
