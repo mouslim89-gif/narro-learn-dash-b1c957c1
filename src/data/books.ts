@@ -303,6 +303,8 @@ export const books: Book[] = [
     readingTimeMin: 12,
     synopsis: "A masterless servant takes shelter from the rain under the crumbling Rashōmon gate, debating whether to starve or turn to crime. Climbing into the tower among the abandoned dead, he confronts an old woman pulling hair from a corpse — and what she says will tip his decision. Akutagawa's celebrated study of survival, morality, and the thin line between victim and villain.",
     content: { simplified: rashomonSimplified, intermediate: rashomonIntermediate, original: rashomonOriginal },
+    parts: { simplified: rashomonSimplifiedParts, intermediate: rashomonIntermediateParts, original: rashomonOriginalParts },
+    anchors: rashomonAnchors,
   },
   {
     id: 'hashire-merosu',
