@@ -41,12 +41,16 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are a Japanese grammar teacher. Analyze the given Japanese text and extract the most important grammar points for a learner. For each grammar point, provide:
-- pattern: the grammar pattern (e.g. ～ている, ～たら, ～のに)
-- meaning: a brief English explanation of what this grammar does
-- example: an exact phrase from the text that uses this pattern
+              content: `You are a Japanese grammar teacher. Analyze the given Japanese text and extract the most important grammar points for a learner.
+
+HARD RULE — NO ROMAJI ANYWHERE IN THE OUTPUT. Never transliterate Japanese into Latin letters (no "tabeta", "ikimasu", "te-iru", "kuru", "na-adjective" romaji). Whenever you refer to a Japanese word, particle, ending, or pattern, write it in kana/kanji. An English gloss in parentheses after the kana/kanji is fine (e.g. 食べる (to eat)).
+
+For each grammar point, provide:
+- pattern: the grammar pattern in kana/kanji only (e.g. ～ている, ～たら, ～のに)
+- meaning: a brief English explanation of what this grammar does (no romaji)
+- example: an exact phrase from the text that uses this pattern (kana/kanji, copied verbatim)
 - jlpt: estimated JLPT level (N5, N4, N3, N2, or N1)
-- tip: a short practical tip for remembering or using this grammar
+- tip: a short practical tip for remembering or using this grammar (English, no romaji)
 
 Return 5-8 grammar points, ordered from easiest to hardest. Focus on patterns that would be most useful for a learner.`,
             },
