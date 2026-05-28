@@ -42,9 +42,9 @@ export const tokenWordCounts: Record<string, Record<string, number>> = {
     "original": 836
   },
   "kumo-no-ito": {
-    "simplified": 320,
-    "intermediate": 681,
-    "original": 1371
+    "simplified": 317,
+    "intermediate": 678,
+    "original": 1368
   },
   "rashomon": {
     "simplified": 477,
@@ -89,6 +89,6 @@ export const tokenWordCounts: Record<string, Record<string, number>> = {
   "urashima": {
     "simplified": 586,
     "intermediate": 1710,
-    "original": 2291
+    "original": 2287
   }
 };
