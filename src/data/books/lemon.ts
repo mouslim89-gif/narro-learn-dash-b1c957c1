@@ -111,9 +111,9 @@ export const lemonOriginalParts: string[] = [
 ];
 
 export const lemonAnchors: string[] = [
-  "Malaise and the lure of decay",
-  "Wandering, the fruit shop, the lemon",
-  "Maruzen — the book tower and the lemon-bomb",
+  "Malaise and Decay",
+  "The Fruit Shop",
+  "Maruzen",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts
