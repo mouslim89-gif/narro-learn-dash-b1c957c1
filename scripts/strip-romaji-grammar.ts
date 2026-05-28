@@ -153,6 +153,24 @@ export interface GrammarNote {
   tip: string;
 }
 
+/** Per-part notes for (book, difficulty). Returns [] if missing. */
+export function getGrammarForPart(bookId: string, difficulty: string, partIdx: number): GrammarNote[] {
+  const parts = bookGrammar[bookId]?.[difficulty];
+  if (!parts || !Array.isArray(parts)) return [];
+  if (parts.length === 0) return [];
+  if (!Array.isArray((parts as unknown[])[0])) return [];
+  return ((parts as unknown) as GrammarNote[][])[partIdx] ?? [];
+}
+
+/** Flattened notes for (book, difficulty) — concatenates all parts. */
+export function getGrammarFlat(bookId: string, difficulty: string): GrammarNote[] {
+  const parts = bookGrammar[bookId]?.[difficulty];
+  if (!parts || !Array.isArray(parts)) return [];
+  if (parts.length === 0) return [];
+  if (!Array.isArray((parts as unknown[])[0])) return parts as unknown as GrammarNote[];
+  return (parts as unknown as GrammarNote[][]).flat();
+}
+
 export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = ${JSON.stringify(allGrammar)};
 `;
   fs.writeFileSync(grammarPath, output, 'utf-8');
