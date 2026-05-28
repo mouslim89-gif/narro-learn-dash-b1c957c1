@@ -79,7 +79,7 @@ async function fetchCachedHashes(hashes: string[]): Promise<Set<string>> {
     const { data, error } = await supabase
       .from('sentence_translations')
       .select('hash')
-      .in('hash', part);
+  const CHUNK = 80;
     if (error) {
       console.warn('cache lookup error', error.message);
       continue;
