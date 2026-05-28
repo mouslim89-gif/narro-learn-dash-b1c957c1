@@ -64,69 +64,20 @@ function looksLikeRomaji(s: string): boolean {
 }
 
 async function rewriteBatch(items: { idx: number; meaning: string; tip: string; pattern: string; example: string }[]): Promise<{ idx: number; meaning: string; tip: string }[]> {
-  const system = `You rewrite Japanese-grammar study notes to remove ALL romaji (Latin-letter transliterations of Japanese).
-Rules:
-- Keep the same meaning. Do not change difficulty or scope.
-- Replace any romaji word (e.g. "tabeta", "te-iru", "kuru", "na-adjective", "wa", "ga") with the kana/kanji equivalent. An English gloss in parentheses is fine (e.g. 食べる (to eat)).
-- English explanation words (verb, particle, conditional, etc.) stay in English.
-- Keep punctuation and length similar.
-- Only rewrite the "meaning" and "tip" fields. Return them as-is for each item.`;
-
-  const user = `Rewrite the following notes. Return JSON: {"items":[{"idx":N,"meaning":"...","tip":"..."}]}.
-
-${JSON.stringify(items, null, 2)}`;
-
-  const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/rewrite-grammar-notes`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.LOVABLE_API_KEY || env.LOVABLE_API_KEY || ''}`,
       'Content-Type': 'application/json',
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
     },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-      tools: [
-        {
-          type: 'function',
-          function: {
-            name: 'return_rewritten',
-            parameters: {
-              type: 'object',
-              properties: {
-                items: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      idx: { type: 'number' },
-                      meaning: { type: 'string' },
-                      tip: { type: 'string' },
-                    },
-                    required: ['idx', 'meaning', 'tip'],
-                    additionalProperties: false,
-                  },
-                },
-              },
-              required: ['items'],
-              additionalProperties: false,
-            },
-          },
-        },
-      ],
-      tool_choice: { type: 'function', function: { name: 'return_rewritten' } },
-    }),
+    body: JSON.stringify({ items }),
   });
-
   if (!resp.ok) {
-    throw new Error(`AI gateway error: ${resp.status} ${await resp.text()}`);
+    throw new Error(`Edge function failed: ${resp.status} ${await resp.text()}`);
   }
   const data = await resp.json();
-  const args = data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-  if (!args) throw new Error('No tool call in response');
-  return JSON.parse(args).items;
+  return data.items;
 }
 
 async function main() {
