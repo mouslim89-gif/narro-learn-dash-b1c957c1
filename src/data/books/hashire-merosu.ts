@@ -305,12 +305,12 @@ export const merosuOriginalParts: string[] = [
 ];
 
 export const merosuAnchors: string[] = [
-  "Melos arrives in Syracuse and learns of the king's killings",
-  "Melos confronts the king and pledges Selinuntius as hostage",
-  "Melos returns home for his sister's wedding",
-  "The flooded river, the bandits, the despair, and the spring",
-  "The final sprint to save Selinuntius",
-  "The slap exchange and the king joins them",
+  "Arrival in Syracuse",
+  "The Tyrant's Court",
+  "The Wedding",
+  "The Flooded River",
+  "The Final Sprint",
+  "Dawn at the Cross",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts
