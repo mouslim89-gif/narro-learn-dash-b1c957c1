@@ -441,6 +441,11 @@ export default function Reader() {
   useEffect(() => {
     if (restoredScroll.current || !saved?.progressPercent) return;
     restoredScroll.current = true;
+    // If the chapter was already completed, start fresh at the top.
+    if (saved.progressPercent >= 100) {
+      window.scrollTo(0, 0);
+      return;
+    }
     requestAnimationFrame(() => {
       const scrollH = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollH > 0) {
