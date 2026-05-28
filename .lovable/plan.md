@@ -1,70 +1,48 @@
-# Inline English Translations (Bilingual Mode)
+Split **Urashima Tarō** and **Rashōmon** into synchronized narrative parts, following the `split-book-into-parts` skill (mirroring the `lemon` reference shape).
 
-Show the English translation in a smaller, muted line directly below each Japanese sentence in the Reader. Toggle is always-on/off (global), translations are preloaded for the whole part on book open, and cached in the DB so the cost is paid once per sentence ever, across all users.
+## Urashima Tarō → 4 parts
 
-## UX
+Boundaries follow the author's own 一/二/三/四 section breaks in the original (sizes 1567 / 1270 / 1105 / 1689 chars). Simplified and intermediate split at the matching narrative beats (both have 23 paragraphs, cleanly aligned).
 
-- **Toggle** in the Reader top bar (next to furigana toggle): "Show translations" eye icon. Persisted in `user_preferences.show_translations` (new boolean, default `false`).
-- **Render**: under each sentence's Japanese line, a smaller English line: `text-sm text-muted-foreground leading-snug`, slightly indented, no border. Hidden when toggle is off (no layout shift — we keep the DOM and use `hidden` class).
-- **Loading state**: while preloading, show a thin shimmer placeholder under each sentence instead of text. No spinner, no toast — silent.
-- **Failure**: if a sentence fails, show nothing (no broken UI). Retry happens on next book open.
+| # | Anchor | Narrative beat | Original ¶ | Intermediate ¶ | Simplified ¶ |
+|---|---|---|---|---|---|
+| 1 | **The Young Fisherman** | opens → through arriving at the palace gate | 一 | 1–7 | 1–7 |
+| 2 | **The Dragon Palace** | inside the palace, feasts, four-season windows | 二 | 8–10 | 8–10 |
+| 3 | **Homeward Bound** | homesickness, departure, receiving the box | 三 | 11–14 | 11–14 |
+| 4 | **The Empty Shore** | return to the village, the box | 四 | 15–23 | 15–23 |
 
-## Preload strategy
+## Rashōmon → 6 parts
 
-When the Reader mounts a `(book, difficulty, part)`:
+Original is 17 K chars over 36 paragraphs — split at narrative ruptures, mapped onto the simpler versions paragraph-by-paragraph.
 
-1. Collect all sentence strings from `sentences` memo (already exists in `Reader.tsx`).
-2. SHA-256 hash each sentence client-side.
-3. **One bulk DB query** to `sentence_translations` filtering `hash IN (...)` — returns all already-cached translations in a single round trip (instant, no AI cost).
-4. For the missing ones, call the edge function in **parallel batches of 5** with a small delay between batches to avoid rate-limit spikes. Each call writes to DB cache, so the next user gets it free.
-5. Store results in a `Map<hash, english>` in component state. Render as soon as each sentence's translation arrives (progressive reveal).
+| # | Anchor | Narrative beat | Original ¶ | Intermediate ¶ | Simplified ¶ |
+|---|---|---|---|---|---|
+| 1 | **Beneath the Gate** | evening, ruined Rashōmon, decay of Kyoto | 1–4 | 1–3 | 1–2 |
+| 2 | **Starve or Steal** | the servant's dismissal and dilemma | 5–7 | 4–6 | 3–4 |
+| 3 | **Firelight Above** | climbs the ladder, sees fire, sees the old woman | 8–12 | 7–9 | 5–6 |
+| 4 | **Drawn Blade** | fury, leaps out, demands an answer | 13–22 | 10–15 | 7–8 |
+| 5 | **The Old Woman's Tale** | her justification, the servant listens | 23–28 | 16–17 | 9–11 |
+| 6 | **Into the Night** | the servant acts, vanishes | 29–36 | 18–22 | 12–15 |
 
-Total cost for a fresh book: ~N sentences × 1 cheap Gemini Flash call, **once ever** across all users of the app. Subsequent opens: 1 DB SELECT.
+Anchors are Title Case, 2–4 words, evocative, no spoilers (no "snaps", "dies", "robs", "opens", etc.).
 
-## Technical changes
+## Execution steps
 
-### 1. DB / migration
+1. Rewrite `src/data/books/urashima.ts` and `src/data/books/rashomon.ts` with `…SimplifiedParts`, `…IntermediateParts`, `…OriginalParts`, `…Anchors`, plus back-compat `urashimaSimplified = urashimaSimplifiedParts.join('\n\n')` aliases. Separator is exactly `'\n\n'`. Concatenation of parts must be byte-identical to the current blob — self-checked in a tiny verification script before writing.
+2. Update `src/data/books.ts` for both books: add `parts: {...}` and `anchors: ...`, extend the import line. Leave `content` as-is.
+3. Create `scripts/generate-grammar-for-urashima.ts` and `scripts/generate-grammar-for-rashomon.ts` by copying the lemon variant and swapping the id (these already exist as single-blob versions — they'll be replaced with the per-part shape from `scripts/generate-grammar-for-lemon.ts`). Run them; verify `bookGrammar['urashima']['simplified'].length === 4` and `bookGrammar['rashomon']['simplified'].length === 6`.
+4. Re-run `npx tsx scripts/generate-tokens.ts` so tokens reflect the (unchanged-content) re-split files.
+5. Skip dictionary regen — no wording changes.
+6. Verify in the Reader: `/reader/urashima/.../part-N` and `/reader/rashomon/.../part-N` render the correct slice, prev/next pills work, BookDetail lists anchors with per-part progress, GrammarPanel shows only that part's notes.
 
-- Add unique index on `sentence_translations.hash` if not present (needed for `IN` lookup + upsert). Check first; the `upsert(onConflict: "hash")` implies it exists.
-- No new tables. `sentence_translations` already exists with `hash`, `japanese`, `english`.
+## Technical notes
 
-### 2. New edge function `translate-sentences-batch`
+- The Reader, BookDetail and GrammarPanel are already part-aware (`hasParts`, `parsePartId`, `getChapterContent`, `getGrammarForPart`) — no UI code changes needed.
+- Confirming the anchors **before** Step 3 because the grammar generator makes ≈ 4×3 + 6×3 = 30 edge-function calls.
+- Translation cache (`sentence_translations`) is hash-keyed on the sentence text only, so the already-preloaded translations remain valid (no re-translation needed).
 
-- Input: `{ sentences: string[] }` (max 50 per call).
-- For each: hash, lookup cache, if missing → call AI, write cache.
-- Returns: `{ results: { hash, english }[] }`.
-- Rationale: avoids 1 HTTP call per sentence (could be 200+ for a long part). Internally still parallelized but with shared cache lookup.
-- Alternative kept: existing single-sentence `translate-sentence` stays for the popup feature.
+## Out of scope
 
-### 3. New lib `src/lib/sentence-translations.ts`
+- No per-part audio, no rephrasing, no new dictionary words.
 
-- `hashSentence(s: string): Promise<string>` — SHA-256 hex via Web Crypto.
-- `preloadTranslations(sentences: string[]): Promise<Map<string, string>>`:
-  - Hash all → query `sentence_translations` for cached hashes in one SELECT.
-  - Group missing into chunks of 50 → call `translate-sentences-batch` in parallel (max 3 in flight).
-  - Returns full `Map<hash, english>`.
-- LocalStorage layer (optional, behind same hash key) to skip even the DB lookup on repeat opens of the same book — keeps it instant offline.
-
-### 4. `Reader.tsx`
-
-- New state: `translations: Map<hash, string>`, `translationsLoading: boolean`.
-- New `useEffect` on `[bookId, difficulty, partIndex, showTranslations]`: when enabled and not yet loaded, call `preloadTranslations(sentenceStrings)`.
-- In the sentence render loop (around the existing token map), after the Japanese tokens, append a `<div>` with the English translation. Visibility controlled by `showTranslations` pref.
-
-### 5. `user_preferences`
-
-- Add `show_translations boolean default false` column.
-- Wire into existing preferences store (same place `show_furigana` is read/written).
-- Add the toggle to whatever settings panel currently hosts `show_furigana` in the Reader.
-
-## Out of scope (intentional)
-
-- Per-sentence reveal / blur / paragraph mode — user chose always-on.
-- Translations for the audio sync sentence alignment (separate concern).
-- Quality controls (alternate translations, user edits) — can come later.
-
-## Risk / tradeoffs
-
-- **Cost on first reader of a brand-new book**: ~200 AI calls in 10–20s. Acceptable since cache is shared globally and you've already paid this pattern for grammar notes.
-- **No streaming UI**: translations appear progressively as batches resolve, which is good enough.
-- **Toggle ON by default?** Recommend keeping it **OFF by default** so users get the immersive experience first; power users opt in. Open to flipping if you disagree. keep it off by default
+**Please confirm the anchors** (especially Urashima #3 "Homeward Bound" and Rashōmon #5 "The Old Woman's Tale") — anything you'd like reworded before I burn the grammar API calls?
