@@ -44,7 +44,7 @@ export function useBookContentOverrides(bookId: string | undefined) {
       if (error || !data) { setLoaded(true); return; }
       const next: OverrideMap = {};
       for (const row of data) {
-        next[keyOf(row.difficulty as Difficulty, row.part_index)] = row as BookContentOverride;
+        next[keyOf(row.difficulty as Difficulty, row.part_index)] = row as unknown as BookContentOverride;
       }
       setMap(next);
       try { localStorage.setItem(LS_PREFIX + bookId, JSON.stringify(next)); } catch {}
@@ -73,23 +73,10 @@ export async function saveBookContentOverride(input: {
   const { bookId, difficulty, partIndex, text, tokens } = input;
   const { data: userData } = await supabase.auth.getUser();
   const updated_by = userData.user?.id ?? null;
-  // Delete + insert to avoid relying on a unique-constraint-aware upsert
-  // (the unique index uses COALESCE so on_conflict isn't trivial).
-  await supabase
-    .from('book_content_overrides')
-    .delete()
-    .eq('book_id', bookId)
-    .eq('difficulty', difficulty)
-    .is('part_index', partIndex === null ? null : (undefined as any))
-    .eq('part_index', partIndex ?? -999999);
-  // Simpler: clear then insert
-  if (partIndex === null) {
-    await supabase.from('book_content_overrides').delete()
-      .eq('book_id', bookId).eq('difficulty', difficulty).is('part_index', null);
-  } else {
-    await supabase.from('book_content_overrides').delete()
-      .eq('book_id', bookId).eq('difficulty', difficulty).eq('part_index', partIndex);
-  }
+  // Clear any existing row for this slot (unique index uses COALESCE so no easy upsert).
+  const delQ = supabase.from('book_content_overrides').delete()
+    .eq('book_id', bookId).eq('difficulty', difficulty);
+  await (partIndex === null ? delQ.is('part_index', null) : delQ.eq('part_index', partIndex));
   const { error } = await supabase.from('book_content_overrides').insert({
     book_id: bookId, difficulty, part_index: partIndex,
     text, tokens: tokens as any, updated_by,
