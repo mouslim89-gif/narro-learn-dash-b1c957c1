@@ -96,10 +96,10 @@ export const kumoOriginalParts: string[] = [
 ];
 
 export const kumoAnchors: string[] = [
-  "Buddha lowers the spider's thread into hell",
-  "Kandata climbs the thread and rests, laughing in triumph",
-  "Other sinners follow and the thread snaps",
-  "Buddha watches in sorrow as the lotuses sway",
+  "The Lotus Pond",
+  "Kandata's Ascent",
+  "The Spider's Thread",
+  "Paradise at Dawn",
 ];
 
 // Flat blobs — preserved for the non-parts code paths. Concatenation of parts joined by '\n\n'.
