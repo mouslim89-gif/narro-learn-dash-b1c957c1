@@ -34,6 +34,8 @@ import { TokenEditFloatingBar } from '@/components/TokenEditFloatingBar';
 import { tokensToRule } from '@/lib/token-edit-rules';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
+
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
