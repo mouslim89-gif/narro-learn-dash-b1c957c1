@@ -137,25 +137,58 @@ async function main() {
 
   const BATCH = 50;
   const PARALLEL = 3;
-  const batches: string[][] = [];
-  for (let i = 0; i < missing.length; i += BATCH) batches.push(missing.slice(i, i + BATCH));
 
-  console.log(`Translating ${missing.length} sentences in ${batches.length} batches (parallel=${PARALLEL})…`);
-  let done = 0;
-  let translated = 0;
-  let cursor = 0;
-  const worker = async (id: number) => {
-    while (cursor < batches.length) {
-      const idx = cursor++;
-      const batch = batches[idx];
-      const got = await callBatch(batch);
-      translated += got;
-      done++;
-      console.log(`  [${done}/${batches.length}] worker ${id} batch ${idx + 1}: +${got}/${batch.length}`);
+  // Drain loop: keep re-checking the cache for missing sentences and retrying
+  // any that remain (handles rate-limit pauses). Backoff grows when no progress.
+  let pending = missing;
+  let totalNew = 0;
+  let backoff = 0;
+  let pass = 0;
+  while (pending.length > 0) {
+    pass++;
+    if (backoff > 0) {
+      console.log(`Sleeping ${backoff}s before next pass…`);
+      await sleep(backoff * 1000);
     }
-  };
-  await Promise.all(Array.from({ length: PARALLEL }, (_, i) => worker(i)));
-  console.log(`Done. Translated ${translated} new sentences.`);
+    const batches: string[][] = [];
+    for (let i = 0; i < pending.length; i += BATCH) batches.push(pending.slice(i, i + BATCH));
+    console.log(`Pass ${pass}: ${pending.length} sentences, ${batches.length} batches`);
+
+    let cursor = 0;
+    let passNew = 0;
+    let sawRate = false;
+    const worker = async (id: number) => {
+      while (cursor < batches.length) {
+        const idx = cursor++;
+        const batch = batches[idx];
+        const { count, rateLimited } = await callBatch(batch);
+        passNew += count;
+        if (rateLimited) {
+          sawRate = true;
+          await sleep(2000);
+        }
+      }
+    };
+    await Promise.all(Array.from({ length: PARALLEL }, (_, i) => worker(i)));
+    totalNew += passNew;
+    console.log(`  pass ${pass} translated: ${passNew}`);
+
+    // Recheck cache to know what's still missing.
+    const pendingHashes = await Promise.all(pending.map(sha256Hex));
+    const nowCached = await fetchCachedHashes(pendingHashes);
+    pending = pending.filter((_, i) => !nowCached.has(pendingHashes[i]));
+    console.log(`  still missing: ${pending.length}`);
+
+    if (passNew === 0 && pending.length > 0) {
+      backoff = Math.min(120, backoff === 0 ? 30 : backoff * 2);
+    } else if (sawRate) {
+      backoff = 30;
+    } else {
+      backoff = 0;
+    }
+  }
+  console.log(`Done. Translated ${totalNew} new sentences total.`);
+}
 }
 
 main().catch((e) => {
