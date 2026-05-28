@@ -160,7 +160,7 @@ export async function pullPreferences(userId: string): Promise<UserPreferences |
   };
 }
 
-}
+
 
 export async function pushPreferences(userId: string, prefs: UserPreferences): Promise<void> {
   useSyncStatus.getState().startSync();
