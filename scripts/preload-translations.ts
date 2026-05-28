@@ -160,14 +160,13 @@ async function main() {
     const worker = async (id: number) => {
       while (cursor < batches.length) {
         const idx = cursor++;
+        const batch = batches[idx];
         const { count, rateLimited } = await callBatch(batch);
         passNew += count;
         console.log(`    batch ${idx + 1}/${batches.length}: +${count}/${batch.length}${rateLimited ? ' (rate-limited)' : ''}`);
         if (rateLimited) {
           sawRate = true;
           await sleep(60000);
-        }
-          await sleep(2000);
         }
       }
     };
