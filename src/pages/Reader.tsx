@@ -860,7 +860,15 @@ export default function Reader() {
                   </span>
                   <Switch checked={showFurigana} onCheckedChange={setShowFurigana} />
                 </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="flex items-center gap-2 text-[15px] font-medium">
+                    <Languages className="h-4 w-4 text-muted-foreground" />
+                    Show English translations
+                  </span>
+                  <Switch checked={showTranslations} onCheckedChange={setShowTranslations} />
+                </div>
               </div>
+
             </section>
 
             {/* Highlights */}
