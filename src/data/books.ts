@@ -407,5 +407,7 @@ export const books: Book[] = [
     readingTimeMin: 9,
     synopsis: "A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home — only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final, devastating gift.",
     content: { simplified: urashimaSimplified, intermediate: urashimaIntermediate, original: urashimaOriginal },
+    parts: { simplified: urashimaSimplifiedParts, intermediate: urashimaIntermediateParts, original: urashimaOriginalParts },
+    anchors: urashimaAnchors,
   },
 ];
