@@ -2,9 +2,8 @@ import { useState, useMemo } from 'react';
 import { books, genreLabels, type Genre } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight, Moon, Sun, Settings, X } from 'lucide-react';
+import { Search, Moon, Sun, Settings, X } from 'lucide-react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -15,17 +14,15 @@ export default function Library() {
   const { progress, darkMode, setDarkMode } = useReadingProgressStore();
 
   // Find most recently read book
-  const continueBook = useMemo(() => {
-    const entries = Object.entries(progress)
+  // Find books in progress, most recently read first
+  const continueBooks = useMemo(() => {
+    return Object.entries(progress)
       .filter(([, p]) => p.progressPercent > 0 && p.progressPercent < 100)
-      .sort(([, a], [, b]) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime());
-    if (entries.length === 0) return null;
-    const [bookId, prog] = entries[0];
-    const book = books.find(b => b.id === bookId);
-    return book ? { book, progress: prog } : null;
+      .sort(([, a], [, b]) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime())
+      .map(([bookId]) => books.find(b => b.id === bookId))
+      .filter((b): b is typeof books[number] => Boolean(b));
   }, [progress]);
 
-  // Filter books by search
   const filteredBooks = useMemo(() => {
     if (!search.trim()) return null;
     const q = search.toLowerCase();
@@ -96,45 +93,21 @@ export default function Library() {
       ) : (
         <>
           {/* Continue Reading */}
-          {continueBook && (
-            <section className="px-6 py-5">
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                <span className="section-bullet" />Continue Reading
-              </p>
-              <Link to={`/reader/${continueBook.book.id}/${continueBook.progress.difficulty}`} className="block">
-                <div
-                  className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40 card-lift"
-                  style={{
-                    backgroundImage: `linear-gradient(135deg, ${continueBook.book.coverColor}22 0%, hsl(var(--card)) 60%)`,
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="book-paper relative flex h-28 w-20 flex-shrink-0 items-end overflow-hidden rounded-md p-2.5 shadow-lg ring-1 ring-black/5 rotate-[-3deg]"
-                      style={{ backgroundColor: continueBook.book.coverColor }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/40" />
-                      <div className="absolute inset-y-0 left-0 w-2 bg-black/20" />
-                      <p className="font-japanese relative text-[13px] font-bold leading-tight text-white drop-shadow-sm">
-                        {continueBook.book.titleJp}
-                      </p>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h2 className="font-serif text-lg font-bold leading-snug truncate">{continueBook.book.titleEn}</h2>
-                      <p className="text-[12px] text-muted-foreground truncate">{continueBook.book.author}</p>
-                      <div className="mt-3 flex items-center gap-2">
-                        <Progress value={continueBook.progress.progressPercent} className="h-1.5 flex-1" />
-                        <span className="text-[11px] font-semibold tabular-nums text-foreground/70">
-                          {Math.round(continueBook.progress.progressPercent)}%
-                        </span>
-                      </div>
-                      <Button size="sm" className="mt-3 w-full rounded-full shadow-md">
-                        Resume <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+          {continueBooks.length > 0 && (
+            <section className="py-5">
+              <div className="px-6 flex items-baseline justify-between">
+                <h3 className="font-serif text-lg font-semibold text-foreground">
+                  Continue Reading
+                </h3>
+                <span className="text-[11px] text-muted-foreground tabular-nums">
+                  {continueBooks.length} book{continueBooks.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+                {continueBooks.map((book) => (
+                  <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
+                ))}
+              </div>
             </section>
           )}
 
