@@ -1,11 +1,11 @@
 ---
 name: split-book-into-parts
-description: Split an existing single-blob book in Tsundoku into N narrative parts/chapters synchronized across the simplified/intermediate/original difficulties, with per-part navigation, grammar, and progress. Use when the user asks to "split <book> into parts/chapters", "add chapter navigation to <book>", or "rework <book> with parts" — for any book that currently has only `content` and no `parts`/`anchors`/`chapters`.
+description: "Split an existing single-blob book in Tsundoku into N narrative parts/chapters synchronized across the simplified/intermediate/original difficulties, with per-part navigation, grammar, and progress. Use when the user asks to \"split <book> into parts/chapters\", \"add chapter navigation to <book>\", or \"rework <book> with parts\" — for any book that currently has only `content` and no `parts`/`anchors`/`chapters`."
 ---
 
 # Split a book into synchronized narrative parts
 
-The app already supports per-part navigation generically (Reader, BookDetail, GrammarPanel). Your job is to (a) decide the part boundaries using the method below, (b) mutate data files, (c) run scripts. Reference implementation: **`lemon`** — read `src/data/books/lemon.ts` and `scripts/generate-grammar-for-lemon.ts` before starting and mirror their shape.
+The app already supports per-part navigation generically (Reader, BookDetail, GrammarPanel). Your job is to (a) decide the part boundaries using the method below, (b) mutate data files, (c) run scripts. Reference implementation: `**lemon**` — read `src/data/books/lemon.ts` and `scripts/generate-grammar-for-lemon.ts` before starting and mirror their shape.
 
 ## Pre-flight
 
@@ -20,11 +20,17 @@ Synchronized split: "part N" must cover the same narrative passage across all th
 
 ### Step A — Define boundaries on the ORIGINAL
 
-Read the `original` version end-to-end. Identify narrative ruptures: scene change, start/end of a dialogue exchange, action pivot, time jump. Cut the original into segments of roughly **1300–1700 characters**, cutting **only** at these ruptures. Prefer 3–5 parts total for a short story; never force evenness.
+Read the `original` version end-to-end. Identify narrative ruptures: scene change, start/end of a dialogue exchange, action pivot, time jump. Cut the original into segments of roughly **1300–1700 characters**, cutting **only** at these ruptures
 
 ### Step B — Name each boundary (anchor)
 
-For every cut, write a short **English** anchor describing the event that opens that part (e.g. `"The servant climbs the stairs"`). These anchors are stored in `<id>Anchors`, displayed in the UI, and used as the spine to align the two other versions.
+For every cut, write a short **English chapter title** (2–5 words, max ~40 chars). Treat it like a book's table-of-contents entry: evocative, not a summary. **No spoilers** — do not name the event that happens; name the setting, mood, or object that opens the part. Avoid verbs that reveal outcomes ("snaps", "dies", "wins", "escapes"). Use Title Case.
+
+- Bad (spoiler): `"Other sinners follow and the thread snaps"` → Good: `"The Spider's Thread"`
+- Bad (spoiler): `"Melos confronts the king and pledges Selinuntius as hostage"` → Good: `"The Tyrant's Court"`
+- Bad (summary): `"The narrator sets up his secret workroom"` → Good: `"The Secret Workroom"`
+
+These anchors are stored in `<id>Anchors`, displayed in the UI as chapter titles, and used as the spine to align the two other versions internally — keep them short for the UI, the alignment work happens in your head.
 
 ### Step C — Align intermediate + simplified to those anchors
 
