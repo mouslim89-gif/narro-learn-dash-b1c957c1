@@ -299,6 +299,8 @@ export const books: Book[] = [
     readingTimeMin: 25,
     synopsis: "Melos, a simple shepherd, is condemned to death after attempting to kill a paranoid tyrant. Granted three days to attend his sister's wedding, he leaves his best friend behind as hostage — and must race back through floods, bandits, and his own despair to save him. Dazai's celebrated tale of friendship, trust, and the impossible weight of a promise.",
     content: { simplified: merosuSimplified, intermediate: merosuIntermediate, original: merosuOriginal },
+    parts: { simplified: merosuSimplifiedParts, intermediate: merosuIntermediateParts, original: merosuOriginalParts },
+    anchors: merosuAnchors,
   },
   {
     id: 'lemon',
@@ -349,6 +351,8 @@ export const books: Book[] = [
     readingTimeMin: 11,
     synopsis: "After a night of heavy drinking, Dazai's narrator collapses in the room of a young woman about to be married — not his lover, just someone he's promised her mother to look after. As a candle burns down in the darkness during a power cut, he counts the minutes between his desire and the dawn, hoping one of them will give out before the other. A short, wry, painfully honest sketch of weakness, restraint, and the saving grace of morning light.",
     content: { simplified: asaSimplified, intermediate: asaIntermediate, original: asaOriginal },
+    parts: { simplified: asaSimplifiedParts, intermediate: asaIntermediateParts, original: asaOriginalParts },
+    anchors: asaAnchors,
   },
   {
     id: 'gyofukuki',
