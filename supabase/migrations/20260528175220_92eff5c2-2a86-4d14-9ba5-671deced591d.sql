@@ -1,0 +1,1 @@
+ALTER TABLE public.user_preferences ADD COLUMN IF NOT EXISTS show_translations boolean NOT NULL DEFAULT false;

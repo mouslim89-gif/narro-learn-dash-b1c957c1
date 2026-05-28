@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
+
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
@@ -33,6 +35,8 @@ import { TokenEditFloatingBar } from '@/components/TokenEditFloatingBar';
 import { tokensToRule } from '@/lib/token-edit-rules';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
+
 
 const fontSizes: FontSize[] = ['small', 'medium', 'large'];
 const fontSizeLabels: Record<FontSize, string> = { small: 'S', medium: 'M', large: 'L' };
@@ -184,7 +188,8 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 export default function Reader() {
   const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+
   const knownIndex = useKnownWordsIndex();
   const knownTogglesByLevel: Record<KnownLevel, boolean> = {
     new: highlightNew,
@@ -432,6 +437,37 @@ export default function Reader() {
     if (current.length > 0) groups.push(current);
     return groups;
   }, [sentences]);
+
+  // ============ Inline English translations ============
+  // Per-sentence Japanese text + hash, computed once per sentences change.
+  const [sentenceHashes, setSentenceHashes] = useState<string[]>([]);
+  const [translations, setTranslations] = useState<TranslationMap>(new Map());
+
+  useEffect(() => {
+    if (!showTranslations || sentences.length === 0) return;
+    let cancelled = false;
+    const controller = new AbortController();
+
+    (async () => {
+      const texts = sentences.map((s) => s.tokens.map((t) => t.t).join('').trim());
+      const hashes = await Promise.all(texts.map(hashSentence));
+      if (cancelled) return;
+      setSentenceHashes(hashes);
+
+      await preloadTranslations(texts, {
+        signal: controller.signal,
+        onProgress: (map) => {
+          if (!cancelled) setTranslations(new Map(map));
+        },
+      });
+    })().catch((e) => console.warn('translation preload failed', e));
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [sentences, showTranslations]);
+
 
   useEffect(() => {
     restoredScroll.current = false;
@@ -699,6 +735,14 @@ export default function Reader() {
             >
               {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
             </HeaderChip>
+            <HeaderChip
+              onClick={() => setShowTranslations(!showTranslations)}
+              active={showTranslations}
+              title={showTranslations ? 'Hide translations' : 'Show translations'}
+            >
+              <Languages className="h-5 w-5" />
+            </HeaderChip>
+
             <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
               <BookType className="h-5 w-5" />
             </HeaderChip>
@@ -817,7 +861,15 @@ export default function Reader() {
                   </span>
                   <Switch checked={showFurigana} onCheckedChange={setShowFurigana} />
                 </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <span className="flex items-center gap-2 text-[15px] font-medium">
+                    <Languages className="h-4 w-4 text-muted-foreground" />
+                    Show English translations
+                  </span>
+                  <Switch checked={showTranslations} onCheckedChange={setShowTranslations} />
+                </div>
               </div>
+
             </section>
 
             {/* Highlights */}
@@ -952,15 +1004,19 @@ export default function Reader() {
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 const sentenceText = sentence.tokens.map(t => t.t).join('');
+                const sentenceHash = sentenceHashes[globalIdx];
+                const englishLine = showTranslations && sentenceHash ? translations.get(sentenceHash) : undefined;
                 const dimmed =
                   (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
                   (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
                 const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
                 const activeAudio = audioCurrentSentence === globalIdx;
+
                 return (
+                  <Fragment key={sIdx}>
                   <span
-                    key={sIdx}
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
+
                     onClick={(e) => {
                       // Only seek if there's an audio sync AND user clicked on the span
                       // background (not on a child token, which has its own onTap).
@@ -1086,7 +1142,19 @@ export default function Reader() {
                       );
                     })}
                   </span>
+                  {showTranslations && (
+                    englishLine ? (
+                      <span className="block text-sm text-muted-foreground/80 italic mt-0.5 mb-3 leading-snug">
+                        {englishLine}
+                      </span>
+                    ) : (
+                      <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-pulse" style={{ width: '60%' }} />
+                    )
+                  )}
+                  </Fragment>
+
                 );
+
               })}
             </p>
           ))}

@@ -125,6 +125,7 @@ export interface UserPreferences {
   readerDarkMode: boolean;
   darkMode: boolean;
   showFurigana: boolean;
+  showTranslations: boolean;
   displayMode: 'normal' | 'grammar';
   japaneseFont: 'sans' | 'serif' | 'handwriting';
   hasSeenLongPressHint: boolean;
@@ -133,6 +134,7 @@ export interface UserPreferences {
   highlightLearning: boolean;
   highlightKnown: boolean;
 }
+
 
 export async function pullPreferences(userId: string): Promise<UserPreferences | null> {
   const { data, error } = await supabase
@@ -147,6 +149,7 @@ export async function pullPreferences(userId: string): Promise<UserPreferences |
     readerDarkMode: data.reader_dark_mode,
     darkMode: data.dark_mode,
     showFurigana: data.show_furigana,
+    showTranslations: (data as any).show_translations ?? false,
     displayMode: data.display_mode as UserPreferences['displayMode'],
     japaneseFont: data.japanese_font as UserPreferences['japaneseFont'],
     hasSeenLongPressHint: data.has_seen_long_press_hint,
@@ -157,6 +160,8 @@ export async function pullPreferences(userId: string): Promise<UserPreferences |
   };
 }
 
+
+
 export async function pushPreferences(userId: string, prefs: UserPreferences): Promise<void> {
   useSyncStatus.getState().startSync();
   try {
@@ -166,6 +171,7 @@ export async function pushPreferences(userId: string, prefs: UserPreferences): P
       reader_dark_mode: prefs.readerDarkMode,
       dark_mode: prefs.darkMode,
       show_furigana: prefs.showFurigana,
+      show_translations: prefs.showTranslations,
       display_mode: prefs.displayMode,
       japanese_font: prefs.japaneseFont,
       has_seen_long_press_hint: prefs.hasSeenLongPressHint,
@@ -175,6 +181,7 @@ export async function pushPreferences(userId: string, prefs: UserPreferences): P
       highlight_known: prefs.highlightKnown,
       updated_at: new Date().toISOString(),
     });
+
     if (error) throw error;
     useSyncStatus.getState().endSync(true);
   } catch (e) {
