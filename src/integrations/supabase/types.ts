@@ -53,42 +53,6 @@ export type Database = {
         }
         Relationships: []
       }
-      book_content_overrides: {
-        Row: {
-          book_id: string
-          created_at: string
-          difficulty: string
-          id: string
-          part_index: number | null
-          text: string
-          tokens: Json | null
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          book_id: string
-          created_at?: string
-          difficulty: string
-          id?: string
-          part_index?: number | null
-          text: string
-          tokens?: Json | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          book_id?: string
-          created_at?: string
-          difficulty?: string
-          id?: string
-          part_index?: number | null
-          text?: string
-          tokens?: Json | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
       dictionary: {
         Row: {
           created_at: string
