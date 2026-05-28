@@ -337,6 +337,7 @@ export type Database = {
           reader_dark_mode: boolean
           show_furigana: boolean
           show_known_highlights: boolean
+          show_translations: boolean
           updated_at: string
           user_id: string
         }
@@ -353,6 +354,7 @@ export type Database = {
           reader_dark_mode?: boolean
           show_furigana?: boolean
           show_known_highlights?: boolean
+          show_translations?: boolean
           updated_at?: string
           user_id: string
         }
@@ -369,6 +371,7 @@ export type Database = {
           reader_dark_mode?: boolean
           show_furigana?: boolean
           show_known_highlights?: boolean
+          show_translations?: boolean
           updated_at?: string
           user_id?: string
         }
