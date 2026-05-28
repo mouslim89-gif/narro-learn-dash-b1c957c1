@@ -189,7 +189,6 @@ async function main() {
   }
   console.log(`Done. Translated ${totalNew} new sentences total.`);
 }
-}
 
 main().catch((e) => {
   console.error(e);
