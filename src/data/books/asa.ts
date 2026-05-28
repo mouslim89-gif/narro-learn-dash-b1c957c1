@@ -303,8 +303,8 @@ export const asaOriginalParts: string[] = [
 ];
 
 export const asaAnchors: string[] = [
-  "The narrator sets up his secret workroom in Kiku-chan's place",
-  "A drunken night in Kiku-chan's room until dawn",
+  "The Secret Workroom",
+  "A Drunken Night",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts
