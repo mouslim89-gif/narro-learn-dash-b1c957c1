@@ -47,7 +47,9 @@ interface ReadingProgressState {
   readerDarkMode: boolean;
   darkMode: boolean;
   showFurigana: boolean;
+  showTranslations: boolean;
   displayMode: DisplayMode;
+
   japaneseFont: JapaneseFont;
   hasSeenLongPressHint: boolean;
   // Known-word highlights (local-only)
@@ -69,7 +71,9 @@ interface ReadingProgressState {
   setReaderDarkMode: (dark: boolean) => void;
   setDarkMode: (dark: boolean) => void;
   setShowFurigana: (show: boolean) => void;
-  setDisplayMode: (mode: DisplayMode) => void;
+  setShowFurigana: (show: boolean) => void;
+  setShowTranslations: (show: boolean) => void;
+
   setJapaneseFont: (font: JapaneseFont) => void;
   setHasSeenLongPressHint: (seen: boolean) => void;
   setShowKnownHighlights: (show: boolean) => void;
@@ -88,7 +92,9 @@ const DEFAULT_PREFS: UserPreferences = {
   readerDarkMode: false,
   darkMode: false,
   showFurigana: false,
+  showTranslations: false,
   displayMode: 'normal',
+
   japaneseFont: 'sans',
   hasSeenLongPressHint: false,
   showKnownHighlights: true,
@@ -103,7 +109,9 @@ export function currentPrefs(state: ReadingProgressState): UserPreferences {
     readerDarkMode: state.readerDarkMode,
     darkMode: state.darkMode,
     showFurigana: state.showFurigana,
+    showTranslations: state.showTranslations,
     displayMode: state.displayMode,
+
     japaneseFont: state.japaneseFont,
     hasSeenLongPressHint: state.hasSeenLongPressHint,
     showKnownHighlights: state.showKnownHighlights,
@@ -143,7 +151,9 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       readerDarkMode: false,
       darkMode: false,
       showFurigana: false,
+      showTranslations: false,
       displayMode: 'normal' as DisplayMode,
+
       japaneseFont: 'sans' as JapaneseFont,
       hasSeenLongPressHint: false,
       showKnownHighlights: true,
@@ -199,6 +209,8 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setReaderDarkMode: (readerDarkMode) => { set({ readerDarkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setDarkMode: (darkMode) => { set({ darkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setShowFurigana: (showFurigana) => { set({ showFurigana }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+      setShowTranslations: (showTranslations) => { set({ showTranslations }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+
       setDisplayMode: (displayMode) => { set({ displayMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setJapaneseFont: (japaneseFont) => { set({ japaneseFont }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setHasSeenLongPressHint: (hasSeenLongPressHint) => { set({ hasSeenLongPressHint }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
