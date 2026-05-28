@@ -437,6 +437,37 @@ export default function Reader() {
     return groups;
   }, [sentences]);
 
+  // ============ Inline English translations ============
+  // Per-sentence Japanese text + hash, computed once per sentences change.
+  const [sentenceHashes, setSentenceHashes] = useState<string[]>([]);
+  const [translations, setTranslations] = useState<TranslationMap>(new Map());
+
+  useEffect(() => {
+    if (!showTranslations || sentences.length === 0) return;
+    let cancelled = false;
+    const controller = new AbortController();
+
+    (async () => {
+      const texts = sentences.map((s) => s.tokens.map((t) => t.t).join('').trim());
+      const hashes = await Promise.all(texts.map(hashSentence));
+      if (cancelled) return;
+      setSentenceHashes(hashes);
+
+      await preloadTranslations(texts, {
+        signal: controller.signal,
+        onProgress: (map) => {
+          if (!cancelled) setTranslations(new Map(map));
+        },
+      });
+    })().catch((e) => console.warn('translation preload failed', e));
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [sentences, showTranslations]);
+
+
   useEffect(() => {
     restoredScroll.current = false;
     if (id) hydrateDictionaryForBook(id, chapterId);
