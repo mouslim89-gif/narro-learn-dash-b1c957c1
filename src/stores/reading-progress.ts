@@ -71,8 +71,8 @@ interface ReadingProgressState {
   setReaderDarkMode: (dark: boolean) => void;
   setDarkMode: (dark: boolean) => void;
   setShowFurigana: (show: boolean) => void;
-  setShowFurigana: (show: boolean) => void;
   setShowTranslations: (show: boolean) => void;
+  setDisplayMode: (mode: DisplayMode) => void;
 
   setJapaneseFont: (font: JapaneseFont) => void;
   setHasSeenLongPressHint: (seen: boolean) => void;
