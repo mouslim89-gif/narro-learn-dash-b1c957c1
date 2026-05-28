@@ -8,7 +8,15 @@ import {
   kumoOriginalParts,
   kumoAnchors,
 } from './books/kumo-no-ito';
-import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
+import {
+  rashomonSimplified,
+  rashomonIntermediate,
+  rashomonOriginal,
+  rashomonSimplifiedParts,
+  rashomonIntermediateParts,
+  rashomonOriginalParts,
+  rashomonAnchors,
+} from './books/rashomon';
 import {
   merosuSimplified,
   merosuIntermediate,
