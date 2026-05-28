@@ -212,16 +212,11 @@
   word-spacing: 0 !important;
   text-align: left;
   font-feature-settings: "palt" 0; /* full-width metrics → even spacing */
-  word-break: keep-all; /* don't break inside a token */
+  word-break: normal; /* allow CJK breaks between tokens (tokens themselves are nowrap) */
   overflow-wrap: break-word; /* fallback for long latin strings */
   line-break: strict; /* respect Japanese kinsoku line-break rules */
 }
-/* Each token stays on one line; line breaks only happen between tokens */
-.reader-text > span,
-.reader-text ruby {
-  white-space: nowrap;
-}
-
+/* Japanese text breaks naturally between characters; line-break: strict enforces kinsoku */
 .reader-text ruby {
   ruby-align: center;
 }
