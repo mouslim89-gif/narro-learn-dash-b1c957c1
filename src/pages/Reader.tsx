@@ -1012,8 +1012,10 @@ export default function Reader() {
                 const activeAudio = audioCurrentSentence === globalIdx;
 
                 return (
+                  <React.Fragment key={sIdx}>
                   <span
-                    key={sIdx}
+                    ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
+
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
                     onClick={(e) => {
                       // Only seek if there's an audio sync AND user clicked on the span
