@@ -136,7 +136,7 @@ async function main() {
   }
 
   const BATCH = 50;
-  const PARALLEL = 3;
+  const PARALLEL = 1;
 
   // Drain loop: keep re-checking the cache for missing sentences and retrying
   // any that remain (handles rate-limit pauses). Backoff grows when no progress.
