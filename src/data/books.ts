@@ -8,7 +8,15 @@ import {
   kumoOriginalParts,
   kumoAnchors,
 } from './books/kumo-no-ito';
-import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
+import {
+  rashomonSimplified,
+  rashomonIntermediate,
+  rashomonOriginal,
+  rashomonSimplifiedParts,
+  rashomonIntermediateParts,
+  rashomonOriginalParts,
+  rashomonAnchors,
+} from './books/rashomon';
 import {
   merosuSimplified,
   merosuIntermediate,
@@ -40,7 +48,15 @@ import {
 } from './books/asa';
 import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
 import { sakuraSimplified, sakuraIntermediate, sakuraOriginal } from './books/sakura';
-import { urashimaSimplified, urashimaIntermediate, urashimaOriginal } from './books/urashima';
+import {
+  urashimaSimplified,
+  urashimaIntermediate,
+  urashimaOriginal,
+  urashimaSimplifiedParts,
+  urashimaIntermediateParts,
+  urashimaOriginalParts,
+  urashimaAnchors,
+} from './books/urashima';
 
 export type Difficulty = 'simplified' | 'intermediate' | 'original';
 export type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror';
@@ -287,6 +303,8 @@ export const books: Book[] = [
     readingTimeMin: 12,
     synopsis: "A masterless servant takes shelter from the rain under the crumbling Rashōmon gate, debating whether to starve or turn to crime. Climbing into the tower among the abandoned dead, he confronts an old woman pulling hair from a corpse — and what she says will tip his decision. Akutagawa's celebrated study of survival, morality, and the thin line between victim and villain.",
     content: { simplified: rashomonSimplified, intermediate: rashomonIntermediate, original: rashomonOriginal },
+    parts: { simplified: rashomonSimplifiedParts, intermediate: rashomonIntermediateParts, original: rashomonOriginalParts },
+    anchors: rashomonAnchors,
   },
   {
     id: 'hashire-merosu',
@@ -389,5 +407,7 @@ export const books: Book[] = [
     readingTimeMin: 9,
     synopsis: "A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home — only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final, devastating gift.",
     content: { simplified: urashimaSimplified, intermediate: urashimaIntermediate, original: urashimaOriginal },
+    parts: { simplified: urashimaSimplifiedParts, intermediate: urashimaIntermediateParts, original: urashimaOriginalParts },
+    anchors: urashimaAnchors,
   },
 ];
