@@ -734,6 +734,14 @@ export default function Reader() {
             >
               {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
             </HeaderChip>
+            <HeaderChip
+              onClick={() => setShowTranslations(!showTranslations)}
+              active={showTranslations}
+              title={showTranslations ? 'Hide translations' : 'Show translations'}
+            >
+              <Languages className="h-5 w-5" />
+            </HeaderChip>
+
             <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
               <BookType className="h-5 w-5" />
             </HeaderChip>
