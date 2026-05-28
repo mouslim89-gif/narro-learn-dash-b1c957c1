@@ -1,12 +1,16 @@
 /**
- * Generate grammar notes for "hashire-merosu" (3 difficulties) and merge
- * into book-grammar.ts. Idempotent — re-run to refresh.
+ * Generate grammar notes for "hashire-merosu" — one call per (difficulty, part).
+ * Writes back into book-grammar.ts under the GrammarNote[][] shape.
  *
  * Run: npx tsx scripts/generate-grammar-for-merosu.ts
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { merosuSimplified, merosuIntermediate, merosuOriginal } from '../src/data/books/hashire-merosu';
+import {
+  merosuSimplifiedParts,
+  merosuIntermediateParts,
+  merosuOriginalParts,
+} from '../src/data/books/hashire-merosu';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -21,11 +25,11 @@ const SUPABASE_URL = env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('Missing Supabase env vars');
 
-const versions = {
-  simplified: merosuSimplified,
-  intermediate: merosuIntermediate,
-  original: merosuOriginal,
-};
+const partsByDiff = {
+  simplified: merosuSimplifiedParts,
+  intermediate: merosuIntermediateParts,
+  original: merosuOriginalParts,
+} as const;
 
 interface GrammarNote {
   pattern: string;
@@ -54,13 +58,18 @@ async function fetchGrammar(text: string): Promise<GrammarNote[]> {
 }
 
 async function main() {
-  const result: Record<string, GrammarNote[]> = {};
+  const result: Record<string, GrammarNote[][]> = {};
   for (const diff of ['simplified', 'intermediate', 'original'] as const) {
-    console.log(`Fetching grammar for hashire-merosu/${diff} (${versions[diff].length} chars)...`);
-    const notes = await fetchGrammar(versions[diff]);
-    console.log(`  → ${notes.length} notes`);
-    result[diff] = notes;
-    await new Promise((r) => setTimeout(r, 1500));
+    const parts = partsByDiff[diff];
+    const perPart: GrammarNote[][] = [];
+    for (let i = 0; i < parts.length; i++) {
+      console.log(`Fetching grammar for hashire-merosu/${diff} part ${i + 1}/${parts.length} (${parts[i].length} chars)...`);
+      const notes = await fetchGrammar(parts[i]);
+      console.log(`  → ${notes.length} notes`);
+      perPart.push(notes);
+      await new Promise((r) => setTimeout(r, 1200));
+    }
+    result[diff] = perPart;
   }
 
   const grammarPath = path.resolve(__dirname, '../src/data/book-grammar.ts');
@@ -68,23 +77,13 @@ async function main() {
   const startIdx = grammarSrc.indexOf('= {') + 2;
   const endIdx = grammarSrc.lastIndexOf('};') + 1;
   const jsonStr = grammarSrc.slice(startIdx, endIdx);
-  const allGrammar: Record<string, Record<string, GrammarNote[]>> = JSON.parse(jsonStr);
+  const allGrammar: Record<string, Record<string, GrammarNote[][]>> = JSON.parse(jsonStr);
 
   allGrammar['hashire-merosu'] = result;
 
-  const output = `// Auto-generated grammar notes for all books
-// Do not edit manually - regenerate with scripts/generate-book-data
-
-export interface GrammarNote {
-  pattern: string;
-  meaning: string;
-  example: string;
-  jlpt: string;
-  tip: string;
-}
-
-export const bookGrammar: Record<string, Record<string, GrammarNote[]>> = ${JSON.stringify(allGrammar)};
-`;
+  const before = grammarSrc.slice(0, startIdx);
+  const after = grammarSrc.slice(endIdx);
+  const output = `${before}${JSON.stringify(allGrammar)}${after}`;
   fs.writeFileSync(grammarPath, output, 'utf-8');
   console.log(`\nWritten to ${grammarPath}`);
 }
