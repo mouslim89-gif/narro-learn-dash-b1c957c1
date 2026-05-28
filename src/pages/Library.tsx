@@ -15,17 +15,15 @@ export default function Library() {
   const { progress, darkMode, setDarkMode } = useReadingProgressStore();
 
   // Find most recently read book
-  const continueBook = useMemo(() => {
-    const entries = Object.entries(progress)
+  // Find books in progress, most recently read first
+  const continueBooks = useMemo(() => {
+    return Object.entries(progress)
       .filter(([, p]) => p.progressPercent > 0 && p.progressPercent < 100)
-      .sort(([, a], [, b]) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime());
-    if (entries.length === 0) return null;
-    const [bookId, prog] = entries[0];
-    const book = books.find(b => b.id === bookId);
-    return book ? { book, progress: prog } : null;
+      .sort(([, a], [, b]) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime())
+      .map(([bookId]) => books.find(b => b.id === bookId))
+      .filter((b): b is typeof books[number] => Boolean(b));
   }, [progress]);
 
-  // Filter books by search
   const filteredBooks = useMemo(() => {
     if (!search.trim()) return null;
     const q = search.toLowerCase();
