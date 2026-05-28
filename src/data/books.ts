@@ -9,7 +9,15 @@ import {
   kumoAnchors,
 } from './books/kumo-no-ito';
 import { rashomonSimplified, rashomonIntermediate, rashomonOriginal } from './books/rashomon';
-import { merosuSimplified, merosuIntermediate, merosuOriginal } from './books/hashire-merosu';
+import {
+  merosuSimplified,
+  merosuIntermediate,
+  merosuOriginal,
+  merosuSimplifiedParts,
+  merosuIntermediateParts,
+  merosuOriginalParts,
+  merosuAnchors,
+} from './books/hashire-merosu';
 import {
   lemonSimplified,
   lemonIntermediate,
@@ -21,7 +29,15 @@ import {
 } from './books/lemon';
 import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
-import { asaSimplified, asaIntermediate, asaOriginal } from './books/asa';
+import {
+  asaSimplified,
+  asaIntermediate,
+  asaOriginal,
+  asaSimplifiedParts,
+  asaIntermediateParts,
+  asaOriginalParts,
+  asaAnchors,
+} from './books/asa';
 import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
 import { sakuraSimplified, sakuraIntermediate, sakuraOriginal } from './books/sakura';
 import { urashimaSimplified, urashimaIntermediate, urashimaOriginal } from './books/urashima';
