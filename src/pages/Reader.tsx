@@ -1142,7 +1142,18 @@ export default function Reader() {
                       );
                     })}
                   </span>
+                  {showTranslations && (
+                    englishLine ? (
+                      <span className="block text-sm text-muted-foreground/80 italic mt-0.5 mb-3 leading-snug">
+                        {englishLine}
+                      </span>
+                    ) : (
+                      <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-pulse" style={{ width: '60%' }} />
+                    )
+                  )}
+                  </React.Fragment>
                 );
+
               })}
             </p>
           ))}
