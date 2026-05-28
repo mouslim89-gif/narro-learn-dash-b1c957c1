@@ -73,13 +73,13 @@ function collectAllTexts(): string[] {
 
 async function fetchCachedHashes(hashes: string[]): Promise<Set<string>> {
   const out = new Set<string>();
-  const CHUNK = 500;
+  const CHUNK = 80;
   for (let i = 0; i < hashes.length; i += CHUNK) {
     const part = hashes.slice(i, i + CHUNK);
     const { data, error } = await supabase
       .from('sentence_translations')
       .select('hash')
-  const CHUNK = 80;
+      .in('hash', part);
     if (error) {
       console.warn('cache lookup error', error.message);
       continue;
