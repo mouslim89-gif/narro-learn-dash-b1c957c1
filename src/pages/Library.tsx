@@ -2,9 +2,8 @@ import { useState, useMemo } from 'react';
 import { books, genreLabels, type Genre } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight, Moon, Sun, Settings, X } from 'lucide-react';
+import { Search, Moon, Sun, Settings, X } from 'lucide-react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
