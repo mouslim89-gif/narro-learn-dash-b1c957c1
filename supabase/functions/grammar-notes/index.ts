@@ -45,16 +45,28 @@ Never transliterate Japanese into Latin letters. All Japanese tokens (words, par
 FORBIDDEN examples (never write these): "no tame ni", "te iru", "te shimau", "rareru", "tabeta", "ikimasu", "na-adjective" (use "na-adjective" only as the English grammatical category label, never as a transliteration of a word).
 ALLOWED: kana/kanji followed by an English gloss in parentheses, e.g. 食べる (to eat), ために (in order to).
 
-==================== HARD RULE 2 — METALANGUAGE IN ENGLISH ====================
-All grammatical terminology and slot labels MUST be in English. Use these slot labels: dictionary form, plain form, plain past, te-form, stem, masu-stem, noun, i-adjective, na-adjective, clause.
-Pattern strings combine an English slot label with the kana/kanji ending. Examples:
-  ✓ "dictionary form + ために"
-  ✓ "te-form + しまう"
-  ✓ "plain past + ら"
-  ✓ "noun + のような"
+==================== HARD RULE 2 — METALANGUAGE IN ENGLISH (STANDARDIZED + CAPITALIZED) ====================
+All grammatical terminology and slot labels MUST be in English. Use EXACTLY these canonical slot labels (always Capitalized, never lowercase, never synonyms):
+  - "Dictionary form" (NEVER "plain form", "plain non-past", "jisho form" — always "Dictionary form")
+  - "Plain past" (NEVER "ta-form")
+  - "Plain negative" (NEVER "nai-form" as a slot, though "～ない" as an ending is fine)
+  - "Te-form"
+  - "Stem" or "Masu-stem"
+  - "Noun"
+  - "I-adjective"
+  - "Na-adjective"
+  - "Clause"
+Pattern strings combine a Capitalized English slot label with the kana/kanji ending, and the FIRST letter of the pattern field MUST be uppercase. Examples:
+  ✓ "Dictionary form + ために"
+  ✓ "Te-form + しまう"
+  ✓ "Plain past + ら"
+  ✓ "Noun + のような"
+  ✗ "dictionary form + ために" (lowercase start — forbidden)
+  ✗ "plain form + ために" (use "Dictionary form" instead — forbidden)
   ✗ "辞書形 + ために" (Japanese metalanguage — forbidden)
   ✗ "jisho-kei + tame ni" (romaji — forbidden)
-The "meaning" and "tip" fields MUST be written in English prose. No Japanese sentences in tips (referencing a kana/kanji token like "Don't confuse with ～てある" is fine).
+The "meaning" and "tip" fields MUST be written in English prose and start with a capital letter. No Japanese sentences in tips (referencing a kana/kanji token like "Don't confuse with ～てある" is fine).
+
 
 ==================== HARD RULE 3 — SKIP TRIVIAL POINTS ====================
 DO NOT emit a note for any of the following:
