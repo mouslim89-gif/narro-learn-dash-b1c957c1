@@ -1,40 +1,51 @@
-Apply the `split-book-into-parts` skill to three books. None have `parts` or `chapters` today; all three originals are above the 2500-char threshold.
+Quatre changements groupés.
 
-## Scope per book (derived from `original` length, ~1300–1700 chars/part)
+## 1. `grammar-notes` edge function
 
-| Book | Original chars | Target parts |
-|---|---|---|
-| hana (鼻 — Akutagawa) | ~17,300 | ~10–12 |
-| matsu (松井 — Kajii) | ~6,200 | ~4 |
-| sakura (桜の樹の下には — Kajii) | ~5,300 | ~3–4 |
+- Retirer la troncature : `const excerpt = text.slice(0, 2000)` → envoyer `text` complet.
+- Remplacer la consigne `Return 5-8 grammar points...` par : "Return every distinct grammar point that appears in the text — no fixed minimum or maximum. Deduplicate; include each pattern once. Order from easiest to hardest."
+- Déployer la fonction.
 
-Exact count locked in once I read each `original` end-to-end and find narrative ruptures.
+## 2. Hana — générer les grammar notes (anchors confirmés)
 
-## Per-book pipeline (applied to each of the 3)
+```bash
+npx tsx scripts/generate-grammar-for-hana.ts
+```
 
-1. Read all three difficulty versions; identify narrative ruptures on `original`, cut into 1300–1700-char segments ending only on `。！？」`.
-2. Write short, spoiler-free English anchors (Title Case, 2–5 words) for each cut.
-3. Align `intermediate` and `simplified` to the same narrative beats — same part count, same anchor order.
-4. Self-check: concat byte-identical, equal counts, each part ends on `。！？」`.
-5. Rewrite `src/data/books/<id>.ts` with `…SimplifiedParts`, `…IntermediateParts`, `…OriginalParts`, `…Anchors` + back-compat aliases (`<id>Simplified = …Parts.join('\n\n')`).
-6. Update entry in `src/data/books.ts`: add `parts` + `anchors`, extend imports, keep `content`.
-7. **STOP and confirm anchors with you before grammar generation** (costs API calls — one batch per book).
-8. After approval, per book:
-   - Copy `scripts/generate-grammar-for-lemon.ts` → `scripts/generate-grammar-for-<id>.ts`, swap identifiers.
-   - `npx tsx scripts/generate-grammar-for-<id>.ts` (≈ N parts × 3 difficulties calls).
-9. After all three books: `npx tsx scripts/generate-tokens.ts` once (regenerates flat tokens for the new text shape).
-10. Verify: Reader `/reader/<id>/<diff>/part-N` renders only that slice; BookDetail lists anchors; grammar panel scopes to `partIdx`.
+Script déjà existant — il faut juste le mettre en forme "per-part" comme `generate-grammar-for-lemon.ts`. Je le réécris (4 parts × 3 difficultés = 12 appels).
 
-## Skipped
+## 3. Splitter sakura et matsu en 2 parts chacun
 
-- Dictionary shard regen (no wording is changed, only segmentation).
-- Audio (out of scope per skill).
-- `konbini-ningen` (uses `chapters` model, not in this request).
+Même pipeline que hana :
 
-## Execution order
+**sakura (1779 chars original)** — 2 parts :
 
-I'll do **sakura → matsu → hana** (shortest to longest) so you can sanity-check the anchor style on the small ones before committing to ~12 anchors on hana. After step 6 for each book, I'll paste the proposed anchors in chat and wait for your go-ahead before running the grammar script.
+- P1 — *The Tree's Secret* : ouverture jusqu'au moment où il explique l'image (paragraphes intro + corps de l'argumentation sur les cadavres sous le cerisier).
+- P2 — *The Mayfly Pool* : transition vers le ravin, scène des éphémères, conclusion sur la fête sous les cerisiers.
+- Cut probable autour du "二三日前、俺は、ここの溪へ下りて..." (orig para 11).
 
-## Open question
+**matsu (2072 chars original)** — 2 parts :
 
-Anchors language: the skill mandates **English Title Case** (e.g. `"The Spider's Thread"`). Confirm that's still what you want for these three Japanese classics — or do you prefer Japanese anchors (e.g. `「桜の樹の下」`)? Default = English per the skill.
+- L'original est un blob mono-paragraphe — je découperai sur une rupture narrative interne (`。`/`」` + ligne) sans toucher au texte. Naturel : couper après "...自信を失ってしまったのです。" (≈ ligne 22), qui sépare l'intro/contexte (pourquoi elle va à la gare) de la rumination introspective (qui/quoi elle attend, conclusion).
+- Anchors proposés : *The Empty Bench* / *What She Awaits*.
+
+Pour matsu, les versions `simplified` et `intermediate` ont déjà 4 paragraphes — j'aligne le cut sur leur paragraphe 2 (après "...急いで帰ります" / "...急いで帰っていくだけです" / etc.) pour garder le même beat narratif.
+
+J'écris les fichiers, je registre dans `books.ts`, je te confirme les anchors **avant** la generation grammar (= 1 nouvelle pause).
+
+## 4. Threshold du skill `split-book-into-parts` : 2500 → 2000
+
+Édite `.workspace/skills/split-book-into-parts/SKILL.md` (via `.agents/skills/split-book-into-parts/SKILL.md` + `skills--apply_draft`) et le skill `add-book` (étape 6) pour passer le seuil de 2500 à 2000 chars. Mets aussi à jour la cible de taille de part (actuellement 1300-1700) → **1000-1500** pour rester cohérent avec un seuil plus bas.
+
+## Ordre d'exécution
+
+1. Patch + deploy `grammar-notes`.
+2. Skill threshold update.
+3. Split sakura, split matsu, register, **pause** pour confirmer anchors.
+4. Une fois anchors validés : grammar pour hana + sakura + matsu, puis `npx tsx scripts/generate-tokens.ts`.
+
+## Question
+
+Pour matsu, l'`original` est un seul bloc dense sans rupture évidente au milieu (Dazai écrit tout d'une traite). Le cut le plus propre tombe vers les 2/3 (≈ 1400 / 700) plutôt qu'à 50/50. Ça te va, ou tu préfères que je force un split plus équilibré (1000/1000) même si la rupture narrative est moins nette ? 
+
+ça me va
