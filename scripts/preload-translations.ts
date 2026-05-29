@@ -22,6 +22,10 @@ const supabase = createClient(SUPABASE_URL, ANON_KEY);
 const DRY = process.argv.includes('--dry');
 const DIFFICULTIES: Difficulty[] = ['simplified', 'intermediate', 'original'];
 
+// Optional --book <id> filter: restrict to a single book.
+const bookFlagIdx = process.argv.indexOf('--book');
+const ONLY_BOOK = bookFlagIdx >= 0 ? process.argv[bookFlagIdx + 1] : null;
+
 // Mirror Reader.tsx stripParens.
 function stripParens(text: string): string {
   return text
