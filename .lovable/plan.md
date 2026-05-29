@@ -1,31 +1,10 @@
-## Grammar notes — tighten prompt + regenerate matsu
+## Changes to `src/components/GrammarPanel.tsx`
 
-### 1. Edge function (`supabase/functions/grammar-notes/index.ts`)
+1. **Wrap long titles instead of truncating**
+   - Remove `truncate` on the pattern `<span>` (line 139), replace with `break-words leading-snug` so long patterns wrap onto multiple lines and stay fully readable on mobile.
+   - Change the title row container to `items-start` and make the JLPT badge stay aligned top (`mt-0.5`) so the badge doesn't stretch when the title wraps.
 
-Rewrite the system prompt to enforce:
+2. **Sort notes by JLPT ascending (N5 → N1)**
+   - Sort the `notes` array before rendering using order `["N5","N4","N3","N2","N1"]`. Done as a derived `const sortedNotes = [...notes].sort(...)` right before the `.map`, so we don't mutate state and it applies both to pre-baked data and edge-function fallbacks.
 
-**Skip (do NOT emit a note for):**
-- Standalone particles: が, の, を, に, へ, で, と, は, も, から, まで, や, か, ね, よ…
-- Bare conjugation morphemes on their own: passive ～られる, potential ～える/～られる, causative ～せる/～させる, past ～た, te-form ～て, negative ～ない, polite ～ます, volitional ～よう
-- Basic aspect/voice combos considered too elementary: ～ている, ～させてもらう, ～られている
-- General rule: skip anything that is just a conjugation slot with no added meaning beyond the base verb form
-
-**Keep (emit a note for):**
-- Compound/idiomatic patterns: ～てしまう, ～なければならない, ～ために, ～のに, ～ように, ～そうだ, ～らしい, ～べき, ～わけではない, ～ばかり, ～つつ, etc.
-- Anything carrying its own lexical/discourse meaning beyond raw conjugation
-
-**Metalanguage rules (all English, zero romaji):**
-- Pattern strings use English slot labels + kana/kanji: `dictionary form + ために`, `te-form + しまう`, `plain past + ら`, `noun + のような`, `i-adjective stem + そうだ`
-- Allowed slot labels: dictionary form, plain form, plain past, te-form, stem, masu-stem, noun, i-adjective, na-adjective, clause
-- `meaning` and `tip` fields: English prose only. No Japanese sentences in tips (kana/kanji tokens as references are fine, e.g. "Don't confuse with ～てある").
-- Hard ban on romaji anywhere in any field. Explicitly list forbidden examples in the prompt: "no tame ni", "te iru", "rareru", "tabeta", "ikimasu" → all must be written in kana/kanji.
-
-Then redeploy the function.
-
-### 2. Regenerate matsu only
-
-Run `scripts/generate-grammar-for-matsu.ts` to overwrite matsu's entry in `src/data/book-grammar.ts` with notes that follow the new rules.
-
-### 3. Side fix (runtime error)
-
-The preview is currently broken: `Failed to fetch …/book-tokens/books/hana.ts`. That token file is missing — only a-aki, kumo-no-ito, matsu, sakura exist under `src/data/book-tokens/books/`. I'll regenerate the missing token files via `scripts/generate-tokens.ts` in the same pass so `/reader/hana/...` works again.
+No data regeneration, no edge-function changes, no other files touched.
