@@ -65,7 +65,12 @@ function collectAllTexts(): string[] {
   const push = (s: string | undefined) => {
     if (s && !seen.has(s)) seen.add(s);
   };
-  for (const book of books) {
+  const targetBooks = ONLY_BOOK ? books.filter((b) => b.id === ONLY_BOOK) : books;
+  if (ONLY_BOOK && targetBooks.length === 0) {
+    console.error(`No book with id "${ONLY_BOOK}"`);
+    process.exit(1);
+  }
+  for (const book of targetBooks) {
     for (const d of DIFFICULTIES) {
       push(book.content?.[d]);
       if (book.chapters) for (const ch of book.chapters) push(ch.content?.[d]);
