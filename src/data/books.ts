@@ -36,7 +36,7 @@ import {
   lemonAnchors,
 } from './books/lemon';
 import { hanaSimplified, hanaIntermediate, hanaOriginal, hanaSimplifiedParts, hanaIntermediateParts, hanaOriginalParts, hanaAnchors } from './books/hana';
-import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
+import { matsuSimplified, matsuIntermediate, matsuOriginal, matsuSimplifiedParts, matsuIntermediateParts, matsuOriginalParts, matsuAnchors } from './books/matsu';
 import {
   asaSimplified,
   asaIntermediate,
@@ -47,7 +47,7 @@ import {
   asaAnchors,
 } from './books/asa';
 import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from './books/gyofukuki';
-import { sakuraSimplified, sakuraIntermediate, sakuraOriginal } from './books/sakura';
+import { sakuraSimplified, sakuraIntermediate, sakuraOriginal, sakuraSimplifiedParts, sakuraIntermediateParts, sakuraOriginalParts, sakuraAnchors } from './books/sakura';
 import {
   urashimaSimplified,
   urashimaIntermediate,
@@ -359,6 +359,8 @@ export const books: Book[] = [
     readingTimeMin: 6,
     synopsis: "Every day, a twenty-year-old woman walks from the market to a small train station. She buys a ticket, sits on a cold bench, and waits. She doesn't know who she is waiting for — not a husband, not a lover, not a friend — only that she cannot stop. Dazai's brief, haunting wartime monologue on longing, loneliness, and the shape of an unnamed hope.",
     content: { simplified: matsuSimplified, intermediate: matsuIntermediate, original: matsuOriginal },
+    parts: { simplified: matsuSimplifiedParts, intermediate: matsuIntermediateParts, original: matsuOriginalParts },
+    anchors: matsuAnchors,
   },
   {
     id: 'asa',
@@ -397,6 +399,8 @@ export const books: Book[] = [
     readingTimeMin: 7,
     synopsis: "\"Bodies are buried beneath the cherry trees!\" Kajii's narrator confides his strange revelation to a friend: only the imagined corpses rotting underground could explain why the blossoms bloom with such unbearable beauty. A short, hallucinatory prose poem in which horror and rapture become indistinguishable.",
     content: { simplified: sakuraSimplified, intermediate: sakuraIntermediate, original: sakuraOriginal },
+    parts: { simplified: sakuraSimplifiedParts, intermediate: sakuraIntermediateParts, original: sakuraOriginalParts },
+    anchors: sakuraAnchors,
   },
   {
     id: 'urashima',
