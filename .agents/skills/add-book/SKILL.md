@@ -82,9 +82,9 @@ Use camelCase for variable names (e.g. `yukiOnna`, `botchan`).
 
 Measure `originalText.length` (the unsplit blob).
 
-- **If `< 2500` chars** → SKIP this step entirely. Leave the book as a single blob. Continue to step 7.
-- **If `≥ 2500` chars** → apply the `split-book-into-parts` skill in full on this book:
-  - Target segments of **1300–1700 chars** in the `original`, cut only on narrative ruptures (paragraph break + sentence terminator `。！？」`).
+- **If `< 2000` chars** → SKIP this step entirely. Leave the book as a single blob. Continue to step 7.
+- **If `≥ 2000` chars** → apply the `split-book-into-parts` skill in full on this book:
+  - Target segments of **1000–1500 chars** in the `original`, cut only on narrative ruptures (paragraph break + sentence terminator `。！？」`).
   - Write **anchors** in Title Case, 2–5 words, evocative, **no spoilers** (no verbs revealing outcomes).
   - Align `intermediate` and `simplified` part-by-part on the SAME narrative beats. All three difficulties end up with the same number of parts.
   - Self-check before writing: concat of each version's parts (joined by `'\n\n'`) is byte-identical to the original blob from step 4; every part ends on `。｜！｜？｜」`; counts match across difficulties and anchors.

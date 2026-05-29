@@ -20,7 +20,7 @@ Synchronized split: "part N" must cover the same narrative passage across all th
 
 ### Step A — Define boundaries on the ORIGINAL
 
-Read the `original` version end-to-end. Identify narrative ruptures: scene change, start/end of a dialogue exchange, action pivot, time jump. Cut the original into segments of roughly **1300–1700 characters**, cutting **only** at these ruptures
+Read the `original` version end-to-end. Identify narrative ruptures: scene change, start/end of a dialogue exchange, action pivot, time jump. Cut the original into segments of roughly **1000–1500 characters**, cutting **only** at these ruptures
 
 ### Step B — Name each boundary (anchor)
 

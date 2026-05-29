@@ -25,9 +25,6 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Truncate to first ~2000 chars to keep cost/latency low
-    const excerpt = text.slice(0, 2000);
-
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
@@ -41,7 +38,7 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are a Japanese grammar teacher. Analyze the given Japanese text and extract the most important grammar points for a learner.
+              content: `You are a Japanese grammar teacher. Analyze the given Japanese text and extract every grammar point a learner should study.
 
 HARD RULE — NO ROMAJI ANYWHERE IN THE OUTPUT. Never transliterate Japanese into Latin letters (no "tabeta", "ikimasu", "te-iru", "kuru", "na-adjective" romaji). Whenever you refer to a Japanese word, particle, ending, or pattern, write it in kana/kanji. An English gloss in parentheses after the kana/kanji is fine (e.g. 食べる (to eat)).
 
@@ -52,11 +49,11 @@ For each grammar point, provide:
 - jlpt: estimated JLPT level (N5, N4, N3, N2, or N1)
 - tip: a short practical tip for remembering or using this grammar (English, no romaji)
 
-Return 5-8 grammar points, ordered from easiest to hardest. Focus on patterns that would be most useful for a learner.`,
+Return every distinct grammar point that appears in the text — no fixed minimum or maximum. Deduplicate: include each pattern only once even if it appears many times. Order from easiest (N5) to hardest (N1). Skip nothing important; do not pad with trivial repeats.`,
             },
             {
               role: "user",
-              content: excerpt,
+              content: text,
             },
           ],
           tools: [
