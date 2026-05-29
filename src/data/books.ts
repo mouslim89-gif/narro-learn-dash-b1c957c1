@@ -35,7 +35,7 @@ import {
   lemonOriginalParts,
   lemonAnchors,
 } from './books/lemon';
-import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
+import { hanaSimplified, hanaIntermediate, hanaOriginal, hanaSimplifiedParts, hanaIntermediateParts, hanaOriginalParts, hanaAnchors } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 import {
   asaSimplified,
@@ -345,6 +345,8 @@ export const books: Book[] = [
     readingTimeMin: 10,
     synopsis: "Zenchi Naigu, an aging monk, is tormented by his absurdly long nose — fifteen centimeters of dangling sausage that hangs past his chin. Trying every remedy he can find, he finally succeeds in shrinking it. But the relief he expected turns into something stranger: those who once pitied him now openly laugh. Akutagawa's wry, compassionate parable on vanity, pity, and the secret cruelty of human kindness.",
     content: { simplified: hanaSimplified, intermediate: hanaIntermediate, original: hanaOriginal },
+    parts: { simplified: hanaSimplifiedParts, intermediate: hanaIntermediateParts, original: hanaOriginalParts },
+    anchors: hanaAnchors,
   },
   {
     id: 'matsu',
