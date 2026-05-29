@@ -116,9 +116,9 @@ async function callBatch(sentences: string[]): Promise<{ count: number; rateLimi
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function main() {
-  console.log('Collecting texts…');
+  console.log('Collecting texts…' + (ONLY_BOOK ? ` (book=${ONLY_BOOK})` : ''));
   const blobs = collectAllTexts();
-  console.log(`  ${blobs.length} distinct text blobs across ${books.length} books`);
+  console.log(`  ${blobs.length} distinct text blobs`);
 
   const allSentences = new Set<string>();
   for (const blob of blobs) {
