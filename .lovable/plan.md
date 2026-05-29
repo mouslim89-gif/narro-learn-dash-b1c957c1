@@ -1,51 +1,31 @@
-Quatre changements groupés.
+## Grammar notes — tighten prompt + regenerate matsu
 
-## 1. `grammar-notes` edge function
+### 1. Edge function (`supabase/functions/grammar-notes/index.ts`)
 
-- Retirer la troncature : `const excerpt = text.slice(0, 2000)` → envoyer `text` complet.
-- Remplacer la consigne `Return 5-8 grammar points...` par : "Return every distinct grammar point that appears in the text — no fixed minimum or maximum. Deduplicate; include each pattern once. Order from easiest to hardest."
-- Déployer la fonction.
+Rewrite the system prompt to enforce:
 
-## 2. Hana — générer les grammar notes (anchors confirmés)
+**Skip (do NOT emit a note for):**
+- Standalone particles: が, の, を, に, へ, で, と, は, も, から, まで, や, か, ね, よ…
+- Bare conjugation morphemes on their own: passive ～られる, potential ～える/～られる, causative ～せる/～させる, past ～た, te-form ～て, negative ～ない, polite ～ます, volitional ～よう
+- Basic aspect/voice combos considered too elementary: ～ている, ～させてもらう, ～られている
+- General rule: skip anything that is just a conjugation slot with no added meaning beyond the base verb form
 
-```bash
-npx tsx scripts/generate-grammar-for-hana.ts
-```
+**Keep (emit a note for):**
+- Compound/idiomatic patterns: ～てしまう, ～なければならない, ～ために, ～のに, ～ように, ～そうだ, ～らしい, ～べき, ～わけではない, ～ばかり, ～つつ, etc.
+- Anything carrying its own lexical/discourse meaning beyond raw conjugation
 
-Script déjà existant — il faut juste le mettre en forme "per-part" comme `generate-grammar-for-lemon.ts`. Je le réécris (4 parts × 3 difficultés = 12 appels).
+**Metalanguage rules (all English, zero romaji):**
+- Pattern strings use English slot labels + kana/kanji: `dictionary form + ために`, `te-form + しまう`, `plain past + ら`, `noun + のような`, `i-adjective stem + そうだ`
+- Allowed slot labels: dictionary form, plain form, plain past, te-form, stem, masu-stem, noun, i-adjective, na-adjective, clause
+- `meaning` and `tip` fields: English prose only. No Japanese sentences in tips (kana/kanji tokens as references are fine, e.g. "Don't confuse with ～てある").
+- Hard ban on romaji anywhere in any field. Explicitly list forbidden examples in the prompt: "no tame ni", "te iru", "rareru", "tabeta", "ikimasu" → all must be written in kana/kanji.
 
-## 3. Splitter sakura et matsu en 2 parts chacun
+Then redeploy the function.
 
-Même pipeline que hana :
+### 2. Regenerate matsu only
 
-**sakura (1779 chars original)** — 2 parts :
+Run `scripts/generate-grammar-for-matsu.ts` to overwrite matsu's entry in `src/data/book-grammar.ts` with notes that follow the new rules.
 
-- P1 — *The Tree's Secret* : ouverture jusqu'au moment où il explique l'image (paragraphes intro + corps de l'argumentation sur les cadavres sous le cerisier).
-- P2 — *The Mayfly Pool* : transition vers le ravin, scène des éphémères, conclusion sur la fête sous les cerisiers.
-- Cut probable autour du "二三日前、俺は、ここの溪へ下りて..." (orig para 11).
+### 3. Side fix (runtime error)
 
-**matsu (2072 chars original)** — 2 parts :
-
-- L'original est un blob mono-paragraphe — je découperai sur une rupture narrative interne (`。`/`」` + ligne) sans toucher au texte. Naturel : couper après "...自信を失ってしまったのです。" (≈ ligne 22), qui sépare l'intro/contexte (pourquoi elle va à la gare) de la rumination introspective (qui/quoi elle attend, conclusion).
-- Anchors proposés : *The Empty Bench* / *What She Awaits*.
-
-Pour matsu, les versions `simplified` et `intermediate` ont déjà 4 paragraphes — j'aligne le cut sur leur paragraphe 2 (après "...急いで帰ります" / "...急いで帰っていくだけです" / etc.) pour garder le même beat narratif.
-
-J'écris les fichiers, je registre dans `books.ts`, je te confirme les anchors **avant** la generation grammar (= 1 nouvelle pause).
-
-## 4. Threshold du skill `split-book-into-parts` : 2500 → 2000
-
-Édite `.workspace/skills/split-book-into-parts/SKILL.md` (via `.agents/skills/split-book-into-parts/SKILL.md` + `skills--apply_draft`) et le skill `add-book` (étape 6) pour passer le seuil de 2500 à 2000 chars. Mets aussi à jour la cible de taille de part (actuellement 1300-1700) → **1000-1500** pour rester cohérent avec un seuil plus bas.
-
-## Ordre d'exécution
-
-1. Patch + deploy `grammar-notes`.
-2. Skill threshold update.
-3. Split sakura, split matsu, register, **pause** pour confirmer anchors.
-4. Une fois anchors validés : grammar pour hana + sakura + matsu, puis `npx tsx scripts/generate-tokens.ts`.
-
-## Question
-
-Pour matsu, l'`original` est un seul bloc dense sans rupture évidente au milieu (Dazai écrit tout d'une traite). Le cut le plus propre tombe vers les 2/3 (≈ 1400 / 700) plutôt qu'à 50/50. Ça te va, ou tu préfères que je force un split plus équilibré (1000/1000) même si la rupture narrative est moins nette ? 
-
-ça me va
+The preview is currently broken: `Failed to fetch …/book-tokens/books/hana.ts`. That token file is missing — only a-aki, kumo-no-ito, matsu, sakura exist under `src/data/book-tokens/books/`. I'll regenerate the missing token files via `scripts/generate-tokens.ts` in the same pass so `/reader/hana/...` works again.
