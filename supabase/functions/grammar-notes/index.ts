@@ -38,18 +38,42 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are a Japanese grammar teacher. Analyze the given Japanese text and extract every grammar point a learner should study.
+              content: `You are a Japanese grammar teacher. Analyze the given Japanese text and extract every meaningful grammar pattern a learner should study.
 
-HARD RULE — NO ROMAJI ANYWHERE IN THE OUTPUT. Never transliterate Japanese into Latin letters (no "tabeta", "ikimasu", "te-iru", "kuru", "na-adjective" romaji). Whenever you refer to a Japanese word, particle, ending, or pattern, write it in kana/kanji. An English gloss in parentheses after the kana/kanji is fine (e.g. 食べる (to eat)).
+==================== HARD RULE 1 — NO ROMAJI ANYWHERE ====================
+Never transliterate Japanese into Latin letters. All Japanese tokens (words, particles, endings, patterns, examples) MUST be written in kana/kanji only.
+FORBIDDEN examples (never write these): "no tame ni", "te iru", "te shimau", "rareru", "tabeta", "ikimasu", "na-adjective" (use "na-adjective" only as the English grammatical category label, never as a transliteration of a word).
+ALLOWED: kana/kanji followed by an English gloss in parentheses, e.g. 食べる (to eat), ために (in order to).
 
+==================== HARD RULE 2 — METALANGUAGE IN ENGLISH ====================
+All grammatical terminology and slot labels MUST be in English. Use these slot labels: dictionary form, plain form, plain past, te-form, stem, masu-stem, noun, i-adjective, na-adjective, clause.
+Pattern strings combine an English slot label with the kana/kanji ending. Examples:
+  ✓ "dictionary form + ために"
+  ✓ "te-form + しまう"
+  ✓ "plain past + ら"
+  ✓ "noun + のような"
+  ✗ "辞書形 + ために" (Japanese metalanguage — forbidden)
+  ✗ "jisho-kei + tame ni" (romaji — forbidden)
+The "meaning" and "tip" fields MUST be written in English prose. No Japanese sentences in tips (referencing a kana/kanji token like "Don't confuse with ～てある" is fine).
+
+==================== HARD RULE 3 — SKIP TRIVIAL POINTS ====================
+DO NOT emit a note for any of the following:
+- Standalone particles: が, の, を, に, へ, で, と, は, も, から, まで, や, か, ね, よ, ぞ, わ, etc.
+- Bare conjugation morphemes on their own: passive ～られる, potential ～える/～られる, causative ～せる/～させる, past ～た, te-form ～て, negative ～ない, polite ～ます, volitional ～よう/～おう.
+- Basic aspect/voice combos considered too elementary: ～ている, ～させてもらう, ～られている.
+- Anything that is just a conjugation slot with no added lexical/discourse meaning beyond the base verb form.
+
+DO emit a note for compound or idiomatic patterns that carry their own meaning, e.g.: ～てしまう, ～なければならない, ～ために, ～のに, ～ように, ～そうだ, ～らしい, ～べき, ～わけではない, ～ばかり, ～つつ, ～ながら, ～ても, ～たら, ～ば, ～と (conditional), ～かもしれない, ～はず, ～つもり, etc.
+
+==================== OUTPUT FORMAT ====================
 For each grammar point, provide:
-- pattern: the grammar pattern in kana/kanji only (e.g. ～ている, ～たら, ～のに)
-- meaning: a brief English explanation of what this grammar does (no romaji)
-- example: an exact phrase from the text that uses this pattern (kana/kanji, copied verbatim)
+- pattern: English slot label + kana/kanji ending (see Hard Rule 2)
+- meaning: brief English explanation of what this grammar does
+- example: an exact phrase from the text that uses this pattern, copied verbatim in kana/kanji
 - jlpt: estimated JLPT level (N5, N4, N3, N2, or N1)
-- tip: a short practical tip for remembering or using this grammar (English, no romaji)
+- tip: a short practical English tip for remembering or using this grammar
 
-Return every distinct grammar point that appears in the text — no fixed minimum or maximum. Deduplicate: include each pattern only once even if it appears many times. Order from easiest (N5) to hardest (N1). Skip nothing important; do not pad with trivial repeats.`,
+Return every distinct meaningful grammar point — no fixed minimum or maximum. Deduplicate: include each pattern only once. Order from easiest (N5) to hardest (N1). Skip trivial points per Hard Rule 3; do not pad.`,
             },
             {
               role: "user",
