@@ -120,7 +120,12 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
 
           {!loading && !error && notes.length > 0 && (
             <div className="flex flex-col gap-2.5">
-              {notes.map((note, i) => {
+              {[...notes]
+                .sort((a, b) => {
+                  const order = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 } as const;
+                  return (order[a.jlpt] ?? 99) - (order[b.jlpt] ?? 99);
+                })
+                .map((note, i) => {
                 const expanded = expandedIdx === i;
                 return (
                   <button
@@ -129,21 +134,22 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
                     className="w-full rounded-2xl bg-card ring-1 ring-border/30 shadow-sm p-4 text-left smooth-colors hover:ring-border/60"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex items-start gap-2 min-w-0 flex-1">
                         <span
-                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shrink-0"
+                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shrink-0 mt-0.5"
                           style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
                         >
                           {note.jlpt}
                         </span>
-                        <span className="font-japanese text-base font-bold truncate">{note.pattern}</span>
+                        <span className="font-japanese text-base font-bold break-words leading-snug min-w-0 flex-1">{note.pattern}</span>
                       </div>
                       {expanded ? (
-                        <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
                       ) : (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
                       )}
                     </div>
+
                     <p className="mt-1 font-serif text-sm text-muted-foreground">{note.meaning}</p>
 
                     {expanded && (
