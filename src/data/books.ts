@@ -35,7 +35,7 @@ import {
   lemonOriginalParts,
   lemonAnchors,
 } from './books/lemon';
-import { hanaSimplified, hanaIntermediate, hanaOriginal } from './books/hana';
+import { hanaSimplified, hanaIntermediate, hanaOriginal, hanaSimplifiedParts, hanaIntermediateParts, hanaOriginalParts, hanaAnchors } from './books/hana';
 import { matsuSimplified, matsuIntermediate, matsuOriginal } from './books/matsu';
 import {
   asaSimplified,
