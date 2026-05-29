@@ -1,64 +1,40 @@
-# Mettre à jour le skill `add-book`
+Apply the `split-book-into-parts` skill to three books. None have `parts` or `chapters` today; all three originals are above the 2500-char threshold.
 
-Deux ajouts au pipeline existant, dans le fichier `.workspace/skills/add-book/SKILL.md` (édition du draft via `.agents/skills/add-book/SKILL.md` puis `skills--apply_draft`).
+## Scope per book (derived from `original` length, ~1300–1700 chars/part)
 
-## Ajout 1 — Auto-split en parts (entre étapes 5 et 6)
+| Book | Original chars | Target parts |
+|---|---|---|
+| hana (鼻 — Akutagawa) | ~17,300 | ~10–12 |
+| matsu (松井 — Kajii) | ~6,200 | ~4 |
+| sakura (桜の樹の下には — Kajii) | ~5,300 | ~3–4 |
 
-Nouvelle **étape 5.5 — Découpe en parts (conditionnelle)** :
+Exact count locked in once I read each `original` end-to-end and find narrative ruptures.
 
-- Mesurer `originalText.length`.
-- **Si ≥ 2500 chars** : appliquer intégralement la méthode du skill `split-book-into-parts` (sections "Splitting method" + Step 1 + Step 2) sur le livre qu'on vient d'ajouter :
-  - Cibler des segments de **1300–1700 chars** sur l'`original`, coupés sur ruptures narratives (`。！？」` + paragraphe).
-  - Générer des **anchors** Title Case, 2–5 mots, sans spoiler.
-  - Aligner `intermediate` et `simplified` sur les mêmes beats narratifs.
-  - Self-check : concat byte-identique, même nombre de parts par difficulté, chaque part finit sur `。！？」`.
-  - Réécrire `src/data/books/<id>.ts` avec `…SimplifiedParts`, `…IntermediateParts`, `…OriginalParts`, `…Anchors` + alias back-compat.
-  - Étendre l'entrée dans `src/data/books.ts` avec `parts` + `anchors`.
-  - **Confirmer les anchors avec l'utilisateur avant l'étape grammar** (coûte des appels API).
-- **Si < 2500 chars** : sauter, garder la forme actuelle à un seul blob.
+## Per-book pipeline (applied to each of the 3)
 
-L'étape 7 (grammar) est inchangée côté code mais la note rappelle : si split appliqué, copier `generate-grammar-for-lemon.ts` (per-part) ; sinon copier `generate-grammar-for-sakura.ts` (single).
+1. Read all three difficulty versions; identify narrative ruptures on `original`, cut into 1300–1700-char segments ending only on `。！？」`.
+2. Write short, spoiler-free English anchors (Title Case, 2–5 words) for each cut.
+3. Align `intermediate` and `simplified` to the same narrative beats — same part count, same anchor order.
+4. Self-check: concat byte-identical, equal counts, each part ends on `。！？」`.
+5. Rewrite `src/data/books/<id>.ts` with `…SimplifiedParts`, `…IntermediateParts`, `…OriginalParts`, `…Anchors` + back-compat aliases (`<id>Simplified = …Parts.join('\n\n')`).
+6. Update entry in `src/data/books.ts`: add `parts` + `anchors`, extend imports, keep `content`.
+7. **STOP and confirm anchors with you before grammar generation** (costs API calls — one batch per book).
+8. After approval, per book:
+   - Copy `scripts/generate-grammar-for-lemon.ts` → `scripts/generate-grammar-for-<id>.ts`, swap identifiers.
+   - `npx tsx scripts/generate-grammar-for-<id>.ts` (≈ N parts × 3 difficulties calls).
+9. After all three books: `npx tsx scripts/generate-tokens.ts` once (regenerates flat tokens for the new text shape).
+10. Verify: Reader `/reader/<id>/<diff>/part-N` renders only that slice; BookDetail lists anchors; grammar panel scopes to `partIdx`.
 
-## Ajout 2 — Préchargement des traductions de phrases
+## Skipped
 
-### 2a. Étendre `scripts/preload-translations.ts`
+- Dictionary shard regen (no wording is changed, only segmentation).
+- Audio (out of scope per skill).
+- `konbini-ningen` (uses `chapters` model, not in this request).
 
-Ajouter un flag `--book <id>` :
-- Sans flag : comportement actuel (tous les livres).
-- Avec flag : filtre `BOOKS` à `[book]` avant la boucle. Reste identique (idempotent, passe par `sentence_translations` + `translate-sentences-batch`).
+## Execution order
 
-### 2b. Nouvelle étape 9 du skill — Préchargement traductions
+I'll do **sakura → matsu → hana** (shortest to longest) so you can sanity-check the anchor style on the small ones before committing to ~12 anchors on hana. After step 6 for each book, I'll paste the proposed anchors in chat and wait for your go-ahead before running the grammar script.
 
-Après le sync dictionnaire, avant la vérification finale :
+## Open question
 
-```bash
-npx tsx scripts/preload-translations.ts --book <id>
-```
-
-- Récupère toutes les phrases des 3 difficultés (parts incluses si splittées).
-- Hash SHA-256 → bulk lookup `sentence_translations` → batch edge function pour les manquantes.
-- Coût one-shot, ensuite instant pour l'utilisateur (toggle 🌐 dans le Reader).
-
-## Numérotation finale du skill add-book
-
-1. Pick book id
-2. Generate missing difficulty versions
-3. AI-deduce metadata
-4. Create `src/data/books/<id>.ts`
-5. Register in `src/data/books.ts`
-6. **(NEW)** Split en parts si `original.length ≥ 2500` — applique le skill `split-book-into-parts`
-7. Run tokenizer
-8. Generate grammar (per-part si splitté, sinon single)
-9. Preload dictionary
-10. **(NEW)** Preload sentence translations — `npx tsx scripts/preload-translations.ts --book <id>`
-11. Verify
-
-## Hors scope
-
-- Pas de split rétroactif sur livres existants (déjà couvert par le skill séparé).
-- Pas de re-traduction si entrée déjà en cache (le script est idempotent).
-- Pas d'audio (toujours hors scope du skill).
-
-## Question ouverte
-
-Le seuil **2500 chars** te convient ? (En dessous, un split donnerait des parts trop courtes — Urashima fait 5631 chars → 4 parts ; un livre de 2000 chars donnerait 1-2 parts seulement, sans valeur ajoutée.)
+Anchors language: the skill mandates **English Title Case** (e.g. `"The Spider's Thread"`). Confirm that's still what you want for these three Japanese classics — or do you prefer Japanese anchors (e.g. `「桜の樹の下」`)? Default = English per the skill.
