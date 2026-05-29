@@ -22,6 +22,10 @@ const supabase = createClient(SUPABASE_URL, ANON_KEY);
 const DRY = process.argv.includes('--dry');
 const DIFFICULTIES: Difficulty[] = ['simplified', 'intermediate', 'original'];
 
+// Optional --book <id> filter: restrict to a single book.
+const bookFlagIdx = process.argv.indexOf('--book');
+const ONLY_BOOK = bookFlagIdx >= 0 ? process.argv[bookFlagIdx + 1] : null;
+
 // Mirror Reader.tsx stripParens.
 function stripParens(text: string): string {
   return text
@@ -61,7 +65,12 @@ function collectAllTexts(): string[] {
   const push = (s: string | undefined) => {
     if (s && !seen.has(s)) seen.add(s);
   };
-  for (const book of books) {
+  const targetBooks = ONLY_BOOK ? books.filter((b) => b.id === ONLY_BOOK) : books;
+  if (ONLY_BOOK && targetBooks.length === 0) {
+    console.error(`No book with id "${ONLY_BOOK}"`);
+    process.exit(1);
+  }
+  for (const book of targetBooks) {
     for (const d of DIFFICULTIES) {
       push(book.content?.[d]);
       if (book.chapters) for (const ch of book.chapters) push(ch.content?.[d]);
@@ -107,9 +116,9 @@ async function callBatch(sentences: string[]): Promise<{ count: number; rateLimi
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function main() {
-  console.log('Collecting texts…');
+  console.log('Collecting texts…' + (ONLY_BOOK ? ` (book=${ONLY_BOOK})` : ''));
   const blobs = collectAllTexts();
-  console.log(`  ${blobs.length} distinct text blobs across ${books.length} books`);
+  console.log(`  ${blobs.length} distinct text blobs`);
 
   const allSentences = new Set<string>();
   for (const blob of blobs) {

@@ -1,48 +1,64 @@
-Split **Urashima Tarō** and **Rashōmon** into synchronized narrative parts, following the `split-book-into-parts` skill (mirroring the `lemon` reference shape).
+# Mettre à jour le skill `add-book`
 
-## Urashima Tarō → 4 parts
+Deux ajouts au pipeline existant, dans le fichier `.workspace/skills/add-book/SKILL.md` (édition du draft via `.agents/skills/add-book/SKILL.md` puis `skills--apply_draft`).
 
-Boundaries follow the author's own 一/二/三/四 section breaks in the original (sizes 1567 / 1270 / 1105 / 1689 chars). Simplified and intermediate split at the matching narrative beats (both have 23 paragraphs, cleanly aligned).
+## Ajout 1 — Auto-split en parts (entre étapes 5 et 6)
 
-| # | Anchor | Narrative beat | Original ¶ | Intermediate ¶ | Simplified ¶ |
-|---|---|---|---|---|---|
-| 1 | **The Young Fisherman** | opens → through arriving at the palace gate | 一 | 1–7 | 1–7 |
-| 2 | **The Dragon Palace** | inside the palace, feasts, four-season windows | 二 | 8–10 | 8–10 |
-| 3 | **Homeward Bound** | homesickness, departure, receiving the box | 三 | 11–14 | 11–14 |
-| 4 | **The Empty Shore** | return to the village, the box | 四 | 15–23 | 15–23 |
+Nouvelle **étape 5.5 — Découpe en parts (conditionnelle)** :
 
-## Rashōmon → 6 parts
+- Mesurer `originalText.length`.
+- **Si ≥ 2500 chars** : appliquer intégralement la méthode du skill `split-book-into-parts` (sections "Splitting method" + Step 1 + Step 2) sur le livre qu'on vient d'ajouter :
+  - Cibler des segments de **1300–1700 chars** sur l'`original`, coupés sur ruptures narratives (`。！？」` + paragraphe).
+  - Générer des **anchors** Title Case, 2–5 mots, sans spoiler.
+  - Aligner `intermediate` et `simplified` sur les mêmes beats narratifs.
+  - Self-check : concat byte-identique, même nombre de parts par difficulté, chaque part finit sur `。！？」`.
+  - Réécrire `src/data/books/<id>.ts` avec `…SimplifiedParts`, `…IntermediateParts`, `…OriginalParts`, `…Anchors` + alias back-compat.
+  - Étendre l'entrée dans `src/data/books.ts` avec `parts` + `anchors`.
+  - **Confirmer les anchors avec l'utilisateur avant l'étape grammar** (coûte des appels API).
+- **Si < 2500 chars** : sauter, garder la forme actuelle à un seul blob.
 
-Original is 17 K chars over 36 paragraphs — split at narrative ruptures, mapped onto the simpler versions paragraph-by-paragraph.
+L'étape 7 (grammar) est inchangée côté code mais la note rappelle : si split appliqué, copier `generate-grammar-for-lemon.ts` (per-part) ; sinon copier `generate-grammar-for-sakura.ts` (single).
 
-| # | Anchor | Narrative beat | Original ¶ | Intermediate ¶ | Simplified ¶ |
-|---|---|---|---|---|---|
-| 1 | **Beneath the Gate** | evening, ruined Rashōmon, decay of Kyoto | 1–4 | 1–3 | 1–2 |
-| 2 | **Starve or Steal** | the servant's dismissal and dilemma | 5–7 | 4–6 | 3–4 |
-| 3 | **Firelight Above** | climbs the ladder, sees fire, sees the old woman | 8–12 | 7–9 | 5–6 |
-| 4 | **Drawn Blade** | fury, leaps out, demands an answer | 13–22 | 10–15 | 7–8 |
-| 5 | **The Old Woman's Tale** | her justification, the servant listens | 23–28 | 16–17 | 9–11 |
-| 6 | **Into the Night** | the servant acts, vanishes | 29–36 | 18–22 | 12–15 |
+## Ajout 2 — Préchargement des traductions de phrases
 
-Anchors are Title Case, 2–4 words, evocative, no spoilers (no "snaps", "dies", "robs", "opens", etc.).
+### 2a. Étendre `scripts/preload-translations.ts`
 
-## Execution steps
+Ajouter un flag `--book <id>` :
+- Sans flag : comportement actuel (tous les livres).
+- Avec flag : filtre `BOOKS` à `[book]` avant la boucle. Reste identique (idempotent, passe par `sentence_translations` + `translate-sentences-batch`).
 
-1. Rewrite `src/data/books/urashima.ts` and `src/data/books/rashomon.ts` with `…SimplifiedParts`, `…IntermediateParts`, `…OriginalParts`, `…Anchors`, plus back-compat `urashimaSimplified = urashimaSimplifiedParts.join('\n\n')` aliases. Separator is exactly `'\n\n'`. Concatenation of parts must be byte-identical to the current blob — self-checked in a tiny verification script before writing.
-2. Update `src/data/books.ts` for both books: add `parts: {...}` and `anchors: ...`, extend the import line. Leave `content` as-is.
-3. Create `scripts/generate-grammar-for-urashima.ts` and `scripts/generate-grammar-for-rashomon.ts` by copying the lemon variant and swapping the id (these already exist as single-blob versions — they'll be replaced with the per-part shape from `scripts/generate-grammar-for-lemon.ts`). Run them; verify `bookGrammar['urashima']['simplified'].length === 4` and `bookGrammar['rashomon']['simplified'].length === 6`.
-4. Re-run `npx tsx scripts/generate-tokens.ts` so tokens reflect the (unchanged-content) re-split files.
-5. Skip dictionary regen — no wording changes.
-6. Verify in the Reader: `/reader/urashima/.../part-N` and `/reader/rashomon/.../part-N` render the correct slice, prev/next pills work, BookDetail lists anchors with per-part progress, GrammarPanel shows only that part's notes.
+### 2b. Nouvelle étape 9 du skill — Préchargement traductions
 
-## Technical notes
+Après le sync dictionnaire, avant la vérification finale :
 
-- The Reader, BookDetail and GrammarPanel are already part-aware (`hasParts`, `parsePartId`, `getChapterContent`, `getGrammarForPart`) — no UI code changes needed.
-- Confirming the anchors **before** Step 3 because the grammar generator makes ≈ 4×3 + 6×3 = 30 edge-function calls.
-- Translation cache (`sentence_translations`) is hash-keyed on the sentence text only, so the already-preloaded translations remain valid (no re-translation needed).
+```bash
+npx tsx scripts/preload-translations.ts --book <id>
+```
 
-## Out of scope
+- Récupère toutes les phrases des 3 difficultés (parts incluses si splittées).
+- Hash SHA-256 → bulk lookup `sentence_translations` → batch edge function pour les manquantes.
+- Coût one-shot, ensuite instant pour l'utilisateur (toggle 🌐 dans le Reader).
 
-- No per-part audio, no rephrasing, no new dictionary words.
+## Numérotation finale du skill add-book
 
-**Please confirm the anchors** (especially Urashima #3 "Homeward Bound" and Rashōmon #5 "The Old Woman's Tale") — anything you'd like reworded before I burn the grammar API calls?
+1. Pick book id
+2. Generate missing difficulty versions
+3. AI-deduce metadata
+4. Create `src/data/books/<id>.ts`
+5. Register in `src/data/books.ts`
+6. **(NEW)** Split en parts si `original.length ≥ 2500` — applique le skill `split-book-into-parts`
+7. Run tokenizer
+8. Generate grammar (per-part si splitté, sinon single)
+9. Preload dictionary
+10. **(NEW)** Preload sentence translations — `npx tsx scripts/preload-translations.ts --book <id>`
+11. Verify
+
+## Hors scope
+
+- Pas de split rétroactif sur livres existants (déjà couvert par le skill séparé).
+- Pas de re-traduction si entrée déjà en cache (le script est idempotent).
+- Pas d'audio (toujours hors scope du skill).
+
+## Question ouverte
+
+Le seuil **2500 chars** te convient ? (En dessous, un split donnerait des parts trop courtes — Urashima fait 5631 chars → 4 parts ; un livre de 2000 chars donnerait 1-2 parts seulement, sans valeur ajoutée.)
