@@ -899,6 +899,32 @@ export default function Reader() {
                 )}
               </div>
             </section>
+
+            {isAdmin && (
+              <section>
+                <SectionLabel>Admin</SectionLabel>
+                <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm">
+                  <div className="flex items-center justify-between gap-3 px-4 py-4">
+                    <span className="flex flex-col">
+                      <span className="flex items-center gap-2 text-[15px] font-medium">
+                        <Wrench className="h-4 w-4 text-muted-foreground" />
+                        Token edit mode
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-0.5">Tap tokens to merge or split</span>
+                    </span>
+                    <Switch
+                      checked={tokenEditMode}
+                      onCheckedChange={(on) => {
+                        setTokenEditMode(on);
+                        setSelectedIdx([]);
+                        setMiniPopup(null);
+                        setSentenceTranslation(null);
+                      }}
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
           </div>
         );
 
