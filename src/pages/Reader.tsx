@@ -747,6 +747,11 @@ export default function Reader() {
             <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
               <BookType className="h-5 w-5" />
             </HeaderChip>
+            {(hasParts(book) || (book.chapters && book.chapters.length > 1)) && (
+              <HeaderChip onClick={() => setShowChapters(true)} title="Chapters">
+                <List className="h-5 w-5" />
+              </HeaderChip>
+            )}
             <HeaderChip
               onClick={() => setShowSettings(!showSettings)}
               active={showSettings}
@@ -754,20 +759,6 @@ export default function Reader() {
             >
               <Settings className="h-5 w-5" />
             </HeaderChip>
-            {isAdmin && (
-              <HeaderChip
-                onClick={() => {
-                  setTokenEditMode(!tokenEditMode);
-                  setSelectedIdx([]);
-                  setMiniPopup(null);
-                  setSentenceTranslation(null);
-                }}
-                active={tokenEditMode}
-                title={tokenEditMode ? 'Exit token edit mode' : 'Token edit mode'}
-              >
-                <Wrench className="h-5 w-5" />
-              </HeaderChip>
-            )}
           </div>
         </div>
         <div className="h-[2px] w-full bg-border/30">
