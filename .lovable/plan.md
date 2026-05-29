@@ -1,10 +1,35 @@
-## Changes to `src/components/GrammarPanel.tsx`
+## Goal
 
-1. **Wrap long titles instead of truncating**
-   - Remove `truncate` on the pattern `<span>` (line 139), replace with `break-words leading-snug` so long patterns wrap onto multiple lines and stay fully readable on mobile.
-   - Change the title row container to `items-start` and make the JLPT badge stay aligned top (`mt-0.5`) so the badge doesn't stretch when the title wraps.
+1. Add a quick chapter-jump UI in the Reader for parts (and reuse for multi-chapter books).
+2. Move the admin "token edit" wrench out of the header and into the Settings sheet as a toggle row.
 
-2. **Sort notes by JLPT ascending (N5 → N1)**
-   - Sort the `notes` array before rendering using order `["N5","N4","N3","N2","N1"]`. Done as a derived `const sortedNotes = [...notes].sort(...)` right before the `.map`, so we don't mutate state and it applies both to pre-baked data and edge-function fallbacks.
+## Changes (all in `src/pages/Reader.tsx`)
 
-No data regeneration, no edge-function changes, no other files touched.
+### 1. Chapters sheet
+
+- **Header chip** (only when `hasParts(book)` or `book.chapters?.length > 1`): new `HeaderChip` with `List` icon (lucide-react), placed just before the Settings chip. Opens a new bottom `Sheet` (`ChaptersSheet`).
+- **Sheet content** (`side="bottom"`, `rounded-t-3xl max-h-[80vh]`, scrollable):
+  - Title row: `"Chapters"` + small `"{currentIdx+1} / {total}"` muted counter.
+  - List items reusing the visual pattern from `BookDetail.tsx` (lines 160-230):
+    - Numbered circle → `CheckCircle2` when `pct >= 100`, plain number otherwise; primary tint when done, ring on current.
+    - Anchor title (parts) or `chapter.title` (chapters).
+    - `Progress` bar + `%` when `0 < pct < 100`.
+    - `ChevronRight` on the right.
+  - **Current item**: `ring-2 ring-primary bg-primary/5`, auto-scrolled into view on open.
+  - Tap → `navigate(\`/reader/${id}/${difficulty}/${targetId}\`)` and close sheet. Tapping the current item just closes.
+- **Data**: read `useReadingProgressStore((s) => s.progress)`; look up each entry by `chapterKey(bookId, partChapterId(i))` or `chapterKey(bookId, ch.id)`.
+- Keep existing top article anchor heading and bottom prev/next pills unchanged.
+
+### 2. Move admin edit toggle to Settings
+
+- Delete the wrench `HeaderChip` block (lines 756-769) from the header.
+- In the Settings sheet body (`settingsBody`), add a new `SettingsSection label="Admin"` rendered only when `isAdmin`:
+  - A row with label `"Token edit mode"` + helper text `"Tap tokens to merge or split"` + a `Switch` bound to `tokenEditMode` / `setTokenEditMode`.
+  - Toggling off also clears `selectedIdx`, closes `miniPopup` and `sentenceTranslation` (same side-effects the old chip had).
+- Remove unused `Wrench` import if it's no longer used elsewhere in the file.
+
+## Out of scope
+
+- BookDetail chapter list changes.
+- Persisting sheet state, swipe gestures, or transitioning between parts without leaving the reader.
+- Any backend or data file changes.
