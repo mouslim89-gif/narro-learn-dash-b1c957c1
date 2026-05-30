@@ -677,11 +677,6 @@ export default function Reader() {
     return () => document.documentElement.classList.remove('dark');
   }, [readerDarkMode]);
 
-  const timeRemaining = useMemo(() => {
-    if (!book || scrollPercent >= 100) return null;
-    const remaining = book.readingTimeMin * ((100 - scrollPercent) / 100);
-    return Math.max(1, Math.round(remaining));
-  }, [book, scrollPercent]);
 
   // Discoverability hint (once per user)
   useEffect(() => {
@@ -726,7 +721,6 @@ export default function Reader() {
             <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
             <p className="text-[10px] text-muted-foreground">
               {difficultyConfig[difficulty].label}
-              {timeRemaining && ` · ~${timeRemaining}m left`}
             </p>
           </div>
           <div className="flex items-center gap-1">
