@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { SavedWord, useFlashcardStore } from '@/stores/flashcards';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { ExampleSentence } from '@/components/ExampleSentence';
+import { FuriganaSentence } from '@/components/FuriganaSentence';
 import { Button } from '@/components/ui/button';
 import { SrsButtons, type SrsQualityLabel } from '@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
