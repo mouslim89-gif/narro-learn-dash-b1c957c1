@@ -242,19 +242,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
                         From your reading
                       </p>
                     </div>
-                    <p className="font-japanese text-[15px] leading-snug text-foreground/90 border-l-[3px] border-primary/40 pl-3">
-                      {(() => {
-                        const idx = card.contextSentence!.indexOf(card.word);
-                        if (idx === -1) return card.contextSentence;
-                        return (
-                          <>
-                            {card.contextSentence!.slice(0, idx)}
-                            <span className="text-primary font-semibold underline decoration-dotted underline-offset-4">{card.word}</span>
-                            {card.contextSentence!.slice(idx + card.word.length)}
-                          </>
-                        );
-                      })()}
-                    </p>
+                    <FuriganaSentence
+                      tokens={card.contextTokens}
+                      fallbackText={card.contextSentence}
+                      highlight={card.word}
+                      className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
+                    />
+
                   </section>
                 )}
 
