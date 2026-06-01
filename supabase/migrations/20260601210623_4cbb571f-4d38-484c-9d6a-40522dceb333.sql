@@ -1,0 +1,1 @@
+ALTER TABLE public.flashcards ADD COLUMN IF NOT EXISTS context_tokens jsonb;

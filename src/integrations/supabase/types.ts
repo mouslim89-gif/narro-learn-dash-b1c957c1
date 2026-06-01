@@ -134,6 +134,7 @@ export type Database = {
       flashcards: {
         Row: {
           context_sentence: string | null
+          context_tokens: Json | null
           created_at: string
           id: string
           jlpt: Json | null
@@ -149,6 +150,7 @@ export type Database = {
         }
         Insert: {
           context_sentence?: string | null
+          context_tokens?: Json | null
           created_at?: string
           id: string
           jlpt?: Json | null
@@ -164,6 +166,7 @@ export type Database = {
         }
         Update: {
           context_sentence?: string | null
+          context_tokens?: Json | null
           created_at?: string
           id?: string
           jlpt?: Json | null
