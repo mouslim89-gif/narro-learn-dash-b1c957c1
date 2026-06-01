@@ -250,6 +250,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
       contextSentence,
+      contextTokens,
       mastery: 0,
     };
     addWord(entry);
