@@ -26,6 +26,8 @@ interface WordPopupProps {
   pos?: string;
   /** Sentence from the story where the word was encountered */
   contextSentence?: string;
+  /** Tokens of the context sentence (surface + reading) for furigana rendering. */
+  contextTokens?: { t: string; r?: string }[];
   onClose: () => void;
 }
 
@@ -158,7 +160,7 @@ function LoadingSkeleton() {
   );
 }
 
-export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, onClose }: WordPopupProps) {
+export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens, onClose }: WordPopupProps) {
   const { addWord, hasWord, removeWord } = useFlashcardStore();
   const navigate = useNavigate();
 
@@ -248,6 +250,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
       contextSentence,
+      contextTokens,
       mastery: 0,
     };
     addWord(entry);

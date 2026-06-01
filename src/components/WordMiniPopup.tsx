@@ -11,6 +11,7 @@ interface WordMiniPopupProps {
   reading?: string;
   pos?: string;
   contextSentence?: string;
+  contextTokens?: { t: string; r?: string }[];
   sentenceRect: { top: number; bottom: number; left: number; right: number };
   onClose: () => void;
   onShowMore: () => void;
@@ -23,6 +24,7 @@ export function WordMiniPopup({
   reading: overrideReading,
   pos,
   contextSentence,
+  contextTokens,
   sentenceRect,
   onClose,
   onShowMore,
@@ -156,6 +158,7 @@ export function WordMiniPopup({
       jlpt: result.jlpt,
       partsOfSpeech: result.senses[0]?.parts_of_speech,
       contextSentence,
+      contextTokens,
       mastery: 0,
     };
     addWord(entry);

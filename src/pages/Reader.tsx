@@ -206,10 +206,10 @@ export default function Reader() {
   const [showSettings, setShowSettings] = useState(false);
   const [showChapters, setShowChapters] = useState(false);
   const progressMap = useReadingProgressStore((s) => s.progress);
-  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
+  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
   const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
   const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
-  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string } | null>(null);
+  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(null);
 
   const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -1218,6 +1218,7 @@ export default function Reader() {
                               reading: token.r,
                               pos: token.p,
                               contextSentence: sentenceText,
+                              contextTokens: sentence.tokens.map(t => ({ t: t.t, r: t.r })),
                               sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
                               sentenceIdx: globalIdx,
                               tokenIdx: i,
@@ -1329,12 +1330,13 @@ export default function Reader() {
           reading={miniPopup.reading}
           pos={miniPopup.pos}
           contextSentence={miniPopup.contextSentence}
+          contextTokens={miniPopup.contextTokens}
           sentenceRect={miniPopup.sentenceRect}
           onClose={() => setMiniPopup(null)}
           onShowMore={() => {
-            const { text, baseForm, reading, pos, contextSentence } = miniPopup;
+            const { text, baseForm, reading, pos, contextSentence, contextTokens } = miniPopup;
             setMiniPopup(null);
-            setFullPopupWord({ text, baseForm, reading, pos, contextSentence });
+            setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
           }}
           onTranslateSentence={() => {
             const idx = miniPopup.sentenceIdx;
@@ -1359,6 +1361,7 @@ export default function Reader() {
           reading={fullPopupWord.reading}
           pos={fullPopupWord.pos}
           contextSentence={fullPopupWord.contextSentence}
+          contextTokens={fullPopupWord.contextTokens}
           onClose={() => setFullPopupWord(null)}
         />
       )}
