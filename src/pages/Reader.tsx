@@ -1218,6 +1218,7 @@ export default function Reader() {
                               reading: token.r,
                               pos: token.p,
                               contextSentence: sentenceText,
+                              contextTokens: sentence.tokens.map(t => ({ t: t.t, r: t.r })),
                               sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
                               sentenceIdx: globalIdx,
                               tokenIdx: i,
