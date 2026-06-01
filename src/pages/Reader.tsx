@@ -1330,12 +1330,13 @@ export default function Reader() {
           reading={miniPopup.reading}
           pos={miniPopup.pos}
           contextSentence={miniPopup.contextSentence}
+          contextTokens={miniPopup.contextTokens}
           sentenceRect={miniPopup.sentenceRect}
           onClose={() => setMiniPopup(null)}
           onShowMore={() => {
-            const { text, baseForm, reading, pos, contextSentence } = miniPopup;
+            const { text, baseForm, reading, pos, contextSentence, contextTokens } = miniPopup;
             setMiniPopup(null);
-            setFullPopupWord({ text, baseForm, reading, pos, contextSentence });
+            setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
           }}
           onTranslateSentence={() => {
             const idx = miniPopup.sentenceIdx;
@@ -1360,6 +1361,7 @@ export default function Reader() {
           reading={fullPopupWord.reading}
           pos={fullPopupWord.pos}
           contextSentence={fullPopupWord.contextSentence}
+          contextTokens={fullPopupWord.contextTokens}
           onClose={() => setFullPopupWord(null)}
         />
       )}
