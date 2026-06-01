@@ -338,9 +338,12 @@ export default function Reader() {
     const partsArr = book.parts[difficulty];
     if (!partsArr || !partsArr[partIdx]) return tokensFull;
     const sep = '\n\n';
+    // Use stripped lengths so offsets align with the cleaned token stream
+    // (cleanRubyTokens removes parenthesized ruby annotations from tokens,
+    // so raw `part.length` would overshoot into the next part).
     let start = 0;
-    for (let i = 0; i < partIdx; i++) start += partsArr[i].length + sep.length;
-    const end = start + partsArr[partIdx].length;
+    for (let i = 0; i < partIdx; i++) start += stripParens(partsArr[i]).length + sep.length;
+    const end = start + stripParens(partsArr[partIdx]).length;
     const out: BookToken[] = [];
     let pos = 0;
     for (const t of tokensFull) {
