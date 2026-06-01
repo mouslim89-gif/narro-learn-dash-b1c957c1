@@ -27,6 +27,7 @@ export async function pushFlashcard(userId: string, word: SavedWord): Promise<vo
       jlpt: word.jlpt ?? [],
       parts_of_speech: word.partsOfSpeech ?? [],
       context_sentence: word.contextSentence ?? null,
+      context_tokens: word.contextTokens ?? null,
       mastery: word.mastery ?? 0,
       last_reviewed_at: word.lastReviewedAt ?? null,
       next_review_at: word.nextReviewAt ?? null,
