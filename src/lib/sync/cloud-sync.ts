@@ -67,6 +67,7 @@ function rowToSavedWord(row: any): SavedWord {
     jlpt: Array.isArray(row.jlpt) ? row.jlpt : [],
     partsOfSpeech: Array.isArray(row.parts_of_speech) ? row.parts_of_speech : [],
     contextSentence: row.context_sentence ?? undefined,
+    contextTokens: Array.isArray(row.context_tokens) ? row.context_tokens : undefined,
     mastery: row.mastery ?? 0,
     lastReviewedAt: row.last_reviewed_at ?? undefined,
     nextReviewAt: row.next_review_at ?? undefined,
