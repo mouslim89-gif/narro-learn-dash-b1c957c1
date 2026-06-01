@@ -223,7 +223,7 @@ export function getFuriganaSegments(text: string, cache = getCached(text)) {
  * Build furigana segments from a pre-computed Kuromoji reading.
  * Pairs each kanji run in `text` with the corresponding slice of `reading`.
  */
-function segmentsFromReading(text: string, reading: string): FuriganaSegment[] | null {
+export function segmentsFromReading(text: string, reading: string): FuriganaSegment[] | null {
   if (!hasKanji(text)) return null;
 
   const chars = [...text];
