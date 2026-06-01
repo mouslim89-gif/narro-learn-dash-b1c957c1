@@ -160,7 +160,7 @@ function LoadingSkeleton() {
   );
 }
 
-export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, onClose }: WordPopupProps) {
+export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens, onClose }: WordPopupProps) {
   const { addWord, hasWord, removeWord } = useFlashcardStore();
   const navigate = useNavigate();
 
