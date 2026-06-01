@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from "@/stores/reading-progress";
 import { useFlashcardStore } from "@/stores/flashcards";
+import ScrollToTop from "@/components/ScrollToTop";
 import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
