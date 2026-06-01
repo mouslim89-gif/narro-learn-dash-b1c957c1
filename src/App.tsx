@@ -56,7 +56,6 @@ function AnimatedRoutes() {
 
   return (
     <>
-    <>
       <ScrollToTop />
       <AnimatePresence mode="sync">
         <motion.div
