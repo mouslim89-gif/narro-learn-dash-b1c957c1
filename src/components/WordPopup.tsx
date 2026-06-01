@@ -26,6 +26,8 @@ interface WordPopupProps {
   pos?: string;
   /** Sentence from the story where the word was encountered */
   contextSentence?: string;
+  /** Tokens of the context sentence (surface + reading) for furigana rendering. */
+  contextTokens?: { t: string; r?: string }[];
   onClose: () => void;
 }
 
