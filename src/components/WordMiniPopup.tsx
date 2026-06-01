@@ -11,6 +11,7 @@ interface WordMiniPopupProps {
   reading?: string;
   pos?: string;
   contextSentence?: string;
+  contextTokens?: { t: string; r?: string }[];
   sentenceRect: { top: number; bottom: number; left: number; right: number };
   onClose: () => void;
   onShowMore: () => void;
