@@ -24,6 +24,7 @@ export function WordMiniPopup({
   reading: overrideReading,
   pos,
   contextSentence,
+  contextTokens,
   sentenceRect,
   onClose,
   onShowMore,
