@@ -11,6 +11,8 @@ export interface SavedWord {
   jlpt?: string[];
   partsOfSpeech?: string[];
   contextSentence?: string;
+  /** Tokens of the context sentence (surface + reading) for furigana rendering. */
+  contextTokens?: { t: string; r?: string }[];
   mastery: number;
   lastReviewedAt?: string;
   nextReviewAt?: string;
