@@ -35,6 +35,7 @@ import { TokenEditFloatingBar } from '@/components/TokenEditFloatingBar';
 import { tokensToRule } from '@/lib/token-edit-rules';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
 
 
@@ -720,12 +721,41 @@ export default function Reader() {
           <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
             <ArrowLeft className="h-5 w-5" />
           </HeaderChip>
-          <div className="min-w-0 flex-1 text-center">
-            <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
-            <p className="text-[10px] text-muted-foreground">
-              {difficultyConfig[difficulty].label}
-            </p>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="min-w-0 flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 hover:bg-foreground/5 active:bg-foreground/10 smooth-colors"
+                aria-label="Change reading level"
+              >
+                <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {difficultyConfig[difficulty].label}
+                </p>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="center" sideOffset={8} className="w-auto p-2 rounded-2xl">
+              <div className="flex flex-col gap-1.5">
+                <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
+                <div className="flex gap-1 rounded-full bg-muted p-1">
+                  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setDifficulty(d)}
+                      className={cn(
+                        'h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
+                        d === difficulty
+                          ? 'bg-card text-foreground shadow-sm ring-1 ring-border/40'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      {difficultyConfig[d].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           <div className="flex items-center gap-1">
             <HeaderChip
               onClick={() => setShowFurigana(!showFurigana)}
@@ -983,7 +1013,7 @@ export default function Reader() {
 
             return (
               <>
-                <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40 space-y-3">
+                <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
                   <div className="flex items-baseline justify-between gap-3">
                     <h2 className="wordmark font-serif text-[22px] leading-none">Chapters</h2>
                     {entries.length > 0 && (
@@ -991,22 +1021,6 @@ export default function Reader() {
                         {Math.max(currentIdx, 0) + 1} / {entries.length}
                       </span>
                     )}
-                  </div>
-                  <div className="flex gap-1 rounded-full bg-muted p-1">
-                    {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
-                      <button
-                        key={d}
-                        onClick={() => setDifficulty(d)}
-                        className={cn(
-                          'h-7 flex-1 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
-                          d === difficulty
-                            ? 'bg-card text-foreground shadow-sm ring-1 ring-border/40'
-                            : 'text-muted-foreground hover:text-foreground',
-                        )}
-                      >
-                        {difficultyConfig[d].label}
-                      </button>
-                    ))}
                   </div>
                 </div>
                 <ul className="space-y-2 px-4 py-4">
