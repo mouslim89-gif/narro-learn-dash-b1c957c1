@@ -1013,7 +1013,7 @@ export default function Reader() {
 
             return (
               <>
-                <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40 space-y-3">
+                <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
                   <div className="flex items-baseline justify-between gap-3">
                     <h2 className="wordmark font-serif text-[22px] leading-none">Chapters</h2>
                     {entries.length > 0 && (
@@ -1021,22 +1021,6 @@ export default function Reader() {
                         {Math.max(currentIdx, 0) + 1} / {entries.length}
                       </span>
                     )}
-                  </div>
-                  <div className="flex gap-1 rounded-full bg-muted p-1">
-                    {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
-                      <button
-                        key={d}
-                        onClick={() => setDifficulty(d)}
-                        className={cn(
-                          'h-7 flex-1 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
-                          d === difficulty
-                            ? 'bg-card text-foreground shadow-sm ring-1 ring-border/40'
-                            : 'text-muted-foreground hover:text-foreground',
-                        )}
-                      >
-                        {difficultyConfig[d].label}
-                      </button>
-                    ))}
                   </div>
                 </div>
                 <ul className="space-y-2 px-4 py-4">
