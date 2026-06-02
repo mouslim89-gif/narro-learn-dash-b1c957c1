@@ -84,6 +84,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await requireUser(req, corsHeaders);
+  if ("error" in auth) return auth.error;
+
   try {
     const json = await req.json();
     const parsed = BodySchema.safeParse(json);
