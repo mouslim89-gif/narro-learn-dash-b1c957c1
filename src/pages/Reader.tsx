@@ -231,6 +231,14 @@ export default function Reader() {
   // While restoring scroll, briefly ignore handleScroll writes so we don't
   // overwrite the saved progress with 0%.
   const suppressSaveUntilRef = useRef<number>(0);
+  // Skip entrance animation when we're about to scroll-restore (would feel laggy).
+  // Captured at mount/chapter change.
+  const skipEntrance = useMemo(
+    () => !!saved && ((saved.sentenceIdx ?? null) !== null || (saved.progressPercent ?? 0) > 5),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id, chapterId]
+  );
+
 
   // --- Audio sync state ---
   const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
