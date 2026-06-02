@@ -226,6 +226,11 @@ export default function Reader() {
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
   const articleRef = useRef<HTMLDivElement>(null);
   const restoredScroll = useRef(false);
+  // Top-most visible sentence index (updated by IntersectionObserver).
+  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
+  // While restoring scroll, briefly ignore handleScroll writes so we don't
+  // overwrite the saved progress with 0%.
+  const suppressSaveUntilRef = useRef<number>(0);
 
   // --- Audio sync state ---
   const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
