@@ -128,7 +128,7 @@ export default function Flashcards() {
       {savedWords.length > 0 && (
         <>
           {/* Hero review CTA */}
-          <section className="px-6 pt-5">
+          <section className="animate-fade-in-up px-6 pt-5" style={{ animationDelay: '0.05s' }}>
             {dueCount > 0 ? (
               <div
                 className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40 card-lift"
