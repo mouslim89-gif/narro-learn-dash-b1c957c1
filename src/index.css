@@ -527,7 +527,7 @@
   display: inline-block;
   opacity: 0;
   will-change: transform, opacity, filter;
-  animation: title-char-in 0.8s var(--ease-out-soft) both;
+  animation: title-char-in 0.55s var(--ease-out-soft) both;
 }
 
 
