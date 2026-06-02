@@ -124,7 +124,7 @@ export default function BookDetail() {
               {book.titleJp}
             </p>
           </div>
-          <AnimatedTitle key={book.id} text={book.titleEn} className="mt-6 font-serif text-3xl font-bold leading-tight" />
+          <h1 className="mt-6 font-serif text-3xl font-bold leading-tight">{book.titleEn}</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">{book.author}</p>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[12px] text-muted-foreground">
