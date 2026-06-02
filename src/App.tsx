@@ -57,7 +57,7 @@ function AnimatedRoutes() {
   return (
     <>
       <div className="relative">
-        <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
+        <AnimatePresence mode={isAuthRoute ? "popLayout" : "wait"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
           <motion.div
             key={location.pathname}
             variants={pageVariants}
