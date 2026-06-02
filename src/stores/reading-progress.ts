@@ -140,17 +140,32 @@ function schedulePrefsPush(userId: string, prefs: UserPreferences) {
   }, 1500);
 }
 
-// Debounce per (book, chapter)
-const pushTimers = new Map<string, number>();
+// Debounce per (book, chapter). We store the latest progress alongside the
+// timer so flushPendingProgressPushes can fire it immediately on page hide.
+const pushTimers = new Map<string, { timer: number; userId: string; bookId: string; progress: ReadingProgress }>();
+
+function flushKey(key: string) {
+  const entry = pushTimers.get(key);
+  if (!entry) return;
+  clearTimeout(entry.timer);
+  pushTimers.delete(key);
+  pushProgress(entry.userId, entry.bookId, entry.progress).catch(() => {});
+}
+
 function schedulePush(userId: string, bookId: string, progress: ReadingProgress) {
   const key = chapterKey(bookId, progress.chapterId);
   const existing = pushTimers.get(key);
-  if (existing) clearTimeout(existing);
-  const t = window.setTimeout(() => {
-    pushProgress(userId, bookId, progress).catch(() => {});
+  if (existing) clearTimeout(existing.timer);
+  const timer = window.setTimeout(() => {
+    const entry = pushTimers.get(key);
     pushTimers.delete(key);
+    if (entry) pushProgress(entry.userId, entry.bookId, entry.progress).catch(() => {});
   }, 1500);
-  pushTimers.set(key, t);
+  pushTimers.set(key, { timer, userId, bookId, progress });
+}
+
+export function flushAllProgressPushes() {
+  for (const key of Array.from(pushTimers.keys())) flushKey(key);
 }
 
 export const useReadingProgressStore = create<ReadingProgressState>()(
