@@ -192,6 +192,11 @@ export default function DictionaryPage() {
                     </p>
                   ))}
                 </div>
+
+                <ChevronRight
+                  aria-hidden
+                  className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+                />
               </div>
 
               <ExampleSentence word={word} />
