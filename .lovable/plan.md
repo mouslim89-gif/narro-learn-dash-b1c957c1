@@ -1,33 +1,32 @@
-## Problem
+# Consistent Page Entrance Animations
 
-Pendant un changement d'onglet du menu, on voit brièvement le haut de la nouvelle page apparaître en bas de l'écran, le reste en blanc.
+Apply the existing `.animate-fade-in-up` and `.stagger-children` CSS utilities across all main pages for a uniform Apple-like subtle fade-up effect. Zero JS, zero new dependencies.
 
-## Cause
+## Scope
 
-Dans `src/App.tsx`, `AnimatePresence` est en `mode="sync"` : l'ancienne et la nouvelle page sont montées en même temps, **l'une après l'autre dans le flux normal**. Résultat :
+Pages: Library, MyBooks, Flashcards, Dictionary, WordDetail, BookDetail, Settings.
+Excluded: Reader (no entrance anim during reading), Auth/ResetPassword (already minimal).
 
-- la page sortante occupe la hauteur du viewport en haut,
-- la page entrante est poussée juste en dessous,
-- on voit donc son haut "à mi-écran" pendant le fade.
+## Pattern
 
-En plus, `ScrollToTop` utilise `useEffect` + `window.scrollTo`, qui s'exécute après le paint, ce qui aggrave le flash quand on quitte une page scrollée.
+For each page:
+1. **Header block** (title, subtitle, search) → wrap in `<div className="animate-fade-in-up">` or rely on parent stagger.
+2. **Main content sections** (lists, grids, cards) → parent gets `stagger-children` so children fade-up sequentially (40-50ms apart, already defined in `index.css`).
+3. Keep existing `stagger-children` already in place on Library shelves — verify they still feel coherent with newly animated headers.
 
-## Fix
+## Per-page changes
 
-1. **`src/App.tsx`** — empiler les pages au lieu de les juxtaposer :
-   - Wrapper l'`AnimatePresence` dans un conteneur `relative`.
-   - Donner au `motion.div` la classe `absolute inset-x-0 top-0 w-full` pour que les deux pages se superposent pendant la transition (au lieu de s'enchaîner verticalement).
-   - Garder `mode="sync"` (transitions plus fluides) — ou basculer en `mode="wait"` si on préfère; je propose de garder `sync` puisque l'empilement absolu suffit.
+- **Library.tsx** — Add `animate-fade-in-up` to the `<header>`. Confirm existing `stagger-children` on shelf rows.
+- **MyBooks.tsx** — `animate-fade-in-up` on header; `stagger-children` on shelf list / empty state.
+- **Flashcards.tsx** — `animate-fade-in-up` on header + stats; `stagger-children` on the action cards / deck list.
+- **Dictionary.tsx** — `animate-fade-in-up` on header + search; `stagger-children` on results list container.
+- **WordDetail.tsx** — `animate-fade-in-up` on back/header; `stagger-children` on the vertical stack of sections (definitions, kanji, examples, grammar).
+- **BookDetail.tsx** — `animate-fade-in-up` on hero/cover block; `stagger-children` on chapters list and CTA section.
+- **Settings.tsx** — `animate-fade-in-up` on header; `stagger-children` on the grouped settings cards.
 
-2. **`src/components/ScrollToTop.tsx`** — remettre le scroll à 0 **avant le paint** :
-   - Remplacer `useEffect` par `useLayoutEffect` et utiliser `window.scrollTo(0, 0)` (sans `behavior: 'smooth'`), pour qu'au moment où la nouvelle page s'affiche, le scroll soit déjà en haut.
+## Notes
 
-## Fichiers touchés
-
-- `src/App.tsx` (structure du wrapper d'animation)
-- `src/components/ScrollToTop.tsx` (timing du scroll)
-
-## Hors scope
-
-- Pas de changement des transitions du Reader, de la BottomNav ou des autres pages.
-- Pas de modification des animations existantes (durée, easing).
+- Uses only existing utilities from `src/index.css` (lines 489-511). No new keyframes.
+- Animations are `both` fill-mode, so initial state is hidden — no flash.
+- Works cleanly with the existing Framer Motion page-level fade in `App.tsx` (opacity-only, no transform conflict).
+- No changes to Reader, BottomNav, or shared components.
