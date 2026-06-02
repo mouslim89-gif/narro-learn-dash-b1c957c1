@@ -56,7 +56,7 @@ export default function Library() {
       <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
 
       {/* Search */}
-      <div className="px-6 pt-1 pb-3">
+      <div className="animate-fade-in-up px-6 pt-1 pb-3" style={{ animationDelay: '0.05s' }}>
         <div className="relative">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
