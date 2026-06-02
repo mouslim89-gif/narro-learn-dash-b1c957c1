@@ -1,3 +1,14 @@
+import { supabase } from "@/integrations/supabase/client";
+
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  return {
+    'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    'Authorization': `Bearer ${token}`,
+  };
+}
+
 export interface JishoResult {
   slug: string;
   is_common: boolean;
