@@ -510,25 +510,8 @@
 .stagger-children > *:nth-child(8) { animation-delay: 0.37s; }
 .stagger-children > *:nth-child(n+9) { animation-delay: 0.4s; }
 
-/* Reader paragraph entrance — subtle, quick, staggered */
-@keyframes reader-paragraph-in {
-  0% { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-.reader-stagger > * {
-  animation: reader-paragraph-in 0.28s var(--ease-out-soft) both;
-}
-.reader-stagger > *:nth-child(1) { animation-delay: 0.00s; }
-.reader-stagger > *:nth-child(2) { animation-delay: 0.03s; }
-.reader-stagger > *:nth-child(3) { animation-delay: 0.06s; }
-.reader-stagger > *:nth-child(4) { animation-delay: 0.09s; }
-.reader-stagger > *:nth-child(5) { animation-delay: 0.12s; }
-.reader-stagger > *:nth-child(6) { animation-delay: 0.15s; }
-.reader-stagger > *:nth-child(7) { animation-delay: 0.18s; }
-.reader-stagger > *:nth-child(8) { animation-delay: 0.21s; }
-.reader-stagger > *:nth-child(9) { animation-delay: 0.24s; }
-.reader-stagger > *:nth-child(n+10) { animation-delay: 0.27s; }
-.no-anim, .no-anim > * { animation: none !important; }
+/* Reader paragraph stagger uses the shared .stagger-children utility */
+
 
 
 /* Smooth color/opacity transitions — apply to icons, labels */
