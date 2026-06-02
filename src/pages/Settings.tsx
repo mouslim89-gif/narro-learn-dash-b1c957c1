@@ -54,7 +54,7 @@ export default function Settings() {
     if (!user) return;
     setDeleting(true);
     try {
-      const { error } = await supabase.from('profiles').delete().eq('id', user.id);
+      const { error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
       await signOut();
       toast.success('Account deleted');

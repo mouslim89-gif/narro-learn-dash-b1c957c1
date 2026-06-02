@@ -231,10 +231,7 @@ serve(async (req) => {
       const errText = await sttRes.text();
       console.error("[generate-audio-sync] Scribe error", sttRes.status, errText);
       return new Response(
-        JSON.stringify({
-          error: `Transcription failed (${sttRes.status})`,
-          details: errText.slice(0, 500),
-        }),
+        JSON.stringify({ error: "Transcription failed" }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
