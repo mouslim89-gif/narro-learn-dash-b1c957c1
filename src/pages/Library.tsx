@@ -94,7 +94,7 @@ export default function Library() {
         <>
           {/* Continue Reading */}
           {continueBooks.length > 0 && (
-            <section className="py-5">
+            <section className="animate-fade-in-up py-5" style={{ animationDelay: '0.1s' }}>
               <div className="px-6 flex items-baseline justify-between">
                 <h3 className="font-serif text-lg font-semibold text-foreground">
                   Continue Reading
