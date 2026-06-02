@@ -1407,7 +1407,8 @@ export default function Reader() {
       </article>
 
       {hasParts(book) && partIdx !== null && book.anchors && (
-        <nav className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 sm:mx-auto sm:max-w-2xl">
+        <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">
+
           {partIdx > 0 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
