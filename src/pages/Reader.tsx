@@ -231,13 +231,6 @@ export default function Reader() {
   // While restoring scroll, briefly ignore handleScroll writes so we don't
   // overwrite the saved progress with 0%.
   const suppressSaveUntilRef = useRef<number>(0);
-  // Skip entrance animation when we're about to scroll-restore (would feel laggy).
-  // Captured at mount/chapter change.
-  const skipEntrance = useMemo(
-    () => !!saved && ((saved.sentenceIdx ?? null) !== null || (saved.progressPercent ?? 0) > 5),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [id, chapterId]
-  );
 
 
   // --- Audio sync state ---
@@ -1203,7 +1196,7 @@ export default function Reader() {
           const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
           if (!chapter || chapterIndex < 0) return null;
           return (
-            <div key={`ch-head-${id}-${chapterId}`} className={cn('px-6 pt-6 pb-2 text-center', !skipEntrance && 'animate-fade-in-soft')}>
+            <div key={`ch-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-up">
 
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Chapter {chapterIndex + 1}
@@ -1215,7 +1208,7 @@ export default function Reader() {
         })()}
 
         {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
-          <div key={`pt-head-${id}-${chapterId}`} className={cn('px-6 pt-6 pb-2 text-center', !skipEntrance && 'animate-fade-in-soft')}>
+          <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-up">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Chapter {partIdx + 1}
             </p>
@@ -1233,7 +1226,7 @@ export default function Reader() {
             japaneseFontClassMap[japaneseFont],
             'text-foreground/90 reader-text',
             fontSizeMap[fontSize],
-            !skipEntrance && 'reader-stagger'
+            'stagger-children'
           )}
           style={{
             lineHeight: showFurigana ? 2.6 : 2,

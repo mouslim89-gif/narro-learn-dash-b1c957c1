@@ -32,8 +32,16 @@ const pageVariants = {
   exit: { opacity: 0 },
 };
 
+const readerVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 6 },
+};
+
 // Apple-like spring easing (matches --ease-out-soft in index.css)
 const pageTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
+const readerTransition = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const };
+
 
 function DarkModeSync() {
   const darkMode = useReadingProgressStore((s) => s.darkMode);
@@ -53,6 +61,7 @@ function AnimatedRoutes() {
   const isReviewing = useFlashcardStore(s => s.isReviewing);
   const isAuthRoute = location.pathname === '/auth' || location.pathname === '/reset-password';
   const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
+  const isReader = location.pathname.startsWith('/reader/');
 
   return (
     <>
@@ -61,11 +70,11 @@ function AnimatedRoutes() {
         <AnimatePresence mode="sync">
           <motion.div
             key={location.pathname}
-            variants={pageVariants}
+            variants={isReader ? readerVariants : pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={pageTransition}
+            transition={isReader ? readerTransition : pageTransition}
             className="absolute inset-x-0 top-0 w-full"
           >
             <Routes location={location}>
