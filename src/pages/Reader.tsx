@@ -1406,7 +1406,7 @@ export default function Reader() {
           {partIdx > 0 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
-              className="tap-scale group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm transition-colors hover:bg-muted/40"
+              className="tap-scale smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm hover:bg-muted/40"
             >
               <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
               Chapter {partIdx}
