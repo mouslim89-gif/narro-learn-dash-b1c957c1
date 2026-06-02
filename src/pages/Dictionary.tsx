@@ -3,7 +3,7 @@ import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
-import { Search, Star, Loader2, X, Settings } from 'lucide-react';
+import { Search, Star, Loader2, X, Settings, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { toRomaji } from 'wanakana';
@@ -145,7 +145,7 @@ export default function DictionaryPage() {
                     navigate(`/dictionary/${encodeURIComponent(word)}`);
                   }
                 }}
-                className="cursor-pointer -m-1 p-1 rounded-lg"
+                className="group cursor-pointer -m-1 p-1 pr-6 rounded-lg relative"
               >
                 {/* Word + reading inline */}
                 <div className="flex items-center gap-1.5 pr-12">
@@ -192,6 +192,11 @@ export default function DictionaryPage() {
                     </p>
                   ))}
                 </div>
+
+                <ChevronRight
+                  aria-hidden
+                  className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+                />
               </div>
 
               <ExampleSentence word={word} />
