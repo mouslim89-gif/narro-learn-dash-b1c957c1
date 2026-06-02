@@ -1226,7 +1226,7 @@ export default function Reader() {
             japaneseFontClassMap[japaneseFont],
             'text-foreground/90 reader-text',
             fontSizeMap[fontSize],
-            !skipEntrance && 'reader-stagger'
+            'stagger-children'
           )}
           style={{
             lineHeight: showFurigana ? 2.6 : 2,
