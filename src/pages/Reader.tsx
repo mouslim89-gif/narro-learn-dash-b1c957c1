@@ -490,10 +490,6 @@ export default function Reader() {
   }, [sentences, showTranslations]);
 
 
-  useEffect(() => {
-    restoredScroll.current = false;
-    if (id) hydrateDictionaryForBook(id, chapterId);
-  }, [id, chapterId, difficulty]);
 
   // Restore scroll position when the chapter loads. Prefer the saved sentence
   // index (exact restore independent of font/layout); fall back to the % of
