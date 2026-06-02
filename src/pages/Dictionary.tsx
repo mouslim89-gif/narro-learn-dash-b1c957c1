@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 export default function DictionaryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const initial = searchParams.get('q') || '';
+  const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ?? '';
   const [query, setQuery] = useState(initial);
   const { addWord, removeWord, hasWord } = useFlashcardStore();
   const [jishoResults, setJishoResults] = useState<JishoResult[]>([]);
