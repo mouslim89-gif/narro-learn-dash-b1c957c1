@@ -1,10 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const MAX_ITEMS = 20;
+const MAX_FIELD = 500;
 
 interface InItem {
   idx: number;
@@ -17,6 +21,9 @@ interface InItem {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const auth = await requireUser(req, corsHeaders);
+  if ("error" in auth) return auth.error;
+
   try {
     const { items } = (await req.json()) as { items: InItem[] };
     if (!Array.isArray(items) || items.length === 0) {
@@ -24,6 +31,23 @@ serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+    if (items.length > MAX_ITEMS) {
+      return new Response(JSON.stringify({ error: `max ${MAX_ITEMS} items` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    for (const it of items) {
+      for (const f of ["pattern", "example", "meaning", "tip"] as const) {
+        const v = (it as any)?.[f];
+        if (typeof v !== "string" || v.length > MAX_FIELD) {
+          return new Response(JSON.stringify({ error: `invalid item field ${f}` }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
