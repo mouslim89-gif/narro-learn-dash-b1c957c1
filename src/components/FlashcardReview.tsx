@@ -90,7 +90,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
         <button
           onClick={onExit}
           aria-label="Exit review"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm smooth-colors tap-scale-sm hover:bg-muted hover:text-foreground"
         >
           <X className="h-[18px] w-[18px]" />
         </button>
