@@ -167,7 +167,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
             key={opt}
             onClick={() => onChange(opt)}
             className={cn(
-              'rounded-xl border p-2.5 text-center text-[12px] font-semibold transition-all active:scale-[0.97]',
+              'rounded-xl border p-2.5 text-center text-[12px] font-semibold smooth-colors tap-scale',
               selected
                 ? 'ring-2 ring-primary/40 border-transparent shadow-sm text-foreground'
                 : 'border-border/40 bg-background text-muted-foreground hover:border-border',
