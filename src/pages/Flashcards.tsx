@@ -128,7 +128,7 @@ export default function Flashcards() {
       {savedWords.length > 0 && (
         <>
           {/* Hero review CTA */}
-          <section className="px-6 pt-5">
+          <section className="animate-fade-in-up px-6 pt-5" style={{ animationDelay: '0.05s' }}>
             {dueCount > 0 ? (
               <div
                 className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40 card-lift"
@@ -240,7 +240,7 @@ export default function Flashcards() {
           <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5">Browse Library</Button></Link>
         </div>
       ) : (
-        <ul className="mt-2 space-y-2 px-6">
+        <ul className="stagger-children mt-2 space-y-2 px-6">
           {filteredWords.map((w) => {
             const mastery = w.mastery || 0;
             const level = masteryLevel(mastery);

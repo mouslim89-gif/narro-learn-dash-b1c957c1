@@ -56,7 +56,7 @@ export default function Library() {
       <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
 
       {/* Search */}
-      <div className="px-6 pt-1 pb-3">
+      <div className="animate-fade-in-up px-6 pt-1 pb-3" style={{ animationDelay: '0.05s' }}>
         <div className="relative">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -79,7 +79,7 @@ export default function Library() {
 
       {/* Search results */}
       {filteredBooks ? (
-        <section className="px-6 py-4">
+        <section className="animate-fade-in-up px-6 py-4" style={{ animationDelay: '0.1s' }}>
           <p className="mb-3 text-xs text-muted-foreground">{filteredBooks.length} result{filteredBooks.length !== 1 ? 's' : ''}</p>
           <div className="flex flex-wrap gap-4">
             {filteredBooks.map(book => (
@@ -94,7 +94,7 @@ export default function Library() {
         <>
           {/* Continue Reading */}
           {continueBooks.length > 0 && (
-            <section className="py-5">
+            <section className="animate-fade-in-up py-5" style={{ animationDelay: '0.1s' }}>
               <div className="px-6 flex items-baseline justify-between">
                 <h3 className="font-serif text-lg font-semibold text-foreground">
                   Continue Reading
@@ -116,7 +116,7 @@ export default function Library() {
             const genreBooks = books.filter((b) => b.genre === genre);
             if (genreBooks.length === 0) return null;
             return (
-              <section key={genre} className="py-5">
+              <section key={genre} className="animate-fade-in-up py-5" style={{ animationDelay: '0.15s' }}>
                 <div className="px-6 flex items-baseline justify-between">
                   <h3 className="font-serif text-lg font-semibold text-foreground">
                     {genreLabels[genre]}
