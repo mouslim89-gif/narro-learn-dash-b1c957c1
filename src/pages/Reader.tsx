@@ -1196,7 +1196,7 @@ export default function Reader() {
           const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
           if (!chapter || chapterIndex < 0) return null;
           return (
-            <div key={`ch-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-up">
+            <div key={`ch-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-soft">
 
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Chapter {chapterIndex + 1}
