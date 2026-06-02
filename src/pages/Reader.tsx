@@ -231,6 +231,14 @@ export default function Reader() {
   // While restoring scroll, briefly ignore handleScroll writes so we don't
   // overwrite the saved progress with 0%.
   const suppressSaveUntilRef = useRef<number>(0);
+  // Skip entrance animation when we're about to scroll-restore (would feel laggy).
+  // Captured at mount/chapter change.
+  const skipEntrance = useMemo(
+    () => !!saved && ((saved.sentenceIdx ?? null) !== null || (saved.progressPercent ?? 0) > 5),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id, chapterId]
+  );
+
 
   // --- Audio sync state ---
   const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
@@ -1195,7 +1203,8 @@ export default function Reader() {
           const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
           if (!chapter || chapterIndex < 0) return null;
           return (
-            <div className="px-6 pt-6 pb-2 text-center">
+            <div key={`ch-head-${id}-${chapterId}`} className={cn('px-6 pt-6 pb-2 text-center', !skipEntrance && 'animate-fade-in-soft')}>
+
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Chapter {chapterIndex + 1}
               </p>
@@ -1206,7 +1215,7 @@ export default function Reader() {
         })()}
 
         {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
-          <div className="px-6 pt-6 pb-2 text-center">
+          <div key={`pt-head-${id}-${chapterId}`} className={cn('px-6 pt-6 pb-2 text-center', !skipEntrance && 'animate-fade-in-soft')}>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Chapter {partIdx + 1}
             </p>
@@ -1219,7 +1228,13 @@ export default function Reader() {
 
         <div className="px-6 py-8 sm:px-12 sm:py-12">
         <div
-          className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]}`}
+          key={`${id}-${chapterId}`}
+          className={cn(
+            japaneseFontClassMap[japaneseFont],
+            'text-foreground/90 reader-text',
+            fontSizeMap[fontSize],
+            !skipEntrance && 'reader-stagger'
+          )}
           style={{
             lineHeight: showFurigana ? 2.6 : 2,
             transition: 'line-height 320ms var(--ease-out-soft)',
@@ -1227,6 +1242,7 @@ export default function Reader() {
         >
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6">
+
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 const sentenceText = sentence.tokens.map(t => t.t).join('');
@@ -1392,7 +1408,8 @@ export default function Reader() {
       </article>
 
       {hasParts(book) && partIdx !== null && book.anchors && (
-        <nav className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 sm:mx-auto sm:max-w-2xl">
+        <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">
+
           {partIdx > 0 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}

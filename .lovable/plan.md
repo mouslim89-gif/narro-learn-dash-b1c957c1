@@ -1,62 +1,31 @@
-# Plan — Rendre la progression fiable et reprendre exactement au bon endroit
+## Entrance animations in Reader
 
-Objectif : la progression doit se sauvegarder de manière robuste, ne pas être écrasée par une ancienne valeur cloud, et le bouton Continue doit reprendre au bon chapitre/à la bonne phrase.
+Add subtle, fast entrance animations that replay on chapter/part change.
 
-## 1. Sauvegarde plus fiable
+### Scope
+- **Text paragraphs**: stagger fade-in-up (subtle, ~250ms, translateY ~6px, stagger 30ms, capped at first ~10 paragraphs for perf).
+- **Header chrome** (top sticky bar with title/progress): light fade-in on mount, ~200ms.
+- **Bottom chapter nav pills** (Prev/Next at end of part): fade-in soft.
+- Skip: audio player (already persistent, avoid jitter on chapter change).
 
-- Remplacer le modèle actuel « sauvegarde cloud debounce 1.5s uniquement » par un système plus robuste :
-  - sauvegarde locale immédiate à chaque progression significative ;
-  - envoi cloud debounced pour économiser les requêtes ;
-  - flush immédiat quand l’utilisateur quitte la page, change de chapitre, masque l’app ou ferme l’onglet.
-- Empêcher les régressions de progression :
-  - ne jamais remplacer une progression locale plus récente par une progression cloud plus ancienne ;
-  - garder `updated_at`/timestamp côté local pour comparer proprement ;
-  - si un chapitre est déjà à 80%, ne pas le ramener à 20% à cause d’une hydratation tardive.
-- Réduire les writes inutiles :
-  - ne pousser au cloud que si la progression a vraiment changé ;
-  - arrondir/stabiliser le pourcentage ;
-  - éviter d’écrire en boucle pendant une restauration automatique de scroll.
+### Trigger
+- Replay on each chapter/part change, not just initial mount.
+- Use a `key` tied to `${id}-${chapterId ?? 'main'}` on the article wrapper so React remounts the children → CSS animations replay naturally.
+- Guard: do **not** play entrance animation when we're scroll-restoring to a saved sentence (would feel laggy). Detect via the existing `suppressSaveUntilRef` window or a new `skipEntranceRef` set true when `sentenceIdx` restore is pending; the article still mounts but children get a `no-anim` class.
 
-## 2. Reprise exacte à la phrase
+### Implementation
+- Reuse existing utilities from `index.css`: `.animate-fade-in-soft` (header, nav) and `.animate-fade-in-up` (paragraphs).
+- Add a small helper class `.reader-stagger > *:nth-child(n)` with `animation-delay` up to ~10 children (300ms total max), `animation-fill-mode: both`. Add it once to `index.css`.
+- In `Reader.tsx`:
+  - Wrap the paragraphs container with `className={cn('reader-stagger', skipEntrance && 'no-anim')}` and add `key={\`${id}-${chapterId ?? 'main'}\`}`.
+  - Add `.animate-fade-in-soft` to the sticky top header and to the bottom Prev/Next nav.
+  - `.no-anim > *` → `animation: none`.
 
-- Ajouter un champ `sentence_idx` à la progression de lecture.
-- Dans le Reader, suivre la phrase courante avec les refs de phrases déjà présentes.
-- Sauvegarder :
-  - `progressPercent` pour la barre/progression visuelle ;
-  - `sentenceIdx` pour la reprise précise.
-- À l’ouverture d’un chapitre :
-  - si `sentenceIdx` existe, scroller vers cette phrase ;
-  - sinon fallback sur l’ancien `%` de scroll ;
-  - si le chapitre est terminé, repartir du haut.
+### Files
+- `src/index.css` — add `.reader-stagger` delays + `.no-anim` override.
+- `src/pages/Reader.tsx` — add classes + key, wire `skipEntrance` flag from the existing sentence-restore logic.
 
-## 3. Continue qui avance au chapitre suivant
-
-- Sur la page du livre, si le dernier chapitre lu est terminé à 100%, le bouton Continue doit ouvrir automatiquement le chapitre/part suivant.
-- Si aucun chapitre suivant n’existe :
-  - reprendre le premier chapitre non terminé s’il en reste ;
-  - sinon afficher un comportement de restart propre.
-- Garder les labels de l’app en anglais : `Continue Chapter N`, `Start Chapter N`, `Restart`.
-
-## 4. Sync cloud plus sûre
-
-- Modifier le store `reading-progress` pour conserver une progression locale optimiste et fiable.
-- Lors du pull cloud : fusionner au lieu de remplacer brutalement.
-- Lors du push cloud : envoyer `sentence_idx` et `last_read_at`/timestamp actuel.
-- En cas d’échec réseau : conserver la progression locale, puis retenter lors de la prochaine modification/session.
-
-## 5. Fichiers concernés
-
-- `src/stores/reading-progress.ts`
-- `src/lib/sync/cloud-sync.ts`
-- `src/hooks/use-cloud-sync.ts`
-- `src/pages/Reader.tsx`
-- `src/pages/BookDetail.tsx`
-- Migration Lovable Cloud : ajouter `sentence_idx` à `reading_progress`
-
-## Validation prévue
-
-- Ouvrir un chapitre, scroller, quitter/revenir : reprise à la même phrase.
-- Changer rapidement de page : la progression reste sauvegardée.
-- Revenir après hydratation cloud : la progression locale récente n’est pas écrasée.
-- Finir un chapitre : Continue ouvre le chapitre suivant.
-- Anciennes progressions sans `sentence_idx` continuent de fonctionner avec le fallback `%`.
+### Out of scope
+- No Framer Motion (CSS only — lighter, no re-render cost on tokens).
+- No animation on individual tokens or furigana.
+- No changes to audio player, settings panel, chapter drawer.
