@@ -1,3 +1,14 @@
+import { supabase } from "@/integrations/supabase/client";
+
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  return {
+    'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    'Authorization': `Bearer ${token}`,
+  };
+}
+
 export interface JishoResult {
   slug: string;
   is_common: boolean;
@@ -75,10 +86,7 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
 
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
   const response = await fetch(url, {
-    headers: {
-      'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
+    headers: await authHeaders(),
   });
 
   liveAttempted.add(keyword);
@@ -95,10 +103,7 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
 async function batchLookup(words: string[]): Promise<void> {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keywords=${encodeURIComponent(words.join(','))}`;
   const response = await fetch(url, {
-    headers: {
-      'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
+    headers: await authHeaders(),
   });
 
   if (!response.ok) return;
