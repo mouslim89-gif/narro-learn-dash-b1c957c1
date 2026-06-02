@@ -1386,7 +1386,7 @@ export default function Reader() {
                         {englishLine}
                       </span>
                     ) : (
-                      <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-pulse" style={{ width: '60%' }} />
+                      <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse" style={{ width: '60%' }} />
                     )
                   )}
                   </Fragment>
