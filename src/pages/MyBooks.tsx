@@ -70,7 +70,7 @@ export default function MyBooks() {
 
   return (
     <div className="pb-20">
-      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-end justify-between">
+      <header className="relative px-6 pt-10 pb-2 flex items-end justify-between">
         <div>
           <AnimatedTitle text="My Books" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
