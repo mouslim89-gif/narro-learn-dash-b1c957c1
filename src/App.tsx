@@ -32,8 +32,16 @@ const pageVariants = {
   exit: { opacity: 0 },
 };
 
+const readerVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 6 },
+};
+
 // Apple-like spring easing (matches --ease-out-soft in index.css)
 const pageTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
+const readerTransition = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const };
+
 
 function DarkModeSync() {
   const darkMode = useReadingProgressStore((s) => s.darkMode);
