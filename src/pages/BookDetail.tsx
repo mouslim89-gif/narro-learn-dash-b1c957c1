@@ -57,7 +57,7 @@ export default function BookDetail() {
           <ArrowLeft className="h-[18px] w-[18px]" />
         </button>
 
-        <div className="relative z-10 mt-8 flex flex-col items-center text-center">
+        <div className="animate-fade-in-up relative z-10 mt-8 flex flex-col items-center text-center">
           <div
             className="book-paper relative flex h-64 w-44 items-end overflow-hidden rounded-xl p-4 shadow-xl ring-1 ring-black/5 rotate-[-3deg]"
             style={{ backgroundColor: book.coverColor }}
@@ -103,7 +103,7 @@ export default function BookDetail() {
 
       <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background" />
 
-      <div className="px-6">
+      <div className="stagger-children px-6">
         <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
         <section className="mt-8">

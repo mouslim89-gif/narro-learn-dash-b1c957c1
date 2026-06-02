@@ -147,7 +147,7 @@ export default function WordDetail() {
       )}
 
       {!loading && result && (
-        <div className="px-6 mt-2 space-y-5">
+        <div className="stagger-children px-6 mt-2 space-y-5">
           {/* Header card */}
           <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
             <div className="flex items-start gap-2">

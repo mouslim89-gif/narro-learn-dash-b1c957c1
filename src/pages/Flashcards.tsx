@@ -110,7 +110,7 @@ export default function Flashcards() {
   return (
     <div className="pb-24">
       {/* Masthead */}
-      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
+      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
         <div>
           <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">Flashcards</h1>
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
@@ -156,7 +156,7 @@ export default function Flashcards() {
           </section>
 
           {/* Stat tiles */}
-          <div className="mt-4 px-6 grid grid-cols-4 gap-2">
+          <div className="stagger-children mt-4 px-6 grid grid-cols-4 gap-2">
             {tiles.map(({ key, label, count, Icon, tint, iconColor }) => {
               const active = filter === key;
               return (

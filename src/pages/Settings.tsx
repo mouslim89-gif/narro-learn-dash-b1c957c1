@@ -70,7 +70,7 @@ export default function Settings() {
   return (
     <div className="pb-24 min-h-screen">
       {/* Editorial header */}
-      <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
+      <header className="library-header-bg animate-fade-in-up relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
         <span className="library-kanji-watermark" aria-hidden="true">設</span>
         <div className="relative z-10 flex items-center gap-3">
           <button
@@ -91,7 +91,7 @@ export default function Settings() {
       </header>
       <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
 
-      <div className="px-5 pt-2 space-y-7">
+      <div className="stagger-children px-5 pt-2 space-y-7">
         {/* Account */}
         <section>
           <SectionLabel>Account</SectionLabel>
