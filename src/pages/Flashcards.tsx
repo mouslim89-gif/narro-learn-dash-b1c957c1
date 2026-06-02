@@ -178,7 +178,7 @@ export default function Flashcards() {
           </div>
 
           {/* Search pill */}
-          <div className="mt-4 px-6 relative">
+          <div className="animate-fade-in-up mt-4 px-6 relative" style={{ animationDelay: '0.1s' }}>
             <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search words..."
@@ -189,7 +189,7 @@ export default function Flashcards() {
           </div>
 
           {/* Sort */}
-          <div className="mt-3 flex items-center justify-end px-6 gap-2">
+          <div className="animate-fade-in-up mt-3 flex items-center justify-end px-6 gap-2" style={{ animationDelay: '0.15s' }}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
