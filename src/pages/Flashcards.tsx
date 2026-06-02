@@ -195,7 +195,7 @@ export default function Flashcards() {
               <DropdownMenuTrigger asChild>
                 <button
                   aria-label={`Sort by ${sortLabels[sortBy]}`}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 transition-colors hover:bg-muted active:scale-[0.97]"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm hover:bg-muted"
                 >
                   <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="text-muted-foreground">Sort by</span>
