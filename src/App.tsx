@@ -6,12 +6,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from "@/stores/reading-progress";
 import { useFlashcardStore } from "@/stores/flashcards";
-import ScrollToTop from "@/components/ScrollToTop";
 import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
@@ -32,15 +31,8 @@ const pageVariants = {
   exit: { opacity: 0 },
 };
 
-const readerVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 6 },
-};
-
 // Apple-like spring easing (matches --ease-out-soft in index.css)
 const pageTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
-const readerTransition = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const };
 
 
 function DarkModeSync() {
@@ -58,24 +50,24 @@ function CloudSyncMount() {
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const { user, loading } = useAuth();
   const isReviewing = useFlashcardStore(s => s.isReviewing);
   const isAuthRoute = location.pathname === '/auth' || location.pathname === '/reset-password';
   const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
-  const isReader = location.pathname.startsWith('/reader/');
+  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
   return (
     <>
-      <ScrollToTop />
       <div className="relative">
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode={shouldWaitForPageTransition ? "wait" : "popLayout"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
           <motion.div
             key={location.pathname}
-            variants={isReader ? readerVariants : pageVariants}
+            variants={pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={isReader ? readerTransition : pageTransition}
-            className="absolute inset-x-0 top-0 w-full bg-background min-h-screen"
+            transition={pageTransition}
+            className="w-full bg-background min-h-screen"
           >
             <Routes location={location}>
               <Route path="/auth" element={<Auth />} />
