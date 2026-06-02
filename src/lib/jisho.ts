@@ -65,17 +65,6 @@ export function seedCache(entries: Record<string, CacheEntry>): void {
   }
 }
 
-import { supabase } from '@/integrations/supabase/client';
-
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  return {
-    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    Authorization: `Bearer ${token}`,
-  };
-}
-
 export async function lookupWord(keyword: string): Promise<CacheEntry> {
   const existing = cache.get(keyword);
   // Use cache only if the entry actually has results, OR if we've already
@@ -85,7 +74,12 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
   }
 
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
-  const response = await fetch(url, { headers: await getAuthHeaders() });
+  const response = await fetch(url, {
+    headers: {
+      'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+    },
+  });
 
   liveAttempted.add(keyword);
   if (!response.ok) throw new Error(`Jisho lookup failed: ${response.status}`);
@@ -100,7 +94,12 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
 
 async function batchLookup(words: string[]): Promise<void> {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keywords=${encodeURIComponent(words.join(','))}`;
-  const response = await fetch(url, { headers: await getAuthHeaders() });
+  const response = await fetch(url, {
+    headers: {
+      'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+    },
+  });
 
   if (!response.ok) return;
   const data = await response.json();
