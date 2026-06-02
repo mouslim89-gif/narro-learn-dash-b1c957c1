@@ -61,6 +61,7 @@ function AnimatedRoutes() {
   const isReviewing = useFlashcardStore(s => s.isReviewing);
   const isAuthRoute = location.pathname === '/auth' || location.pathname === '/reset-password';
   const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
+  const isReader = location.pathname.startsWith('/reader/');
 
   return (
     <>
@@ -69,11 +70,11 @@ function AnimatedRoutes() {
         <AnimatePresence mode="sync">
           <motion.div
             key={location.pathname}
-            variants={pageVariants}
+            variants={isReader ? readerVariants : pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={pageTransition}
+            transition={isReader ? readerTransition : pageTransition}
             className="absolute inset-x-0 top-0 w-full"
           >
             <Routes location={location}>
