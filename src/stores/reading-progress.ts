@@ -62,7 +62,15 @@ interface ReadingProgressState {
   // Auth-synced user
   syncUserId: string | null;
   // Actions
-  updateProgress: (bookId: string, chapterId: string | undefined, difficulty: Difficulty, percent: number) => void;
+  updateProgress: (
+    bookId: string,
+    chapterId: string | undefined,
+    difficulty: Difficulty,
+    percent: number,
+    sentenceIdx?: number | null,
+  ) => void;
+  /** Force-flush any debounced cloud pushes immediately (best-effort, fire-and-forget). */
+  flushPendingProgressPushes: () => void;
   /** Get progress for a specific chapter (defaults to 'main'). */
   getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
   /** Get the most recently read progress entry for a book (across chapters). */
