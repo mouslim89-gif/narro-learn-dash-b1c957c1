@@ -3,7 +3,7 @@ import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
 import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
-import { Search, Star, Loader2, X, Settings } from 'lucide-react';
+import { Search, Star, Loader2, X, Settings, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { toRomaji } from 'wanakana';
