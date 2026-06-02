@@ -122,7 +122,7 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
     <button
       ref={ref}
       className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 transition-colors active:scale-[0.94]',
+        'flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 smooth-colors tap-scale-sm',
         active
           ? 'bg-primary/15 text-primary ring-primary/25'
           : 'bg-background/70 text-foreground/70 ring-border/40 hover:bg-background',
