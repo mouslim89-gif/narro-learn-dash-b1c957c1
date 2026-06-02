@@ -19,7 +19,7 @@ export function AnimatedTitle({
   text,
   className,
   as: Tag = "h1",
-  stagger = 35,
+  stagger = 60,
   delay = 0,
 }: AnimatedTitleProps) {
   const chars = Array.from(text);
