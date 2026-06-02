@@ -34,7 +34,7 @@ export default function Library() {
 
   return (
     <div className="pb-20">
-      <header className="library-header-bg animate-fade-in-up relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
+      <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
         <span className="library-kanji-watermark" aria-hidden="true">積</span>
         <div className="relative z-10">
           <AnimatedTitle text="Tsundoku" className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground" />
