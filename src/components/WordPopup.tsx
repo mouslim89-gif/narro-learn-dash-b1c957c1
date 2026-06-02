@@ -370,7 +370,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                         'reopen-word-popup',
                         JSON.stringify({
                           returnPath: window.location.pathname + window.location.search,
-                          word: { text: word, baseForm, reading, pos, contextSentence, contextTokens },
+                          word: { text: word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens },
                         })
                       );
                     } catch {}
