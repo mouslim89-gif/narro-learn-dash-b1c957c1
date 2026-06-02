@@ -190,7 +190,7 @@ export default function Flashcards() {
           </div>
 
           {/* Sort */}
-          <div className="animate-fade-in-up mt-3 flex items-center justify-end px-6 gap-2" style={{ animationDelay: '0.15s' }}>
+          <div className="mt-3 flex items-center justify-end px-6 gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
