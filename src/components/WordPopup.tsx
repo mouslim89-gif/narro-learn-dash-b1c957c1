@@ -365,6 +365,15 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                 </button>
                 <button
                   onClick={() => {
+                    try {
+                      sessionStorage.setItem(
+                        'reopen-word-popup',
+                        JSON.stringify({
+                          returnPath: window.location.pathname + window.location.search,
+                          word: { text: word, baseForm, reading, pos, contextSentence, contextTokens },
+                        })
+                      );
+                    } catch {}
                     onClose();
                     navigate(`/dictionary/${encodeURIComponent(dictForm)}`);
                   }}
