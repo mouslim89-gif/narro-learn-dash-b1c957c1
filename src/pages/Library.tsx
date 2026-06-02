@@ -6,6 +6,7 @@ import { Search, Moon, Sun, Settings, X } from 'lucide-react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
 
 const genres = Object.keys(genreLabels) as Genre[];
 
@@ -36,7 +37,7 @@ export default function Library() {
       <header className="library-header-bg animate-fade-in-up relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
         <span className="library-kanji-watermark" aria-hidden="true">積</span>
         <div className="relative z-10">
-          <h1 className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground">Tsundoku</h1>
+          <AnimatedTitle text="Tsundoku" className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground" />
           <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
             <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
             Learn Japanese through reading
