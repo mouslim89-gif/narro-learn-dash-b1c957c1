@@ -1415,7 +1415,7 @@ export default function Reader() {
           {partIdx < book.anchors.length - 1 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
-              className="tap-scale group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md transition-shadow hover:shadow-lg"
+              className="tap-scale smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md hover:shadow-lg"
             >
               Chapter {partIdx + 2}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
