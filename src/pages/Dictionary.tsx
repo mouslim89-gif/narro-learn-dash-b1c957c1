@@ -110,7 +110,7 @@ export default function DictionaryPage() {
         </div>
       )}
 
-      <div className="mt-5 flex flex-col gap-3 px-6">
+      <div className="stagger-children mt-5 flex flex-col gap-3 px-6">
         {jishoResults.map((result, idx) => {
           const disp = getDisplayWord(result);
           const word = disp.word || result.slug;
