@@ -217,7 +217,7 @@ export function ConjugationTable({ dictForm, partsOfSpeech, alwaysOpen = false, 
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5 text-sm font-semibold text-foreground transition-colors active:bg-muted my-[10px]">
+      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5 text-sm font-semibold text-foreground smooth-colors tap-scale-sm active:bg-muted my-[10px]">
         <span>{tableLabel}</span>
         <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
       </CollapsibleTrigger>

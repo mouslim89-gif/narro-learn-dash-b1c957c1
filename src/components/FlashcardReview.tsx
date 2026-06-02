@@ -90,7 +90,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
         <button
           onClick={onExit}
           aria-label="Exit review"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm smooth-colors tap-scale-sm hover:bg-muted hover:text-foreground"
         >
           <X className="h-[18px] w-[18px]" />
         </button>
@@ -110,7 +110,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
         <button
           onClick={() => setShowDeleteDialog(true)}
           aria-label="Delete card"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm transition-all hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm smooth-colors tap-scale-sm hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
         >
           <Trash2 className="h-[16px] w-[16px]" />
         </button>
@@ -165,7 +165,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 <button
                   onClick={() => setShowFrontReading((v) => !v)}
                   aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm smooth-colors tap-scale-sm hover:bg-muted hover:text-foreground"
                 >
                   {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeClosed className="h-[18px] w-[18px]" />}
                 </button>

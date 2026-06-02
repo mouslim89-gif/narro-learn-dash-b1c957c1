@@ -48,7 +48,7 @@ export function SrsButtons({ card, onAnswer }: Props) {
           <button
             key={key}
             onClick={() => onAnswer(key)}
-            className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-[11px] font-semibold transition-all active:scale-[0.97] ${cls}`}
+            className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-[11px] font-semibold smooth-colors tap-scale ${cls}`}
           >
             <Icon className="h-3.5 w-3.5" />
             <span className="leading-none">{label}</span>

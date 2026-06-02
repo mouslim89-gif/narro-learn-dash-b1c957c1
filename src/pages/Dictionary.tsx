@@ -90,7 +90,7 @@ export default function DictionaryPage() {
   return (
     <div className="pb-24">
       {/* Masthead */}
-      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
+      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
         <AnimatedTitle text="Dictionary" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
         <Link to="/settings">
           <Button
@@ -104,7 +104,7 @@ export default function DictionaryPage() {
       </header>
 
       {/* Search pill */}
-      <div className="animate-fade-in-up mt-5 px-6 relative" style={{ animationDelay: '0.05s' }}>
+      <div className="mt-5 px-6 relative">
         <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           ref={inputRef}
@@ -150,7 +150,7 @@ export default function DictionaryPage() {
               <button
                 onClick={() => handleToggleSave(result)}
                 aria-label={saved ? 'Remove from flashcards' : 'Save word'}
-                className={`absolute top-4 right-4 z-10 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center transition-colors ${
+                className={`absolute top-4 right-4 z-10 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center smooth-colors tap-scale-sm ${
                   saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
                 }`}
               >

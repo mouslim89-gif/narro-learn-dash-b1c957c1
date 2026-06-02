@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,12 +75,7 @@ export default function Auth() {
     <div className="library-header-bg relative flex min-h-screen items-center justify-center px-6 py-12 overflow-hidden">
       <span className="library-kanji-watermark" aria-hidden="true">読</span>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        className="relative z-10 w-full max-w-sm"
-      >
+      <div className="relative z-10 w-full max-w-sm animate-fade-in-soft">
         <div className="mb-6 text-center">
           <h1 className="wordmark font-serif text-[44px] leading-none text-foreground">Tsundoku</h1>
           <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
@@ -208,7 +202,7 @@ export default function Auth() {
             </button>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

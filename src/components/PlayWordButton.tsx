@@ -64,8 +64,8 @@ export function PlayWordButton({ word, reading, className = '', size = 18 }: Pla
   return (
     <button
       onClick={play}
-      className={`inline-flex items-center justify-center rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent active:scale-95 ${
-        state === 'playing' ? 'text-accent animate-pulse' : ''
+      className={`inline-flex items-center justify-center rounded-full p-1.5 text-muted-foreground smooth-colors tap-scale-sm hover:bg-accent/10 hover:text-accent ${
+        state === 'playing' ? 'text-accent animate-soft-pulse' : ''
       } ${className}`}
       aria-label={`Play pronunciation of ${word}`}
       type="button"

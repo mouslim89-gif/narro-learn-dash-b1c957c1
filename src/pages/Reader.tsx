@@ -122,7 +122,7 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
     <button
       ref={ref}
       className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 transition-colors active:scale-[0.94]',
+        'flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 smooth-colors tap-scale-sm',
         active
           ? 'bg-primary/15 text-primary ring-primary/25'
           : 'bg-background/70 text-foreground/70 ring-border/40 hover:bg-background',
@@ -167,7 +167,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
             key={opt}
             onClick={() => onChange(opt)}
             className={cn(
-              'rounded-xl border p-2.5 text-center text-[12px] font-semibold transition-all active:scale-[0.97]',
+              'rounded-xl border p-2.5 text-center text-[12px] font-semibold smooth-colors tap-scale',
               selected
                 ? 'ring-2 ring-primary/40 border-transparent shadow-sm text-foreground'
                 : 'border-border/40 bg-background text-muted-foreground hover:border-border',
@@ -1066,7 +1066,7 @@ export default function Reader() {
         }
 
         return showSettings ? (
-          <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in">
+          <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in-soft">
             <div className="mx-auto max-w-2xl">
               <div className="mb-5 flex items-center gap-3">
                 <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
@@ -1196,7 +1196,7 @@ export default function Reader() {
           const chapterIndex = book.chapters.findIndex((c) => c.id === chapterId);
           if (!chapter || chapterIndex < 0) return null;
           return (
-            <div key={`ch-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-up">
+            <div key={`ch-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-soft">
 
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Chapter {chapterIndex + 1}
@@ -1208,7 +1208,7 @@ export default function Reader() {
         })()}
 
         {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
-          <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-up">
+          <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-soft">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Chapter {partIdx + 1}
             </p>
@@ -1386,7 +1386,7 @@ export default function Reader() {
                         {englishLine}
                       </span>
                     ) : (
-                      <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-pulse" style={{ width: '60%' }} />
+                      <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse" style={{ width: '60%' }} />
                     )
                   )}
                   </Fragment>
@@ -1406,7 +1406,7 @@ export default function Reader() {
           {partIdx > 0 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
-              className="tap-scale group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm transition-colors hover:bg-muted/40"
+              className="tap-scale smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm hover:bg-muted/40"
             >
               <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
               Chapter {partIdx}
@@ -1415,7 +1415,7 @@ export default function Reader() {
           {partIdx < book.anchors.length - 1 ? (
             <button
               onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
-              className="tap-scale group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md transition-shadow hover:shadow-lg"
+              className="tap-scale smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md hover:shadow-lg"
             >
               Chapter {partIdx + 2}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

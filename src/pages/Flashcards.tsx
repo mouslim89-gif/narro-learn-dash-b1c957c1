@@ -111,7 +111,7 @@ export default function Flashcards() {
   return (
     <div className="pb-24">
       {/* Masthead */}
-      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
+      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
         <div>
           <AnimatedTitle text="Flashcards" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
@@ -129,7 +129,7 @@ export default function Flashcards() {
       {savedWords.length > 0 && (
         <>
           {/* Hero review CTA */}
-          <section className="animate-fade-in-up px-6 pt-5" style={{ animationDelay: '0.05s' }}>
+          <section className="px-6 pt-5">
             {dueCount > 0 ? (
               <div
                 className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40 card-lift"
@@ -165,7 +165,7 @@ export default function Flashcards() {
                   key={key}
                   onClick={() => setFilter(active ? 'all' : key)}
                   className={cn(
-                    'rounded-xl border bg-card p-3 text-left card-lift transition-all',
+                    'rounded-xl border bg-card p-3 text-left card-lift tap-scale smooth-colors',
                     active ? 'border-primary/40 ring-1 ring-primary/30' : 'border-border/40'
                   )}
                   style={{ backgroundImage: `linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)` }}
@@ -179,7 +179,7 @@ export default function Flashcards() {
           </div>
 
           {/* Search pill */}
-          <div className="animate-fade-in-up mt-4 px-6 relative" style={{ animationDelay: '0.1s' }}>
+          <div className="mt-4 px-6 relative">
             <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search words..."
@@ -190,12 +190,12 @@ export default function Flashcards() {
           </div>
 
           {/* Sort */}
-          <div className="animate-fade-in-up mt-3 flex items-center justify-end px-6 gap-2" style={{ animationDelay: '0.15s' }}>
+          <div className="mt-3 flex items-center justify-end px-6 gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   aria-label={`Sort by ${sortLabels[sortBy]}`}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 transition-colors hover:bg-muted active:scale-[0.97]"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm hover:bg-muted"
                 >
                   <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="text-muted-foreground">Sort by</span>
@@ -221,7 +221,7 @@ export default function Flashcards() {
             <button
               onClick={() => setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))}
               aria-label={sortDir === 'asc' ? 'Ascending — tap to reverse' : 'Descending — tap to reverse'}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 transition-colors hover:bg-muted active:scale-[0.94]"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm hover:bg-muted"
             >
               {sortDir === 'asc'
                 ? <ArrowUp className="h-4 w-4" />

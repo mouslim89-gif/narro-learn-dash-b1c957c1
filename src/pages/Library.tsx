@@ -34,7 +34,7 @@ export default function Library() {
 
   return (
     <div className="pb-20">
-      <header className="library-header-bg animate-fade-in-up relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
+      <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
         <span className="library-kanji-watermark" aria-hidden="true">積</span>
         <div className="relative z-10">
           <AnimatedTitle text="Tsundoku" className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground" />
@@ -57,7 +57,7 @@ export default function Library() {
       <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
 
       {/* Search */}
-      <div className="animate-fade-in-up px-6 pt-1 pb-3" style={{ animationDelay: '0.05s' }}>
+      <div className="px-6 pt-1 pb-3">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -80,7 +80,7 @@ export default function Library() {
 
       {/* Search results */}
       {filteredBooks ? (
-        <section className="animate-fade-in-up px-6 py-4" style={{ animationDelay: '0.1s' }}>
+        <section className="px-6 py-4">
           <p className="mb-3 text-xs text-muted-foreground">{filteredBooks.length} result{filteredBooks.length !== 1 ? 's' : ''}</p>
           <div className="flex flex-wrap gap-4">
             {filteredBooks.map(book => (
@@ -95,7 +95,7 @@ export default function Library() {
         <>
           {/* Continue Reading */}
           {continueBooks.length > 0 && (
-            <section className="animate-fade-in-up py-5" style={{ animationDelay: '0.1s' }}>
+            <section className="py-5">
               <div className="px-6 flex items-baseline justify-between">
                 <h3 className="font-serif text-lg font-semibold text-foreground">
                   Continue Reading
@@ -117,7 +117,7 @@ export default function Library() {
             const genreBooks = books.filter((b) => b.genre === genre);
             if (genreBooks.length === 0) return null;
             return (
-              <section key={genre} className="animate-fade-in-up py-5" style={{ animationDelay: '0.15s' }}>
+              <section key={genre} className="py-5">
                 <div className="px-6 flex items-baseline justify-between">
                   <h3 className="font-serif text-lg font-semibold text-foreground">
                     {genreLabels[genre]}
