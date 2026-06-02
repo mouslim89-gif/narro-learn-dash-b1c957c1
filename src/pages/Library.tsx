@@ -79,7 +79,7 @@ export default function Library() {
 
       {/* Search results */}
       {filteredBooks ? (
-        <section className="px-6 py-4">
+        <section className="animate-fade-in-up px-6 py-4" style={{ animationDelay: '0.1s' }}>
           <p className="mb-3 text-xs text-muted-foreground">{filteredBooks.length} result{filteredBooks.length !== 1 ? 's' : ''}</p>
           <div className="flex flex-wrap gap-4">
             {filteredBooks.map(book => (
