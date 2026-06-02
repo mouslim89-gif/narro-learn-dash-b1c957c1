@@ -21,6 +21,10 @@ export default function DictionaryPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    sessionStorage.setItem('dictionary:query', query);
+  }, [query]);
+
+  useEffect(() => {
     if (!query.trim()) {
       setJishoResults([]);
       return;
