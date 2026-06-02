@@ -366,7 +366,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                 <button
                   onClick={() => {
                     onClose();
-                    navigate(`/dictionary?q=${encodeURIComponent(dictForm)}`);
+                    navigate(`/dictionary/${encodeURIComponent(dictForm)}`);
                   }}
                   className="tap-scale-sm flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-muted/40 text-foreground ring-1 ring-border/40 smooth-colors hover:bg-muted/60"
                 >
