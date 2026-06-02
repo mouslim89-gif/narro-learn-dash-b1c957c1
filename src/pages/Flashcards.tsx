@@ -221,7 +221,7 @@ export default function Flashcards() {
             <button
               onClick={() => setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))}
               aria-label={sortDir === 'asc' ? 'Ascending — tap to reverse' : 'Descending — tap to reverse'}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 transition-colors hover:bg-muted active:scale-[0.94]"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm hover:bg-muted"
             >
               {sortDir === 'asc'
                 ? <ArrowUp className="h-4 w-4" />
