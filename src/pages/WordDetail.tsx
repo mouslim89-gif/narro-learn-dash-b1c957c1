@@ -57,6 +57,16 @@ export default function WordDetail() {
   const saved = hasWord(display);
 
   const handleBack = () => {
+    try {
+      const stored = sessionStorage.getItem('reopen-word-popup');
+      if (stored) {
+        const data = JSON.parse(stored);
+        if (data?.returnPath) {
+          navigate(data.returnPath);
+          return;
+        }
+      }
+    } catch {}
     if (window.history.length > 1) navigate(-1);
     else navigate('/dictionary');
   };
