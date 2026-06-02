@@ -104,7 +104,7 @@ export default function DictionaryPage() {
       </header>
 
       {/* Search pill */}
-      <div className="animate-fade-in-up mt-5 px-6 relative" style={{ animationDelay: '0.05s' }}>
+      <div className="mt-5 px-6 relative">
         <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           ref={inputRef}
