@@ -512,6 +512,24 @@
 
 /* Reader paragraph stagger uses the shared .stagger-children utility */
 
+/* ──────────────────────────────────────────
+   Animated title — letter-by-letter entrance
+   ────────────────────────────────────────── */
+@keyframes title-char-in {
+  0% { opacity: 0; transform: translateY(0.4em) rotate(2deg); filter: blur(2px); }
+  100% { opacity: 1; transform: translateY(0) rotate(0); filter: blur(0); }
+}
+.animated-title {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+.animated-title__char {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+  animation: title-char-in 0.55s var(--ease-out-soft) both;
+}
+
 
 
 /* Smooth color/opacity transitions — apply to icons, labels */
