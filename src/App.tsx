@@ -53,7 +53,6 @@ function AnimatedRoutes() {
   const isReviewing = useFlashcardStore(s => s.isReviewing);
   const isAuthRoute = location.pathname === '/auth' || location.pathname === '/reset-password';
   const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
-  const isReader = location.pathname.startsWith('/reader/');
 
   return (
     <>
