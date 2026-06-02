@@ -150,7 +150,7 @@ export default function DictionaryPage() {
               <button
                 onClick={() => handleToggleSave(result)}
                 aria-label={saved ? 'Remove from flashcards' : 'Save word'}
-                className={`absolute top-4 right-4 z-10 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center transition-colors ${
+                className={`absolute top-4 right-4 z-10 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center smooth-colors tap-scale-sm ${
                   saved ? 'text-accent' : 'text-muted-foreground hover:text-accent'
                 }`}
               >
