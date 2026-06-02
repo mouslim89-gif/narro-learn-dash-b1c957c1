@@ -1227,7 +1227,13 @@ export default function Reader() {
 
         <div className="px-6 py-8 sm:px-12 sm:py-12">
         <div
-          className={`${japaneseFontClassMap[japaneseFont]} text-foreground/90 reader-text ${fontSizeMap[fontSize]}`}
+          key={`${id}-${chapterId}`}
+          className={cn(
+            japaneseFontClassMap[japaneseFont],
+            'text-foreground/90 reader-text',
+            fontSizeMap[fontSize],
+            !skipEntrance && 'reader-stagger'
+          )}
           style={{
             lineHeight: showFurigana ? 2.6 : 2,
             transition: 'line-height 320ms var(--ease-out-soft)',
@@ -1235,6 +1241,7 @@ export default function Reader() {
         >
           {paragraphs.map((paragraph, pIdx) => (
             <p key={pIdx} className="mb-6">
+
               {paragraph.map((sentence, sIdx) => {
                 const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
                 const sentenceText = sentence.tokens.map(t => t.t).join('');
