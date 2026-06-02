@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,15 +7,26 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const MAX_TEXT = 5000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await requireUser(req, corsHeaders);
+  if ("error" in auth) return auth.error;
+
   try {
     const { text } = await req.json();
     if (!text || typeof text !== "string") {
       return new Response(JSON.stringify({ error: "text is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (text.length > MAX_TEXT) {
+      return new Response(JSON.stringify({ error: `text exceeds ${MAX_TEXT} chars` }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
