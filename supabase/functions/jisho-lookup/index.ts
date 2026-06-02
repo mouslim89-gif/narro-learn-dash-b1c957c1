@@ -193,6 +193,9 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  const auth = await requireUser(req, corsHeaders);
+  if ("error" in auth) return auth.error;
+
   try {
     const url = new URL(req.url);
     const keyword = url.searchParams.get('keyword');
