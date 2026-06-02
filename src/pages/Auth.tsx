@@ -202,7 +202,7 @@ export default function Auth() {
             </button>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
