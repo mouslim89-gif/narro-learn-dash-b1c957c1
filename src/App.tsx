@@ -67,7 +67,7 @@ function AnimatedRoutes() {
     <>
       <ScrollToTop />
       <div className="relative">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
             key={location.pathname}
             variants={isReader ? readerVariants : pageVariants}
@@ -75,7 +75,7 @@ function AnimatedRoutes() {
             animate="animate"
             exit="exit"
             transition={isReader ? readerTransition : pageTransition}
-            className="absolute inset-x-0 top-0 w-full bg-background"
+            className="absolute inset-x-0 top-0 w-full bg-background min-h-screen"
           >
             <Routes location={location}>
               <Route path="/auth" element={<Auth />} />
