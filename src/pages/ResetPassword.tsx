@@ -96,7 +96,7 @@ export default function ResetPassword() {
             </Button>
           </form>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
