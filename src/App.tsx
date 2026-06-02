@@ -57,35 +57,39 @@ function AnimatedRoutes() {
   return (
     <>
       <ScrollToTop />
-      <AnimatePresence mode="sync">
-        <motion.div
-          key={location.pathname}
-          variants={pageVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={pageTransition}
-        >
-          <Routes location={location}>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/" element={<ProtectedRoute><Library /></ProtectedRoute>} />
-            <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
-            <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
-            <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
-            <Route path="/dictionary/:word" element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
-            <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
-            <Route path="/reader/:id/:difficulty" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
-            <Route path="/reader/:id/:difficulty/:chapterId" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={location.pathname}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+            className="absolute inset-x-0 top-0 w-full"
+          >
+            <Routes location={location}>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+              <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
+              <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
+              <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+              <Route path="/dictionary/:word" element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
+              <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
+              <Route path="/reader/:id/:difficulty" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+              <Route path="/reader/:id/:difficulty/:chapterId" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
+      </div>
       {!hideNav && <BottomNav />}
     </>
   );
 }
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
