@@ -192,19 +192,11 @@ export default function BookDetail() {
 
         <Link to={continueLink}>
           <Button size="lg" className="mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md">
-            {hasProgress
-              ? isMultiChapter
-                ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
-                : isMultiPart
-                  ? `Continue Chapter ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
-                  : 'Continue Reading'
-              : (isMultiChapter || isMultiPart)
-                ? 'Start Chapter 1'
-                : 'Start Reading'}
-
+            {continueLabel()}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
+
 
         {isMultiChapter && (
           <section className="mt-8">
