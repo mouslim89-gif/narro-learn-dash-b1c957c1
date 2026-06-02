@@ -1242,6 +1242,8 @@ export default function Reader() {
                   <Fragment key={sIdx}>
                   <span
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
+                    data-sentence-idx={globalIdx}
+
 
                     onClick={(e) => {
                       // Only seek if there's an audio sync AND user clicked on the span
