@@ -247,6 +247,7 @@ export type Database = {
           difficulty: string
           last_read_at: string
           progress_percent: number
+          sentence_idx: number | null
           updated_at: string
           user_id: string
         }
@@ -257,6 +258,7 @@ export type Database = {
           difficulty: string
           last_read_at?: string
           progress_percent?: number
+          sentence_idx?: number | null
           updated_at?: string
           user_id: string
         }
@@ -267,6 +269,7 @@ export type Database = {
           difficulty?: string
           last_read_at?: string
           progress_percent?: number
+          sentence_idx?: number | null
           updated_at?: string
           user_id?: string
         }
