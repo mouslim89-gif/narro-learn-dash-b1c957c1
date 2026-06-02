@@ -49,12 +49,7 @@ export default function ResetPassword() {
     <div className="library-header-bg relative flex min-h-screen items-center justify-center px-6 py-12 overflow-hidden">
       <span className="library-kanji-watermark" aria-hidden="true">鍵</span>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        className="relative z-10 w-full max-w-sm"
-      >
+      <div className="relative z-10 w-full max-w-sm animate-fade-in-soft">
         <div className="mb-6 text-center">
           <h1 className="wordmark font-serif text-[32px] leading-none text-foreground">Set new password</h1>
           <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
