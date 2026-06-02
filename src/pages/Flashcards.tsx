@@ -111,7 +111,7 @@ export default function Flashcards() {
   return (
     <div className="pb-24">
       {/* Masthead */}
-      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
+      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
         <div>
           <AnimatedTitle text="Flashcards" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
