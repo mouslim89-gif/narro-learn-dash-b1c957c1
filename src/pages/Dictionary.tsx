@@ -16,9 +16,19 @@ export default function DictionaryPage() {
   const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ?? '';
   const [query, setQuery] = useState(initial);
   const { addWord, removeWord, hasWord } = useFlashcardStore();
-  const [jishoResults, setJishoResults] = useState<JishoResult[]>([]);
+  const [jishoResults, setJishoResults] = useState<JishoResult[]>(() => {
+    try {
+      const cachedQuery = sessionStorage.getItem('dictionary:query');
+      const cachedResults = sessionStorage.getItem('dictionary:results');
+      if (cachedQuery && cachedQuery === initial && cachedResults) {
+        return JSON.parse(cachedResults) as JishoResult[];
+      }
+    } catch {/* ignore */}
+    return [];
+  });
   const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial : '');
 
   useEffect(() => {
     sessionStorage.setItem('dictionary:query', query);
@@ -27,14 +37,22 @@ export default function DictionaryPage() {
   useEffect(() => {
     if (!query.trim()) {
       setJishoResults([]);
+      sessionStorage.removeItem('dictionary:results');
+      lastFetchedRef.current = '';
       return;
     }
+
+    if (query === lastFetchedRef.current) return;
 
     const timeout = setTimeout(async () => {
       setSearching(true);
       try {
         const results = await searchJisho(query);
         setJishoResults(results);
+        lastFetchedRef.current = query;
+        try {
+          sessionStorage.setItem('dictionary:results', JSON.stringify(results));
+        } catch {/* quota — ignore */}
       } catch {
         setJishoResults([]);
       } finally {
