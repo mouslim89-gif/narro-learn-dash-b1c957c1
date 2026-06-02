@@ -261,9 +261,33 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setHighlightNew: (highlightNew) => { set({ highlightNew }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setHighlightLearning: (highlightLearning) => { set({ highlightLearning }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-      hydrateProgress: (progress, userId) => set({ progress, syncUserId: userId }),
+      hydrateProgress: (incoming, userId) => {
+        // Merge instead of replace: keep whichever side is newer per chapter so
+        // a slow cloud pull can't clobber a fresh local write (or vice-versa).
+        const current = get().progress;
+        const merged: Record<string, ReadingProgress> = { ...current };
+        for (const [key, remote] of Object.entries(incoming)) {
+          const local = current[key];
+          if (!local) {
+            merged[key] = remote;
+            continue;
+          }
+          const localTs = new Date(local.lastReadAt).getTime();
+          const remoteTs = new Date(remote.lastReadAt).getTime();
+          // Local is strictly newer — keep it. Pending push (if any) will sync.
+          if (localTs > remoteTs) continue;
+          // Remote is newer or equal — accept it, but never let it pull a
+          // chapter's progress backwards if local somehow has a higher %.
+          if (remoteTs === localTs && local.progressPercent >= remote.progressPercent) continue;
+          if (remote.progressPercent < local.progressPercent && remoteTs - localTs < 60_000) {
+            continue;
+          }
+          merged[key] = remote;
+        }
+        set({ progress: merged, syncUserId: userId });
+      },
       clearProgress: () => {
-        pushTimers.forEach((t) => clearTimeout(t));
+        pushTimers.forEach((entry) => clearTimeout(entry.timer));
         pushTimers.clear();
         set({ progress: {}, syncUserId: null });
       },
