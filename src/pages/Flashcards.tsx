@@ -240,7 +240,7 @@ export default function Flashcards() {
           <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5">Browse Library</Button></Link>
         </div>
       ) : (
-        <ul className="mt-2 space-y-2 px-6">
+        <ul className="stagger-children mt-2 space-y-2 px-6">
           {filteredWords.map((w) => {
             const mastery = w.mastery || 0;
             const level = masteryLevel(mastery);
