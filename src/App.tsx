@@ -11,7 +11,6 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from "@/stores/reading-progress";
 import { useFlashcardStore } from "@/stores/flashcards";
-import ScrollToTop from "@/components/ScrollToTop";
 import Library from "./pages/Library";
 import MyBooks from "./pages/MyBooks";
 import Flashcards from "./pages/Flashcards";
@@ -32,15 +31,8 @@ const pageVariants = {
   exit: { opacity: 0 },
 };
 
-const readerVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 6 },
-};
-
 // Apple-like spring easing (matches --ease-out-soft in index.css)
 const pageTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
-const readerTransition = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const };
 
 
 function DarkModeSync() {
@@ -65,17 +57,16 @@ function AnimatedRoutes() {
 
   return (
     <>
-      <ScrollToTop />
       <div className="relative">
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
           <motion.div
             key={location.pathname}
-            variants={isReader ? readerVariants : pageVariants}
+            variants={pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={isReader ? readerTransition : pageTransition}
-            className="absolute inset-x-0 top-0 w-full bg-background min-h-screen"
+            transition={pageTransition}
+            className="w-full bg-background min-h-screen"
           >
             <Routes location={location}>
               <Route path="/auth" element={<Auth />} />
