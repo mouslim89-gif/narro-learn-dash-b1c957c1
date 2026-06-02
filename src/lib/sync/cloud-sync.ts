@@ -112,7 +112,8 @@ export async function pushProgress(
       difficulty: progress.difficulty,
       progress_percent: progress.progressPercent,
       last_read_at: progress.lastReadAt,
-    });
+      sentence_idx: progress.sentenceIdx ?? null,
+    } as any);
     if (error) throw error;
     useSyncStatus.getState().endSync(true);
   } catch (e) {
