@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
