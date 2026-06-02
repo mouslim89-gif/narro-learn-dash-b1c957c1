@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -81,7 +82,7 @@ export default function Settings() {
             <ArrowLeft className="h-[18px] w-[18px]" />
           </button>
           <div>
-            <h1 className="wordmark font-serif text-[32px] leading-none text-foreground">Settings</h1>
+            <AnimatedTitle text="Settings" className="wordmark font-serif text-[32px] leading-none text-foreground" />
             <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
               <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
               Make it yours

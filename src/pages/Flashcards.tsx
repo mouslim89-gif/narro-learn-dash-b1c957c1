@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { FlashcardReview } from '@/components/FlashcardReview';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -112,7 +113,7 @@ export default function Flashcards() {
       {/* Masthead */}
       <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
         <div>
-          <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">Flashcards</h1>
+          <AnimatedTitle text="Flashcards" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
             <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
             {savedWords.length} saved {savedWords.length === 1 ? 'word' : 'words'}
