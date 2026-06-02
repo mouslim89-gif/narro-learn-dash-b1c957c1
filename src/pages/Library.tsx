@@ -116,7 +116,7 @@ export default function Library() {
             const genreBooks = books.filter((b) => b.genre === genre);
             if (genreBooks.length === 0) return null;
             return (
-              <section key={genre} className="py-5">
+              <section key={genre} className="animate-fade-in-up py-5" style={{ animationDelay: '0.15s' }}>
                 <div className="px-6 flex items-baseline justify-between">
                   <h3 className="font-serif text-lg font-semibold text-foreground">
                     {genreLabels[genre]}
