@@ -165,7 +165,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
                 <button
                   onClick={() => setShowFrontReading((v) => !v)}
                   aria-label={showFrontReading ? 'Hide reading' : 'Show reading'}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm smooth-colors tap-scale-sm hover:bg-muted hover:text-foreground"
                 >
                   {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeClosed className="h-[18px] w-[18px]" />}
                 </button>
