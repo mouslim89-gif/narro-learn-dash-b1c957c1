@@ -7,6 +7,7 @@ import { tokenWordCounts } from '@/data/book-tokens';
 import { Link } from 'react-router-dom';
 import { Settings, Flame, BookOpen, Bookmark, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { BookShelfRow } from '@/components/my-books/BookShelfRow';
 import { useDelayed } from '@/hooks/use-delayed';
 
@@ -71,7 +72,7 @@ export default function MyBooks() {
     <div className="pb-20">
       <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-end justify-between">
         <div>
-          <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">My Books</h1>
+          <AnimatedTitle text="My Books" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
             <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
             Continue where you left off

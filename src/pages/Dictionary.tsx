@@ -9,6 +9,7 @@ import { PlayWordButton } from '@/components/PlayWordButton';
 import { toRomaji } from 'wanakana';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Input } from '@/components/ui/input';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
 
 export default function DictionaryPage() {
   const navigate = useNavigate();
@@ -90,7 +91,7 @@ export default function DictionaryPage() {
     <div className="pb-24">
       {/* Masthead */}
       <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
-        <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">Dictionary</h1>
+        <AnimatedTitle text="Dictionary" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
         <Link to="/settings">
           <Button
             variant="ghost"
