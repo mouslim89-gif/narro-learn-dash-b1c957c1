@@ -1208,7 +1208,7 @@ export default function Reader() {
         })()}
 
         {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
-          <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-up">
+          <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-soft">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Chapter {partIdx + 1}
             </p>
