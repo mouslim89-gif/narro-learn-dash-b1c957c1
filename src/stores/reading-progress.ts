@@ -186,20 +186,38 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       highlightLearning: true,
       highlightKnown: false,
       syncUserId: null,
-      updateProgress: (bookId, chapterId, difficulty, percent) => {
+      updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
         const cid = chapterId || DEFAULT_CHAPTER_ID;
+        const key = chapterKey(bookId, cid);
+        const prev = get().progress[key];
+        const roundedPct = Math.max(0, Math.min(100, Math.round(percent)));
+        // Once a chapter is marked complete, drop the sentence anchor so the next
+        // visit starts at the top.
+        const nextSentence = roundedPct >= 100 ? null : (sentenceIdx ?? prev?.sentenceIdx ?? null);
+        // Skip no-op writes (same pct AND same sentence anchor) to avoid spamming cloud.
+        if (
+          prev &&
+          prev.progressPercent === roundedPct &&
+          (prev.sentenceIdx ?? null) === nextSentence &&
+          prev.difficulty === difficulty
+        ) {
+          return;
+        }
         const next: ReadingProgress = {
           difficulty,
-          progressPercent: Math.round(percent),
+          progressPercent: roundedPct,
           lastReadAt: new Date().toISOString(),
           chapterId: cid,
+          sentenceIdx: nextSentence,
         };
-        const key = chapterKey(bookId, cid);
         set((state) => ({
           progress: { ...state.progress, [key]: next },
         }));
         const userId = get().syncUserId;
         if (userId) schedulePush(userId, bookId, next);
+      },
+      flushPendingProgressPushes: () => {
+        flushAllProgressPushes();
       },
       getProgress: (bookId, chapterId) => {
         const key = chapterKey(bookId, chapterId);
