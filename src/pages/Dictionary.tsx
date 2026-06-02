@@ -145,7 +145,7 @@ export default function DictionaryPage() {
                     navigate(`/dictionary/${encodeURIComponent(word)}`);
                   }
                 }}
-                className="cursor-pointer -m-1 p-1 rounded-lg"
+                className="group cursor-pointer -m-1 p-1 pr-6 rounded-lg relative"
               >
                 {/* Word + reading inline */}
                 <div className="flex items-center gap-1.5 pr-12">
