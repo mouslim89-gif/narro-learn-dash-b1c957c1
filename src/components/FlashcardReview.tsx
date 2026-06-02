@@ -110,7 +110,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
         <button
           onClick={() => setShowDeleteDialog(true)}
           aria-label="Delete card"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm transition-all hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm smooth-colors tap-scale-sm hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
         >
           <Trash2 className="h-[16px] w-[16px]" />
         </button>
