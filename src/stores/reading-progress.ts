@@ -33,6 +33,8 @@ export interface ReadingProgress {
   lastReadAt: string;
   /** Chapter id; defaults to 'main' for single-chapter books. */
   chapterId?: string;
+  /** Exact sentence index where the reader stopped (within the current chapter/part). */
+  sentenceIdx?: number | null;
 }
 
 interface ReadingProgressState {
