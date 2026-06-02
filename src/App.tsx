@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from "@/stores/reading-progress";
@@ -50,14 +50,16 @@ function CloudSyncMount() {
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const { user, loading } = useAuth();
   const isReviewing = useFlashcardStore(s => s.isReviewing);
   const isAuthRoute = location.pathname === '/auth' || location.pathname === '/reset-password';
   const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
+  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
   return (
     <>
       <div className="relative">
-        <AnimatePresence mode={isAuthRoute ? "popLayout" : "wait"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
+        <AnimatePresence mode={shouldWaitForPageTransition ? "wait" : "popLayout"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
           <motion.div
             key={location.pathname}
             variants={pageVariants}
