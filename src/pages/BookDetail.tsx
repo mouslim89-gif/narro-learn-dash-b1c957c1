@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { cn } from '@/lib/utils';
-import { AnimatedTitle } from '@/components/AnimatedTitle';
+
 
 export default function BookDetail() {
   const { id } = useParams();
