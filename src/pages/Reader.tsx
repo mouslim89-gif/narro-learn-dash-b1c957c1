@@ -189,7 +189,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 export default function Reader() {
   const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
-  const { updateProgress, getProgress, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
   const knownIndex = useKnownWordsIndex();
   const knownTogglesByLevel: Record<KnownLevel, boolean> = {
@@ -226,6 +226,11 @@ export default function Reader() {
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
   const articleRef = useRef<HTMLDivElement>(null);
   const restoredScroll = useRef(false);
+  // Top-most visible sentence index (updated by IntersectionObserver).
+  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
+  // While restoring scroll, briefly ignore handleScroll writes so we don't
+  // overwrite the saved progress with 0%.
+  const suppressSaveUntilRef = useRef<number>(0);
 
   // --- Audio sync state ---
   const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
@@ -485,30 +490,89 @@ export default function Reader() {
   }, [sentences, showTranslations]);
 
 
-  useEffect(() => {
-    restoredScroll.current = false;
-    if (id) hydrateDictionaryForBook(id, chapterId);
-  }, [id, chapterId, difficulty]);
 
+  // Restore scroll position when the chapter loads. Prefer the saved sentence
+  // index (exact restore independent of font/layout); fall back to the % of
+  // total scroll for legacy progress entries.
   useEffect(() => {
-    if (restoredScroll.current || !saved?.progressPercent) return;
+    if (restoredScroll.current) return;
+    if (!saved) return;
+    // Wait until sentence DOM refs are mounted for sentence-based restore.
+    if (sentences.length === 0) return;
     restoredScroll.current = true;
-    // If the chapter was already completed, start fresh at the top.
+
     if (saved.progressPercent >= 100) {
       window.scrollTo(0, 0);
       return;
     }
-    requestAnimationFrame(() => {
+
+    // Briefly suppress save writes while we programmatically scroll, so a
+    // transient 0% reading from the scroll handler doesn't clobber `saved`.
+    suppressSaveUntilRef.current = performance.now() + 1500;
+
+    const targetSentence = saved.sentenceIdx ?? null;
+
+    const attempt = (tries: number) => {
+      if (targetSentence != null) {
+        const el = sentenceRefs.current.get(targetSentence);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          // Offset for sticky header (~56px) plus a little breathing room.
+          window.scrollTo(0, Math.max(0, top - 72));
+          currentSentenceRef.current = targetSentence;
+          return;
+        }
+        if (tries > 0) {
+          requestAnimationFrame(() => attempt(tries - 1));
+          return;
+        }
+      }
+      // Fallback: percent-based restore (legacy or missing sentence ref).
       const scrollH = document.documentElement.scrollHeight - window.innerHeight;
-      if (scrollH > 0) {
+      if (scrollH > 0 && saved.progressPercent > 0) {
         window.scrollTo(0, (saved.progressPercent / 100) * scrollH);
       }
-    });
-  }, [saved?.progressPercent]);
+    };
+    requestAnimationFrame(() => attempt(15));
+  }, [saved, sentences.length]);
+
+  // Reset restore flag when the chapter changes.
+  useEffect(() => {
+    restoredScroll.current = false;
+    currentSentenceRef.current = null;
+    if (id) hydrateDictionaryForBook(id, chapterId);
+  }, [id, chapterId, difficulty]);
+
+  // Track the top-most visible sentence so we can persist an accurate anchor.
+  useEffect(() => {
+    if (sentences.length === 0) return;
+    const visible = new Set<number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const idxAttr = (entry.target as HTMLElement).dataset.sentenceIdx;
+          if (!idxAttr) continue;
+          const idx = Number(idxAttr);
+          if (entry.isIntersecting) visible.add(idx);
+          else visible.delete(idx);
+        }
+        if (visible.size > 0) {
+          let min = Infinity;
+          visible.forEach((v) => { if (v < min) min = v; });
+          if (min !== Infinity) currentSentenceRef.current = min;
+        }
+      },
+      // Treat "visible" as crossing ~25% from top of viewport.
+      { root: null, rootMargin: '-15% 0px -55% 0px', threshold: 0 },
+    );
+    sentenceRefs.current.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [sentences.length]);
 
   const rafRef = useRef<number>(0);
-  // Plain scroll handler: only updates progress percent. We do NOT use it to
-  // detect "user scrolled", because programmatic scrolls also fire it.
+  // Plain scroll handler: updates progress percent + persists the current
+  // sentence anchor. Programmatic scrolls also fire it, so we guard during
+  // restoration via `suppressSaveUntilRef`.
   const handleScroll = useCallback(() => {
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
@@ -517,9 +581,26 @@ export default function Reader() {
       if (scrollH <= 0) return;
       const pct = Math.min(100, (window.scrollY / scrollH) * 100);
       setScrollPercent(Math.round(pct));
-      if (id) updateProgress(id, chapterId, difficulty, pct);
+      if (performance.now() < suppressSaveUntilRef.current) return;
+      if (id) updateProgress(id, chapterId, difficulty, pct, currentSentenceRef.current ?? null);
     });
   }, [id, chapterId, difficulty, updateProgress]);
+
+  // Flush pending cloud pushes when the user leaves / hides the tab / changes
+  // chapter. This is the difference between "sometimes saves" and "always saves".
+  useEffect(() => {
+    const flush = () => flushPendingProgressPushes();
+    const onVisibility = () => { if (document.visibilityState === 'hidden') flush(); };
+    window.addEventListener('pagehide', flush);
+    window.addEventListener('beforeunload', flush);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      window.removeEventListener('beforeunload', flush);
+      document.removeEventListener('visibilitychange', onVisibility);
+      flush();
+    };
+  }, [flushPendingProgressPushes]);
 
   // Detect *real* user-initiated scroll inputs and immediately disengage
   // auto-follow + cancel any in-flight programmatic scroll animation.
@@ -1161,6 +1242,8 @@ export default function Reader() {
                   <Fragment key={sIdx}>
                   <span
                     ref={(el) => { if (el) sentenceRefs.current.set(globalIdx, el); }}
+                    data-sentence-idx={globalIdx}
+
 
                     onClick={(e) => {
                       // Only seek if there's an audio sync AND user clicked on the span

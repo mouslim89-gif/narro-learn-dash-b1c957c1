@@ -33,6 +33,8 @@ export interface ReadingProgress {
   lastReadAt: string;
   /** Chapter id; defaults to 'main' for single-chapter books. */
   chapterId?: string;
+  /** Exact sentence index where the reader stopped (within the current chapter/part). */
+  sentenceIdx?: number | null;
 }
 
 interface ReadingProgressState {
@@ -60,7 +62,15 @@ interface ReadingProgressState {
   // Auth-synced user
   syncUserId: string | null;
   // Actions
-  updateProgress: (bookId: string, chapterId: string | undefined, difficulty: Difficulty, percent: number) => void;
+  updateProgress: (
+    bookId: string,
+    chapterId: string | undefined,
+    difficulty: Difficulty,
+    percent: number,
+    sentenceIdx?: number | null,
+  ) => void;
+  /** Force-flush any debounced cloud pushes immediately (best-effort, fire-and-forget). */
+  flushPendingProgressPushes: () => void;
   /** Get progress for a specific chapter (defaults to 'main'). */
   getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
   /** Get the most recently read progress entry for a book (across chapters). */
@@ -130,17 +140,32 @@ function schedulePrefsPush(userId: string, prefs: UserPreferences) {
   }, 1500);
 }
 
-// Debounce per (book, chapter)
-const pushTimers = new Map<string, number>();
+// Debounce per (book, chapter). We store the latest progress alongside the
+// timer so flushPendingProgressPushes can fire it immediately on page hide.
+const pushTimers = new Map<string, { timer: number; userId: string; bookId: string; progress: ReadingProgress }>();
+
+function flushKey(key: string) {
+  const entry = pushTimers.get(key);
+  if (!entry) return;
+  clearTimeout(entry.timer);
+  pushTimers.delete(key);
+  pushProgress(entry.userId, entry.bookId, entry.progress).catch(() => {});
+}
+
 function schedulePush(userId: string, bookId: string, progress: ReadingProgress) {
   const key = chapterKey(bookId, progress.chapterId);
   const existing = pushTimers.get(key);
-  if (existing) clearTimeout(existing);
-  const t = window.setTimeout(() => {
-    pushProgress(userId, bookId, progress).catch(() => {});
+  if (existing) clearTimeout(existing.timer);
+  const timer = window.setTimeout(() => {
+    const entry = pushTimers.get(key);
     pushTimers.delete(key);
+    if (entry) pushProgress(entry.userId, entry.bookId, entry.progress).catch(() => {});
   }, 1500);
-  pushTimers.set(key, t);
+  pushTimers.set(key, { timer, userId, bookId, progress });
+}
+
+export function flushAllProgressPushes() {
+  for (const key of Array.from(pushTimers.keys())) flushKey(key);
 }
 
 export const useReadingProgressStore = create<ReadingProgressState>()(
@@ -161,20 +186,38 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       highlightLearning: true,
       highlightKnown: false,
       syncUserId: null,
-      updateProgress: (bookId, chapterId, difficulty, percent) => {
+      updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
         const cid = chapterId || DEFAULT_CHAPTER_ID;
+        const key = chapterKey(bookId, cid);
+        const prev = get().progress[key];
+        const roundedPct = Math.max(0, Math.min(100, Math.round(percent)));
+        // Once a chapter is marked complete, drop the sentence anchor so the next
+        // visit starts at the top.
+        const nextSentence = roundedPct >= 100 ? null : (sentenceIdx ?? prev?.sentenceIdx ?? null);
+        // Skip no-op writes (same pct AND same sentence anchor) to avoid spamming cloud.
+        if (
+          prev &&
+          prev.progressPercent === roundedPct &&
+          (prev.sentenceIdx ?? null) === nextSentence &&
+          prev.difficulty === difficulty
+        ) {
+          return;
+        }
         const next: ReadingProgress = {
           difficulty,
-          progressPercent: Math.round(percent),
+          progressPercent: roundedPct,
           lastReadAt: new Date().toISOString(),
           chapterId: cid,
+          sentenceIdx: nextSentence,
         };
-        const key = chapterKey(bookId, cid);
         set((state) => ({
           progress: { ...state.progress, [key]: next },
         }));
         const userId = get().syncUserId;
         if (userId) schedulePush(userId, bookId, next);
+      },
+      flushPendingProgressPushes: () => {
+        flushAllProgressPushes();
       },
       getProgress: (bookId, chapterId) => {
         const key = chapterKey(bookId, chapterId);
@@ -218,9 +261,33 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
       setHighlightNew: (highlightNew) => { set({ highlightNew }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setHighlightLearning: (highlightLearning) => { set({ highlightLearning }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
       setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-      hydrateProgress: (progress, userId) => set({ progress, syncUserId: userId }),
+      hydrateProgress: (incoming, userId) => {
+        // Merge instead of replace: keep whichever side is newer per chapter so
+        // a slow cloud pull can't clobber a fresh local write (or vice-versa).
+        const current = get().progress;
+        const merged: Record<string, ReadingProgress> = { ...current };
+        for (const [key, remote] of Object.entries(incoming)) {
+          const local = current[key];
+          if (!local) {
+            merged[key] = remote;
+            continue;
+          }
+          const localTs = new Date(local.lastReadAt).getTime();
+          const remoteTs = new Date(remote.lastReadAt).getTime();
+          // Local is strictly newer — keep it. Pending push (if any) will sync.
+          if (localTs > remoteTs) continue;
+          // Remote is newer or equal — accept it, but never let it pull a
+          // chapter's progress backwards if local somehow has a higher %.
+          if (remoteTs === localTs && local.progressPercent >= remote.progressPercent) continue;
+          if (remote.progressPercent < local.progressPercent && remoteTs - localTs < 60_000) {
+            continue;
+          }
+          merged[key] = remote;
+        }
+        set({ progress: merged, syncUserId: userId });
+      },
       clearProgress: () => {
-        pushTimers.forEach((t) => clearTimeout(t));
+        pushTimers.forEach((entry) => clearTimeout(entry.timer));
         pushTimers.clear();
         set({ progress: {}, syncUserId: null });
       },

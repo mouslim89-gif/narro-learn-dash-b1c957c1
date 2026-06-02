@@ -86,11 +86,13 @@ export async function pullProgress(userId: string): Promise<Record<string, Readi
   for (const row of data ?? []) {
     const cid = row.chapter_id ?? DEFAULT_CHAPTER_ID;
     const key = chapterKey(row.book_id, cid);
+    const rawIdx = (row as any).sentence_idx;
     out[key] = {
       difficulty: row.difficulty as Difficulty,
       progressPercent: row.progress_percent ?? 0,
       lastReadAt: row.last_read_at ?? new Date().toISOString(),
       chapterId: cid,
+      sentenceIdx: typeof rawIdx === 'number' ? rawIdx : null,
     };
   }
   return out;
@@ -110,7 +112,8 @@ export async function pushProgress(
       difficulty: progress.difficulty,
       progress_percent: progress.progressPercent,
       last_read_at: progress.lastReadAt,
-    });
+      sentence_idx: progress.sentenceIdx ?? null,
+    } as any);
     if (error) throw error;
     useSyncStatus.getState().endSync(true);
   } catch (e) {

@@ -35,11 +35,66 @@ export default function BookDetail() {
   const isMultiPart = !isMultiChapter && hasParts(book);
   const chapterProgressMap = id ? getChapterProgress(id) : {};
 
-  const defaultPartId = isMultiPart ? partChapterId(0) : DEFAULT_CHAPTER_ID;
-  const continueChapterId = bookProgress?.chapterId || defaultPartId;
+  // Ordered chapter ids for this book (used to auto-advance Continue).
+  const orderedChapterIds: string[] = isMultiChapter
+    ? book.chapters!.map((c) => c.id)
+    : isMultiPart
+      ? book.anchors!.map((_, i) => partChapterId(i))
+      : [DEFAULT_CHAPTER_ID];
+
+  // Decide what Continue should open:
+  //   - last read chapter if it's still in progress
+  //   - else the next chapter after it
+  //   - else the first not-completed chapter
+  //   - else the first chapter (book finished -> restart)
+  function pickResumeChapter(): { id: string; label: 'continue' | 'next' | 'start' | 'restart' } {
+    if (!isMultiChapter && !isMultiPart) {
+      const p = chapterProgressMap[DEFAULT_CHAPTER_ID];
+      if (!p || p.progressPercent <= 0) return { id: DEFAULT_CHAPTER_ID, label: 'start' };
+      if (p.progressPercent >= 100) return { id: DEFAULT_CHAPTER_ID, label: 'restart' };
+      return { id: DEFAULT_CHAPTER_ID, label: 'continue' };
+    }
+    const lastId = bookProgress?.chapterId;
+    const lastIdx = lastId ? orderedChapterIds.indexOf(lastId) : -1;
+    if (lastIdx >= 0) {
+      const lastPct = chapterProgressMap[lastId!]?.progressPercent ?? 0;
+      if (lastPct > 0 && lastPct < 100) return { id: lastId!, label: 'continue' };
+      // Last chapter is done — jump to the next one.
+      const nextIdx = lastIdx + 1;
+      if (nextIdx < orderedChapterIds.length) {
+        return { id: orderedChapterIds[nextIdx], label: 'next' };
+      }
+    }
+    // Either nothing read or book finished — find first non-completed.
+    const firstUnfinished = orderedChapterIds.find(
+      (cid) => (chapterProgressMap[cid]?.progressPercent ?? 0) < 100,
+    );
+    if (firstUnfinished) {
+      const pct = chapterProgressMap[firstUnfinished]?.progressPercent ?? 0;
+      return { id: firstUnfinished, label: pct > 0 ? 'continue' : (lastIdx >= 0 ? 'next' : 'start') };
+    }
+    return { id: orderedChapterIds[0], label: 'restart' };
+  }
+
+  const resume = pickResumeChapter();
+  const continueChapterId = resume.id;
   const continueLink = (isMultiChapter || isMultiPart)
     ? `/reader/${book.id}/${difficulty}/${continueChapterId}`
     : `/reader/${book.id}/${difficulty}`;
+
+  function continueLabel(): string {
+    if (!isMultiChapter && !isMultiPart) {
+      if (resume.label === 'restart') return 'Read Again';
+      if (resume.label === 'continue') return 'Continue Reading';
+      return 'Start Reading';
+    }
+    const idx = orderedChapterIds.indexOf(continueChapterId);
+    const num = idx >= 0 ? idx + 1 : 1;
+    if (resume.label === 'restart') return 'Read Again';
+    if (resume.label === 'continue') return `Continue Chapter ${num}`;
+    if (resume.label === 'next') return `Start Chapter ${num}`;
+    return `Start Chapter ${num}`;
+  }
 
 
   return (
@@ -137,19 +192,11 @@ export default function BookDetail() {
 
         <Link to={continueLink}>
           <Button size="lg" className="mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md">
-            {hasProgress
-              ? isMultiChapter
-                ? `Continue Chapter ${(book.chapters!.findIndex(c => c.id === continueChapterId) + 1) || 1}`
-                : isMultiPart
-                  ? `Continue Chapter ${(book.anchors!.findIndex((_, i) => partChapterId(i) === continueChapterId) + 1) || 1}`
-                  : 'Continue Reading'
-              : (isMultiChapter || isMultiPart)
-                ? 'Start Chapter 1'
-                : 'Start Reading'}
-
+            {continueLabel()}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
+
 
         {isMultiChapter && (
           <section className="mt-8">
