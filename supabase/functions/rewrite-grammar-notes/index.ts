@@ -106,7 +106,8 @@ Rules:
 
     if (!resp.ok) {
       const t = await resp.text();
-      return new Response(JSON.stringify({ error: `AI gateway: ${resp.status} ${t}` }), {
+      console.error("rewrite-grammar-notes AI gateway error", resp.status, t);
+      return new Response(JSON.stringify({ error: "AI service error" }), {
         status: resp.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
