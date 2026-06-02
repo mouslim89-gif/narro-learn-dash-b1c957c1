@@ -67,7 +67,7 @@ export default function DictionaryPage() {
   return (
     <div className="pb-24">
       {/* Masthead */}
-      <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
+      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-start justify-between">
         <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">Dictionary</h1>
         <Link to="/settings">
           <Button
@@ -81,7 +81,7 @@ export default function DictionaryPage() {
       </header>
 
       {/* Search pill */}
-      <div className="mt-5 px-6 relative">
+      <div className="animate-fade-in-up mt-5 px-6 relative" style={{ animationDelay: '0.05s' }}>
         <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           ref={inputRef}

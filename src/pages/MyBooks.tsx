@@ -69,7 +69,7 @@ export default function MyBooks() {
 
   return (
     <div className="pb-20">
-      <header className="relative px-6 pt-10 pb-2 flex items-end justify-between">
+      <header className="animate-fade-in-up relative px-6 pt-10 pb-2 flex items-end justify-between">
         <div>
           <h1 className="font-serif text-[34px] font-bold leading-none tracking-tight">My Books</h1>
           <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
@@ -86,7 +86,7 @@ export default function MyBooks() {
 
       <div className="px-6">
         {bookProgressList.length > 0 && (
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="stagger-children mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
               <div
                 key={key}
@@ -113,7 +113,7 @@ export default function MyBooks() {
             </Link>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {bookProgressList.map(({ book, progress: p }) => (
               <BookShelfRow key={book.id} book={book} progress={p} />
             ))}
