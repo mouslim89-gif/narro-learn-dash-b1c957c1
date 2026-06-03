@@ -24,16 +24,20 @@ export function extractKanji(word: string): string[] {
   return out;
 }
 
+import { supabase } from '@/integrations/supabase/client';
+
 export async function fetchKanji(char: string): Promise<KanjiDetails | null> {
   if (cache.has(char)) return cache.get(char)!;
   try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kanji-lookup`;
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ kanji: char }),
     });
@@ -49,3 +53,4 @@ export async function fetchKanji(char: string): Promise<KanjiDetails | null> {
     return null;
   }
 }
+
