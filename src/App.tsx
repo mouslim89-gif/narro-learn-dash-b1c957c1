@@ -53,7 +53,13 @@ function AnimatedRoutes() {
   const { user, loading } = useAuth();
   const isReviewing = useFlashcardStore(s => s.isReviewing);
   const isAuthRoute = location.pathname === '/auth' || location.pathname === '/reset-password';
-  const hideNav = location.pathname.startsWith('/reader/') || isReviewing || isAuthRoute;
+  const path = location.pathname;
+  const isDetailRoute =
+    path.startsWith('/reader/') ||
+    path.startsWith('/book/') ||
+    (path.startsWith('/dictionary/') && path !== '/dictionary') ||
+    path === '/settings';
+  const hideNav = isDetailRoute || isReviewing || isAuthRoute;
   const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
   return (
