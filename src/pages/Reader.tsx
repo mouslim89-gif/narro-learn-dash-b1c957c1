@@ -204,6 +204,20 @@ export default function Reader() {
  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
  const [levelOpen, setLevelOpen] = useState(false);
  const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+ const toggleTranslations = () => {
+ const anchorIdx = currentSentenceRef.current;
+ setShowTranslations(!showTranslations);
+ if (anchorIdx == null) return;
+ requestAnimationFrame(() => {
+ requestAnimationFrame(() => {
+ const el = sentenceRefs.current.get(anchorIdx);
+ if (!el) return;
+ const HEADER_OFFSET = 64;
+ const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+ window.scrollTo({ top: y, behavior:'auto'});
+ });
+ });
+ };
  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
  try {
  const stored = sessionStorage.getItem('reopen-word-popup');
@@ -849,7 +863,10 @@ export default function Reader() {
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
  <button
  key={d}
- onClick={() => setDifficulty(d)}
+ onClick={() => {
+ setDifficulty(d);
+ setLevelOpen(false);
+ }}
  className={cn('h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
  d === difficulty
  ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground',
@@ -871,7 +888,7 @@ export default function Reader() {
  {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
  </HeaderChip>
  <HeaderChip
- onClick={() => setShowTranslations(!showTranslations)}
+ onClick={toggleTranslations}
  active={showTranslations}
  title={showTranslations ?'Hide translations':'Show translations'}
  >
@@ -992,7 +1009,7 @@ export default function Reader() {
  <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
- <Switch checked={showTranslations} onCheckedChange={setShowTranslations} />
+ <Switch checked={showTranslations} onCheckedChange={toggleTranslations} />
  </div>
  </div>
 
