@@ -113,10 +113,6 @@ export default function Flashcards() {
  <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
  <div>
  <AnimatedTitle text="Flashcards" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
- <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
- {savedWords.length} saved {savedWords.length === 1 ?'word':'words'}
- </p>
  </div>
  <Link to="/settings">
  <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
