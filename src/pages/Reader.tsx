@@ -1332,6 +1332,7 @@ export default function Reader() {
                             const rect = spanEl?.getBoundingClientRect();
                             if (!rect) return;
                             setSentenceTranslation(null);
+                            setLevelOpen(false);
                             setMiniPopup({
                               text: token.t,
                               baseForm: token.b,
