@@ -65,7 +65,7 @@ export default function Library() {
  {search && (
  <button
  onClick={() => setSearch('')}
- className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground"
+ className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground smooth-colors tap-scale-sm"
  aria-label="Clear search"
  >
  <X className="h-3.5 w-3.5"/>
