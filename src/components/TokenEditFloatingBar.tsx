@@ -132,25 +132,25 @@ export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearS
  <div className="flex flex-wrap gap-2">
  <button
  onClick={() => setScope(bookId)}
- className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === bookId ?'bg-primary text-primary-foreground':'bg-muted'}`}
+ className={`rounded px-3 py-1.5 text-xs font-semibold ${scope === bookId ?'bg-accent text-accent-foreground':'bg-muted'}`}
  >
  {bookId} ({bookSaved.length}+{bookPending.length})
  </button>
  <button
  onClick={() => setScope('*')}
- className={`rounded px-3 py-1.5 text-xs font-semibold ${scope ==='*'?'bg-primary text-primary-foreground':'bg-muted'}`}
+ className={`rounded px-3 py-1.5 text-xs font-semibold ${scope ==='*'?'bg-accent text-accent-foreground':'bg-muted'}`}
  >
  * global ({globalSaved.length}+{globalPending.length})
  </button>
  <button
  onClick={() => setScope('sb')}
- className={`rounded px-3 py-1.5 text-xs font-semibold ${scope ==='sb'?'bg-primary text-primary-foreground':'bg-muted'}`}
+ className={`rounded px-3 py-1.5 text-xs font-semibold ${scope ==='sb'?'bg-accent text-accent-foreground':'bg-muted'}`}
  >
  shared {bookId} ({sharedBook.length})
  </button>
  <button
  onClick={() => setScope('sg')}
- className={`rounded px-3 py-1.5 text-xs font-semibold ${scope ==='sg'?'bg-primary text-primary-foreground':'bg-muted'}`}
+ className={`rounded px-3 py-1.5 text-xs font-semibold ${scope ==='sg'?'bg-accent text-accent-foreground':'bg-muted'}`}
  >
  shared * ({sharedGlobal.length})
  </button>

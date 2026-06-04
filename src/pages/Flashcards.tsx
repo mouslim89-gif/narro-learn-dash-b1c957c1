@@ -160,7 +160,7 @@ export default function Flashcards() {
  key={key}
  onClick={() => setFilter(active ?'all': key)}
  className={cn('rounded-xl border bg-card p-3 text-left card-lift tap-scale smooth-colors',
- active ?'border-primary/40 ring-1 ring-primary/30':'border-border/40')}
+ active ?'border-accent/50 ring-1 ring-accent/40':'border-border/40')}
  style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
  >
  <Icon className="h-4 w-4"style={{ color: iconColor }} />
@@ -205,7 +205,7 @@ export default function Flashcards() {
  className="flex items-center justify-between gap-2"
  >
  <span>{sortLabels[key]}</span>
- {active && <Check className="h-3.5 w-3.5 text-primary"/>}
+ {active && <Check className="h-3.5 w-3.5 text-accent"/>}
  </DropdownMenuItem>
  );
  })}

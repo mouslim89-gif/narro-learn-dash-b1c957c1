@@ -337,8 +337,8 @@
  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 .reader-icon-btn[data-active="true"] {
- color: hsl(var(--primary));
- background-color: hsl(var(--primary) / 0.10);
+ color: hsl(var(--accent));
+ background-color: hsl(var(--accent) / 0.12);
 }
 
 /* Reader settings panel — drawer-style soft shadow */
