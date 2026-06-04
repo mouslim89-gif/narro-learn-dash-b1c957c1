@@ -795,6 +795,7 @@ export default function Reader() {
     if (!spanEl) return;
     const rect = spanEl.getBoundingClientRect();
     setMiniPopup(null);
+    setLevelOpen(false);
     setSentenceTranslation({
       sentenceIdx,
       japanese,
