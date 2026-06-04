@@ -1,47 +1,29 @@
-## Goals
-1. Close the difficulty popover (`levelOpen`) when the user picks a difficulty inside it.
-2. When toggling the "Show translations" header chip, keep the reader anchored on the paragraph/sentence currently at the top of the viewport so the user doesn't lose their place.
+## Bug
+In `src/pages/Reader.tsx` (lines ~380-411), the sentence splitter flushes on every `。`/`！`/`？` regardless of context. When such a character appears inside 「…」 / 『…』 quotes (e.g. `太郎は「かわいそうに。だれかが…」と言った。`), the splitter breaks mid-quote, so translation mode sends `太郎は「かわいそうに。` as a standalone sentence.
+
+## Fix
+Track quote depth inside the `sentences` `useMemo` and only flush on terminal punctuation when `quoteDepth === 0`. Newline-driven flushes stay unchanged (paragraph layer already protects quoted spans).
+
+Pseudocode:
+```ts
+let quoteDepth = 0;
+const updateDepth = (text: string) => {
+  for (const ch of text) {
+    if (ch === '「' || ch === '『') quoteDepth++;
+    else if ((ch === '」' || ch === '』') && quoteDepth > 0) quoteDepth--;
+  }
+};
+
+tokens.forEach((token) => {
+  // ...existing newline handling unchanged...
+  current.push(token);
+  updateDepth(token.t);
+  const hasTerminal = /[。！？]/.test(token.t);
+  if (hasTerminal && quoteDepth === 0) flush(false);
+});
+```
+
+No other change. Translation cache keys stay valid because previously-split fragments will simply merge into the correct full sentence going forward; old cached partial entries become unused (harmless).
 
 ## File
-`src/pages/Reader.tsx`
-
-## Changes
-
-### 1. Close difficulty popover on selection
-The popover buttons (L849-860) currently call `setDifficulty(d)`. Update the click handler to also close the popover:
-
-```tsx
-onClick={() => {
-  setDifficulty(d);
-  setLevelOpen(false);
-}}
-```
-
-(The in-sheet pills around L929-935 live inside the Reader Settings sheet, which is a different UI — leave them alone unless requested.)
-
-### 2. Anchor reader on top-visible sentence when toggling translations
-We already track the top-most visible sentence in `currentSentenceRef` via IntersectionObserver, and `sentenceRefs` maps idx → DOM element. Add a wrapper:
-
-```ts
-const toggleTranslations = () => {
-  const anchorIdx = currentSentenceRef.current;
-  setShowTranslations(!showTranslations);
-  if (anchorIdx == null) return;
-  // Two rAFs: let React commit + browser lay out the new/removed translation lines.
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const el = sentenceRefs.current.get(anchorIdx);
-      if (!el) return;
-      const HEADER_OFFSET = 64;
-      const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-      window.scrollTo({ top: y, behavior: 'auto' });
-    });
-  });
-};
-```
-
-Wire it:
-- Header chip (L874): `onClick={() => setShowTranslations(!showTranslations)}` → `onClick={toggleTranslations}`
-- Settings sheet switch (L995): `onCheckedChange={setShowTranslations}` → `onCheckedChange={toggleTranslations}`
-
-`behavior: 'auto'` (instant) avoids a jarring smooth-scroll fight after the layout shift.
+- `src/pages/Reader.tsx` — update the `sentences` `useMemo`.
