@@ -434,7 +434,7 @@
 }
 .tap-scale-sm:active {
  transform: scale(0.92);
- background-color: hsl(var(--accent) / 0.17);
+ background-color: hsl(var(--foreground) / 0.08);
 }
 
 /* Card lift — soft hover + tap */
