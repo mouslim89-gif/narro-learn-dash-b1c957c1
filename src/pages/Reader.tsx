@@ -1009,7 +1009,7 @@ export default function Reader() {
  <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
- <Switch checked={showTranslations} onCheckedChange={setShowTranslations} />
+ <Switch checked={showTranslations} onCheckedChange={toggleTranslations} />
  </div>
  </div>
 
