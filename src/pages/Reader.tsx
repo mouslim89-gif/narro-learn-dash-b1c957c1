@@ -380,12 +380,19 @@ export default function Reader() {
  const sentences = useMemo(() => {
  const result: { tokens: BookToken[]; breakAfter: boolean }[] = [];
  let current: BookToken[] = [];
+ let quoteDepth = 0;
  const flush = (breakAfter: boolean) => {
  if (current.length > 0) {
  result.push({ tokens: current, breakAfter });
  current = [];
  } else if (breakAfter && result.length > 0) {
  result[result.length - 1].breakAfter = true;
+ }
+ };
+ const updateQuoteDepth = (text: string) => {
+ for (const ch of text) {
+ if (ch === '「' || ch === '『') quoteDepth++;
+ else if ((ch === '」' || ch === '』') && quoteDepth > 0) quoteDepth--;
  }
  };
  tokens.forEach((token) => {
@@ -397,12 +404,16 @@ export default function Reader() {
  // Tokens containing embedded newlines: split off the newline as a break.
  if (token.t.includes('\n')) {
  const cleaned = token.t.replace(/[\n\r]+/g,'');
- if (cleaned.length > 0) current.push({ ...token, t: cleaned });
+ if (cleaned.length > 0) {
+ current.push({ ...token, t: cleaned });
+ updateQuoteDepth(cleaned);
+ }
  flush(true);
  return;
  }
  current.push(token);
- if (token.t.includes('。') || token.t.includes('！') || token.t.includes('？')) {
+ updateQuoteDepth(token.t);
+ if (quoteDepth === 0 && /[。！？]/.test(token.t)) {
  flush(false);
  }
  });
