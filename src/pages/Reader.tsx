@@ -832,7 +832,7 @@ export default function Reader() {
                   'flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
                   levelOpen
                     ? 'bg-foreground/10 ring-1 ring-border/50'
-                    : 'hover:bg-foreground/5 active:bg-foreground/10',
+                    : '',
                 )}
                 aria-label="Change reading level"
               >
