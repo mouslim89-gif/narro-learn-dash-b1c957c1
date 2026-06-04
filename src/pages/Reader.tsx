@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, List, CheckCircle2, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, List, CheckCircle2, ChevronRight, ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
@@ -208,6 +208,7 @@ export default function Reader() {
   const progressMap = useReadingProgressStore((s) => s.progress);
   const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
   const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
+  const [levelOpen, setLevelOpen] = useState(false);
   const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
   const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
     try {
@@ -794,6 +795,7 @@ export default function Reader() {
     if (!spanEl) return;
     const rect = spanEl.getBoundingClientRect();
     setMiniPopup(null);
+    setLevelOpen(false);
     setSentenceTranslation({
       sentenceIdx,
       japanese,
@@ -813,16 +815,33 @@ export default function Reader() {
           <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
             <ArrowLeft className="h-5 w-5" />
           </HeaderChip>
-          <Popover>
+          <Popover
+            open={levelOpen}
+            onOpenChange={(o) => {
+              setLevelOpen(o);
+              if (o) {
+                setMiniPopup(null);
+                setSentenceTranslation(null);
+              }
+            }}
+          >
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="min-w-0 flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 hover:bg-foreground/5 active:bg-foreground/10 smooth-colors"
+                className={cn(
+                  'flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
+                  levelOpen
+                    ? 'bg-foreground/10 ring-1 ring-border/50'
+                    : 'hover:bg-foreground/5 active:bg-foreground/10',
+                )}
                 aria-label="Change reading level"
               >
-                <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="font-japanese text-sm font-bold leading-tight whitespace-normal break-words">{book.titleJp}</p>
+                <p className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5 mt-0.5">
                   {difficultyConfig[difficulty].label}
+                  <ChevronDown
+                    className={cn('h-3 w-3 transition-transform', levelOpen && 'rotate-180')}
+                  />
                 </p>
               </button>
             </PopoverTrigger>
@@ -1314,6 +1333,7 @@ export default function Reader() {
                             const rect = spanEl?.getBoundingClientRect();
                             if (!rect) return;
                             setSentenceTranslation(null);
+                            setLevelOpen(false);
                             setMiniPopup({
                               text: token.t,
                               baseForm: token.b,
