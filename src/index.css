@@ -434,7 +434,7 @@
 }
 .tap-scale-sm:active {
  transform: scale(0.92);
- background-color: hsl(var(--foreground) / 0.08);
+ background-color: hsl(var(--accent) / 0.17);
 }
 
 /* Card lift — soft hover + tap */
@@ -457,7 +457,7 @@
  content:"";
  position: absolute;
  inset: 0;
- background: radial-gradient(circle at center, hsl(var(--foreground) / 0.08), transparent 60%);
+ background: radial-gradient(circle at center, hsl(var(--accent) / 0.20), transparent 60%);
  opacity: 0;
  pointer-events: none;
  transition: opacity 0.4s var(--ease-out-soft);
