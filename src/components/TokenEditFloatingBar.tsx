@@ -17,7 +17,9 @@ interface Props {
  onExitEditMode: () => void;
 }
 
-type ScopeKey = string; //'book'|'global'|'shared-book'|'shared-global'encoded as bookId/'*'/'sb'/'sg'export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearSelection, onExitEditMode }: Props) {
+type ScopeKey = string;
+
+export function TokenEditFloatingBar({ bookId, selectionCount, onMerge, onClearSelection, onExitEditMode }: Props) {
  const { user } = useAuth();
  const isAdmin = useIsAdmin();
  const { saved, pending, undoPending, clearPending, applyPending, deleteSaved } = useUserRulesStore();
