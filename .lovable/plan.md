@@ -1,27 +1,49 @@
-## Reader header — single-popup rule, clickable title affordance, full title
+## Objectif
+S'assurer que **chaque bouton** de l'app a un retour visuel clair au tap (couleur + micro-animation), puisque tous les `hover:` / `active:` ont été supprimés précédemment.
 
-All changes in `src/pages/Reader.tsx` header block.
+## Stratégie
+Centraliser le feedback dans 2 endroits pour ne pas avoir à toucher chaque composant :
 
-### 1. One bubble at a time
-Make the reading-level Popover controlled with a `levelOpen` state.
-- Opening it → `setMiniPopup(null)` + `setSentenceTranslation(null)`.
-- Opening a word mini popup (token click ~line 1317) or sentence translation → `setLevelOpen(false)`.
+### 1. `src/components/ui/button.tsx` (couvre 80% des boutons)
+Ajouter au `cva` base : `tap-scale active:scale-[0.96]`
+Ajouter par variant un overlay de couleur au `:active` :
+- `default` (primary) → `active:bg-primary/85`
+- `destructive` → `active:bg-destructive/85`
+- `secondary` → `active:bg-secondary/70`
+- `outline` → `active:bg-accent/10`
+- `ghost` → `active:bg-foreground/8`
+- `link` → `active:opacity-70`
 
-### 2. Visible "open" state on the title
-While `levelOpen` is true the title button gets `bg-foreground/10 ring-1 ring-border/50` and the chevron rotates 180°.
+### 2. `src/index.css` — renforcer `.tap-scale` et `.tap-scale-sm`
+S'assurer que les classes incluent bien :
+- `transform: scale(0.96)` sur `:active`
+- un léger `background-color` overlay via `::after` (déjà partiellement en place)
+- `-webkit-tap-highlight-color: transparent` + `touch-action: manipulation`
 
-### 3. Clickable affordance next to the title
-Inline `ChevronDown` (lucide, `h-3 w-3 text-muted-foreground`) next to the difficulty label, rotating on open:
+### 3. Composants custom qui n'utilisent pas `<Button>`
+Audit ciblé + ajout de `tap-scale` (ou `tap-scale-sm`) + une classe `active:bg-*` adaptée au fond :
+- `BottomNav.tsx` — items de navigation (couleur d'item actif déjà OK, ajouter feedback au tap)
+- `NavLink.tsx` — rien à faire (wrapper)
+- `ReaderToken.tsx` — déjà géré par `animate-word-tap`, vérifier
+- `PlayWordButton.tsx` — déjà `tap-scale-sm`, OK
+- `SrsButtons.tsx` — déjà `tap-scale`, OK
+- `BookCard.tsx` — `card-lift tap-scale` à confirmer
+- `TokenEditFloatingBar.tsx`, `WordPopup.tsx`, `WordMiniPopup.tsx`, `AudioPlayer.tsx`, `GrammarPanel.tsx`, `Reader.tsx` (icon buttons `.reader-icon-btn` déjà gérés en CSS)
+- `MyBooks.tsx`, `Library.tsx`, `BookDetail.tsx`, `Flashcards.tsx`, `Settings.tsx`, `Dictionary.tsx`, `WordDetail.tsx`, `Auth.tsx` — sweep des `<button>` natifs et `<div onClick>` interactifs
 
-```
-浦島太郎
-Intermediate ▾
-```
+### 4. shadcn ui interactifs (au-delà de Button)
+Ajouter feedback sur les surfaces tappables : `tabs trigger`, `select trigger`, `dropdown item`, `accordion trigger`, `toggle`, `switch`, `checkbox`, `radio` — ajouter `active:bg-*` au `cn()` de base de chaque.
 
-### 4. Show the full Japanese title
-Remove `truncate` from the title `<p>` and drop `min-w-0` constraints so the full `book.titleJp` wraps if needed. Title becomes `text-sm font-bold leading-tight` with `whitespace-normal break-words`. The header row stays `flex items-center` so wrapping the title doesn't push the side chips out — the title column grows vertically only.
+## Approche d'exécution
+1. Patch `button.tsx` + `index.css` (gain immédiat sur la majorité)
+2. Sweep `rg "<button"` et `rg "onClick"` dans `src/components` et `src/pages` → ajouter `tap-scale` + `active:bg-*` sur les surfaces qui n'en ont pas
+3. Patch ciblé des composants shadcn les plus utilisés (tabs, select, dropdown-menu, toggle, switch, accordion)
+4. Vérification visuelle via preview sur quelques écrans clés (Library, Reader, Flashcards, Settings)
 
-### Technical notes
-- `<Popover open={levelOpen} onOpenChange={(o) => { setLevelOpen(o); if (o) { setMiniPopup(null); setSentenceTranslation(null); } }}>`
-- Add `ChevronDown` to the existing `lucide-react` import.
-- No changes outside the header and the two popup-opening sites.
+## Question
+**Quelle intensité de feedback veux-tu ?**
+- (A) **Subtil** : `scale(0.96)` + overlay 8% (cohérent avec ce qui est déjà là)
+- (B) **Marqué / Duolingo-like** : `scale(0.94)` + overlay 15% + 150ms
+- (C) **Coloré** : overlay teinté `--accent` (doré) au lieu de neutre, pour un effet plus signature
+
+Je pars sur **(A)** par défaut sauf indication contraire.

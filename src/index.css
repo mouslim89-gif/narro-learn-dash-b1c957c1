@@ -413,9 +413,17 @@
  -webkit-tap-highlight-color: transparent;
  touch-action: manipulation;
 }
+.tap-scale:active {
+ transform: scale(0.96);
+}
 .tap-scale-sm {
  transition: transform 0.15s var(--ease-out-soft), background-color 0.15s var(--ease-out-soft);
  -webkit-tap-highlight-color: transparent;
+ touch-action: manipulation;
+}
+.tap-scale-sm:active {
+ transform: scale(0.92);
+ background-color: hsl(var(--foreground) / 0.08);
 }
 
 /* Card lift — soft hover + tap */
@@ -424,6 +432,9 @@
  transform 0.25s var(--ease-out-soft),
  box-shadow 0.25s var(--ease-out-soft);
  -webkit-tap-highlight-color: transparent;
+}
+.card-lift:active {
+ transform: scale(0.985);
 }
 
 /* Subtle ripple-like flash on press (color-only, no layout) */
