@@ -814,16 +814,33 @@ export default function Reader() {
           <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
             <ArrowLeft className="h-5 w-5" />
           </HeaderChip>
-          <Popover>
+          <Popover
+            open={levelOpen}
+            onOpenChange={(o) => {
+              setLevelOpen(o);
+              if (o) {
+                setMiniPopup(null);
+                setSentenceTranslation(null);
+              }
+            }}
+          >
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="min-w-0 flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 hover:bg-foreground/5 active:bg-foreground/10 smooth-colors"
+                className={cn(
+                  'flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
+                  levelOpen
+                    ? 'bg-foreground/10 ring-1 ring-border/50'
+                    : 'hover:bg-foreground/5 active:bg-foreground/10',
+                )}
                 aria-label="Change reading level"
               >
-                <p className="font-japanese text-sm font-bold truncate">{book.titleJp}</p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="font-japanese text-sm font-bold leading-tight whitespace-normal break-words">{book.titleJp}</p>
+                <p className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5 mt-0.5">
                   {difficultyConfig[difficulty].label}
+                  <ChevronDown
+                    className={cn('h-3 w-3 transition-transform', levelOpen && 'rotate-180')}
+                  />
                 </p>
               </button>
             </PopoverTrigger>
