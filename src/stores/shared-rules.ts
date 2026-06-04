@@ -9,7 +9,8 @@ export interface SharedRule {
 }
 
 interface SharedRulesState {
- saved: Record<string, SharedRule[]>; // bookId or'*'loading: boolean;
+ saved: Record<string, SharedRule[]>; // bookId or '*'
+ loading: boolean;
  loaded: boolean;
 
  loadShared: () => Promise<void>;
