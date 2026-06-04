@@ -11,9 +11,9 @@ const buttonVariants = cva(
  variant: {
  default:"bg-primary text-primary-foreground active:bg-primary/85",
  destructive:"bg-destructive text-destructive-foreground active:bg-destructive/85",
-        outline:"border border-input bg-background active:bg-[hsl(var(--accent)/0.17)]",
-        secondary:"bg-secondary text-secondary-foreground active:bg-[hsl(var(--accent)/0.17)]",
-        ghost:"active:bg-[hsl(var(--accent)/0.17)]",
+        outline:"border border-input bg-background active:bg-[hsl(var(--accent)/0.25)]",
+        secondary:"bg-secondary text-secondary-foreground active:bg-[hsl(var(--accent)/0.25)]",
+        ghost:"active:bg-[hsl(var(--accent)/0.25)]",
  link:"text-primary underline-offset-4 active:opacity-70",
  },
  size: {
