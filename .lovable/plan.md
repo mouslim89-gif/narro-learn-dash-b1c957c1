@@ -1,39 +1,30 @@
-# Selection color → accent amber (global)
+## Remove header subtitles + align Grammar Notes panel style
 
-Tous les états sélectionnés/actifs des boutons (segments, toggles, tabs, icônes du reader) passent du gris/navy actuel à l'accent ambre (`hsl(var(--accent))`), avec un fond tinté léger + ring ambre pour rester subtil et cohérent avec la palette warm paper.
+### 1. Remove subtitle `<p>` under page titles
 
-## Changements
+Remove the small `inline-block h-px w-6 …` decorative line + text under the title in each top-level page header:
 
-### 1. `src/index.css` — token réutilisable + reader icon
-Ajouter une classe utilitaire `.is-selected` et mettre à jour `.reader-icon-btn[data-active="true"]` :
-```css
-.reader-icon-btn[data-active="true"] {
-  color: hsl(var(--accent));
-  background-color: hsl(var(--accent) / 0.12);
-}
-```
+- **`src/pages/Library.tsx`** — remove `Learn Japanese through reading`
+- **`src/pages/MyBooks.tsx`** — remove `Continue where you left off`
+- **`src/pages/Settings.tsx`** — remove `Make it yours`
+- **`src/pages/Flashcards.tsx`** — remove `{n} saved words`
 
-### 2. `src/pages/Reader.tsx` — pills segmented (difficulty / font size / japanese font)
-Ligne 906 : `pillActive` devient
-```ts
-'bg-[hsl(var(--accent)/0.12)] text-[hsl(var(--accent))] ring-1 ring-[hsl(var(--accent)/0.35)] shadow-sm'
-```
-Ligne 821 (toggle token-edit mode) : `bg-foreground/10 ring-1 ring-border/50` → `bg-[hsl(var(--accent)/0.12)] ring-1 ring-[hsl(var(--accent)/0.35)] text-[hsl(var(--accent))]`.
-Ligne 1141 (token edit chip selected) : `bg-primary text-primary-foreground ring-primary/30` → `bg-accent text-accent-foreground ring-accent/40`.
+Only the `<p>` is removed. Titles, icons, header buttons, layout untouched. `Auth.tsx` / `ResetPassword.tsx` are auth screens with their own subtitle layout — left alone.
 
-### 3. `src/components/ui/tabs.tsx`
-`TabsTrigger` active state : `data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm` → `data-[state=active]:bg-[hsl(var(--accent)/0.12)] data-[state=active]:text-[hsl(var(--accent))] data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-[hsl(var(--accent)/0.35)]`.
+### 2. Restyle Grammar Notes panel to match Chapters/Reader Settings
 
-### 4. `src/pages/Flashcards.tsx`
-Ligne 163 (card sélectionnée) : `border-primary/40 ring-1 ring-primary/30` → `border-accent/50 ring-1 ring-accent/40 bg-accent/5`.
-Ligne 208 (icône check) : `text-primary` → `text-accent`.
+The Reader's `Chapters` and `Reader Settings` panels both use the shadcn `Sheet` opened from the bottom (`side="bottom"`, `rounded-t-3xl max-h-[80vh]`) with a sticky header containing a `wordmark font-serif text-[22px]` title and a `border-b border-border/40`.
 
-### 5. `src/components/TokenEditFloatingBar.tsx` (admin)
-Les 4 chips scope : `bg-primary text-primary-foreground` → `bg-accent text-accent-foreground` pour rester cohérent.
+**`src/components/GrammarPanel.tsx`** — replace the current custom fixed overlay (`fixed inset-0 z-40 …` + `bg-black/40` backdrop + `relative z-50 …` card + drag handle + small title row) with a `Sheet` matching the Chapters panel:
 
-## Hors scope
-- Boutons CTA primaires (Continue, Save…) : restent navy `bg-primary` — c'est l'action principale, pas un état sélectionné.
-- Liens actifs de la `BottomNav` : déjà gérés séparément, à voir dans un second tour si tu veux aussi les passer en ambre.
-- Couleurs SRS / known-words / JLPT levels : inchangées (sémantique distincte).
+- Use `<Sheet open={open} onOpenChange={(o) => !o && onClose()}>`
+- `<SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0">`
+- Sticky header: `sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40` with `<h2 className="wordmark font-serif text-[22px] leading-none">Grammar Notes</h2>` (drop the decorative 文 character and the round X button — Sheet provides its own close)
+- Body (notes list, loading / error / empty states) kept as-is, wrapped in `px-4 py-4` to mirror Chapters spacing
+- Remove the manual `useBodyScrollLock` (Sheet handles it) and the manual backdrop
 
-Confirme et je l'applique.
+No changes to data fetching, props, or behavior. The `partIdx`/`bookId`/`difficulty` reset effect stays intact.
+
+### Out of scope
+
+No other components, no token changes, no behavior changes.

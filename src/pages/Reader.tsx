@@ -818,7 +818,7 @@ export default function Reader() {
  type="button"
  className={cn('flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
  levelOpen
- ?'bg-[hsl(var(--accent)/0.12)] text-[hsl(var(--accent))] ring-1 ring-[hsl(var(--accent)/0.35)]':'',
+ ?'bg-foreground/10 ring-1 ring-border/50':'',
  )}
  aria-label="Change reading level"
  >
@@ -903,7 +903,7 @@ export default function Reader() {
  );
 
  const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
- const pillActive ='bg-[hsl(var(--accent)/0.12)] text-[hsl(var(--accent))] shadow-sm ring-1 ring-[hsl(var(--accent)/0.35)]';
+ const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
  const pillIdle ='text-muted-foreground';
 
  const settingsBody = (
@@ -1138,7 +1138,7 @@ export default function Reader() {
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done
  ?'bg-primary/15 text-primary ring-primary/20': isCurrent
- ?'bg-accent text-accent-foreground ring-accent/40':'bg-muted text-muted-foreground ring-border/40',
+ ?'bg-primary text-primary-foreground ring-primary/30':'bg-muted text-muted-foreground ring-border/40',
  )}>
  {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
  </span>
