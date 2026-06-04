@@ -1,30 +1,29 @@
-## Remove header subtitles + align Grammar Notes panel style
+# Replace gray tap feedback with warm amber accent
 
-### 1. Remove subtitle `<p>` under page titles
+Le feedback au clic/maintien (`active:bg-*`) utilise actuellement du gris (`bg-accent/10`, `bg-foreground/10`, etc.), ce qui rend l'app monotone. On le remplace par un overlay **ambré** basé sur `--accent` à **~17% d'opacité** (`/17` arrondi à `/15` côté Tailwind pour rester sur des paliers standards, ou `/[0.17]` pour exact).
 
-Remove the small `inline-block h-px w-6 …` decorative line + text under the title in each top-level page header:
+## Changements
 
-- **`src/pages/Library.tsx`** — remove `Learn Japanese through reading`
-- **`src/pages/MyBooks.tsx`** — remove `Continue where you left off`
-- **`src/pages/Settings.tsx`** — remove `Make it yours`
-- **`src/pages/Flashcards.tsx`** — remove `{n} saved words`
+### 1. `src/components/ui/button.tsx`
+Mettre à jour les `active:` de chaque variante :
+- `default` : `active:bg-primary/85` → garde primary (déjà coloré, OK) **ou** `active:bg-[hsl(var(--accent)/0.85)]` si on veut uniformiser. **Décision : garder primary** (déjà coloré, pas concerné par "monotone").
+- `destructive` : garder rouge (déjà coloré).
+- `outline` : `active:bg-accent/10` → `active:bg-[hsl(var(--accent)/0.17)]`
+- `secondary` : `active:bg-secondary/70` → `active:bg-[hsl(var(--accent)/0.17)]`
+- `ghost` : `active:bg-foreground/10` → `active:bg-[hsl(var(--accent)/0.17)]`
+- `link` : inchangé (opacity)
 
-Only the `<p>` is removed. Titles, icons, header buttons, layout untouched. `Auth.tsx` / `ResetPassword.tsx` are auth screens with their own subtitle layout — left alone.
+### 2. `src/index.css` — utilitaires globaux
+- `.tap-scale-sm:active` : `background-color: hsl(var(--foreground) / 0.08)` → `hsl(var(--accent) / 0.17)`
+- `.press-flash::after` : radial gradient `hsl(var(--foreground) / 0.08)` → `hsl(var(--accent) / 0.20)`
 
-### 2. Restyle Grammar Notes panel to match Chapters/Reader Settings
+### 3. Mode sombre
+`--accent` en dark = `36 76% 50%` (un peu plus saturé) — l'overlay à 17% reste lisible sans surcharge. Pas de surcharge `.dark` nécessaire.
 
-The Reader's `Chapters` and `Reader Settings` panels both use the shadcn `Sheet` opened from the bottom (`side="bottom"`, `rounded-t-3xl max-h-[80vh]`) with a sticky header containing a `wordmark font-serif text-[22px]` title and a `border-b border-border/40`.
+## Hors scope
+- Les boutons `primary`/`destructive` qui ont déjà une couleur active distincte restent inchangés.
+- Les hovers (desktop) ne sont pas modifiés — l'app est mobile-first, seul `active:` compte.
+- Pas de changement sur les Sheets, Dialogs, ou inputs.
 
-**`src/components/GrammarPanel.tsx`** — replace the current custom fixed overlay (`fixed inset-0 z-40 …` + `bg-black/40` backdrop + `relative z-50 …` card + drag handle + small title row) with a `Sheet` matching the Chapters panel:
-
-- Use `<Sheet open={open} onOpenChange={(o) => !o && onClose()}>`
-- `<SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0">`
-- Sticky header: `sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40` with `<h2 className="wordmark font-serif text-[22px] leading-none">Grammar Notes</h2>` (drop the decorative 文 character and the round X button — Sheet provides its own close)
-- Body (notes list, loading / error / empty states) kept as-is, wrapped in `px-4 py-4` to mirror Chapters spacing
-- Remove the manual `useBodyScrollLock` (Sheet handles it) and the manual backdrop
-
-No changes to data fetching, props, or behavior. The `partIdx`/`bookId`/`difficulty` reset effect stays intact.
-
-### Out of scope
-
-No other components, no token changes, no behavior changes.
+## Vérification
+Tester sur Reader (boutons chrome), BottomNav, Settings (rows ghost), Flashcards (SrsButtons outline) — le tap doit flasher en ambré chaud, plus en gris.
