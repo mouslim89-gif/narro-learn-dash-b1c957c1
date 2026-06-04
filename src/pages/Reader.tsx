@@ -97,7 +97,7 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
  continue;
  }
 
- // Replace standalone "一" with zero-width space
+ // Replace standalone"一"with zero-width space
  if (token.t ==='一'&& (i === 0 || raw[i-1].t ==='\n') && (i === raw.length - 1 || raw[i+1].t ==='\n')) {
  out.push({ ...token, t:'​'});
  } else {
@@ -138,7 +138,7 @@ const SettingsSection = ({ label, children }: { label: string; children: ReactNo
  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground font-serif">
  {label}
  </p>
- <div className="mt-1 h-px w-8 bg-border/60" />
+ <div className="mt-1 h-px w-8 bg-border/60"/>
  <div className="mt-3">{children}</div>
  </div>
 );
@@ -323,7 +323,7 @@ export default function Reader() {
  if (raw && raw.length > 0) {
  let out = applyTokenOverrides(id, cleanRubyTokens(raw));
  // Apply custom rules before automatic post-processing so rules like
- // ["九|時", "九時:くじ"] can override the raw Kuromoji split.
+ // ["九|時","九時:くじ"] can override the raw Kuromoji split.
  if (allRules.length > 0) out = applyRules(allRules, out);
  out = gluePhrasalCompounds(mergeCounterCompounds(mergeConjugatedTokens(splitNoParticleNouns(out))));
  // Apply them again after post-processing to keep rules targeting displayed tokens working.
@@ -554,7 +554,7 @@ export default function Reader() {
  if (min !== Infinity) currentSentenceRef.current = min;
  }
  },
- // Treat "visible" as crossing ~25% from top of viewport.
+ // Treat"visible"as crossing ~25% from top of viewport.
  { root: null, rootMargin:'-15% 0px -55% 0px', threshold: 0 },
  );
  sentenceRefs.current.forEach((el) => observer.observe(el));
@@ -579,7 +579,7 @@ export default function Reader() {
  }, [id, chapterId, difficulty, updateProgress]);
 
  // Flush pending cloud pushes when the user leaves / hides the tab / changes
- // chapter. This is the difference between "sometimes saves" and "always saves".
+ // chapter. This is the difference between"sometimes saves"and"always saves".
  useEffect(() => {
  const flush = () => flushPendingProgressPushes();
  const onVisibility = () => { if (document.visibilityState ==='hidden') flush(); };
@@ -801,7 +801,7 @@ export default function Reader() {
  >
  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
- <ArrowLeft className="h-5 w-5" />
+ <ArrowLeft className="h-5 w-5"/>
  </HeaderChip>
  <Popover
  open={levelOpen}
@@ -831,7 +831,7 @@ export default function Reader() {
  </p>
  </button>
  </PopoverTrigger>
- <PopoverContent align="center" sideOffset={8} className="w-auto p-2 rounded-2xl">
+ <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
  <div className="flex flex-col gap-1.5">
  <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
  <div className="flex gap-1 rounded-full bg-muted p-1">
@@ -857,22 +857,22 @@ export default function Reader() {
  active={showFurigana}
  title={showFurigana ?'Hide Furigana':'Show Furigana'}
  >
- {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
+ {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
  </HeaderChip>
  <HeaderChip
  onClick={() => setShowTranslations(!showTranslations)}
  active={showTranslations}
  title={showTranslations ?'Hide translations':'Show translations'}
  >
- <Languages className="h-5 w-5" />
+ <Languages className="h-5 w-5"/>
  </HeaderChip>
 
  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
- <BookType className="h-5 w-5" />
+ <BookType className="h-5 w-5"/>
  </HeaderChip>
  {(hasParts(book) || (book.chapters && book.chapters.length > 1)) && (
  <HeaderChip onClick={() => setShowChapters(true)} title="Chapters">
- <List className="h-5 w-5" />
+ <List className="h-5 w-5"/>
  </HeaderChip>
  )}
  <HeaderChip
@@ -880,7 +880,7 @@ export default function Reader() {
  active={showSettings}
  title="Settings"
  >
- <Settings className="h-5 w-5" />
+ <Settings className="h-5 w-5"/>
  </HeaderChip>
  </div>
  </div>
@@ -898,7 +898,7 @@ export default function Reader() {
  <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
  {children}
  </h2>
- <div className="flex-1 h-px bg-border/60" />
+ <div className="flex-1 h-px bg-border/60"/>
  </div>
  );
 
@@ -964,21 +964,21 @@ export default function Reader() {
  <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
  <div className="flex items-center justify-between gap-3 px-4 py-4">
  <span className="flex items-center gap-2 text-[15px] font-medium">
- {readerDarkMode ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-muted-foreground" />}
+ {readerDarkMode ? <Moon className="h-4 w-4 text-muted-foreground"/> : <Sun className="h-4 w-4 text-muted-foreground"/>}
  Dark mode
  </span>
  <Switch checked={readerDarkMode} onCheckedChange={setReaderDarkMode} />
  </div>
  <div className="flex items-center justify-between gap-3 px-4 py-4">
  <span className="flex items-center gap-2 text-[15px] font-medium">
- {showFurigana ? <Eye className="h-4 w-4 text-muted-foreground" /> : <EyeClosed className="h-4 w-4 text-muted-foreground" />}
+ {showFurigana ? <Eye className="h-4 w-4 text-muted-foreground"/> : <EyeClosed className="h-4 w-4 text-muted-foreground"/>}
  Show furigana
  </span>
  <Switch checked={showFurigana} onCheckedChange={setShowFurigana} />
  </div>
  <div className="flex items-center justify-between gap-3 px-4 py-4">
  <span className="flex items-center gap-2 text-[15px] font-medium">
- <Languages className="h-4 w-4 text-muted-foreground" />
+ <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
  <Switch checked={showTranslations} onCheckedChange={setShowTranslations} />
@@ -999,21 +999,21 @@ export default function Reader() {
  <>
  <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
  <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-new" />
+ <span className="color-dot color-dot-new"/>
  New words
  </span>
  <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
  </div>
  <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
  <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-learning" />
+ <span className="color-dot color-dot-learning"/>
  Learning
  </span>
  <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
  </div>
  <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
  <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-known" />
+ <span className="color-dot color-dot-known"/>
  Known
  </span>
  <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
@@ -1030,7 +1030,7 @@ export default function Reader() {
  <div className="flex items-center justify-between gap-3 px-4 py-4">
  <span className="flex flex-col">
  <span className="flex items-center gap-2 text-[15px] font-medium">
- <Wrench className="h-4 w-4 text-muted-foreground" />
+ <Wrench className="h-4 w-4 text-muted-foreground"/>
  Token edit mode
  </span>
  <span className="text-xs text-muted-foreground mt-0.5">Tap tokens to merge or split</span>
@@ -1060,7 +1060,7 @@ export default function Reader() {
  >
  <div className="mb-5 flex items-center gap-3">
  <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
- <div className="flex-1 h-px bg-border/60" />
+ <div className="flex-1 h-px bg-border/60"/>
  </div>
  {settingsBody}
  </SheetContent>
@@ -1073,7 +1073,7 @@ export default function Reader() {
  <div className="mx-auto max-w-2xl">
  <div className="mb-5 flex items-center gap-3">
  <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
- <div className="flex-1 h-px bg-border/60" />
+ <div className="flex-1 h-px bg-border/60"/>
  </div>
  {settingsBody}
  </div>
@@ -1140,18 +1140,18 @@ export default function Reader() {
  ?'bg-primary/15 text-primary ring-primary/20': isCurrent
  ?'bg-primary text-primary-foreground ring-primary/30':'bg-muted text-muted-foreground ring-border/40',
  )}>
- {done ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+ {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
  </span>
  <div className="min-w-0 flex-1">
  <p className="font-serif text-[15px] font-semibold leading-snug">{e.title}</p>
  {e.pct > 0 && !done && (
  <div className="mt-1.5 flex items-center gap-2">
- <Progress value={e.pct} className="h-1 flex-1" />
+ <Progress value={e.pct} className="h-1 flex-1"/>
  <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{e.pct}%</span>
  </div>
  )}
  </div>
- <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+ <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
  </div>
  </button>
  </li>
@@ -1178,9 +1178,9 @@ export default function Reader() {
  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{book.author}</p>
  <h1 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-4xl">{book.titleJp}</h1>
  <div className="mx-auto mt-4 flex items-center justify-center gap-3 text-muted-foreground">
- <span className="h-px w-8 bg-border/60" />
+ <span className="h-px w-8 bg-border/60"/>
  <p className="font-serif italic text-sm tracking-wide">{book.titleEn}</p>
- <span className="h-px w-8 bg-border/60" />
+ <span className="h-px w-8 bg-border/60"/>
  </div>
  </div>
  );
@@ -1197,7 +1197,7 @@ export default function Reader() {
  Chapter {chapterIndex + 1}
  </p>
  <p className="mt-1 font-serif text-lg font-bold">{chapter.title}</p>
- <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
+ <div className="mx-auto mt-3 h-px w-12 bg-border/60"/>
  </div>
  );
  })()}
@@ -1208,7 +1208,7 @@ export default function Reader() {
  Chapter {partIdx + 1}
  </p>
  <p className="mt-1 font-serif text-lg font-bold">{book.anchors[partIdx]}</p>
- <div className="mx-auto mt-3 h-px w-12 bg-border/60" />
+ <div className="mx-auto mt-3 h-px w-12 bg-border/60"/>
  </div>
  )}
 
@@ -1271,7 +1271,7 @@ export default function Reader() {
  }
 
  const editClass = tokenEditMode
- ?`outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ?'bg-primary/30 outline-primary':'hover:bg-primary/10'}`:'';
+ ?`outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ?'bg-primary/30 outline-primary':''}`:'';
 
  const tokenNode = (
  <ReaderToken
@@ -1375,7 +1375,7 @@ export default function Reader() {
  {englishLine}
  </span>
  ) : (
- <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse" style={{ width:'60%'}} />
+ <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse"style={{ width:'60%'}} />
  )
  )}
  </Fragment>
@@ -1395,19 +1395,19 @@ export default function Reader() {
  {partIdx > 0 ? (
  <button
  onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
- className="tap-scale smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm "
+ className="tap-scale smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm"
  >
- <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform " />
+ <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform"/>
  Chapter {partIdx}
  </button>
  ) : <span />}
  {partIdx < book.anchors.length - 1 ? (
  <button
  onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
- className="tap-scale smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md "
+ className="tap-scale smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md"
  >
  Chapter {partIdx + 2}
- <ArrowRight className="h-4 w-4 transition-transform " />
+ <ArrowRight className="h-4 w-4 transition-transform"/>
  </button>
  ) : <span />}
  </nav>

@@ -19,8 +19,8 @@ export function BookShelfRow({ book, progress }: { book: Book; progress: Reading
  className="book-paper relative flex h-24 w-16 flex-shrink-0 items-end overflow-hidden rounded-md p-2 shadow-md ring-1 ring-black/5"
  style={{ backgroundColor: book.coverColor }}
  >
- <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/40" />
- <div className="absolute inset-y-0 left-0 w-1.5 bg-black/20" />
+ <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/40"/>
+ <div className="absolute inset-y-0 left-0 w-1.5 bg-black/20"/>
  <p className="font-japanese relative text-[11px] font-bold leading-tight text-white drop-shadow-sm">{book.titleJp}</p>
  </div>
  <div className="min-w-0 flex-1">
@@ -35,10 +35,10 @@ export function BookShelfRow({ book, progress }: { book: Book; progress: Reading
  <p className="text-[11px] text-muted-foreground truncate">{book.author}</p>
  <div className="mt-2 flex items-center gap-2">
  <span className="text-[10px] font-semibold text-foreground/70 truncate">{difficultyConfig[progress.difficulty].label}</span>
- {hasAnyAudio(book) && <Headphones className="h-3 w-3 text-muted-foreground" />}
+ {hasAnyAudio(book) && <Headphones className="h-3 w-3 text-muted-foreground"/>}
  </div>
  <div className="mt-2 flex items-center gap-2">
- <Progress value={progress.progressPercent} className="h-1.5 flex-1" />
+ <Progress value={progress.progressPercent} className="h-1.5 flex-1"/>
  <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{Math.round(progress.progressPercent)}%</span>
  </div>
  <p className="mt-1 text-[10px] text-muted-foreground">

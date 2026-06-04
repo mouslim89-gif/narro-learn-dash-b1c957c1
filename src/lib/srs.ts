@@ -120,7 +120,7 @@ export function applyReview(card: SrsCard, quality: Quality): ReviewResult {
  };
 }
 
-/** Short human label like "10m", "1d", "3d", "2w". */
+/** Short human label like"10m","1d","3d","2w". */
 export function formatInterval(days: number): string {
  if (days <= 0) return'10m';
  if (days < 7) return`${days}d`;

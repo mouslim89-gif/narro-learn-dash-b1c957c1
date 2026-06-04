@@ -47,24 +47,24 @@ export default function ResetPassword() {
 
  return (
  <div className="library-header-bg relative flex min-h-screen items-center justify-center px-6 py-12 overflow-hidden">
- <span className="library-kanji-watermark" aria-hidden="true">鍵</span>
+ <span className="library-kanji-watermark"aria-hidden="true">鍵</span>
 
  <div className="relative z-10 w-full max-w-sm animate-fade-in-soft">
  <div className="mb-6 text-center">
  <h1 className="wordmark font-serif text-[32px] leading-none text-foreground">Set new password</h1>
  <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+ <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
  Choose something memorable
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle ml-2" />
+ <span className="inline-block h-px w-6 bg-foreground/30 align-middle ml-2"/>
  </p>
  </div>
 
  <div className="rounded-3xl bg-card/95 backdrop-blur-md ring-1 ring-border/40 shadow-lg p-7">
  <form onSubmit={handleSubmit} className="space-y-4">
  <div className="space-y-1.5">
- <Label htmlFor="pw" className="text-xs uppercase tracking-wider text-muted-foreground">New password</Label>
+ <Label htmlFor="pw"className="text-xs uppercase tracking-wider text-muted-foreground">New password</Label>
  <div className="relative">
- <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+ <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
  <Input
  id="pw"
  type="password"
@@ -77,9 +77,9 @@ export default function ResetPassword() {
  </div>
  </div>
  <div className="space-y-1.5">
- <Label htmlFor="pw2" className="text-xs uppercase tracking-wider text-muted-foreground">Confirm password</Label>
+ <Label htmlFor="pw2"className="text-xs uppercase tracking-wider text-muted-foreground">Confirm password</Label>
  <div className="relative">
- <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+ <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
  <Input
  id="pw2"
  type="password"
@@ -91,8 +91,8 @@ export default function ResetPassword() {
  />
  </div>
  </div>
- <Button type="submit" className="h-12 w-full rounded-xl text-[15px] font-semibold tap-scale-sm" disabled={submitting || !ready}>
- {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> :'Update password'}
+ <Button type="submit"className="h-12 w-full rounded-xl text-[15px] font-semibold tap-scale-sm"disabled={submitting || !ready}>
+ {submitting ? <Loader2 className="h-4 w-4 animate-spin"/> :'Update password'}
  </Button>
  </form>
  </div>

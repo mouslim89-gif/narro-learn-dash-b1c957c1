@@ -206,7 +206,7 @@
  letter-spacing: 0 !important;
  word-spacing: 0 !important;
  text-align: left;
- font-feature-settings: "palt" 0; /* full-width metrics → even spacing */
+ font-feature-settings:"palt"0; /* full-width metrics → even spacing */
  word-break: normal; /* allow CJK breaks between tokens (tokens themselves are nowrap) */
  overflow-wrap: break-word; /* fallback for long latin strings */
  line-break: strict; /* respect Japanese kinsoku line-break rules */
@@ -217,7 +217,7 @@
 }
 .reader-text rt {
  letter-spacing: 0;
- font-feature-settings: "palt" 0;
+ font-feature-settings:"palt"0;
 }
 
 /* ──────────────────────────────────────────
@@ -432,7 +432,7 @@
  overflow: hidden;
 }
 .press-flash::after {
- content: "";
+ content:"";
  position: absolute;
  inset: 0;
  background: radial-gradient(circle at center, hsl(var(--foreground) / 0.08), transparent 60%);

@@ -93,7 +93,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
  },
  hasWord: (id) => !!get().savedWords.find(w => w.id === id),
  incrementMastery: (id) => {
- // Treat as a "Good" review (back-compat helper)
+ // Treat as a"Good"review (back-compat helper)
  get().adjustMastery(id,'good');
  },
  resetMastery: (id) => {

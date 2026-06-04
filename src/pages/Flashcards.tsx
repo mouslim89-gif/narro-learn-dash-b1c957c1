@@ -112,15 +112,15 @@ export default function Flashcards() {
  {/* Masthead */}
  <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
  <div>
- <AnimatedTitle text="Flashcards" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
+ <AnimatedTitle text="Flashcards"className="font-serif text-[34px] font-bold leading-none tracking-tight"/>
  <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+ <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
  {savedWords.length} saved {savedWords.length === 1 ?'word':'words'}
  </p>
  </div>
  <Link to="/settings">
- <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
- <Settings className="h-[18px] w-[18px]" />
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
+ <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
  </header>
@@ -136,21 +136,21 @@ export default function Flashcards() {
  >
  <div className="flex items-center gap-4">
  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40">
- <Flame className="h-6 w-6" style={{ color:'hsl(36 80% 55%)'}} />
+ <Flame className="h-6 w-6"style={{ color:'hsl(36 80% 55%)'}} />
  </div>
  <div className="flex-1 min-w-0">
  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Due today</p>
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
- <Button size="sm" className="rounded-full px-4 shadow-md" onClick={enterReview}>
- Review <ArrowRight className="ml-1 h-3.5 w-3.5" />
+ <Button size="sm"className="rounded-full px-4 shadow-md"onClick={enterReview}>
+ Review <ArrowRight className="ml-1 h-3.5 w-3.5"/>
  </Button>
  </div>
  </div>
  ) : (
- <Button variant="outline" className="w-full h-12 rounded-full" onClick={enterReview}>
- <RotateCcw className="mr-2 h-4 w-4" />Review all words
+ <Button variant="outline"className="w-full h-12 rounded-full"onClick={enterReview}>
+ <RotateCcw className="mr-2 h-4 w-4"/>Review all words
  </Button>
  )}
  </section>
@@ -167,7 +167,7 @@ export default function Flashcards() {
  active ?'border-primary/40 ring-1 ring-primary/30':'border-border/40')}
  style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
  >
- <Icon className="h-4 w-4" style={{ color: iconColor }} />
+ <Icon className="h-4 w-4"style={{ color: iconColor }} />
  <p className="mt-1.5 text-2xl font-bold tabular-nums leading-none">{count}</p>
  <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
  </button>
@@ -177,7 +177,7 @@ export default function Flashcards() {
 
  {/* Search pill */}
  <div className="mt-4 px-6 relative">
- <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+ <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
  <Input
  placeholder="Search words..."
  value={search}
@@ -192,14 +192,14 @@ export default function Flashcards() {
  <DropdownMenuTrigger asChild>
  <button
  aria-label={`Sort by ${sortLabels[sortBy]}`}
- className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm "
+ className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm"
  >
- <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+ <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground"/>
  <span className="text-muted-foreground">Sort by</span>
  <span>{sortLabels[sortBy]}</span>
  </button>
  </DropdownMenuTrigger>
- <DropdownMenuContent align="end" className="w-44">
+ <DropdownMenuContent align="end"className="w-44">
  {(Object.keys(sortLabels) as SortOption[]).map(key => {
  const active = sortBy === key;
  return (
@@ -209,7 +209,7 @@ export default function Flashcards() {
  className="flex items-center justify-between gap-2"
  >
  <span>{sortLabels[key]}</span>
- {active && <Check className="h-3.5 w-3.5 text-primary" />}
+ {active && <Check className="h-3.5 w-3.5 text-primary"/>}
  </DropdownMenuItem>
  );
  })}
@@ -218,10 +218,10 @@ export default function Flashcards() {
  <button
  onClick={() => setSortDir(d => (d ==='asc'?'desc':'asc'))}
  aria-label={sortDir ==='asc'?'Ascending — tap to reverse':'Descending — tap to reverse'}
- className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm "
+ className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm"
  >
- {sortDir ==='asc'? <ArrowUp className="h-4 w-4" />
- : <ArrowDown className="h-4 w-4" />}
+ {sortDir ==='asc'? <ArrowUp className="h-4 w-4"/>
+ : <ArrowDown className="h-4 w-4"/>}
  </button>
  </div>
  </>
@@ -230,11 +230,11 @@ export default function Flashcards() {
  {savedWords.length === 0 ? (
  <div className={`mt-24 flex flex-col items-center text-center px-6 transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
- <Sparkles className="h-9 w-9 text-primary" />
+ <Sparkles className="h-9 w-9 text-primary"/>
  </div>
  <p className="mt-5 font-serif text-lg font-semibold">No flashcards yet</p>
  <p className="mt-1 text-sm text-muted-foreground">Tap a word while reading to save it here.</p>
- <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5">Browse Library</Button></Link>
+ <Link to="/"className="mt-5"><Button size="sm"className="rounded-full px-5">Browse Library</Button></Link>
  </div>
  ) : (
  <ul className="stagger-children mt-2 space-y-2 px-6">
@@ -257,17 +257,17 @@ export default function Flashcards() {
  </div>
  <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{w.meanings.join(',')}</p>
  <div className="mt-2 flex items-center gap-2">
- <Progress value={pct} className="h-1 flex-1" />
+ <Progress value={pct} className="h-1 flex-1"/>
  <span className="text-[10px] font-semibold tabular-nums text-foreground/60">{Math.round(pct)}%</span>
  </div>
  </div>
- <PlayWordButton word={w.word} reading={w.reading} className="flex-shrink-0" />
+ <PlayWordButton word={w.word} reading={w.reading} className="flex-shrink-0"/>
  <button
  onClick={() => removeWord(w.id)}
- className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground "
+ className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground"
  aria-label="Delete"
  >
- <Trash2 className="h-3.5 w-3.5" />
+ <Trash2 className="h-3.5 w-3.5"/>
  </button>
  </div>
  </li>

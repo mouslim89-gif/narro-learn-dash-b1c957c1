@@ -111,7 +111,7 @@ export default function WordDetail() {
  className="h-9 w-9 rounded-full bg-muted/60 ring-1 ring-border/40 shrink-0"
  aria-label="Back"
  >
- <ArrowLeft className="h-[18px] w-[18px]" />
+ <ArrowLeft className="h-[18px] w-[18px]"/>
  </Button>
  <div className="flex-1 min-w-0">
  <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">Dictionary</p>
@@ -124,14 +124,14 @@ export default function WordDetail() {
  className={`h-9 w-9 rounded-full ring-1 ring-border/40 bg-muted/60 flex items-center justify-center shrink-0 transition-colors ${
  saved ?'text-accent':'text-muted-foreground'}`}
  >
- <Star className="h-4 w-4" fill={saved ?'currentColor':'none'} />
+ <Star className="h-4 w-4"fill={saved ?'currentColor':'none'} />
  </button>
  )}
  </header>
 
  {loading && (
  <div className="mt-10 flex justify-center">
- <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+ <Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/>
  </div>
  )}
 
@@ -139,7 +139,7 @@ export default function WordDetail() {
  <div className="mt-16 text-center px-6">
  <p className="font-japanese text-3xl font-bold">{word}</p>
  <p className="mt-3 text-sm text-muted-foreground">No dictionary entry found.</p>
- <Link to="/dictionary" className="mt-6 inline-block text-sm text-primary underline">
+ <Link to="/dictionary"className="mt-6 inline-block text-sm text-primary underline">
  Back to dictionary
  </Link>
  </div>
@@ -194,11 +194,11 @@ export default function WordDetail() {
  >
  {saved ? (
  <>
- <Star className="h-4 w-4 mr-1.5" fill="currentColor" /> Saved to flashcards
+ <Star className="h-4 w-4 mr-1.5"fill="currentColor"/> Saved to flashcards
  </>
  ) : (
  <>
- <Star className="h-4 w-4 mr-1.5" /> Add to flashcards
+ <Star className="h-4 w-4 mr-1.5"/> Add to flashcards
  </>
  )}
  </Button>
@@ -301,8 +301,8 @@ export default function WordDetail() {
  <h2 className="font-serif text-lg font-bold mb-3">Examples</h2>
  {!examples && (
  <div className="space-y-2">
- <Skeleton className="h-4 w-3/4" />
- <Skeleton className="h-3 w-1/2" />
+ <Skeleton className="h-4 w-3/4"/>
+ <Skeleton className="h-3 w-1/2"/>
  </div>
  )}
  {examples && examples.length === 0 && (
@@ -316,7 +316,7 @@ export default function WordDetail() {
  <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
  {highlightWord(ex.japanese, display)}
  </p>
- <PlayWordButton word={ex.japanese} size={14} className="mt-0.5 shrink-0" />
+ <PlayWordButton word={ex.japanese} size={14} className="mt-0.5 shrink-0"/>
  </div>
  {ex.english && (
  <p className="mt-1 text-xs text-muted-foreground italic">{ex.english}</p>

@@ -5,7 +5,7 @@
  * 1. On first ever load → fetch the words this book needs from the global
  *`dictionary`table in DB, store them in IndexedDB keyed by word.
  * 2. On subsequent loads → read straight from IndexedDB (offline-friendly).
- * 3. Mark each book as "hydrated" so we skip the per-word fetch entirely
+ * 3. Mark each book as"hydrated"so we skip the per-word fetch entirely
  * next time and just read everything cached locally.
  *
  * We keep IndexedDB as a flat word→entry store (shared across books) so that
@@ -145,7 +145,7 @@ export async function hydrateDictionaryForBook(
  if (Object.keys(seed).length > 0) seedCache(seed);
 
  // 3. Skip the DB fetch only if everything we need is present locally.
- // (We no longer rely on a "hydrated" flag — a missing word always triggers a refetch
+ // (We no longer rely on a"hydrated"flag — a missing word always triggers a refetch
  // so corrected DB entries propagate to clients without manual cache clears.)
  if (missing.length === 0) return;
 

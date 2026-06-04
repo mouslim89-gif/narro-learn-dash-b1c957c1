@@ -23,7 +23,7 @@ export default function BookDetail() {
  return (
  <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 px-6 text-center">
  <p className="font-serif text-2xl font-semibold">Book not found</p>
- <Link to="/" className="text-sm text-muted-foreground underline-offset-4 ">
+ <Link to="/"className="text-sm text-muted-foreground underline-offset-4">
  Back to Library
  </Link>
  </div>
@@ -103,10 +103,10 @@ export default function BookDetail() {
  
  <button
  onClick={() => navigate('/')}
- className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 "
+ className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
  aria-label="Back"
  >
- <ArrowLeft className="h-[18px] w-[18px]" />
+ <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
 
  <div className="relative z-10 mt-8 flex flex-col items-center text-center">
@@ -114,8 +114,8 @@ export default function BookDetail() {
  className="book-paper relative flex h-64 w-44 items-end overflow-hidden rounded-xl p-4 shadow-xl ring-1 ring-black/5 rotate-[-3deg]"
  style={{ backgroundColor: book.coverColor }}
  >
- <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/40" />
- <div className="absolute inset-y-0 left-0 w-2 bg-black/20" />
+ <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/40"/>
+ <div className="absolute inset-y-0 left-0 w-2 bg-black/20"/>
  <p className="font-japanese relative text-lg font-bold leading-tight text-white drop-shadow-sm">
  {book.titleJp}
  </p>
@@ -125,42 +125,42 @@ export default function BookDetail() {
 
  <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[12px] text-muted-foreground">
  <span className="inline-flex items-center gap-1.5">
- <span className="h-1.5 w-1.5 rounded-full bg-foreground/40" />
+ <span className="h-1.5 w-1.5 rounded-full bg-foreground/40"/>
  {genreLabels[book.genre]}
  </span>
  <span className="text-foreground/20">·</span>
- <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{book.readingTimeMin}m</span>
+ <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5"/>{book.readingTimeMin}m</span>
  {hasAnyAudio(book) && (
  <>
  <span className="text-foreground/20">·</span>
- <span className="inline-flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5" />Audio</span>
+ <span className="inline-flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5"/>Audio</span>
  </>
  )}
  {book.chapters && book.chapters.length > 1 && (
  <>
  <span className="text-foreground/20">·</span>
- <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" />{book.chapters.length} chapters</span>
+ <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5"/>{book.chapters.length} chapters</span>
  </>
  )}
  </div>
 
  {hasProgress && (
  <div className="mx-auto mt-5 flex w-full max-w-xs items-center gap-3">
- <Progress value={bookProgress!.progressPercent} className="h-1.5 flex-1" />
+ <Progress value={bookProgress!.progressPercent} className="h-1.5 flex-1"/>
  <span className="text-[11px] font-semibold tabular-nums text-foreground/70">{bookProgress!.progressPercent}%</span>
  </div>
  )}
  </div>
  </header>
 
- <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background" />
+ <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
  <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
  <section className="mt-8">
  <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
- <span className="section-bullet" />Reading Level
+ <span className="section-bullet"/>Reading Level
  </p>
  <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
@@ -185,9 +185,9 @@ export default function BookDetail() {
  </section>
 
  <Link to={continueLink}>
- <Button size="lg" className="mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md">
+ <Button size="lg"className="mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md">
  {continueLabel()}
- <ArrowRight className="ml-2 h-4 w-4" />
+ <ArrowRight className="ml-2 h-4 w-4"/>
  </Button>
  </Link>
 
@@ -209,18 +209,18 @@ export default function BookDetail() {
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
- {done ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+ {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
  </span>
  <div className="min-w-0 flex-1">
  <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
  {pct > 0 && !done && (
  <div className="mt-1.5 flex items-center gap-2">
- <Progress value={pct} className="h-1 flex-1" />
+ <Progress value={pct} className="h-1 flex-1"/>
  <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
  </div>
  )}
  </div>
- <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+ <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
  </div>
  </div>
  </Link>
@@ -250,18 +250,18 @@ export default function BookDetail() {
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
- {done ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+ {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
  </span>
  <div className="min-w-0 flex-1">
  <p className="font-serif text-[15px] font-semibold leading-snug">{title}</p>
  {pct > 0 && !done && (
  <div className="mt-1.5 flex items-center gap-2">
- <Progress value={pct} className="h-1 flex-1" />
+ <Progress value={pct} className="h-1 flex-1"/>
  <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
  </div>
  )}
  </div>
- <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+ <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
  </div>
  </div>
  </Link>

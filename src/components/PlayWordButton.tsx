@@ -70,7 +70,7 @@ export function PlayWordButton({ word, reading, className ='', size = 18 }: Play
  type="button"
  >
  {state ==='loading'? (
- <Loader2 style={{ width: size, height: size }} className="animate-spin" />
+ <Loader2 style={{ width: size, height: size }} className="animate-spin"/>
  ) : (
  <Volume2 style={{ width: size, height: size }} />
  )}

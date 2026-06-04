@@ -82,17 +82,17 @@ export function FlashcardReview({ deck, onExit }: Props) {
  return (
  <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col overflow-hidden bg-gradient-to-b from-muted/40 via-background to-background">
  {/* Ambient blobs */}
- <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
- <div className="pointer-events-none absolute top-1/3 -right-24 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+ <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl"/>
+ <div className="pointer-events-none absolute top-1/3 -right-24 h-80 w-80 rounded-full bg-accent/10 blur-3xl"/>
 
  {/* Header */}
  <div className="relative flex-none flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),14px)] pb-3">
  <button
  onClick={onExit}
  aria-label="Exit review"
- className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm smooth-colors tap-scale-sm "
+ className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground shadow-sm smooth-colors tap-scale-sm"
  >
- <X className="h-[18px] w-[18px]" />
+ <X className="h-[18px] w-[18px]"/>
  </button>
 
  <div className="flex-1 flex items-center gap-3">
@@ -110,9 +110,9 @@ export function FlashcardReview({ deck, onExit }: Props) {
  <button
  onClick={() => setShowDeleteDialog(true)}
  aria-label="Delete card"
- className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm smooth-colors tap-scale-sm "
+ className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-muted-foreground/70 shadow-sm smooth-colors tap-scale-sm"
  >
- <Trash2 className="h-[16px] w-[16px]" />
+ <Trash2 className="h-[16px] w-[16px]"/>
  </button>
  </div>
 
@@ -145,7 +145,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  <p className="font-japanese text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm">
  {card.word}
  </p>
- <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+ <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent"/>
  <p
  className={`font-japanese text-xl mt-7 font-medium transition-all duration-300 ${
  showFrontReading ?'text-muted-foreground opacity-100':'text-muted-foreground opacity-0 blur-md select-none'}`}
@@ -163,9 +163,9 @@ export function FlashcardReview({ deck, onExit }: Props) {
  <button
  onClick={() => setShowFrontReading((v) => !v)}
  aria-label={showFrontReading ?'Hide reading':'Show reading'}
- className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm smooth-colors tap-scale-sm "
+ className="flex h-11 w-11 items-center justify-center rounded-full bg-background/80 border border-border/70 text-muted-foreground shadow-sm smooth-colors tap-scale-sm"
  >
- {showFrontReading ? <Eye className="h-[18px] w-[18px]" /> : <EyeClosed className="h-[18px] w-[18px]" />}
+ {showFrontReading ? <Eye className="h-[18px] w-[18px]"/> : <EyeClosed className="h-[18px] w-[18px]"/>}
  </button>
  <PlayWordButton word={card.word} reading={card.reading} size={26} />
  </div>
@@ -187,7 +187,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  {toRomaji(card.reading || card.word)}
  </p>
  </div>
- <div data-no-flip className="shrink-0 -mr-1" onClick={(e) => e.stopPropagation()}>
+ <div data-no-flip className="shrink-0 -mr-1"onClick={(e) => e.stopPropagation()}>
  <PlayWordButton word={card.word} reading={card.reading} size={20} />
  </div>
  </div>
@@ -199,7 +199,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  )}
  </div>
 
- <div className="mx-5 h-px bg-border/60" />
+ <div className="mx-5 h-px bg-border/60"/>
 
  {/* Body — scrollable */}
  <div className="flex-1 min-h-0 px-5 py-4 overflow-y-auto overscroll-contain">
@@ -225,7 +225,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  onClick={(e) => { e.stopPropagation(); setShowAllMeanings(true); }}
  className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-muted-foreground transition-colors"
  >
- <ChevronDown className="h-3 w-3" />
+ <ChevronDown className="h-3 w-3"/>
  {hiddenMeaningsCount} more
  </button>
  )}
@@ -235,7 +235,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  {card.contextSentence && (
  <section className="mt-4">
  <div className="flex items-center gap-1.5 mb-1.5">
- <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
+ <BookOpen className="h-3 w-3 text-foreground/55 shrink-0"/>
  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">
  From your reading
  </p>
@@ -288,7 +288,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  <AlertDialogFooter>
  <AlertDialogCancel>Cancel</AlertDialogCancel>
  <AlertDialogAction
- className="bg-destructive text-destructive-foreground "
+ className="bg-destructive text-destructive-foreground"
  onClick={handleDeleteCurrent}
  >
  Delete

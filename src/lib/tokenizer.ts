@@ -44,8 +44,8 @@ export interface TextToken {
 
 /**
  * Try to split a token at a て-form boundary.
- * e.g. "食べている" → ["食べて", "いる"]
- * e.g. "走っていました" → ["走って", "いました"]
+ * e.g."食べている"→ ["食べて","いる"]
+ * e.g."走っていました"→ ["走って","いました"]
  */
 function trySplitTeForm(token: string): string[] | null {
  // Look for て or で in the token (te-form markers)

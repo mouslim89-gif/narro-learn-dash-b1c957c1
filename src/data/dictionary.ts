@@ -12,7 +12,7 @@ export const dictionary: DictionaryEntry[] = [
  { id:'1', word:'桃', reading:'もも', romaji:'momo', translation:'Peach', example:'大きな桃が流れてきた。', exampleTranslation:'A large peach came floating down.'},
  { id:'2', word:'山', reading:'やま', romaji:'yama', translation:'Mountain', example:'お爺さんは山へ行きました。', exampleTranslation:'The old man went to the mountain.'},
  { id:'3', word:'川', reading:'かわ', romaji:'kawa', translation:'River', example:'川で洗濯をしました。', exampleTranslation:'She did laundry at the river.'},
- { id:'4', word:'家', reading:'いえ', romaji:'ie', translation:'House / Home', example:'家に帰りましょう。', exampleTranslation: "Let's go home." },
+ { id:'4', word:'家', reading:'いえ', romaji:'ie', translation:'House / Home', example:'家に帰りましょう。', exampleTranslation:"Let's go home."},
  { id:'5', word:'食べる', reading:'たべる', romaji:'taberu', translation:'To eat', example:'朝ごはんを食べる。', exampleTranslation:'To eat breakfast.'},
  { id:'6', word:'飲む', reading:'のむ', romaji:'nomu', translation:'To drink', example:'お茶を飲む。', exampleTranslation:'To drink tea.'},
  { id:'7', word:'行く', reading:'いく', romaji:'iku', translation:'To go', example:'学校に行く。', exampleTranslation:'To go to school.'},

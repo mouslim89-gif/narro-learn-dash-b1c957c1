@@ -43,7 +43,7 @@ export interface TokenDraft {
  p?: string;
  pMode: PMode;
  j?: boolean;
- /** Original POS of the matched token at this index (for "auto" hint). */
+ /** Original POS of the matched token at this index (for"auto"hint). */
  origP?: string;
 }
 
@@ -146,7 +146,7 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
 
  return (
  <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
- <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+ <SheetContent side="bottom"className="max-h-[85vh] overflow-y-auto">
  <SheetHeader>
  <SheetTitle>
  {matched.length === 1 ?`Edit token 「${matched[0].t}」`:`Merge ${matched.length} tokens`}
@@ -164,12 +164,12 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  <div className="flex items-center justify-between">
  <span className="text-xs font-semibold text-muted-foreground">Output token {i + 1}</span>
  <div className="flex gap-1">
- <Button size="sm" variant="ghost" onClick={() => splitTokenAt(i)} title="Split this token">
+ <Button size="sm"variant="ghost"onClick={() => splitTokenAt(i)} title="Split this token">
  Split
  </Button>
  {drafts.length > 1 && (
- <Button size="sm" variant="ghost" onClick={() => removeDraft(i)} title="Remove">
- <Trash2 className="h-3.5 w-3.5" />
+ <Button size="sm"variant="ghost"onClick={() => removeDraft(i)} title="Remove">
+ <Trash2 className="h-3.5 w-3.5"/>
  </Button>
  )}
  </div>
@@ -178,15 +178,15 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  <div className="grid grid-cols-2 gap-2">
  <div>
  <Label className="text-[10px]">Surface (t)</Label>
- <Input value={d.t} onChange={(e) => updateDraft(i, { t: e.target.value })} className="font-japanese" />
+ <Input value={d.t} onChange={(e) => updateDraft(i, { t: e.target.value })} className="font-japanese"/>
  </div>
  <div>
  <Label className="text-[10px]">Reading / furigana (r)</Label>
- <Input value={d.r ??''} onChange={(e) => updateDraft(i, { r: e.target.value || undefined })} className="font-japanese" placeholder="kana" />
+ <Input value={d.r ??''} onChange={(e) => updateDraft(i, { r: e.target.value || undefined })} className="font-japanese"placeholder="kana"/>
  </div>
  <div>
  <Label className="text-[10px]">Base / dico key (b)</Label>
- <Input value={d.b ??''} onChange={(e) => updateDraft(i, { b: e.target.value || undefined })} className="font-japanese" placeholder="optional" />
+ <Input value={d.b ??''} onChange={(e) => updateDraft(i, { b: e.target.value || undefined })} className="font-japanese"placeholder="optional"/>
  </div>
  <div>
  <Label className="text-[10px]">POS (p)</Label>
@@ -216,7 +216,7 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </select>
  )}
  {d.pMode ==='auto'&& d.origP && (
- <span className="flex-1 truncate rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground" title="Inherited from original token">
+ <span className="flex-1 truncate rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground"title="Inherited from original token">
  ↻ {posLabel(d.origP)}
  </span>
  )}
@@ -236,8 +236,8 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </div>
  ))}
 
- <Button variant="outline" size="sm" onClick={addDraft} className="w-full">
- <Plus className="mr-1 h-3.5 w-3.5" /> Add another output token
+ <Button variant="outline"size="sm"onClick={addDraft} className="w-full">
+ <Plus className="mr-1 h-3.5 w-3.5"/> Add another output token
  </Button>
  </div>
 
@@ -245,8 +245,8 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  <div className="mt-4 rounded-md border bg-muted/30 p-2">
  <div className="mb-1 flex items-center justify-between">
  <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Rule preview</span>
- <Button size="sm" variant="ghost" onClick={copyPreview} disabled={!previewStr} className="h-6 px-2">
- <Copy className="h-3 w-3" />
+ <Button size="sm"variant="ghost"onClick={copyPreview} disabled={!previewStr} className="h-6 px-2">
+ <Copy className="h-3 w-3"/>
  </Button>
  </div>
  <pre className="overflow-x-auto text-[11px] leading-relaxed">
@@ -272,7 +272,7 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </label>
  )}
  <div className="flex gap-2">
- <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
+ <Button variant="outline"onClick={onClose} className="flex-1">Cancel</Button>
  <Button
  disabled={!valid}
  onClick={() => onSubmit(drafts.map(toToken), { global: globalScope, shared: sharedScope })}

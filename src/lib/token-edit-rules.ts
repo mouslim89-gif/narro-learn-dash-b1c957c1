@@ -49,7 +49,7 @@ export function formatRule(rule: Rule): string {
 }
 
 export function formatRulesBlock(rules: Rule[], scope: string): string {
- if (rules.length === 0) return`// (no rules for "${scope}")`;
+ if (rules.length === 0) return`// (no rules for"${scope}")`;
  const header = scope ==='*'?`// Paste inside tokenOverrides["*"]:`:`// Paste inside tokenOverrides["${scope}"]:`;
  const lines = rules.map((r) =>''+ formatRule(r) +',');
  return [header, ...lines].join('\n');

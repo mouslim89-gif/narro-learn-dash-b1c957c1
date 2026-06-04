@@ -50,7 +50,7 @@ export function SrsButtons({ card, onAnswer }: Props) {
  onClick={() => onAnswer(key)}
  className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-[11px] font-semibold smooth-colors tap-scale ${cls}`}
  >
- <Icon className="h-3.5 w-3.5" />
+ <Icon className="h-3.5 w-3.5"/>
  <span className="leading-none">{label}</span>
  <span className="text-[9px] font-medium opacity-70 leading-none">
  {formatInterval(days)}

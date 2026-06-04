@@ -35,31 +35,31 @@ export default function Library() {
  return (
  <div className="pb-20">
  <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
- <span className="library-kanji-watermark" aria-hidden="true">積</span>
+ <span className="library-kanji-watermark"aria-hidden="true">積</span>
  <div className="relative z-10">
- <AnimatedTitle text="Tsundoku" className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground" />
+ <AnimatedTitle text="Tsundoku"className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground"/>
  <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+ <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
  Learn Japanese through reading
  </p>
  </div>
  <div className="relative z-10 flex items-center gap-2">
- <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 " onClick={() => setDarkMode(!darkMode)}>
- {darkMode ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"onClick={() => setDarkMode(!darkMode)}>
+ {darkMode ? <Sun className="h-[18px] w-[18px]"/> : <Moon className="h-[18px] w-[18px]"/>}
  </Button>
  <Link to="/settings">
- <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 ">
- <Settings className="h-[18px] w-[18px]" />
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
+ <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
  </div>
  </header>
- <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
+ <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0"/>
 
  {/* Search */}
  <div className="px-6 pt-1 pb-3">
  <div className="relative">
- <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+ <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
  <Input
  placeholder="Search by title or author…"
  value={search}
@@ -69,10 +69,10 @@ export default function Library() {
  {search && (
  <button
  onClick={() => setSearch('')}
- className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground "
+ className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground"
  aria-label="Clear search"
  >
- <X className="h-3.5 w-3.5" />
+ <X className="h-3.5 w-3.5"/>
  </button>
  )}
  </div>

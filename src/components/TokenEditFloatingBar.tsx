@@ -87,10 +87,10 @@ type ScopeKey = string; //'book'|'global'|'shared-book'|'shared-global'encoded a
  <div className="mx-auto flex max-w-2xl flex-wrap items-center gap-2">
  <button
  onClick={onExitEditMode}
- className="rounded-md bg-muted px-2 py-1.5 text-xs "
+ className="rounded-md bg-muted px-2 py-1.5 text-xs"
  title="Exit edit mode"
  >
- <X className="h-4 w-4" />
+ <X className="h-4 w-4"/>
  </button>
  <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">EDIT</span>
  {totalPending > 0 && (
@@ -101,20 +101,20 @@ type ScopeKey = string; //'book'|'global'|'shared-book'|'shared-global'encoded a
 
  {selectionCount > 1 && (
  <div className="flex gap-1 rounded-md bg-accent/15 px-1 py-1">
- <Button size="sm" onClick={onMerge} className="h-7">Merge {selectionCount}</Button>
- <Button size="sm" variant="ghost" onClick={onClearSelection} className="h-7">Clear</Button>
+ <Button size="sm"onClick={onMerge} className="h-7">Merge {selectionCount}</Button>
+ <Button size="sm"variant="ghost"onClick={onClearSelection} className="h-7">Clear</Button>
  </div>
  )}
 
  <div className="ml-auto flex gap-1">
- <Button size="sm" variant="outline" onClick={handleUndo} disabled={totalPending === 0} title="Undo last pending rule" className="h-8 px-2">
- <Undo2 className="h-3.5 w-3.5" />
+ <Button size="sm"variant="outline"onClick={handleUndo} disabled={totalPending === 0} title="Undo last pending rule"className="h-8 px-2">
+ <Undo2 className="h-3.5 w-3.5"/>
  </Button>
- <Button size="sm" variant="outline" onClick={() => setShowManage(true)} className="h-8 px-2" title="Manage rules">
- <Settings2 className="h-3.5 w-3.5" />
+ <Button size="sm"variant="outline"onClick={() => setShowManage(true)} className="h-8 px-2"title="Manage rules">
+ <Settings2 className="h-3.5 w-3.5"/>
  </Button>
- <Button size="sm" onClick={handleApply} disabled={totalPending === 0 || busy || !user} className="h-8" title={!user ?'Sign in to save':'Save pending rules'}>
- {busy ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Check className="mr-1 h-3.5 w-3.5" />}
+ <Button size="sm"onClick={handleApply} disabled={totalPending === 0 || busy || !user} className="h-8"title={!user ?'Sign in to save':'Save pending rules'}>
+ {busy ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin"/> : <Check className="mr-1 h-3.5 w-3.5"/>}
  Apply{totalPending > 0 ?`(${totalPending})`:''}
  </Button>
  </div>
@@ -159,7 +159,7 @@ type ScopeKey = string; //'book'|'global'|'shared-book'|'shared-global'encoded a
  <section>
  <div className="mb-1 flex items-center justify-between">
  <h3 className="text-[10px] font-semibold uppercase tracking-wide text-accent-foreground">Pending</h3>
- <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => clearPending(scope)}>
+ <Button size="sm"variant="ghost"className="h-6 px-2 text-xs"onClick={() => clearPending(scope)}>
  Clear
  </Button>
  </div>
@@ -187,8 +187,8 @@ type ScopeKey = string; //'book'|'global'|'shared-book'|'shared-global'encoded a
  <li key={r.id} className="flex items-center gap-2 rounded bg-primary/5 px-2 py-1.5">
  <code className="flex-1 truncate text-[11px]">{formatRule(r.rule)}</code>
  {isAdmin && (
- <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDeleteShared(r.id, scope ==='sb'? bookId :'*')} title="Remove from shared">
- <Trash2 className="h-3.5 w-3.5" />
+ <Button size="sm"variant="ghost"className="h-7 w-7 p-0"onClick={() => handleDeleteShared(r.id, scope ==='sb'? bookId :'*')} title="Remove from shared">
+ <Trash2 className="h-3.5 w-3.5"/>
  </Button>
  )}
  </li>
@@ -208,8 +208,8 @@ type ScopeKey = string; //'book'|'global'|'shared-book'|'shared-global'encoded a
  {activeSaved.map((r) => (
  <li key={r.id} className="flex items-center gap-2 rounded bg-muted/40 px-2 py-1.5">
  <code className="flex-1 truncate text-[11px]">{formatRule(r.rule)}</code>
- <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleDelete(r.id, scope)} title="Delete">
- <Trash2 className="h-3.5 w-3.5" />
+ <Button size="sm"variant="ghost"className="h-7 w-7 p-0"onClick={() => handleDelete(r.id, scope)} title="Delete">
+ <Trash2 className="h-3.5 w-3.5"/>
  </Button>
  </li>
  ))}

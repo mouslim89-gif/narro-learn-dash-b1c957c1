@@ -75,10 +75,10 @@ export const kumoOriginalParts: string[] = [`ある日の事でございます�
 ];
 
 export const kumoAnchors: string[] = [
- "The Lotus Pond",
- "Kandata's Ascent",
- "The Spider's Thread",
- "Paradise at Dawn",
+"The Lotus Pond",
+"Kandata's Ascent",
+"The Spider's Thread",
+"Paradise at Dawn",
 ];
 
 // Flat blobs — preserved for the non-parts code paths. Concatenation of parts joined by'\n\n'.

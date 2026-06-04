@@ -51,7 +51,7 @@ export function BottomNav() {
  />
  )}
  <div className="relative z-10">
- <Icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+ <Icon className="h-5 w-5"strokeWidth={active ? 2.2 : 1.8} />
  {showBadge && (
  <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white animate-scale-pop">
  {dueCount > 9 ?'9+': dueCount}

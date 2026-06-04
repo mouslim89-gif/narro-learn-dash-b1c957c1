@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from"@/integrations/supabase/client";
 
 async function authHeaders(): Promise<Record<string, string>> {
  const { data } = await supabase.auth.getSession();
@@ -154,7 +154,7 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
  { match: (p) => p.startsWith('名詞'), needles: ['Noun','Pronoun','Suffix','Prefix','Na-adjective','No-adjective','Adjectival noun'] },
 ];
 
-/** True if any sense (or tag) of the result is marked "Usually written using kana alone". */
+/** True if any sense (or tag) of the result is marked"Usually written using kana alone". */
 export function isUsuallyKana(result: JishoResult | null | undefined): boolean {
  if (!result) return false;
  const re = /usually written using kana|^uk$/i;

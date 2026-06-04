@@ -22,7 +22,7 @@ interface WordPopupProps {
  baseForm?: string;
  /** Override reading (kana) from token, takes priority over dictionary reading */
  reading?: string;
- /** Part of speech from Kuromoji (e.g. "動詞/自立") */
+ /** Part of speech from Kuromoji (e.g."動詞/自立") */
  pos?: string;
  /** Sentence from the story where the word was encountered */
  contextSentence?: string;
@@ -148,12 +148,12 @@ function kuromojiPosToJisho(pos: string): string[] {
 function LoadingSkeleton() {
  return (
  <div className="space-y-3 py-2">
- <Skeleton className="h-4 w-24" />
+ <Skeleton className="h-4 w-24"/>
  <div className="space-y-2">
- <Skeleton className="h-5 w-full" />
- <Skeleton className="h-5 w-3/4" />
+ <Skeleton className="h-5 w-full"/>
+ <Skeleton className="h-5 w-3/4"/>
  </div>
- <Skeleton className="h-10 w-full rounded-lg" />
+ <Skeleton className="h-10 w-full rounded-lg"/>
  </div>
  );
 }
@@ -260,7 +260,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  const displayReading = (isShowingSurface ? overrideReading : undefined) || disp.reading;
  const isCommon = (result as any)?.is_common;
 
- const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
+ const sectionLabel ="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
  return (
  <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
@@ -309,7 +309,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  {/* Meanings */}
  <section>
  <p className={sectionLabel}>Meanings</p>
- <div className="mt-1 h-px w-8 bg-accent/60" />
+ <div className="mt-1 h-px w-8 bg-accent/60"/>
  <div className="mt-2 space-y-1">
  {result.senses.slice(0, 3).map((sense, i) => (
  <p key={i} className="font-serif text-sm leading-relaxed">
@@ -323,7 +323,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  {/* Examples */}
  <section>
  <p className={sectionLabel}>Examples</p>
- <div className="mt-1 h-px w-8 bg-accent/60" />
+ <div className="mt-1 h-px w-8 bg-accent/60"/>
  <div className="mt-2">
  <ExampleSentence word={displayWord} />
  </div>
@@ -336,9 +336,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  <CollapsibleTrigger className="group flex w-full items-center justify-between">
  <div>
  <p className={sectionLabel}>Conjugations</p>
- <div className="mt-1 h-px w-8 bg-accent/60" />
+ <div className="mt-1 h-px w-8 bg-accent/60"/>
  </div>
- <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+ <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180"/>
  </CollapsibleTrigger>
  <CollapsibleContent>
  <div className="mt-2 rounded-2xl bg-muted/40 p-3 ring-1 ring-border/30">
@@ -356,7 +356,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  saved
  ?'bg-muted/40 text-muted-foreground ring-border/40':'bg-card text-accent ring-accent/40'}`}
  >
- <Star className="h-4 w-4" fill={saved ?'currentColor':'none'} />
+ <Star className="h-4 w-4"fill={saved ?'currentColor':'none'} />
  {saved ?'Saved':'Add to Flashcards'}
  </button>
  <button
@@ -372,9 +372,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  onClose();
  navigate(`/dictionary/${encodeURIComponent(dictForm)}`);
  }}
- className="tap-scale-sm flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-muted/40 text-foreground ring-1 ring-border/40 smooth-colors "
+ className="tap-scale-sm flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-muted/40 text-foreground ring-1 ring-border/40 smooth-colors"
  >
- <BookOpen className="h-4 w-4" /> Dictionary
+ <BookOpen className="h-4 w-4"/> Dictionary
  </button>
  </div>
  </>

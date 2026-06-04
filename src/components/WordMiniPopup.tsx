@@ -200,10 +200,10 @@ export function WordMiniPopup({
  ?'bg-amber-500/15 text-amber-700 dark:text-amber-300':'bg-muted/60 text-muted-foreground'}`}
  title={saved ?'Remove from flashcards':'Add to flashcards'}
  >
- <Star className="h-3.5 w-3.5" fill={saved ?'currentColor':'none'} />
+ <Star className="h-3.5 w-3.5"fill={saved ?'currentColor':'none'} />
  </button>
  )}
- <div className="flex-1" />
+ <div className="flex-1"/>
  {(result as any)?.is_common && (
  <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary/80 ring-1 ring-primary/15">
  ✦
@@ -215,7 +215,7 @@ export function WordMiniPopup({
  className="flex items-center gap-0.5 text-[11px] font-semibold text-muted-foreground transition-colors"
  title="Translate sentence"
  >
- <Languages className="h-3 w-3" />
+ <Languages className="h-3 w-3"/>
  </button>
  )}
  {result && !loading && (
@@ -223,7 +223,7 @@ export function WordMiniPopup({
  onClick={onShowMore}
  className="flex items-center gap-0.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors"
  >
- More <ChevronRight className="h-3 w-3" />
+ More <ChevronRight className="h-3 w-3"/>
  </button>
  )}
  </div>
@@ -239,7 +239,7 @@ export function WordMiniPopup({
  <div className="px-2.5 pt-1 pb-2">
  {loading && (
  <div className="flex items-center gap-2 py-2 text-muted-foreground">
- <Loader2 className="h-3.5 w-3.5 animate-spin" />
+ <Loader2 className="h-3.5 w-3.5 animate-spin"/>
  <span className="text-[11px]">Looking up…</span>
  </div>
  )}

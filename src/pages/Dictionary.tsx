@@ -91,21 +91,21 @@ export default function DictionaryPage() {
  <div className="pb-24">
  {/* Masthead */}
  <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
- <AnimatedTitle text="Dictionary" className="font-serif text-[34px] font-bold leading-none tracking-tight" />
+ <AnimatedTitle text="Dictionary"className="font-serif text-[34px] font-bold leading-none tracking-tight"/>
  <Link to="/settings">
  <Button
  variant="ghost"
  size="icon"
  className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
  >
- <Settings className="h-[18px] w-[18px]" />
+ <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
  </header>
 
  {/* Search pill */}
  <div className="mt-5 px-6 relative">
- <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+ <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
  <Input
  ref={inputRef}
  value={query}
@@ -117,9 +117,9 @@ export default function DictionaryPage() {
  <button
  onClick={clearQuery}
  aria-label="Clear search"
- className="absolute right-9 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground "
+ className="absolute right-9 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground"
  >
- <X className="h-3.5 w-3.5" />
+ <X className="h-3.5 w-3.5"/>
  </button>
  )}
  </div>
@@ -127,7 +127,7 @@ export default function DictionaryPage() {
  {searching && (
  <div className="mt-6 flex justify-center">
  <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3.5 py-1.5 ring-1 ring-border/40">
- <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+ <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground"/>
  <span className="text-xs font-medium text-muted-foreground">Searching…</span>
  </div>
  </div>
@@ -153,7 +153,7 @@ export default function DictionaryPage() {
  className={`absolute top-4 right-4 z-10 h-9 w-9 rounded-full ring-1 ring-border/40 bg-background/70 backdrop-blur-md flex items-center justify-center smooth-colors tap-scale-sm ${
  saved ?'text-accent':'text-muted-foreground'}`}
  >
- <Star className="h-4 w-4" fill={saved ?'currentColor':'none'} />
+ <Star className="h-4 w-4"fill={saved ?'currentColor':'none'} />
  </button>
 
  {/* Clickable summary → word detail */}
@@ -217,7 +217,7 @@ export default function DictionaryPage() {
 
  <ChevronRight
  aria-hidden
- className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-muted-foreground/50 transition-transform "
+ className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-muted-foreground/50 transition-transform"
  />
  </div>
 
@@ -235,7 +235,7 @@ export default function DictionaryPage() {
  {!query.trim() && (
  <div className="mt-16 flex flex-col items-center text-center">
  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
- <Search className="h-9 w-9 text-primary" />
+ <Search className="h-9 w-9 text-primary"/>
  </div>
  <p className="mt-5 font-serif text-lg font-semibold">Search the dictionary</p>
  <p className="mt-1 text-sm text-muted-foreground">

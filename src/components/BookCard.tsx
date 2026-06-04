@@ -14,13 +14,13 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
  style={{ backgroundColor: book.coverColor }}
  >
  {/* Soft top highlight + bottom shade for depth */}
- <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/35" />
+ <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/35"/>
  {/* Spine effect */}
- <div className="absolute inset-y-0 left-0 w-2 bg-black/20" />
- <div className="absolute inset-y-0 left-2 w-px bg-white/10" />
+ <div className="absolute inset-y-0 left-0 w-2 bg-black/20"/>
+ <div className="absolute inset-y-0 left-2 w-px bg-white/10"/>
  {hasAnyAudio(book) && (
  <div className="absolute right-2 top-2 rounded-full bg-black/30 p-1.5 backdrop-blur-md ring-1 ring-white/20">
- <Headphones className="h-3 w-3 text-white" />
+ <Headphones className="h-3 w-3 text-white"/>
  </div>
  )}
  <div className="relative w-full">
@@ -39,7 +39,7 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
  <p className="truncate text-[13px] font-semibold text-foreground">{book.titleEn}</p>
  <div className="mt-1.5 flex items-center gap-2">
  <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
- <Clock className="h-3 w-3" /> {book.readingTimeMin}m
+ <Clock className="h-3 w-3"/> {book.readingTimeMin}m
  </span>
  </div>
  </div>

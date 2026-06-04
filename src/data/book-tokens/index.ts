@@ -7,7 +7,7 @@ export interface BookToken {
  r?: string;
  /** base/dictionary form (only if different from surface) */
  b?: string;
- /** part of speech (e.g. "動詞/自立") */
+ /** part of speech (e.g."動詞/自立") */
  p?: string;
 }
 

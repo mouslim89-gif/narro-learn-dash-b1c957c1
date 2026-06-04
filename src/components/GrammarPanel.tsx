@@ -67,15 +67,15 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
 
  if (!open) return null;
 
- const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
+ const sectionLabel ="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
  return (
  <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center">
- <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+ <div className="absolute inset-0 bg-black/40"onClick={onClose} />
  <div className="relative z-50 w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-card ring-1 ring-border/40 shadow-lg animate-fade-in">
  {/* Drag handle */}
  <div className="sm:hidden flex justify-center pt-2">
- <div className="h-1.5 w-10 rounded-full bg-border/60" />
+ <div className="h-1.5 w-10 rounded-full bg-border/60"/>
  </div>
 
  {/* Header */}
@@ -86,18 +86,18 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
  </div>
  <button
  onClick={onClose}
- className="tap-scale-sm rounded-full bg-muted/50 p-1.5 ring-1 ring-border/30 smooth-colors "
+ className="tap-scale-sm rounded-full bg-muted/50 p-1.5 ring-1 ring-border/30 smooth-colors"
  >
- <X className="h-3.5 w-3.5" />
+ <X className="h-3.5 w-3.5"/>
  </button>
  </div>
 
  <div className="p-5 pt-3">
  {loading && (
  <div className="flex flex-col gap-3">
- <Skeleton className="h-16 w-full rounded-2xl" />
- <Skeleton className="h-16 w-full rounded-2xl" />
- <Skeleton className="h-16 w-full rounded-2xl" />
+ <Skeleton className="h-16 w-full rounded-2xl"/>
+ <Skeleton className="h-16 w-full rounded-2xl"/>
+ <Skeleton className="h-16 w-full rounded-2xl"/>
  <p className="text-center text-xs text-muted-foreground mt-2">
  Analyzing grammar patterns…
  </p>
@@ -129,7 +129,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
  <button
  key={i}
  onClick={() => setExpandedIdx(expanded ? null : i)}
- className="w-full rounded-2xl bg-card ring-1 ring-border/30 shadow-sm p-4 text-left smooth-colors "
+ className="w-full rounded-2xl bg-card ring-1 ring-border/30 shadow-sm p-4 text-left smooth-colors"
  >
  <div className="flex items-start justify-between gap-2">
  <div className="flex items-start gap-2 min-w-0 flex-1">
@@ -142,9 +142,9 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
  <span className="font-japanese text-base font-bold break-words leading-snug min-w-0 flex-1">{note.pattern}</span>
  </div>
  {expanded ? (
- <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
+ <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1"/>
  ) : (
- <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
+ <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1"/>
  )}
  </div>
 
@@ -154,12 +154,12 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
  <div className="mt-3 space-y-2.5 animate-in fade-in">
  <div className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3">
  <p className={sectionLabel}>Example from text</p>
- <div className="mt-1 h-px w-8 bg-accent/60" />
+ <div className="mt-1 h-px w-8 bg-accent/60"/>
  <p className="mt-2 font-japanese text-sm">{note.example}</p>
  </div>
  <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3">
  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Tip</p>
- <div className="mt-1 h-px w-8 bg-accent/60" />
+ <div className="mt-1 h-px w-8 bg-accent/60"/>
  <p className="mt-2 font-serif text-sm text-foreground">{note.tip}</p>
  </div>
  </div>

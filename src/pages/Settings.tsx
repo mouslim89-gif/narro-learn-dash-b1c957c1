@@ -34,7 +34,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
  <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
  {children}
  </h2>
- <div className="flex-1 h-px bg-border/60" />
+ <div className="flex-1 h-px bg-border/60"/>
  </div>
  );
 }
@@ -72,25 +72,25 @@ export default function Settings() {
  <div className="pb-24 min-h-screen">
  {/* Editorial header */}
  <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
- <span className="library-kanji-watermark" aria-hidden="true">設</span>
+ <span className="library-kanji-watermark"aria-hidden="true">設</span>
  <div className="relative z-10 flex items-center gap-3">
  <button
  onClick={() => window.history.back()}
  aria-label="Back"
  className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 flex items-center justify-center smooth-colors tap-scale-sm"
  >
- <ArrowLeft className="h-[18px] w-[18px]" />
+ <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
  <div>
- <AnimatedTitle text="Settings" className="wordmark font-serif text-[32px] leading-none text-foreground" />
+ <AnimatedTitle text="Settings"className="wordmark font-serif text-[32px] leading-none text-foreground"/>
  <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2" />
+ <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
  Make it yours
  </p>
  </div>
  </div>
  </header>
- <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0" />
+ <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0"/>
 
  <div className="stagger-children px-5 pt-2 space-y-7">
  {/* Account */}
@@ -112,7 +112,7 @@ export default function Settings() {
  className="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium smooth-colors tap-scale-sm"
  >
  <span className="flex items-center gap-2.5">
- <LogOut className="h-4 w-4 text-muted-foreground" />
+ <LogOut className="h-4 w-4 text-muted-foreground"/>
  Sign out
  </span>
  </button>
@@ -125,8 +125,8 @@ export default function Settings() {
  <SectionLabel>Appearance</SectionLabel>
  <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
  <div className="flex items-center justify-between px-4 py-4">
- <Label htmlFor="dark-mode" className="text-[15px] font-medium">Dark mode</Label>
- <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
+ <Label htmlFor="dark-mode"className="text-[15px] font-medium">Dark mode</Label>
+ <Switch id="dark-mode"checked={darkMode} onCheckedChange={setDarkMode} />
  </div>
 
  <div className="flex items-center justify-between px-4 py-4">
@@ -147,8 +147,8 @@ export default function Settings() {
  </div>
 
  <div className="flex items-center justify-between px-4 py-4">
- <Label htmlFor="furigana" className="text-[15px] font-medium">Show furigana</Label>
- <Switch id="furigana" checked={showFurigana} onCheckedChange={setShowFurigana} />
+ <Label htmlFor="furigana"className="text-[15px] font-medium">Show furigana</Label>
+ <Switch id="furigana"checked={showFurigana} onCheckedChange={setShowFurigana} />
  </div>
  </div>
  </section>
@@ -187,9 +187,9 @@ export default function Settings() {
  <AlertDialogAction
  onClick={handleDeleteAccount}
  disabled={deleting}
- className="bg-destructive text-destructive-foreground "
+ className="bg-destructive text-destructive-foreground"
  >
- {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> :'Delete'}
+ {deleting ? <Loader2 className="h-4 w-4 animate-spin"/> :'Delete'}
  </AlertDialogAction>
  </AlertDialogFooter>
  </AlertDialogContent>

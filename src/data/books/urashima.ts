@@ -270,10 +270,10 @@ export const urashimaOriginalParts: string[] = [`むかし、むかし、丹後�
 ];
 
 export const urashimaAnchors: string[] = [
- "The Young Fisherman",
- "The Dragon Palace",
- "Homeward Bound",
- "The Empty Shore",
+"The Young Fisherman",
+"The Dragon Palace",
+"Homeward Bound",
+"The Empty Shore",
 ];
 
 // Back-compat aliases — Reader still reads`content`for non-parts code paths

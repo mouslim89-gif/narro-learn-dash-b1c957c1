@@ -105,15 +105,15 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
  }}
  >
  <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1.5">
- <Languages className="h-3.5 w-3.5 text-primary" />
+ <Languages className="h-3.5 w-3.5 text-primary"/>
  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">Translation</span>
- <div className="flex-1" />
+ <div className="flex-1"/>
  <button
  onClick={onClose}
  className="p-0.5 text-muted-foreground transition-colors"
  aria-label="Close"
  >
- <X className="h-3.5 w-3.5" />
+ <X className="h-3.5 w-3.5"/>
  </button>
  </div>
 
@@ -131,7 +131,7 @@ export function SentenceTranslationPopup({ japanese, sentenceRect, onClose }: Pr
 
  {loading && (
  <div className="flex items-center gap-2 py-0.5 text-muted-foreground">
- <Loader2 className="h-3.5 w-3.5 animate-spin" />
+ <Loader2 className="h-3.5 w-3.5 animate-spin"/>
  <span className="text-[11px]">Translating…</span>
  </div>
  )}

@@ -1,9 +1,9 @@
-import { cn } from "@/lib/utils";
+import { cn } from"@/lib/utils";
 
 interface AnimatedTitleProps {
  text: string;
  className?: string;
- as?: "h1" | "h2" | "h3";
+ as?:"h1"|"h2"|"h3";
  /** Delay between letters in ms */
  stagger?: number;
  /** Initial delay before first letter, ms */
@@ -18,7 +18,7 @@ interface AnimatedTitleProps {
 export function AnimatedTitle({
  text,
  className,
- as: Tag = "h1",
+ as: Tag ="h1",
  stagger = 22,
  delay = 0,
 }: AnimatedTitleProps) {
@@ -26,7 +26,7 @@ export function AnimatedTitle({
  return (
  <Tag className={cn("animated-title", className)} aria-label={text}>
  {chars.map((ch, i) => {
- if (ch === " ") {
+ if (ch ==="") {
  return (
  <span key={i} aria-hidden className="inline-block">
  &nbsp;

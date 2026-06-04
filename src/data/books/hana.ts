@@ -143,10 +143,10 @@ export const hanaOriginalParts: string[] = [`禅智内供の鼻と云えば、�
 （大正五年一月）`];
 
 export const hanaAnchors: string[] = [
- "A Priest's Nose",
- "In Search of Relief",
- "The Disciple's Cure",
- "After the Treatment"
+"A Priest's Nose",
+"In Search of Relief",
+"The Disciple's Cure",
+"After the Treatment"
  ];
 
 // Back-compat aliases — Reader still reads single-string content for non-parts code paths.

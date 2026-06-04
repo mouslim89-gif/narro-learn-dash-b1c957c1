@@ -294,8 +294,8 @@ export const asaOriginalParts: string[] = [`私は遊ぶ事が何よりも好き
 ];
 
 export const asaAnchors: string[] = [
- "The Secret Workroom",
- "A Drunken Night",
+"The Secret Workroom",
+"A Drunken Night",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts

@@ -96,9 +96,9 @@ export const lemonOriginalParts: string[] = [`えたいの知れない不吉な�
 ];
 
 export const lemonAnchors: string[] = [
- "Malaise and Decay",
- "The Fruit Shop",
- "Maruzen",
+"Malaise and Decay",
+"The Fruit Shop",
+"Maruzen",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts

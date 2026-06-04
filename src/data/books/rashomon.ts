@@ -123,12 +123,12 @@ export const rashomonOriginalParts: string[] = [`ある日の暮方の事であ�
 ];
 
 export const rashomonAnchors: string[] = [
- "Beneath the Gate",
- "Starve or Steal",
- "Firelight Above",
- "Drawn Blade",
- "The Old Woman's Tale",
- "Into the Night",
+"Beneath the Gate",
+"Starve or Steal",
+"Firelight Above",
+"Drawn Blade",
+"The Old Woman's Tale",
+"Into the Night",
 ];
 
 // Back-compat aliases — Reader still reads`content`for non-parts code paths

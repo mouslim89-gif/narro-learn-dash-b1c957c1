@@ -5,7 +5,7 @@ import type { BookToken } from'@/data/book-tokens';
  * trailing auxiliaries, conjugational endings, and the て/で particle when it
  * forms a compound (て+いる, て+くれる, etc).
  *
- * This produces "one clickable unit" for forms like 包まれました,
+ * This produces"one clickable unit"for forms like 包まれました,
  * 食べさせられる, 行ってくれました — even when Kuromoji split them.
  *
  * The base form (b) and reading (r) are inherited from the head verb so the

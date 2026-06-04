@@ -118,7 +118,7 @@ export function AudioPlayer({
  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/25 transition-transform"
  aria-label={playing ?'Pause':'Play'}
  >
- {playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
+ {playing ? <Pause className="h-4 w-4"/> : <Play className="ml-0.5 h-4 w-4"/>}
  </button>
  <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground w-9">
  {formatTime(currentTime)}
@@ -145,7 +145,7 @@ export function AudioPlayer({
  {speed}×
  </button>
  </PopoverTrigger>
- <PopoverContent align="end" side="top" className="w-24 p-1">
+ <PopoverContent align="end"side="top"className="w-24 p-1">
  <div className="flex flex-col">
  {SPEEDS.map((s) => (
  <button

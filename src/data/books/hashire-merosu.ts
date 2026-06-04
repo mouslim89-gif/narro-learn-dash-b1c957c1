@@ -272,12 +272,12 @@ export const merosuOriginalParts: string[] = [`メロスは激怒した。必ず
 ];
 
 export const merosuAnchors: string[] = [
- "Arrival in Syracuse",
- "The Tyrant's Court",
- "The Wedding",
- "The Flooded River",
- "The Final Sprint",
- "Dawn at the Cross",
+"Arrival in Syracuse",
+"The Tyrant's Court",
+"The Wedding",
+"The Flooded River",
+"The Final Sprint",
+"Dawn at the Cross",
 ];
 
 // Back-compat aliases (concat) — kept until the Reader is migrated to parts
