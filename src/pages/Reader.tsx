@@ -204,6 +204,20 @@ export default function Reader() {
  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
  const [levelOpen, setLevelOpen] = useState(false);
  const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+ const toggleTranslations = () => {
+ const anchorIdx = currentSentenceRef.current;
+ setShowTranslations(!showTranslations);
+ if (anchorIdx == null) return;
+ requestAnimationFrame(() => {
+ requestAnimationFrame(() => {
+ const el = sentenceRefs.current.get(anchorIdx);
+ if (!el) return;
+ const HEADER_OFFSET = 64;
+ const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+ window.scrollTo({ top: y, behavior:'auto'});
+ });
+ });
+ };
  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
  try {
  const stored = sessionStorage.getItem('reopen-word-popup');
