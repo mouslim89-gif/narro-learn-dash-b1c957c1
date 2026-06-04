@@ -91,7 +91,7 @@ export default function DictionaryPage() {
  <div className="pb-24">
  {/* Masthead */}
  <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
- <AnimatedTitle text="Dictionary"className="font-serif text-[34px] font-bold leading-none tracking-tight"/>
+ <AnimatedTitle text="Dictionary" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
  <Link to="/settings">
  <Button
  variant="ghost"
