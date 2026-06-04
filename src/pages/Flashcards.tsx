@@ -260,7 +260,7 @@ export default function Flashcards() {
  <PlayWordButton word={w.word} reading={w.reading} className="flex-shrink-0"/>
  <button
  onClick={() => removeWord(w.id)}
- className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground"
+ className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground smooth-colors tap-scale-sm"
  aria-label="Delete"
  >
  <Trash2 className="h-3.5 w-3.5"/>
