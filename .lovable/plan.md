@@ -1,49 +1,30 @@
-## Objectif
-S'assurer que **chaque bouton** de l'app a un retour visuel clair au tap (couleur + micro-animation), puisque tous les `hover:` / `active:` ont été supprimés précédemment.
+## Remove header subtitles + align Grammar Notes panel style
 
-## Stratégie
-Centraliser le feedback dans 2 endroits pour ne pas avoir à toucher chaque composant :
+### 1. Remove subtitle `<p>` under page titles
 
-### 1. `src/components/ui/button.tsx` (couvre 80% des boutons)
-Ajouter au `cva` base : `tap-scale active:scale-[0.96]`
-Ajouter par variant un overlay de couleur au `:active` :
-- `default` (primary) → `active:bg-primary/85`
-- `destructive` → `active:bg-destructive/85`
-- `secondary` → `active:bg-secondary/70`
-- `outline` → `active:bg-accent/10`
-- `ghost` → `active:bg-foreground/8`
-- `link` → `active:opacity-70`
+Remove the small `inline-block h-px w-6 …` decorative line + text under the title in each top-level page header:
 
-### 2. `src/index.css` — renforcer `.tap-scale` et `.tap-scale-sm`
-S'assurer que les classes incluent bien :
-- `transform: scale(0.96)` sur `:active`
-- un léger `background-color` overlay via `::after` (déjà partiellement en place)
-- `-webkit-tap-highlight-color: transparent` + `touch-action: manipulation`
+- **`src/pages/Library.tsx`** — remove `Learn Japanese through reading`
+- **`src/pages/MyBooks.tsx`** — remove `Continue where you left off`
+- **`src/pages/Settings.tsx`** — remove `Make it yours`
+- **`src/pages/Flashcards.tsx`** — remove `{n} saved words`
 
-### 3. Composants custom qui n'utilisent pas `<Button>`
-Audit ciblé + ajout de `tap-scale` (ou `tap-scale-sm`) + une classe `active:bg-*` adaptée au fond :
-- `BottomNav.tsx` — items de navigation (couleur d'item actif déjà OK, ajouter feedback au tap)
-- `NavLink.tsx` — rien à faire (wrapper)
-- `ReaderToken.tsx` — déjà géré par `animate-word-tap`, vérifier
-- `PlayWordButton.tsx` — déjà `tap-scale-sm`, OK
-- `SrsButtons.tsx` — déjà `tap-scale`, OK
-- `BookCard.tsx` — `card-lift tap-scale` à confirmer
-- `TokenEditFloatingBar.tsx`, `WordPopup.tsx`, `WordMiniPopup.tsx`, `AudioPlayer.tsx`, `GrammarPanel.tsx`, `Reader.tsx` (icon buttons `.reader-icon-btn` déjà gérés en CSS)
-- `MyBooks.tsx`, `Library.tsx`, `BookDetail.tsx`, `Flashcards.tsx`, `Settings.tsx`, `Dictionary.tsx`, `WordDetail.tsx`, `Auth.tsx` — sweep des `<button>` natifs et `<div onClick>` interactifs
+Only the `<p>` is removed. Titles, icons, header buttons, layout untouched. `Auth.tsx` / `ResetPassword.tsx` are auth screens with their own subtitle layout — left alone.
 
-### 4. shadcn ui interactifs (au-delà de Button)
-Ajouter feedback sur les surfaces tappables : `tabs trigger`, `select trigger`, `dropdown item`, `accordion trigger`, `toggle`, `switch`, `checkbox`, `radio` — ajouter `active:bg-*` au `cn()` de base de chaque.
+### 2. Restyle Grammar Notes panel to match Chapters/Reader Settings
 
-## Approche d'exécution
-1. Patch `button.tsx` + `index.css` (gain immédiat sur la majorité)
-2. Sweep `rg "<button"` et `rg "onClick"` dans `src/components` et `src/pages` → ajouter `tap-scale` + `active:bg-*` sur les surfaces qui n'en ont pas
-3. Patch ciblé des composants shadcn les plus utilisés (tabs, select, dropdown-menu, toggle, switch, accordion)
-4. Vérification visuelle via preview sur quelques écrans clés (Library, Reader, Flashcards, Settings)
+The Reader's `Chapters` and `Reader Settings` panels both use the shadcn `Sheet` opened from the bottom (`side="bottom"`, `rounded-t-3xl max-h-[80vh]`) with a sticky header containing a `wordmark font-serif text-[22px]` title and a `border-b border-border/40`.
 
-## Question
-**Quelle intensité de feedback veux-tu ?**
-- (A) **Subtil** : `scale(0.96)` + overlay 8% (cohérent avec ce qui est déjà là)
-- (B) **Marqué / Duolingo-like** : `scale(0.94)` + overlay 15% + 150ms
-- (C) **Coloré** : overlay teinté `--accent` (doré) au lieu de neutre, pour un effet plus signature
+**`src/components/GrammarPanel.tsx`** — replace the current custom fixed overlay (`fixed inset-0 z-40 …` + `bg-black/40` backdrop + `relative z-50 …` card + drag handle + small title row) with a `Sheet` matching the Chapters panel:
 
-Je pars sur **(A)** par défaut sauf indication contraire.
+- Use `<Sheet open={open} onOpenChange={(o) => !o && onClose()}>`
+- `<SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0">`
+- Sticky header: `sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40` with `<h2 className="wordmark font-serif text-[22px] leading-none">Grammar Notes</h2>` (drop the decorative 文 character and the round X button — Sheet provides its own close)
+- Body (notes list, loading / error / empty states) kept as-is, wrapped in `px-4 py-4` to mirror Chapters spacing
+- Remove the manual `useBodyScrollLock` (Sheet handles it) and the manual backdrop
+
+No changes to data fetching, props, or behavior. The `partIdx`/`bookId`/`difficulty` reset effect stays intact.
+
+### Out of scope
+
+No other components, no token changes, no behavior changes.

@@ -82,11 +82,7 @@ export default function Settings() {
  <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
  <div>
- <AnimatedTitle text="Settings"className="wordmark font-serif text-[32px] leading-none text-foreground"/>
- <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
- Make it yours
- </p>
+         <AnimatedTitle text="Settings"className="wordmark font-serif text-[32px] leading-none text-foreground"/>
  </div>
  </div>
  </header>

@@ -37,11 +37,7 @@ export default function Library() {
  <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
  <span className="library-kanji-watermark"aria-hidden="true">積</span>
  <div className="relative z-10">
- <AnimatedTitle text="Tsundoku"className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground"/>
- <p className="mt-3 text-[12px] tracking-[0.08em] text-muted-foreground">
- <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
- Learn Japanese through reading
- </p>
+         <AnimatedTitle text="Tsundoku"className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground"/>
  </div>
  <div className="relative z-10 flex items-center gap-2">
  <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"onClick={() => setDarkMode(!darkMode)}>
