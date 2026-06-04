@@ -195,9 +195,9 @@ export function WordMiniPopup({
  {result && !loading && (
  <button
  onClick={handleSave}
- className={`h-7 w-7 flex items-center justify-center rounded-full transition-colors ${
- saved
- ?'bg-amber-500/15 text-amber-700 dark:text-amber-300':'bg-muted/60 text-muted-foreground'}`}
+              className={`h-7 w-7 flex items-center justify-center rounded-full transition-colors ${
+                saved
+                  ? 'bg-[hsl(var(--state-new)/0.18)] text-[hsl(var(--state-new))]' : 'bg-muted/60 text-muted-foreground'}`}
  title={saved ?'Remove from flashcards':'Add to flashcards'}
  >
  <Star className="h-3.5 w-3.5"fill={saved ?'currentColor':'none'} />

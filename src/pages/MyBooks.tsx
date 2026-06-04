@@ -72,7 +72,7 @@ export default function MyBooks() {
  <div className="pb-20">
  <header className="relative px-6 pt-10 pb-2 flex items-end justify-between">
  <div>
- <AnimatedTitle text="My Books"className="font-serif text-[34px] font-bold leading-none tracking-tight"/>
+ <AnimatedTitle text="My Books" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
  <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
  <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
  Continue where you left off

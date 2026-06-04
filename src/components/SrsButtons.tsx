@@ -9,34 +9,34 @@ interface Props {
 }
 
 const ORDER: { key: SrsQualityLabel; quality: Quality; label: string; Icon: typeof Check; cls: string }[] = [
- {
- key:'again',
- quality: 0,
- label:'Again',
- Icon: X,
- cls:'border-destructive/40 text-destructive bg-destructive/5',
- },
- {
- key:'hard',
- quality: 3,
- label:'Hard',
- Icon: AlertTriangle,
- cls:'border-amber-400/50 text-amber-600 bg-amber-500/5 dark:text-amber-300 dark:border-amber-500/40',
- },
- {
- key:'good',
- quality: 4,
- label:'Good',
- Icon: Check,
- cls:'border-emerald-400/50 text-emerald-600 bg-emerald-500/5 dark:text-emerald-300 dark:border-emerald-500/40',
- },
- {
- key:'easy',
- quality: 5,
- label:'Easy',
- Icon: Sparkles,
- cls:'border-primary/40 text-primary bg-primary/5',
- },
+  {
+    key: 'again',
+    quality: 0,
+    label: 'Again',
+    Icon: X,
+    cls: 'border-destructive/40 text-destructive bg-destructive/5',
+  },
+  {
+    key: 'hard',
+    quality: 3,
+    label: 'Hard',
+    Icon: AlertTriangle,
+    cls: 'border-[hsl(var(--state-new)/0.5)] text-[hsl(var(--state-new))] bg-[hsl(var(--state-new)/0.08)]',
+  },
+  {
+    key: 'good',
+    quality: 4,
+    label: 'Good',
+    Icon: Check,
+    cls: 'border-[hsl(var(--state-known)/0.5)] text-[hsl(var(--state-known))] bg-[hsl(var(--state-known)/0.08)]',
+  },
+  {
+    key: 'easy',
+    quality: 5,
+    label: 'Easy',
+    Icon: Sparkles,
+    cls: 'border-primary/40 text-primary bg-primary/5',
+  },
 ];
 
 export function SrsButtons({ card, onAnswer }: Props) {

@@ -26,10 +26,10 @@ function masteryLevel(m: number):'new'|'learning'|'known'{
  return'known';
 }
 
-const LEVEL_BAR: Record<'new'|'learning'|'known', string> = {
- new:'bg-amber-500',
- learning:'bg-sky-500',
- known:'bg-emerald-500',
+const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
+  new: 'bg-[hsl(var(--state-new))]',
+  learning: 'bg-[hsl(var(--state-learning))]',
+  known: 'bg-[hsl(var(--state-known))]',
 };
 
 export default function Flashcards() {
@@ -112,7 +112,7 @@ export default function Flashcards() {
  {/* Masthead */}
  <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
  <div>
- <AnimatedTitle text="Flashcards"className="font-serif text-[34px] font-bold leading-none tracking-tight"/>
+ <AnimatedTitle text="Flashcards" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
  <p className="mt-2 text-[12px] tracking-[0.08em] text-muted-foreground">
  <span className="inline-block h-px w-6 bg-foreground/30 align-middle mr-2"/>
  {savedWords.length} saved {savedWords.length === 1 ?'word':'words'}
@@ -253,7 +253,7 @@ export default function Flashcards() {
  {w.reading && w.reading !== w.word && (
  <p className="font-japanese text-[12px] text-muted-foreground truncate">{w.reading}</p>
  )}
- {isDue && <span className="ml-auto rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">Due</span>}
+ {isDue && <span className="ml-auto rounded-full bg-[hsl(var(--state-due)/0.15)] px-2 py-0.5 text-[10px] font-bold text-[hsl(var(--state-due))]">Due</span>}
  </div>
  <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{w.meanings.join(',')}</p>
  <div className="mt-2 flex items-center gap-2">

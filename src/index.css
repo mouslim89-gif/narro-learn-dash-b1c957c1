@@ -45,12 +45,18 @@
  --sidebar-border: 36 15% 88%;
  --sidebar-ring: 210 29% 24%;
 
- --n5: 168 50% 35%;
- --n4: 200 55% 42%;
- --n3: 36 60% 45%;
- --n2: 20 60% 45%;
- --n1: 0 50% 42%;
- }
+  --n5: 168 50% 35%;
+  --n4: 200 55% 42%;
+  --n3: 36 60% 45%;
+  --n2: 20 60% 45%;
+  --n1: 0 50% 42%;
+
+  /* Mastery / state tokens — aligned with .known-* highlights */
+  --state-new: 38 92% 50%;       /* amber */
+  --state-learning: 199 89% 48%; /* sky */
+  --state-known: 160 84% 39%;    /* emerald */
+  --state-due: 36 80% 55%;       /* warm amber, matches accent family */
+  }
 
  .dark {
  --background: 220 15% 8%;
@@ -78,9 +84,14 @@
  --destructive-foreground: 0 0% 100%;
 
  --border: 220 12% 20%;
- --input: 220 12% 20%;
- --ring: 36 50% 65%;
- }
+  --input: 220 12% 20%;
+  --ring: 36 50% 65%;
+
+  --state-new: 43 96% 56%;
+  --state-learning: 198 93% 60%;
+  --state-known: 158 64% 52%;
+  --state-due: 36 80% 60%;
+  }
 }
 
 @layer base {
