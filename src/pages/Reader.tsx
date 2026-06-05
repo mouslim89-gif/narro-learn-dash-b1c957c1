@@ -1467,15 +1467,27 @@ export default function Reader() {
  );
  })}
  </span>
- {showTranslations && (
- englishLine ? (
- <span className="block text-sm text-muted-foreground/80 italic mt-0.5 mb-3 leading-snug">
- {englishLine}
- </span>
- ) : (
- <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse"style={{ width:'60%'}} />
- )
- )}
+  {showTranslations && (() => {
+    const dist = translationAnchorIdx != null ? Math.abs(globalIdx - translationAnchorIdx) : 0;
+    const delayMs = Math.min(420, dist * 28);
+    const revealStyle = { animationDelay: `${delayMs}ms` } as React.CSSProperties;
+    return englishLine ? (
+      <span
+        key={`tr-${translationRevealKey}-${globalIdx}`}
+        className="block text-sm text-muted-foreground/80 italic mt-0.5 mb-3 leading-snug translation-reveal"
+        style={revealStyle}
+      >
+        {englishLine}
+      </span>
+    ) : (
+      <span
+        key={`trp-${translationRevealKey}-${globalIdx}`}
+        className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse translation-reveal"
+        style={{ ...revealStyle, width: '60%' }}
+      />
+    );
+  })()}
+
  </Fragment>
 
  );
