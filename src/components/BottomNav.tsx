@@ -37,29 +37,22 @@ export function BottomNav() {
  const active = path ==='/'? pathname ==='/': pathname.startsWith(path);
  const showBadge = path ==='/flashcards'&& dueCount > 0;
  return (
- <Link
- key={path}
- to={path}
- className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 text-[11px] font-medium tap-scale-sm smooth-colors ${
- active ?'text-primary':'text-muted-foreground'}`}
- >
- {active && (
- <motion.span
- layoutId="bottom-nav-pill"
- className="absolute inset-0 rounded-full bg-foreground/10"
- transition={{ type:'spring', stiffness: 380, damping: 32 }}
- />
- )}
- <div className="relative z-10">
- <Icon className="h-5 w-5"strokeWidth={active ? 2.2 : 1.8} />
- {showBadge && (
- <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white animate-scale-pop">
- {dueCount > 9 ?'9+': dueCount}
- </span>
- )}
- </div>
- <span className="relative z-10 leading-none">{label}</span>
- </Link>
+            <Link
+              key={path}
+              to={path}
+              className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 text-[11px] font-medium tap-scale smooth-colors ${
+                active ?'text-primary':'text-muted-foreground'}`}
+            >
+              <div className="relative z-10">
+                <Icon className="h-5 w-5"strokeWidth={active ? 2.2 : 1.8} />
+                {showBadge && (
+                  <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-white animate-scale-pop">
+                    {dueCount > 9 ?'9+': dueCount}
+                  </span>
+                )}
+              </div>
+              <span className="relative z-10 leading-none">{label}</span>
+            </Link>
  );
  })}
  </div>
