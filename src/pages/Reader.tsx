@@ -225,7 +225,18 @@ export default function Reader() {
  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
  // While restoring scroll, briefly ignore handleScroll writes so we don't
  // overwrite the saved progress with 0%.
- const suppressSaveUntilRef = useRef<number>(0);
+  const suppressSaveUntilRef = useRef<number>(0);
+  // When the user switches difficulty, we want to land at the same % of the
+  // text instead of trying to map sentence indices (which don't survive a
+  // text rewrite). Setting this ref forces the restore effect to use percent.
+  const pendingPercentRestoreRef = useRef<number | null>(null);
+  // When toggling translations, we anchor the sentence closest to viewport
+  // center and restore its on-screen position after the layout changes.
+  // Also drives the radial stagger animation for newly revealed translations.
+  const translationAnchorRef = useRef<{ idx: number; offsetTop: number } | null>(null);
+  const [translationAnchorIdx, setTranslationAnchorIdx] = useState<number | null>(null);
+  const translationRevealKeyRef = useRef(0);
+  const [translationRevealKey, setTranslationRevealKey] = useState(0);
 
  // --- Audio sync state ---
  const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
