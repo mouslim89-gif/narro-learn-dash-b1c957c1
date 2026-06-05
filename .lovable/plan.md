@@ -1,29 +1,26 @@
-## Problem
+## Goal
+Two small visual polish tweaks: remove the click/active background on bottom nav buttons, and add a soft inset shadow on the Reader's white text area to match the search-bar feel from Library/Dictionary/Flashcards.
 
-When the audio sync highlight lands on a sentence, the line wrapping shifts. Cause: in `src/pages/Reader.tsx` (line 1352), the active sentence span gets `bg-primary/10 px-0.5`. The added horizontal padding (`px-0.5` = 2px each side) widens the sentence by 4px, which is enough to push tokens onto the next line in places — so the whole paragraph re-flows when the highlight moves from one sentence to the next.
+## 1. Bottom nav — no click color
 
-## Fix
+File: `src/components/BottomNav.tsx`
 
-Compensate the padding with an equal negative margin so the box looks the same but takes the exact same horizontal space as the unhighlighted state.
+- Remove the `motion.span` active pill (the `bg-foreground/10` background that appears under the selected tab). Active state is conveyed by `text-primary` on the icon/label only — no background.
+- Replace `tap-scale-sm` (which adds an `active:bg-foreground/8` flash) with `tap-scale` on the tab links so the only feedback on tap is the subtle scale, not a color flash.
 
-In `Reader.tsx` around line 1352, change:
+Net result: tapping or selecting a tab no longer paints any background — just color + scale.
 
-```
-${activeAudio ? 'bg-primary/10 px-0.5' : ''}
-```
+## 2. Reader — soft inset shadow on text area
 
-to:
+File: `src/pages/Reader.tsx` (line 1265, the `<article>` wrapper around the reading content)
 
-```
-${activeAudio ? 'bg-primary/10 px-0.5 -mx-0.5' : ''}
-```
+Current: `mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 …`
 
-That's a zero-layout-impact highlight — width contribution is `+0px` instead of `+4px`, so the surrounding text keeps its line breaks as the highlight moves between sentences.
+Change to add `shadow-inner-sm` so the top edge of the white area gets the same soft 1px inset highlight used by the search inputs in Library, Dictionary, Flashcards. Keeps the existing outer `shadow-sm` + `ring-1 ring-border/30` so the card still sits softly on the background.
 
-### Why not just remove `px-0.5`?
+New className: `… rounded-2xl bg-card shadow-sm shadow-inner-sm ring-1 ring-border/30 …`
 
-Without any horizontal padding, the tint hugs the glyphs too tightly and looks cramped (especially against neighbouring kanji). Keeping the visual padding but cancelling it with `-mx-0.5` preserves the current look while eliminating the reflow.
+(No CSS additions — `shadow-inner-sm` already exists in `src/index.css`.)
 
-### Files touched
-
-- `src/pages/Reader.tsx` — single className change on the sentence wrapper span.
+## Out of scope
+No changes to other interactive surfaces, no token/color edits, no logic changes.
