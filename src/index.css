@@ -534,6 +534,19 @@
  animation: soft-pulse 1.8s var(--ease-in-out-soft) infinite;
 }
 
+/* Inline translation reveal — radiates outward from an anchor sentence */
+@keyframes translation-reveal {
+ 0% { opacity: 0; transform: translateY(-4px); filter: blur(2px); }
+ 100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.translation-reveal {
+ opacity: 0;
+ animation: translation-reveal 0.32s var(--ease-out-soft) both;
+ will-change: opacity, transform, filter;
+}
+
+
+
 /* Respect user motion preferences */
 @media (prefers-reduced-motion: reduce) {
  *,

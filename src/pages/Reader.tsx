@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from'react-router-dom';
-import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from'react';
+import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from'react';
 
 import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, List, CheckCircle2, ChevronRight, ChevronDown } from'lucide-react';
 
@@ -225,7 +225,17 @@ export default function Reader() {
  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
  // While restoring scroll, briefly ignore handleScroll writes so we don't
  // overwrite the saved progress with 0%.
- const suppressSaveUntilRef = useRef<number>(0);
+  const suppressSaveUntilRef = useRef<number>(0);
+  // When the user switches difficulty, we want to land at the same % of the
+  // text instead of trying to map sentence indices (which don't survive a
+  // text rewrite). Setting this ref forces the restore effect to use percent.
+  const pendingPercentRestoreRef = useRef<number | null>(null);
+  // When toggling translations, we anchor the sentence closest to viewport
+  // center and restore its on-screen position after the layout changes.
+  // Also drives the radial stagger animation for newly revealed translations.
+  const translationAnchorRef = useRef<{ idx: number; offsetTop: number } | null>(null);
+  const [translationAnchorIdx, setTranslationAnchorIdx] = useState<number | null>(null);
+  const [translationRevealKey, setTranslationRevealKey] = useState(0);
 
  // --- Audio sync state ---
  const [audioSync, setAudioSync] = useState<AudioSync | null>(null);
@@ -511,7 +521,25 @@ export default function Reader() {
 
  // Briefly suppress save writes while we programmatically scroll, so a
  // transient 0% reading from the scroll handler doesn't clobber`saved`.
- suppressSaveUntilRef.current = performance.now() + 1500;
+  suppressSaveUntilRef.current = performance.now() + 1500;
+
+  // Difficulty switch: sentence ids don't translate across rewrites, so
+  // restore by % only.
+  const pendingPct = pendingPercentRestoreRef.current;
+  if (pendingPct != null) {
+  pendingPercentRestoreRef.current = null;
+  const attemptPct = (tries: number) => {
+  const scrollH = document.documentElement.scrollHeight - window.innerHeight;
+  if (scrollH > 0) {
+  window.scrollTo(0, (pendingPct / 100) * scrollH);
+  return;
+  }
+  if (tries > 0) requestAnimationFrame(() => attemptPct(tries - 1));
+  };
+  requestAnimationFrame(() => attemptPct(15));
+  return;
+  }
+
 
  const targetSentence = saved.sentenceIdx ?? null;
 
@@ -786,7 +814,66 @@ export default function Reader() {
  }, 1200);
  return () => clearTimeout(t);
  }
- }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
+  }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
+
+  // Switch reading difficulty: capture % to restore the same relative spot
+  // after the new text mounts, and auto-close the popover.
+  const handleChangeDifficulty = useCallback((d: Difficulty) => {
+    if (d === difficulty) { setLevelOpen(false); return; }
+    const scrollH = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = scrollH > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollH) * 100)) : 0;
+    pendingPercentRestoreRef.current = pct;
+    restoredScroll.current = false;
+    setDifficulty(d);
+    setLevelOpen(false);
+  }, [difficulty]);
+
+  // Toggle inline translations while keeping the reader anchored on the
+  // sentence closest to viewport center. A radial stagger animation reveals
+  // the translations outward from that anchor when turning ON.
+  const handleToggleTranslations = useCallback(() => {
+    const turningOn = !showTranslations;
+    // Find sentence closest to viewport center.
+    const viewportCenter = window.innerHeight / 2;
+    let bestIdx: number | null = null;
+    let bestDist = Infinity;
+    let bestOffsetTop = 0;
+    sentenceRefs.current.forEach((el, idx) => {
+      const rect = el.getBoundingClientRect();
+      const center = (rect.top + rect.bottom) / 2;
+      const dist = Math.abs(center - viewportCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = idx;
+        bestOffsetTop = rect.top;
+      }
+    });
+    if (bestIdx != null) {
+      translationAnchorRef.current = { idx: bestIdx, offsetTop: bestOffsetTop };
+      if (turningOn) {
+        setTranslationAnchorIdx(bestIdx);
+        setTranslationRevealKey((k) => k + 1);
+      }
+    }
+    setShowTranslations(turningOn);
+  }, [showTranslations, setShowTranslations]);
+
+  // After the layout changes from toggling translations, re-anchor the
+  // captured sentence to its previous viewport offset (imperceptible jump).
+  useLayoutEffect(() => {
+    const anchor = translationAnchorRef.current;
+    if (!anchor) return;
+    const el = sentenceRefs.current.get(anchor.idx);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const delta = rect.top - anchor.offsetTop;
+    if (Math.abs(delta) > 0.5) {
+      suppressSaveUntilRef.current = performance.now() + 600;
+      window.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior });
+    }
+    translationAnchorRef.current = null;
+  }, [showTranslations]);
+
 
  // Trigger sentence translation for a given sentence
  const triggerSentenceTranslation = useCallback((sentenceIdx: number, japanese: string) => {
@@ -849,7 +936,7 @@ export default function Reader() {
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
  <button
  key={d}
- onClick={() => setDifficulty(d)}
+  onClick={() => handleChangeDifficulty(d)}
  className={cn('h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
  d === difficulty
  ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground',
@@ -871,7 +958,7 @@ export default function Reader() {
  {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
  </HeaderChip>
  <HeaderChip
- onClick={() => setShowTranslations(!showTranslations)}
+ onClick={handleToggleTranslations}
  active={showTranslations}
  title={showTranslations ?'Hide translations':'Show translations'}
  >
@@ -929,7 +1016,7 @@ export default function Reader() {
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
  <button
  key={d}
- onClick={() => setDifficulty(d)}
+ onClick={() => handleChangeDifficulty(d)}
  className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
  >
  {difficultyConfig[d].label}
@@ -992,7 +1079,7 @@ export default function Reader() {
  <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
- <Switch checked={showTranslations} onCheckedChange={setShowTranslations} />
+ <Switch checked={showTranslations} onCheckedChange={handleToggleTranslations} />
  </div>
  </div>
 
@@ -1380,15 +1467,27 @@ export default function Reader() {
  );
  })}
  </span>
- {showTranslations && (
- englishLine ? (
- <span className="block text-sm text-muted-foreground/80 italic mt-0.5 mb-3 leading-snug">
- {englishLine}
- </span>
- ) : (
- <span className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse"style={{ width:'60%'}} />
- )
- )}
+  {showTranslations && (() => {
+    const dist = translationAnchorIdx != null ? Math.abs(globalIdx - translationAnchorIdx) : 0;
+    const delayMs = Math.min(420, dist * 28);
+    const revealStyle = { animationDelay: `${delayMs}ms` };
+    return englishLine ? (
+      <span
+        key={`tr-${translationRevealKey}-${globalIdx}`}
+        className="block text-sm text-muted-foreground/80 italic mt-0.5 mb-3 leading-snug translation-reveal"
+        style={revealStyle}
+      >
+        {englishLine}
+      </span>
+    ) : (
+      <span
+        key={`trp-${translationRevealKey}-${globalIdx}`}
+        className="block h-3 mt-1 mb-3 rounded bg-muted/40 animate-soft-pulse translation-reveal"
+        style={{ ...revealStyle, width: '60%' }}
+      />
+    );
+  })()}
+
  </Fragment>
 
  );
