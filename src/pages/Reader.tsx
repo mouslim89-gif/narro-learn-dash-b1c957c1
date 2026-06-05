@@ -814,7 +814,66 @@ export default function Reader() {
  }, 1200);
  return () => clearTimeout(t);
  }
- }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
+  }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
+
+  // Switch reading difficulty: capture % to restore the same relative spot
+  // after the new text mounts, and auto-close the popover.
+  const handleChangeDifficulty = useCallback((d: Difficulty) => {
+    if (d === difficulty) { setLevelOpen(false); return; }
+    const scrollH = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = scrollH > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollH) * 100)) : 0;
+    pendingPercentRestoreRef.current = pct;
+    restoredScroll.current = false;
+    setDifficulty(d);
+    setLevelOpen(false);
+  }, [difficulty]);
+
+  // Toggle inline translations while keeping the reader anchored on the
+  // sentence closest to viewport center. A radial stagger animation reveals
+  // the translations outward from that anchor when turning ON.
+  const handleToggleTranslations = useCallback(() => {
+    const turningOn = !showTranslations;
+    // Find sentence closest to viewport center.
+    const viewportCenter = window.innerHeight / 2;
+    let bestIdx: number | null = null;
+    let bestDist = Infinity;
+    let bestOffsetTop = 0;
+    sentenceRefs.current.forEach((el, idx) => {
+      const rect = el.getBoundingClientRect();
+      const center = (rect.top + rect.bottom) / 2;
+      const dist = Math.abs(center - viewportCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = idx;
+        bestOffsetTop = rect.top;
+      }
+    });
+    if (bestIdx != null) {
+      translationAnchorRef.current = { idx: bestIdx, offsetTop: bestOffsetTop };
+      if (turningOn) {
+        setTranslationAnchorIdx(bestIdx);
+        setTranslationRevealKey((k) => k + 1);
+      }
+    }
+    setShowTranslations(turningOn);
+  }, [showTranslations, setShowTranslations]);
+
+  // After the layout changes from toggling translations, re-anchor the
+  // captured sentence to its previous viewport offset (imperceptible jump).
+  useLayoutEffect(() => {
+    const anchor = translationAnchorRef.current;
+    if (!anchor) return;
+    const el = sentenceRefs.current.get(anchor.idx);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const delta = rect.top - anchor.offsetTop;
+    if (Math.abs(delta) > 0.5) {
+      suppressSaveUntilRef.current = performance.now() + 600;
+      window.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior });
+    }
+    translationAnchorRef.current = null;
+  }, [showTranslations]);
+
 
  // Trigger sentence translation for a given sentence
  const triggerSentenceTranslation = useCallback((sentenceIdx: number, japanese: string) => {
