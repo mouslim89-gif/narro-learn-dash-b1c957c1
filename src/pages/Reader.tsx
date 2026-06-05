@@ -1470,7 +1470,7 @@ export default function Reader() {
   {showTranslations && (() => {
     const dist = translationAnchorIdx != null ? Math.abs(globalIdx - translationAnchorIdx) : 0;
     const delayMs = Math.min(420, dist * 28);
-    const revealStyle = { animationDelay: `${delayMs}ms` } as React.CSSProperties;
+    const revealStyle: React.CSSProperties = { animationDelay: `${delayMs}ms` };
     return englishLine ? (
       <span
         key={`tr-${translationRevealKey}-${globalIdx}`}
