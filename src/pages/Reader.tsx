@@ -235,7 +235,6 @@ export default function Reader() {
   // Also drives the radial stagger animation for newly revealed translations.
   const translationAnchorRef = useRef<{ idx: number; offsetTop: number } | null>(null);
   const [translationAnchorIdx, setTranslationAnchorIdx] = useState<number | null>(null);
-  const translationRevealKeyRef = useRef(0);
   const [translationRevealKey, setTranslationRevealKey] = useState(0);
 
  // --- Audio sync state ---
