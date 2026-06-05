@@ -1262,7 +1262,7 @@ export default function Reader() {
  </SheetContent>
  </Sheet>
 
- <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-inset-soft ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+ <article ref={articleRef} className="mx-3 my-5 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
 
  {(() => {
  const isFirstChapter = book.chapters && book.chapters.length > 1
