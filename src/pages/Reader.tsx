@@ -1016,7 +1016,7 @@ export default function Reader() {
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
  <button
  key={d}
- onClick={() => setDifficulty(d)}
+ onClick={() => handleChangeDifficulty(d)}
  className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
  >
  {difficultyConfig[d].label}
