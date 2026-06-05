@@ -936,7 +936,7 @@ export default function Reader() {
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
  <button
  key={d}
- onClick={() => setDifficulty(d)}
+  onClick={() => handleChangeDifficulty(d)}
  className={cn('h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
  d === difficulty
  ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground',
