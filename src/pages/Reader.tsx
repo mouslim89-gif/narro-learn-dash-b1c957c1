@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from'react-router-dom';
-import { useState, useMemo, useEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from'react';
+import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from'react';
 
 import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, List, CheckCircle2, ChevronRight, ChevronDown } from'lucide-react';
 
