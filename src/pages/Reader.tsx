@@ -521,7 +521,25 @@ export default function Reader() {
 
  // Briefly suppress save writes while we programmatically scroll, so a
  // transient 0% reading from the scroll handler doesn't clobber`saved`.
- suppressSaveUntilRef.current = performance.now() + 1500;
+  suppressSaveUntilRef.current = performance.now() + 1500;
+
+  // Difficulty switch: sentence ids don't translate across rewrites, so
+  // restore by % only.
+  const pendingPct = pendingPercentRestoreRef.current;
+  if (pendingPct != null) {
+  pendingPercentRestoreRef.current = null;
+  const attemptPct = (tries: number) => {
+  const scrollH = document.documentElement.scrollHeight - window.innerHeight;
+  if (scrollH > 0) {
+  window.scrollTo(0, (pendingPct / 100) * scrollH);
+  return;
+  }
+  if (tries > 0) requestAnimationFrame(() => attemptPct(tries - 1));
+  };
+  requestAnimationFrame(() => attemptPct(15));
+  return;
+  }
+
 
  const targetSentence = saved.sentenceIdx ?? null;
 
