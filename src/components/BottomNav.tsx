@@ -1,6 +1,6 @@
 import { Link, useLocation } from'react-router-dom';
 import { Library, BookOpen, Layers, Search } from'lucide-react';
-import { motion } from'framer-motion';
+
 import { useFlashcardStore } from'@/stores/flashcards';
 import { useSyncStatus } from'@/lib/sync/sync-status';
 
