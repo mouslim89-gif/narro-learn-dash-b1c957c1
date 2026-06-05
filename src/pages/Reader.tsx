@@ -1349,7 +1349,7 @@ export default function Reader() {
  const ts = audioSync.sentences[globalIdx];
  if (ts) audioSeekRef.current(ts.startSec);
  }}
- className={`transition-all duration-200 rounded ${dimmed ?'opacity-25':''} ${activeTranslation ?'bg-primary/5':''} ${activeAudio ?'bg-primary/10 px-0.5':''}`}
+ className={`transition-all duration-200 rounded ${dimmed ?'opacity-25':''} ${activeTranslation ?'bg-primary/5':''} ${activeAudio ?'bg-primary/10 px-0.5 -mx-0.5':''}`}
  >
  {sentence.tokens.map((token, i) => {
  if (!token.j && !tokenEditMode) {
