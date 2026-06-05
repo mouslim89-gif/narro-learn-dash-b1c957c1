@@ -958,7 +958,7 @@ export default function Reader() {
  {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
  </HeaderChip>
  <HeaderChip
- onClick={() => setShowTranslations(!showTranslations)}
+ onClick={handleToggleTranslations}
  active={showTranslations}
  title={showTranslations ?'Hide translations':'Show translations'}
  >
