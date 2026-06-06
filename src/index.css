@@ -589,13 +589,13 @@
 /* Reader article — inset/pressed shadow effect */
 .reader-article-inset {
   box-shadow:
-    inset 0 1px 2px hsl(220 15% 8% / 0.10),
-    inset 0 0 0 1px hsl(220 15% 8% / 0.04);
+    inset 0 2px 3px hsl(220 15% 8% / 0.14),
+    inset 0 0 0 1px hsl(220 15% 8% / 0.06);
 }
 .dark .reader-article-inset {
   box-shadow:
-    inset 0 1px 2px hsl(0 0% 0% / 0.40),
-    inset 0 0 0 1px hsl(0 0% 0% / 0.20);
+    inset 0 2px 3px hsl(0 0% 0% / 0.55),
+    inset 0 0 0 1px hsl(0 0% 0% / 0.28);
 }
 
 /* BottomNav links — keep scale tap but no background flash on press */
