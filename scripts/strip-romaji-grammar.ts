@@ -21,6 +21,7 @@ for (const line of envSrc.split('\n')) {
 const SUPABASE_URL = env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('Missing Supabase env vars');
+const USER_JWT = process.env.SUPABASE_USER_JWT || SUPABASE_KEY;
 
 interface GrammarNote {
   pattern: string;
@@ -69,7 +70,7 @@ async function rewriteBatch(items: { idx: number; meaning: string; tip: string; 
     headers: {
       'Content-Type': 'application/json',
       apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Authorization: `Bearer ${USER_JWT}`,
     },
     body: JSON.stringify({ items }),
   });

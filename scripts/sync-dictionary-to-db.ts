@@ -17,6 +17,7 @@ import { createClient } from '@supabase/supabase-js';
 const base = '/dev-server';
 const SUPABASE_URL = 'https://bjkftxbbfxjyezrjzlmw.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqa2Z0eGJiZnhqeWV6cmp6bG13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzExNTUsImV4cCI6MjA5MTI0NzE1NX0.DLGXEWor58Uz3RwWbLKDxNQLMdh2ylqZrP0AjjnQ7LE';
+const USER_JWT = process.env.SUPABASE_USER_JWT || ANON_KEY;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SERVICE_KEY) {
@@ -83,7 +84,7 @@ for (let i = 0; i < missing.length; i += BATCH) {
   const url = `${SUPABASE_URL}/functions/v1/jisho-lookup?keywords=${encodeURIComponent(batch.join(','))}`;
   try {
     const response = await fetch(url, {
-      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${ANON_KEY}` },
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${USER_JWT}` },
     });
     if (!response.ok) {
       console.error(`Batch ${i} failed: ${response.status}`);
