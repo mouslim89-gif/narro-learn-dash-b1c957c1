@@ -46,7 +46,7 @@ import {
  asaOriginalParts,
  asaAnchors,
 } from'./books/asa';
-import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from'./books/gyofukuki';
+import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal, gyofukukiSimplifiedParts, gyofukukiIntermediateParts, gyofukukiOriginalParts, gyofukukiAnchors } from'./books/gyofukuki';
 import { sakuraSimplified, sakuraIntermediate, sakuraOriginal, sakuraSimplifiedParts, sakuraIntermediateParts, sakuraOriginalParts, sakuraAnchors } from'./books/sakura';
 import {
  urashimaSimplified,
