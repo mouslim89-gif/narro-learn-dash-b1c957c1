@@ -24,6 +24,7 @@ for (const line of envSrc.split('\n')) {
 const SUPABASE_URL = env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('Missing Supabase env vars');
+const USER_JWT = process.env.SUPABASE_USER_JWT || SUPABASE_KEY;
 
 const partsByDiff = {
   simplified: gyofukukiSimplifiedParts,
