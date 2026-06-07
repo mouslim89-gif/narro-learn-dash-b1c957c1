@@ -46,7 +46,7 @@ async function fetchGrammar(text: string): Promise<GrammarNote[]> {
     headers: {
       'Content-Type': 'application/json',
       apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Authorization: `Bearer ${USER_JWT}`,
     },
     body: JSON.stringify({ text }),
   });
