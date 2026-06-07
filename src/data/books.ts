@@ -46,7 +46,7 @@ import {
  asaOriginalParts,
  asaAnchors,
 } from'./books/asa';
-import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal } from'./books/gyofukuki';
+import { gyofukukiSimplified, gyofukukiIntermediate, gyofukukiOriginal, gyofukukiSimplifiedParts, gyofukukiIntermediateParts, gyofukukiOriginalParts, gyofukukiAnchors } from'./books/gyofukuki';
 import { sakuraSimplified, sakuraIntermediate, sakuraOriginal, sakuraSimplifiedParts, sakuraIntermediateParts, sakuraOriginalParts, sakuraAnchors } from'./books/sakura';
 import {
  urashimaSimplified,
@@ -380,7 +380,9 @@ export const books: Book[] = [
  coverColor:'#5B7B8C',
  readingTimeMin: 10,
  synopsis:"Deep in a northern mountain, thirteen-year-old Suwa lives alone with her charcoal-burning father by a roaring waterfall. After a winter night when her drunken father becomes something monstrous, she flees into the blizzard and throws herself into the freezing pool — only to wake transformed, weightless, and finally free. Dazai's earliest masterpiece: a brutal folk tale that slips quietly into the miraculous.",
- content: { simplified: gyofukukiSimplified, intermediate: gyofukukiIntermediate, original: gyofukukiOriginal },
+  content: { simplified: gyofukukiSimplified, intermediate: gyofukukiIntermediate, original: gyofukukiOriginal },
+  parts: { simplified: gyofukukiSimplifiedParts, intermediate: gyofukukiIntermediateParts, original: gyofukukiOriginalParts },
+  anchors: gyofukukiAnchors,
  },
  {
  id:'sakura',
