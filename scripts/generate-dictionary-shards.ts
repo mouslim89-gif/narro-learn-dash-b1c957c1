@@ -35,6 +35,7 @@ const base = process.cwd();
 const SUPABASE_URL = 'https://bjkftxbbfxjyezrjzlmw.supabase.co';
 const ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqa2Z0eGJiZnhqeWV6cmp6bG13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzExNTUsImV4cCI6MjA5MTI0NzE1NX0.DLGXEWor58Uz3RwWbLKDxNQLMdh2ylqZrP0AjjnQ7LE';
+const USER_JWT = process.env.SUPABASE_USER_JWT || ANON_KEY;
 
 // Must match DICT_CACHE_VERSION in src/lib/dictionary-db.ts
 const SHARD_VERSION = 2;
@@ -181,7 +182,7 @@ async function lookupViaEdge(word: string): Promise<Entry | null> {
   try {
     const url = `${SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(word)}`;
     const res = await fetch(url, {
-      headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+      headers: { apikey: ANON_KEY, Authorization: `Bearer ${USER_JWT}` },
     });
     if (!res.ok) return null;
     const data = await res.json();
