@@ -19,11 +19,6 @@ export async function requireUser(
     };
   }
   const token = authHeader.slice("Bearer ".length).trim();
-  // Allow service role key to bypass (used by generation scripts)
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (serviceRoleKey && token === serviceRoleKey) {
-    return { user: { id: "service-role" }, token };
-  }
   const client = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!,
