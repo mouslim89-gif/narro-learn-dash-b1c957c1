@@ -1,4 +1,4 @@
-import { konbiniChapters } from'./books/konbini-ningen';
+
 import {
  kumoSimplified,
  kumoIntermediate,
@@ -239,9 +239,6 @@ const aAkiOriginal =`本職の詩人ともなれば、いつどんな注文が�
 　ちっとも秋に関係ない、そんな言葉まで、書かれてあるが、或いはこれも、「季節の思想」といったようなわけのものかも知れない。
 　その他、農家。絵本。秋ト兵隊。秋ノ蚕。火事。ケムリ。オ寺。ごたごた一ぱい書かれてある。`;
 
-// --- Konbini Ningen — derive book-level content from chapter 1 (used as fallback) ---
-const konbiniCh1 = konbiniChapters[0];
-
 export const books: Book[] = [
  {
  id:'a-aki',
@@ -258,19 +255,6 @@ export const books: Book[] = [
  simplified: { durationSec: 146 },
  },
  content: { simplified: aAkiSimplified, intermediate: aAkiIntermediate, original: aAkiOriginal },
- },
- {
- id:'konbini-ningen',
- titleJp:'コンビニ人間',
- titleEn:'Convenience Store Woman',
- author:'Sayaka Murata',
- genre:'slice-of-life',
- jlptLevel:'N1',
- coverColor:'#2A8C5F',
- readingTimeMin: 90,
- synopsis:"Keiko Furukura has worked at the Smile Mart for eighteen years. While society pressures her to pursue'normal'goals — marriage, a career — she finds her sense of self only in the rhythms of the convenience store. A sharp, deadpan novel about conformity, identity, and the quiet defiance of choosing your own way of being human.",
- content: konbiniCh1.content, // Fallback content = chapter 1
- chapters: konbiniChapters,
  },
  {
  id:'kumo-no-ito',
