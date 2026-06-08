@@ -6,41 +6,6 @@ export const tokenWordCounts: Record<string, Record<string, number>> = {
     "intermediate": 456,
     "original": 655
   },
-  "konbini-ningen": {
-    "simplified": 601,
-    "intermediate": 903,
-    "original": 890
-  },
-  "konbini-ningen__ch1": {
-    "simplified": 601,
-    "intermediate": 903,
-    "original": 890
-  },
-  "konbini-ningen__ch2": {
-    "simplified": 797,
-    "intermediate": 1038,
-    "original": 957
-  },
-  "konbini-ningen__ch3": {
-    "simplified": 664,
-    "intermediate": 933,
-    "original": 830
-  },
-  "konbini-ningen__ch4": {
-    "simplified": 564,
-    "intermediate": 912,
-    "original": 930
-  },
-  "konbini-ningen__ch5": {
-    "simplified": 479,
-    "intermediate": 897,
-    "original": 870
-  },
-  "konbini-ningen__ch6": {
-    "simplified": 605,
-    "intermediate": 918,
-    "original": 836
-  },
   "kumo-no-ito": {
     "simplified": 317,
     "intermediate": 678,
