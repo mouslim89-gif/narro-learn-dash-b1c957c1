@@ -95,6 +95,9 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
  deinflected: data.deinflected || null,
  };
  cache.set(keyword, entry);
+ if (entry.results.length > 0) {
+   import('@/lib/dictionary-db').then(m => m.persistWordEntry(keyword, entry)).catch(() => {});
+ }
  return entry;
 }
 
@@ -106,11 +109,19 @@ async function batchLookup(words: string[]): Promise<void> {
 
  if (!response.ok) return;
  const data = await response.json();
+ const toPersist: [string, CacheEntry][] = [];
  for (const entry of data.batch || []) {
- cache.set(entry.keyword, {
+ const e: CacheEntry = {
  results: entry.results || [],
  deinflected: entry.deinflected || null,
- });
+ };
+ cache.set(entry.keyword, e);
+ if (e.results.length > 0) toPersist.push([entry.keyword, e]);
+ }
+ if (toPersist.length > 0) {
+   import('@/lib/dictionary-db').then(m => {
+     for (const [w, e] of toPersist) m.persistWordEntry(w, e).catch(() => {});
+   }).catch(() => {});
  }
 }
 
