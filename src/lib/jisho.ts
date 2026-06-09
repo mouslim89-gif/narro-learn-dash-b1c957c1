@@ -82,6 +82,16 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
  return existing;
  }
 
+ // Try IndexedDB (persisted from a previous session) before hitting the network.
+ try {
+   const { readWordEntry } = await import('@/lib/dictionary-db');
+   const persisted = await readWordEntry(keyword);
+   if (persisted && !isKnownStaleEntry(keyword, persisted)) {
+     cache.set(keyword, persisted);
+     return persisted;
+   }
+ } catch { /* ignore */ }
+
  const url =`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
  const response = await fetch(url, {
  headers: await authHeaders(),

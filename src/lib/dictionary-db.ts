@@ -30,6 +30,19 @@ export async function persistWordEntry(word: string, entry: CacheEntry): Promise
   }
 }
 
+/** Read a single entry from IndexedDB (returns undefined on miss). */
+export async function readWordEntry(word: string): Promise<CacheEntry | undefined> {
+  if (!word) return undefined;
+  try {
+    await ensureCacheVersion();
+    const entry = await get<CacheEntry>(word, wordStore);
+    if (entry && entry.results && entry.results.length > 0) return entry;
+  } catch {
+    /* ignore */
+  }
+  return undefined;
+}
+
 // Bump this whenever cached dictionary entries become invalid (e.g. after fixing
 // polluted entries like 三 → 三人 or 一 → 一歩). On bump, we clear IndexedDB once.
 const DICT_CACHE_VERSION = 2;
