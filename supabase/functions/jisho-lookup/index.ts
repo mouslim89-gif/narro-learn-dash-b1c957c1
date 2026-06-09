@@ -228,6 +228,7 @@ Deno.serve(async (req) => {
     if (keywords) {
       const words = keywords.split(',').map(w => w.trim()).filter(Boolean).slice(0, 50);
       const results = await Promise.all(words.map(fetchWord));
+      persistLookups(results).catch(() => {});
       return new Response(JSON.stringify({ batch: results }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -241,6 +242,7 @@ Deno.serve(async (req) => {
     }
 
     const result = await fetchWord(keyword);
+    persistLookups([result]).catch(() => {});
     return new Response(
       JSON.stringify({ results: result.results, deinflected: result.deinflected }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
