@@ -19,6 +19,17 @@ import { loadBookTokens } from'@/data/book-tokens';
 const wordStore = createStore('yomimasu-dict','words');
 const metaStore = createStore('yomimasu-dict-meta','meta');
 
+/** Persist a single entry to IndexedDB so a token-edit lookup survives reloads. */
+export async function persistWordEntry(word: string, entry: CacheEntry): Promise<void> {
+  if (!word || !entry?.results?.length) return;
+  await ensureCacheVersion();
+  try {
+    await set(word, entry, wordStore);
+  } catch {
+    /* ignore */
+  }
+}
+
 // Bump this whenever cached dictionary entries become invalid (e.g. after fixing
 // polluted entries like 三 → 三人 or 一 → 一歩). On bump, we clear IndexedDB once.
 const DICT_CACHE_VERSION = 2;
