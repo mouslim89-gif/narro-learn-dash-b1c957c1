@@ -211,7 +211,7 @@ export default function DictionaryPage() {
  {result.senses.slice(0, 3).map((sense, i) => (
  <p key={i} className="text-sm leading-relaxed">
  <span className="text-muted-foreground mr-1">{i + 1}.</span>
- <span className="font-medium text-foreground">{sense.english_definitions.join(';')}</span>
+ <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
  </p>
  ))}
  </div>
