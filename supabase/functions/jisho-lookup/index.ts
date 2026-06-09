@@ -1,4 +1,5 @@
 import { requireUser } from "../_shared/auth.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -6,6 +7,27 @@ const corsHeaders = {
 };
 
 const JISHO_API = 'https://jisho.org/api/v1/search/words';
+
+const adminClient = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  { auth: { persistSession: false } },
+);
+
+/** Write-through: upsert successful lookups into the global dictionary table
+ *  so the next user / next shard build picks them up for free. Fire-and-forget. */
+async function persistLookups(
+  rows: { keyword: string; results: unknown[]; deinflected: string | null }[],
+): Promise<void> {
+  const payload = rows
+    .filter((r) => Array.isArray(r.results) && r.results.length > 0)
+    .map((r) => ({ word: r.keyword, entry: { results: r.results, deinflected: r.deinflected } }));
+  if (payload.length === 0) return;
+  const { error } = await adminClient
+    .from('dictionary')
+    .upsert(payload, { onConflict: 'word' });
+  if (error) console.warn('[jisho-lookup] upsert error', error.message);
+}
 
 // Comprehensive deinflection rules for Japanese verbs and adjectives
 function getDeinflections(word: string): string[] {
