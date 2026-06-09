@@ -274,9 +274,9 @@ export default function WordDetail() {
  <div className="flex gap-2">
  <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
  <div className="flex-1">
- <p className="font-medium text-foreground leading-relaxed">
- {sense.english_definitions.join(';')}
- </p>
+                 <p className="font-medium text-foreground leading-relaxed">
+                   {sense.english_definitions.join('; ')}
+                 </p>
  {sense.parts_of_speech.length > 0 && (
  <div className="mt-1 flex flex-wrap gap-1">
  {sense.parts_of_speech.map((pos, j) => (
