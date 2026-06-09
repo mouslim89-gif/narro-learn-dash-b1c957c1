@@ -7,6 +7,7 @@ import { useReadingProgressStore } from'@/stores/reading-progress';
 import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { romajiToKana } from'@/lib/romaji';
 
 const genres = Object.keys(genreLabels) as Genre[];
 
