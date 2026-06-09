@@ -10,6 +10,7 @@ import { toRomaji } from'wanakana';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { Input } from'@/components/ui/input';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { romajiToKana } from'@/lib/romaji';
 
 export default function DictionaryPage() {
  const navigate = useNavigate();
