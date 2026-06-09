@@ -44,8 +44,8 @@ export async function fetchExample(word: string): Promise<ExampleSentence | null
 
 const multiCache = new Map<string, ExampleSentence[]>();
 
-export async function fetchExamples(word: string, limit = 3): Promise<ExampleSentence[]> {
- const key =`${word}::${limit}`;
+export async function fetchExamples(word: string, limit = 3, altWord?: string): Promise<ExampleSentence[]> {
+ const key =`${word}::${altWord ?? ''}::${limit}`;
  if (multiCache.has(key)) return multiCache.get(key)!;
 
  if (CURATED[word]) {
@@ -56,7 +56,7 @@ export async function fetchExamples(word: string, limit = 3): Promise<ExampleSen
 
  try {
  const { data, error } = await supabase.functions.invoke('tatoeba-example', {
- body: { word, limit },
+ body: { word, limit, altWord },
  });
  if (error) {
  multiCache.set(key, []);
