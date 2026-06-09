@@ -49,7 +49,7 @@ export default function DictionaryPage() {
  const timeout = setTimeout(async () => {
  setSearching(true);
  try {
- const results = await searchJisho(query);
+ const results = await searchJisho(romajiToKana(query) ?? query);
  setJishoResults(results);
  lastFetchedRef.current = query;
  try {
