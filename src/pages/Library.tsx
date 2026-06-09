@@ -7,6 +7,7 @@ import { useReadingProgressStore } from'@/stores/reading-progress';
 import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { romajiToKana } from'@/lib/romaji';
 
 const genres = Object.keys(genreLabels) as Genre[];
 
@@ -24,13 +25,14 @@ export default function Library() {
  .filter((b): b is typeof books[number] => Boolean(b));
  }, [progress]);
 
- const filteredBooks = useMemo(() => {
- if (!search.trim()) return null;
- const q = search.toLowerCase();
- return books.filter(
- b => b.titleEn.toLowerCase().includes(q) || b.titleJp.includes(q) || b.author.toLowerCase().includes(q)
- );
- }, [search]);
+    const filteredBooks = useMemo(() => {
+        if (!search.trim()) return null;
+        const q = search.toLowerCase();
+        const kana = romajiToKana(q);
+        return books.filter(
+            b => b.titleEn.toLowerCase().includes(q) || b.titleJp.includes(q) || b.author.toLowerCase().includes(q) || (kana ? b.titleJp.includes(kana) : false)
+        );
+    }, [search]);
 
  return (
  <div className="pb-20">

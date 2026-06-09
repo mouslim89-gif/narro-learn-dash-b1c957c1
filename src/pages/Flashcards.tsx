@@ -9,6 +9,7 @@ import { Progress } from'@/components/ui/progress';
 import { FlashcardReview } from'@/components/FlashcardReview';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { cn } from'@/lib/utils';
+import { romajiToKana } from'@/lib/romaji';
 import {
  DropdownMenu,
  DropdownMenuContent,
@@ -62,14 +63,16 @@ export default function Flashcards() {
  else if (filter ==='learning') words = words.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3);
  else if (filter ==='known') words = words.filter(w => (w.mastery || 0) >= 3);
 
- if (search.trim()) {
- const q = search.trim().toLowerCase();
- words = words.filter(w =>
- w.word.toLowerCase().includes(q) ||
- w.reading.toLowerCase().includes(q) ||
- w.meanings.some(m => m.toLowerCase().includes(q))
- );
- }
+     if (search.trim()) {
+            const q = search.trim().toLowerCase();
+            const kana = romajiToKana(q);
+            words = words.filter(w =>
+                w.word.toLowerCase().includes(q) ||
+                w.reading.toLowerCase().includes(q) ||
+                w.meanings.some(m => m.toLowerCase().includes(q)) ||
+                (kana ? (w.word.includes(kana) || w.reading.includes(kana)) : false)
+            );
+        }
 
  if (sortBy ==='mastery') {
  words.sort((a, b) => (a.mastery || 0) - (b.mastery || 0));
