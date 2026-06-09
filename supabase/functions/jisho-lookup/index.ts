@@ -184,6 +184,8 @@ function mapResult(item: any) {
     senses: (item.senses || []).slice(0, 3).map((s: any) => ({
       english_definitions: s.english_definitions || [],
       parts_of_speech: s.parts_of_speech || [],
+      tags: s.tags || [],
+      misc: s.misc || [],
     })),
   };
 }
