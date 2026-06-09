@@ -13,7 +13,7 @@ export interface JishoResult {
  jlpt: string[];
  tags: string[];
  japanese: { word: string; reading: string }[];
- senses: { english_definitions: string[]; parts_of_speech: string[] }[];
+ senses: { english_definitions: string[]; parts_of_speech: string[]; tags?: string[]; misc?: string[] }[];
 }
 
 export interface CacheEntry {
