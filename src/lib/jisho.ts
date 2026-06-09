@@ -13,7 +13,7 @@ export interface JishoResult {
  jlpt: string[];
  tags: string[];
  japanese: { word: string; reading: string }[];
- senses: { english_definitions: string[]; parts_of_speech: string[] }[];
+ senses: { english_definitions: string[]; parts_of_speech: string[]; tags?: string[]; misc?: string[] }[];
 }
 
 export interface CacheEntry {
@@ -154,13 +154,15 @@ const POS_KEYWORDS: { match: (p: string) => boolean; needles: string[] }[] = [
  { match: (p) => p.startsWith('名詞'), needles: ['Noun','Pronoun','Suffix','Prefix','Na-adjective','No-adjective','Adjectival noun'] },
 ];
 
-/** True if any sense (or tag) of the result is marked"Usually written using kana alone". */
+/** True if any sense (or tag) of the result is marked "Usually written using kana alone". */
 export function isUsuallyKana(result: JishoResult | null | undefined): boolean {
  if (!result) return false;
  const re = /usually written using kana|^uk$/i;
  if (result.tags?.some((t) => re.test(t))) return true;
  return (result.senses ?? []).some((s) =>
- s.parts_of_speech.some((p) => re.test(p)),
+ s.parts_of_speech.some((p) => re.test(p)) ||
+ (s.tags ?? []).some((t) => re.test(t)) ||
+ (s.misc ?? []).some((m) => re.test(m)),
  );
 }
 

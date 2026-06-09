@@ -314,7 +314,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  {result.senses.slice(0, 3).map((sense, i) => (
  <p key={i} className="font-serif text-sm leading-relaxed">
  <span className="text-muted-foreground tabular-nums mr-1">{i + 1}.</span>
- <span className="font-medium text-foreground">{sense.english_definitions.join(';')}</span>
+ <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
  </p>
  ))}
  </div>

@@ -253,7 +253,7 @@ export function WordMiniPopup({
  <div className="space-y-0.5">
  {result.senses.slice(0, 2).map((sense, i) => (
  <p key={i} className="text-[13px] font-semibold text-accent">
- {i + 1}. {sense.english_definitions.join(';')}
+ {i + 1}. {sense.english_definitions.join('; ')}
  </p>
  ))}
  </div>

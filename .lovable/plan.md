@@ -1,64 +1,62 @@
-# Romaji-aware search bars
+## Issues identified (using うるさい as the example case)
 
-Goal: typing `taberu` finds 食べる, `neko` finds 猫, etc., across all search bars in the app.
+1. **Header shows 煩い instead of うるさい** — `getDisplayWord()` in `src/lib/jisho.ts` checks `isUsuallyKana()` against `senses[].parts_of_speech` and `result.tags`, but Jisho's "Usually written using kana alone" flag actually lives in `senses[].misc` (and sometimes `senses[].tags`). The edge function `supabase/functions/jisho-lookup/index.ts` strips those fields out in `mapResult()`, so the client never sees the uk flag and falls back to the kanji form.
 
-## Approach
+2. **Meanings rendered as `noisy;loud`** — definitions are joined with a bare `';'` (no spaces) in `WordDetail.tsx` line 278 and `Dictionary.tsx` line ~210. Should be `'; '` (or `', '`) to read naturally.
 
-Use the already-installed `wanakana` library (`toHiragana`, `isRomaji`) to convert romaji input → hiragana before searching. Romaji is only converted when the input looks like pure latin (so English queries like "peach" still work in Library/Flashcards).
+3. **Examples don't contain the word** — Tatoeba does substring matching, so a query for `煩い` returns sentences containing `煩悩`, `煩わしい`, etc. We also never query the kana form, so we miss the most natural うるさい sentences. The result is filtered to nothing relevant.
 
-A tiny helper in `src/lib/utils.ts` (or a new `src/lib/romaji.ts`):
+---
 
+## Plan
+
+### 1. Edge function: preserve uk metadata
+`supabase/functions/jisho-lookup/index.ts` — extend `mapResult()` so each sense also carries `misc` and `tags`:
 ```ts
-import { toHiragana, isRomaji } from 'wanakana';
-
-/** If the query is pure romaji, return its hiragana form; else return null. */
-export function romajiToKana(q: string): string | null {
-  const trimmed = q.trim();
-  if (!trimmed) return null;
-  // Pure latin letters (+ spaces/'-'): treat as romaji
-  if (!/^[a-zA-Z\s'-]+$/.test(trimmed)) return null;
-  if (!isRomaji(trimmed)) return null;
-  const kana = toHiragana(trimmed, { passRomaji: false });
-  return kana && kana !== trimmed ? kana : null;
-}
+senses: (item.senses || []).slice(0, 3).map((s: any) => ({
+  english_definitions: s.english_definitions || [],
+  parts_of_speech: s.parts_of_speech || [],
+  tags: s.tags || [],
+  misc: s.misc || [],
+})),
 ```
+No schema change for callers; just additional fields.
 
-## Per-page integration
+### 2. Client: detect uk correctly
+`src/lib/jisho.ts`
+- Extend the `JishoResult` sense type to optionally include `tags?: string[]` and `misc?: string[]`.
+- Update `isUsuallyKana()` to also check `sense.tags` and `sense.misc` (Jisho exposes the human label "Usually written using kana alone" in misc; the short tag `uk` may appear too).
 
-### 1. `src/pages/Dictionary.tsx` (Jisho search)
+### 3. Fix meanings separator
+- `src/pages/WordDetail.tsx` line 278: `english_definitions.join('; ')`.
+- `src/pages/Dictionary.tsx` (search result card meanings): same change.
 
-- Before calling `searchJisho(query)`, compute `const kana = romajiToKana(query) ?? query;` and pass that.
-- The visible input keeps showing the user's original romaji; only the search string is transformed.
-- (Optional small UX hint: under the input, if a conversion happened, show `→ たべる` muted text so the user understands what was searched.)
+### 4. Filter Tatoeba examples to the actual word
+`supabase/functions/tatoeba-example/index.ts`
+- Accept an optional `altWord` in the request body (e.g. the kana form for usually-kana entries).
+- Query Tatoeba with whichever form is more likely to give clean matches (prefer the kana form when provided, since substring noise from a kanji like 煩 is the worst offender). Optionally do a second query for the alt form and merge.
+- After fetching, **filter** `collected` to sentences whose `japanese` contains either `word` or `altWord` as a substring matching the **exact form** (i.e. the kanji form OR the kana form, not just one kanji of it). Concretely: keep a sentence iff it contains `word` or `altWord` literally.
+- Important: drop the existing cache row before re-querying when callers supply a new altWord, or key the DB cache on `(word, altWord)`. Simpler approach: cache key stays `word`, but we re-validate and re-fetch when cached sentences fail the new filter. To keep this minimal, just re-filter at read time and treat empty filtered cache as a miss.
 
-### 2. `src/pages/Flashcards.tsx` (saved words filter)
+`src/lib/tatoeba.ts`
+- Add optional `altWord?: string` parameter to `fetchExamples(word, limit, altWord?)`.
+- Pass it through in the function body.
 
-- In the filter pass at line ~65, build a second query `kana = romajiToKana(q)` and match against `word`, `reading`, and meanings using **either** `q` or `kana`. English meanings still work because English queries don't pass the romaji test.
+`src/pages/WordDetail.tsx`
+- When calling `fetchExamples`, pass both the chosen display form and the other form: if `disp.word === reading` (usually-kana case), pass `altWord = result.japanese[0].word` (the kanji form). Otherwise pass `altWord = reading`. This way we always look up examples by whichever form actually exists in Tatoeba data, then filter to one of those forms.
 
-### 3. `src/pages/Library.tsx` (book title/author filter)
+### 5. Verification
+- Reload `/dictionary/うるさい` (or search "urusai"): header card should display うるさい with 煩い as a secondary reading; meanings show "noisy; loud" with spacing; example list shows only sentences containing うるさい or 煩い (exact substring), no 煩悩 / 煩わしい matches.
+- Spot-check a non-uk word (e.g. 食べる) to make sure the uk path didn't regress regular entries.
 
-- Same dual-match: keep matching `titleEn`/`author` with the lowercase query, and additionally match `titleJp` against the romaji→kana version. So `momotaro` would match `桃太郎` if such a title's romaji form roughly matches; in practice we just compare `titleJp.includes(kana)`.
-
-## Edge cases handled
-
-- `n` ambiguity: wanakana handles `nn` → ん and `n'` → ん correctly.
-- Mixed input (e.g. `食べru`) — fails the pure-latin regex, so it stays as-is.
-- English words that happen to be valid romaji (e.g. `sake`, `kite`) — Library/Flashcards search **both** the original English string and the kana form, so English matches keep working.
-- Empty / whitespace input — returns null, no change.
+---
 
 ## Files touched
+- `supabase/functions/jisho-lookup/index.ts` — keep `misc` and `tags` per sense.
+- `supabase/functions/tatoeba-example/index.ts` — accept `altWord`, filter results to exact-form matches.
+- `src/lib/jisho.ts` — extend type; uk detection reads `misc`/`tags`.
+- `src/lib/tatoeba.ts` — pass `altWord` through.
+- `src/pages/WordDetail.tsx` — pass altWord; fix `'; '` join.
+- `src/pages/Dictionary.tsx` — fix `'; '` join.
 
-- `src/lib/romaji.ts` (new, ~10 lines)
-- `src/pages/Dictionary.tsx` (1 line in the debounced effect)
-- `src/pages/Flashcards.tsx` (a few lines in the filter)
-- `src/pages/Library.tsx` (a few lines in the filter)
-
-No backend changes, no new deps (wanakana already installed).
-
-## Question
-
-Veux-tu que j'affiche un petit indicateur sous la search bar du Dictionary genre `→ たべる` quand une conversion romaji se fait, ou je le garde 100% silencieux ?
-
-&nbsp;
-
-Réponse : non garde ça silencieux 
+No DB migration, no new dependencies.

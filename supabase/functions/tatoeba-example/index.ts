@@ -24,6 +24,8 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const word: unknown = body.word;
+    const altWordRaw: unknown = body.altWord;
+    const altWord = typeof altWordRaw === 'string' && altWordRaw.length > 0 && altWordRaw.length <= 50 ? altWordRaw : null;
     const rawLimit = Number(body.limit ?? 1);
     const limit = Math.max(1, Math.min(5, Number.isFinite(rawLimit) ? rawLimit : 1));
 
@@ -33,6 +35,9 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const matchesTarget = (jp: string) =>
+      jp.includes(word) || (altWord ? jp.includes(altWord) : false);
 
     // 1. DB cache
     const { data: cached } = await supabase
@@ -48,8 +53,10 @@ Deno.serve(async (req) => {
           ? [{ japanese: cached.japanese, english: cached.english || '' }]
           : [];
 
-      if (cachedSentences.length >= limit || limit === 1) {
-        const sliced = cachedSentences.slice(0, limit);
+      const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
+
+      if (filtered.length >= limit) {
+        const sliced = filtered.slice(0, limit);
         return new Response(
           JSON.stringify({
             japanese: sliced[0]?.japanese ?? null,
@@ -59,32 +66,37 @@ Deno.serve(async (req) => {
           { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
         );
       }
-      // else fall through to refetch with bigger limit
+      // else fall through to refetch
     }
 
-    const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(word)}&limit=${Math.max(3, limit + 2)}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.error('Tatoeba API error:', res.status);
-      return new Response(
-        JSON.stringify({ japanese: null, english: null, sentences: [] }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const data = await res.json();
-    const results = Array.isArray(data.results) ? data.results : [];
-
+    // Query Tatoeba for both forms when altWord present, merge results.
+    const queries = [word, ...(altWord ? [altWord] : [])];
     const collected: Sentence[] = [];
-    for (const sentence of results) {
-      const jpText = sentence.text;
-      if (!jpText) continue;
-      const directTranslations = sentence.translations?.[0] || [];
-      for (const t of directTranslations) {
-        if (t?.lang === 'eng' && t?.text) {
-          collected.push({ japanese: jpText, english: t.text });
-          break;
+    const seen = new Set<string>();
+
+    for (const q of queries) {
+      const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&limit=${Math.max(8, limit + 4)}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.error('Tatoeba API error:', res.status);
+        continue;
+      }
+      const data = await res.json();
+      const results = Array.isArray(data.results) ? data.results : [];
+
+      for (const sentence of results) {
+        const jpText = sentence.text;
+        if (!jpText || seen.has(jpText)) continue;
+        if (!matchesTarget(jpText)) continue;
+        const directTranslations = sentence.translations?.[0] || [];
+        for (const t of directTranslations) {
+          if (t?.lang === 'eng' && t?.text) {
+            collected.push({ japanese: jpText, english: t.text });
+            seen.add(jpText);
+            break;
+          }
         }
+        if (collected.length >= limit) break;
       }
       if (collected.length >= limit) break;
     }

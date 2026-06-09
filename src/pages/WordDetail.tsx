@@ -40,16 +40,34 @@ export default function WordDetail() {
  }, [word]);
 
  useEffect(() => {
- if (!word) return;
- let cancelled = false;
- fetchExamples(word, 3).then((s) => { if (!cancelled) setExamples(s); });
- const chars = extractKanji(word);
- if (chars.length === 0) { setKanjiList([]); return; }
- Promise.all(chars.map((c) => fetchKanji(c))).then((data) => {
- if (!cancelled) setKanjiList(data);
- });
- return () => { cancelled = true; };
+   if (!word) return;
+   let cancelled = false;
+   const chars = extractKanji(word);
+   if (chars.length === 0) { setKanjiList([]); }
+   else {
+     Promise.all(chars.map((c) => fetchKanji(c))).then((data) => {
+       if (!cancelled) setKanjiList(data);
+     });
+   }
+   return () => { cancelled = true; };
  }, [word]);
+
+ useEffect(() => {
+   if (!word) return;
+   let cancelled = false;
+   // Pick a useful altWord: if display is the kana form, the kanji form is the alt, and vice-versa.
+   let altWord: string | undefined;
+   if (result) {
+     const j = result.japanese[0];
+     if (j) {
+       const primary = (disp?.word) || j.word || j.reading;
+       altWord = primary === j.word ? j.reading : j.word;
+       if (!altWord || altWord === primary) altWord = undefined;
+     }
+   }
+   fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
+   return () => { cancelled = true; };
+ }, [word, result]);
 
  const disp = result ? getDisplayWord(result) : null;
  const display = disp?.word || word;
@@ -274,9 +292,9 @@ export default function WordDetail() {
  <div className="flex gap-2">
  <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
  <div className="flex-1">
- <p className="font-medium text-foreground leading-relaxed">
- {sense.english_definitions.join(';')}
- </p>
+                 <p className="font-medium text-foreground leading-relaxed">
+                   {sense.english_definitions.join('; ')}
+                 </p>
  {sense.parts_of_speech.length > 0 && (
  <div className="mt-1 flex flex-wrap gap-1">
  {sense.parts_of_speech.map((pos, j) => (
