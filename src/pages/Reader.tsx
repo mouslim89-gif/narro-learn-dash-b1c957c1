@@ -912,22 +912,22 @@ export default function Reader() {
  }}
  >
  <PopoverTrigger asChild>
- <button
- type="button"
- className={cn('flex-1 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
- levelOpen
- ?'bg-foreground/10 ring-1 ring-border/50':'',
- )}
- aria-label="Change reading level"
- >
- <p className="font-japanese text-sm font-bold leading-tight whitespace-normal break-words">{book.titleJp}</p>
- <p className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5 mt-0.5">
- {difficultyConfig[difficulty].label}
- <ChevronDown
- className={cn('h-3 w-3 transition-transform', levelOpen &&'rotate-180')}
- />
- </p>
- </button>
+                <button
+                  type="button"
+                  className={cn('flex-1 min-w-0 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
+                    levelOpen
+                      ?'bg-foreground/10 ring-1 ring-border/50':'',
+                  )}
+                  aria-label="Change reading level"
+                >
+                  <p className="font-japanese text-sm font-bold leading-tight truncate">{book.titleJp}</p>
+                  <p className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5 mt-0.5">
+                    {difficultyConfig[difficulty].label}
+                    <ChevronDown
+                      className={cn('h-3 w-3 transition-transform', levelOpen &&'rotate-180')}
+                    />
+                  </p>
+                </button>
  </PopoverTrigger>
  <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
  <div className="flex flex-col gap-1.5">
