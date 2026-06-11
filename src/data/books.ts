@@ -377,7 +377,7 @@ export const books: Book[] = [
  jlptLevel:'N2',
  coverColor:'#E8B4C8',
  readingTimeMin: 7,
- synopsis:"\"Bodies are buried beneath the cherry trees!\" Kajii's narrator confides his strange revelation to a friend: only the imagined corpses rotting underground could explain why the blossoms bloom with such unbearable beauty. A short, hallucinatory prose poem in which horror and rapture become indistinguishable.",
+ synopsis:"\"Bodies are buried beneath the cherry trees!\"Kajii's narrator confides his strange revelation to a friend: only the imagined corpses rotting underground could explain why the blossoms bloom with such unbearable beauty. A short, hallucinatory prose poem in which horror and rapture become indistinguishable.",
  content: { simplified: sakuraSimplified, intermediate: sakuraIntermediate, original: sakuraOriginal },
  parts: { simplified: sakuraSimplifiedParts, intermediate: sakuraIntermediateParts, original: sakuraOriginalParts },
  anchors: sakuraAnchors,
