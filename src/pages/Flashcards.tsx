@@ -1,4 +1,5 @@
-import { useState, useMemo } from'react';
+import { useState, useMemo, useRef } from'react';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
 import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check } from'lucide-react';
 import { Link } from'react-router-dom';
@@ -37,6 +38,8 @@ export default function Flashcards() {
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
  const [reviewMode, setReviewMode] = useState(false);
  const showEmpty = useDelayed(300);
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 56);
 
  const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
@@ -113,9 +116,24 @@ export default function Flashcards() {
  return (
  <div className="pb-24">
  {/* Masthead */}
- <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
- <div>
- <AnimatedTitle text="Flashcards" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
+ <header
+ ref={headerRef}
+ className="sticky top-0 z-30 px-6 flex items-center justify-between"
+ style={{
+ paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ }}
+ >
+ <div className="min-w-0">
+ <AnimatedTitle
+ text="Flashcards"
+ className="font-serif font-bold leading-none tracking-tight"
+ style={{ fontSize: 'calc(32px - var(--p, 0) * 15px)' }}
+ />
  </div>
  <Link to="/settings">
  <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">

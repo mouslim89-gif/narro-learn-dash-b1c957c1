@@ -1,4 +1,5 @@
-import { useMemo } from'react';
+import { useMemo, useRef } from'react';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
@@ -15,6 +16,8 @@ export default function MyBooks() {
  const { progress, getBookProgress } = useReadingProgressStore();
  const savedWords = useFlashcardStore(s => s.savedWords);
  const showEmpty = useDelayed(300);
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 56);
 
  const bookProgressList = useMemo(() => {
  const list: { book: typeof books[number]; progress: NonNullable<ReturnType<typeof getBookProgress>> }[] = [];
@@ -70,9 +73,24 @@ export default function MyBooks() {
 
  return (
  <div className="pb-20">
- <header className="relative px-6 pt-10 pb-2 flex items-end justify-between">
- <div>
-         <AnimatedTitle text="My Books" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
+ <header
+ ref={headerRef}
+ className="sticky top-0 z-30 px-6 flex items-center justify-between"
+ style={{
+ paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ }}
+ >
+ <div className="min-w-0">
+         <AnimatedTitle
+ text="My Books"
+ className="font-serif font-bold leading-none tracking-tight"
+ style={{ fontSize: 'calc(32px - var(--p, 0) * 15px)' }}
+ />
  </div>
  <Link to="/settings">
  <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">

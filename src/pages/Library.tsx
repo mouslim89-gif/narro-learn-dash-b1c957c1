@@ -1,4 +1,5 @@
-import { useState, useMemo } from'react';
+import { useState, useMemo, useRef } from'react';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { books, genreLabels, type Genre } from'@/data/books';
 import { BookCard } from'@/components/BookCard';
 import { Link } from'react-router-dom';
@@ -14,6 +15,8 @@ const genres = Object.keys(genreLabels) as Genre[];
 export default function Library() {
  const [search, setSearch] = useState('');
  const { progress, darkMode, setDarkMode } = useReadingProgressStore();
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 64);
 
  // Find most recently read book
  // Find books in progress, most recently read first
@@ -36,10 +39,30 @@ export default function Library() {
 
  return (
  <div className="pb-20">
- <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
- <span className="library-kanji-watermark"aria-hidden="true">積</span>
- <div className="relative z-10">
-         <AnimatedTitle text="Tsundoku"className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground"/>
+ <header
+ ref={headerRef}
+ className="library-header-bg sticky top-0 z-30 px-6 flex items-center justify-between overflow-hidden"
+ style={{
+ paddingTop: 'calc(48px - var(--p, 0) * 36px)',
+ paddingBottom: 'calc(24px - var(--p, 0) * 16px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ transition: 'border-color 120ms linear',
+ }}
+ >
+ <span
+ className="library-kanji-watermark"
+ aria-hidden="true"
+ style={{ opacity: 'calc(1 - var(--p, 0))' }}
+ >積</span>
+ <div className="relative z-10 min-w-0">
+         <AnimatedTitle
+ text="Tsundoku"
+ className="wordmark font-serif font-bold tracking-tight leading-none text-foreground"
+ style={{ fontSize: 'calc(42px - var(--p, 0) * 25px)' }}
+ />
  </div>
  <div className="relative z-10 flex items-center gap-2">
  <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"onClick={() => setDarkMode(!darkMode)}>
@@ -52,7 +75,6 @@ export default function Library() {
  </Link>
  </div>
  </header>
- <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0"/>
 
  {/* Search */}
  <div className="px-6 pt-1 pb-3">
