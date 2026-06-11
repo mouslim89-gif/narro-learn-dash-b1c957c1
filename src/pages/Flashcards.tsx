@@ -8,6 +8,7 @@ import { Input } from'@/components/ui/input';
 import { Progress } from'@/components/ui/progress';
 import { FlashcardReview } from'@/components/FlashcardReview';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { ShrinkHeader } from'@/components/ShrinkHeader';
 import { cn } from'@/lib/utils';
 import { romajiToKana } from'@/lib/romaji';
 import {
