@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from'react';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { ConjugationTable } from'@/components/ConjugationTable';
 import { useSearchParams, useNavigate, Link } from'react-router-dom';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
