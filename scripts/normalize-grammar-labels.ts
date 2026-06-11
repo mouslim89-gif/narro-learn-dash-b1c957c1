@@ -43,6 +43,7 @@ const labelMap: [RegExp, string][] = [
   [/\bimperative\s*form\b/gi, "Imperative form"],
   [/\bnoun\b/g, "Noun"],
   [/\bclause\b/gi, "Clause"],
+  [/\bVolitional form form\b/gi, "Volitional form"],
 ];
 
 const rashomonJPMap: [RegExp, string][] = [
@@ -131,13 +132,13 @@ const rashomonFullPatternMap: Record<string, string> = {
   "～られそう / ～れそう": "Masu-stem + そう",
   "～ために": "Dictionary form + ために",
   "～ため": "Dictionary form + ために",
-  "～のに": "Dictionary form + ののに",
+  "～のに": "Dictionary form + のに",
   "～のだ / ～んだ": "Dictionary form + のだ",
-  "～の (nominalizer)": "Dictionary form + の (nominalizer)",
-  "～の（を・は・が）": "Dictionary form + の (nominalizer)",
-  "～の（名詞化）": "Dictionary form + の (nominalizer)",
+  "～の (nominalizer)": "Dictionary form + の",
+  "～の（を・は・が）": "Dictionary form + の",
+  "～の（名詞化）": "Dictionary form + の",
   "～のは": "Clause + のは",
-  "～ことがある": "Plain past + ことがある",
+  "～ことがある": "Plain past + ことがあります",
   "～ことにする": "Dictionary form + ことにする",
   "～という事": "Noun + という + Noun",
   "Noun + という + Noun": "Noun + という + Noun",
@@ -147,7 +148,7 @@ const rashomonFullPatternMap: Record<string, string> = {
   "～ずに": "Plain negative + ずに",
   "～ねば (ならぬ)": "Plain negative + ねばならぬ",
   "～ねば (ならぬ / ならぬ)": "Plain negative + ねばならぬ",
-  "～なさい": "Masu-stem + natsai",
+  "～なさい": "Masu-stem + なさい",
   "～なんて": "Clause + なんて",
   "なんて～（だ）": "Clause + なんて",
   "～なければ": "Plain negative + ければ",
@@ -187,6 +188,7 @@ const rashomonFullPatternMap: Record<string, string> = {
   "～を": "Noun + を",
   "～の中に": "Noun + のの中に",
   "～とか～とか": "Noun + とか〜とか",
+  "～よう (Volitional form)": "Volitional form",
 };
 
 function normalizeRashomon(pattern: string): string {
