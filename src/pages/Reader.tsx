@@ -889,13 +889,12 @@ export default function Reader() {
  </HeaderChip>
  <Popover
  open={levelOpen}
- onOpenChange={(o) => {
- setLevelOpen(o);
- if (o) {
- setMiniPopup(null);
- setSentenceTranslation(null);
- }
- }}
+        onOpenChange={(o) => {
+          setLevelOpen(o);
+          if (o) {
+            setMiniPopup(null);
+          }
+        }}
  >
  <PopoverTrigger asChild>
                 <button
