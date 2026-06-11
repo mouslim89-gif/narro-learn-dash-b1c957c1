@@ -116,17 +116,13 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
       >
         <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
           <div className="flex items-baseline justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="section-bullet" />
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Grammar</p>
-            </div>
+            <h2 className="wordmark font-serif text-[20px] leading-none">Grammar Notes</h2>
             {notes.length > 0 && (
               <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">
                 {notes.length} {notes.length === 1 ? 'note' : 'notes'}
               </span>
             )}
           </div>
-          <h2 className="wordmark font-serif text-[20px] leading-none mt-2">Grammar Notes</h2>
         </div>
 
         <div className="px-4 py-4">
