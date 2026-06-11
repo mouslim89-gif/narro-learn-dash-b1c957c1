@@ -115,13 +115,17 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
       >
         <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="wordmark font-serif text-[22px] leading-none">Grammar Notes</h2>
+            <div className="flex items-center gap-2">
+              <span className="section-bullet" />
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Grammar</p>
+            </div>
             {notes.length > 0 && (
-              <span className="text-[11px] tabular-nums text-muted-foreground">
+              <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">
                 {notes.length} {notes.length === 1 ? 'note' : 'notes'}
               </span>
             )}
           </div>
+          <h2 className="wordmark font-serif text-[20px] leading-none mt-2">Grammar Notes</h2>
         </div>
 
         <div className="px-4 py-4">
@@ -137,11 +141,14 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           )}
 
           {error && (
-            <div className="rounded-2xl bg-card ring-1 ring-destructive/30 p-4 text-center shadow-sm">
+            <div className="rounded-2xl bg-card ring-1 ring-border/30 p-8 text-center shadow-sm">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 ring-1 ring-destructive/20 mb-4">
+                <p className="text-xl">⚠️</p>
+              </div>
               <p className="text-sm text-destructive">{error}</p>
               <button
                 onClick={() => { setFetched(false); setError(null); }}
-                className="mt-2 text-xs text-accent underline"
+                className="mt-4 text-xs font-semibold text-accent uppercase tracking-wider tap-scale-sm"
               >
                 Retry
               </button>
@@ -149,7 +156,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           )}
 
           {!loading && !error && notes.length > 0 && (
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-3">
               {[...notes]
                 .sort((a, b) => {
                   const order = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 } as const;
@@ -161,67 +168,88 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                   const translation = hash ? translations.get(hash) : null;
 
                   return (
-                    <button
+                    <div
                       key={i}
-                      onClick={() => setExpandedIdx(expanded ? null : i)}
-                      className="card-lift tap-scale w-full rounded-xl border border-border/40 bg-card p-4 text-left ring-1 ring-border/30 smooth-colors"
+                      className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 min-w-0 flex-1">
-                          <span
-                            className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shrink-0 mt-0.5"
-                            style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
-                          >
-                            {note.jlpt}
-                          </span>
-                          <span className="font-japanese text-base font-bold break-words leading-snug min-w-0 flex-1">{note.pattern}</span>
+                      <button
+                        onClick={() => setExpandedIdx(expanded ? null : i)}
+                        className="w-full p-4 text-left tap-scale flex flex-col gap-1"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2 min-w-0 flex-1">
+                            <span
+                              className="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white shrink-0 mt-0.5"
+                              style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
+                            >
+                              {note.jlpt}
+                            </span>
+                            <span className="font-japanese text-base font-bold break-words leading-snug min-w-0 flex-1">
+                              {note.pattern}
+                            </span>
+                          </div>
+                          <ChevronDown 
+                            className={cn(
+                              "h-4 w-4 text-muted-foreground flex-shrink-0 mt-1 transition-transform duration-200",
+                              expanded && "rotate-180"
+                            )} 
+                          />
                         </div>
-                        {expanded ? (
-                          <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
-                        )}
-                      </div>
-
-                      <p className="mt-1 font-serif text-sm text-muted-foreground">{note.meaning}</p>
+                        <p className="font-serif text-sm text-muted-foreground">{note.meaning}</p>
+                      </button>
 
                       {expanded && (
-                        <div className="mt-3 space-y-2.5 animate-in fade-in">
-                          <div 
-                            className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3 relative tap-scale-sm transition-colors active:bg-muted/70"
-                            role="button"
-                            tabIndex={0}
+                        <div className="px-4 pb-4 pt-0 space-y-3 animate-fade-in-soft">
+                          <button 
+                            className="w-full text-left rounded-xl bg-muted/50 ring-1 ring-border/30 p-3 relative tap-scale-sm transition-colors active:bg-muted/70 smooth-colors"
                             onClick={(e) => {
                               e.stopPropagation();
                               onJumpToExample?.(note.example);
                             }}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <p className={sectionLabel}>Example from text</p>
-                              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-accent">
+                              <div className="flex items-center gap-1.5">
+                                <span className="section-bullet" />
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Example from text</p>
+                              </div>
+                              <span className="text-[10px] font-medium text-accent">
                                 Jump to text →
                               </span>
                             </div>
-                            <div className="mt-1 h-px w-8 bg-accent/60" />
                             <p className="mt-2 font-japanese text-sm">{note.example}</p>
                             {translation && (
                               <p className="mt-1.5 text-[12px] text-muted-foreground leading-snug italic animate-in fade-in duration-300">
                                 {translation}
                               </p>
                             )}
-                          </div>
+                          </button>
+
                           <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Tip</p>
-                            <div className="mt-1 h-px w-8 bg-accent/60" />
+                            <div className="flex items-center gap-1.5">
+                              <span className="section-bullet" />
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-accent">Tip</p>
+                            </div>
                             <p className="mt-2 font-serif text-sm text-foreground">{note.tip}</p>
                           </div>
                         </div>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
             </div>
           )}
+
+          {!loading && !error && notes.length === 0 && fetched && (
+            <div className="py-12 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20 mb-4 opacity-40">
+                <p className="text-xl">📭</p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                No grammar notes found for this text.
+              </p>
+            </div>
+          )}
+        </div>
 
           {!loading && !error && notes.length === 0 && fetched && (
             <p className="text-center text-sm text-muted-foreground py-8">
