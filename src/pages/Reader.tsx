@@ -874,18 +874,6 @@ export default function Reader() {
 
 
  // Trigger sentence translation for a given sentence
- const triggerSentenceTranslation = useCallback((sentenceIdx: number, japanese: string) => {
- const spanEl = sentenceRefs.current.get(sentenceIdx);
- if (!spanEl) return;
- const rect = spanEl.getBoundingClientRect();
- setMiniPopup(null);
- setLevelOpen(false);
- setSentenceTranslation({
- sentenceIdx,
- japanese,
- sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
- });
- }, []);
 
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
