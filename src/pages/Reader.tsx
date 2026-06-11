@@ -15,7 +15,7 @@ import { FuriganaWord } from'@/components/FuriganaWord';
 import { WordPopup } from'@/components/WordPopup';
 import { WordMiniPopup } from'@/components/WordMiniPopup';
 import { ReaderToken } from'@/components/ReaderToken';
-import { SentenceTranslationPopup } from'@/components/SentenceTranslationPopup';
+
 import { GrammarPanel } from'@/components/GrammarPanel';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from'@/stores/reading-progress';
