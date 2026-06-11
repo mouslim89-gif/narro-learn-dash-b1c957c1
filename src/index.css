@@ -534,15 +534,33 @@
  animation: soft-pulse 1.8s var(--ease-in-out-soft) infinite;
 }
 
+/* Sentence flash highlight when jumping from a grammar example.
+   Uses box-decoration-break so multi-line spans get padded/rounded
+   on each line fragment instead of one harsh box. */
+.sentence-highlight-flash {
+  background-color: hsl(var(--accent) / 0.18);
+  border-radius: 0.35rem;
+  padding: 0.02em 0.25em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: sentence-flash-in 0.18s var(--ease-out-soft) both;
+  transition: background-color 600ms var(--ease-out-soft);
+}
+
+@keyframes sentence-flash-in {
+  0%   { background-color: hsl(var(--accent) / 0); }
+  100% { background-color: hsl(var(--accent) / 0.18); }
+}
+
 /* Inline translation reveal — radiates outward from an anchor sentence */
 @keyframes translation-reveal {
- 0% { opacity: 0; transform: translateY(-4px); filter: blur(2px); }
- 100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  0% { opacity: 0; transform: translateY(-4px); filter: blur(2px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 .translation-reveal {
- opacity: 0;
- animation: translation-reveal 0.32s var(--ease-out-soft) both;
- will-change: opacity, transform, filter;
+  opacity: 0;
+  animation: translation-reveal 0.32s var(--ease-out-soft) both;
+  will-change: opacity, transform, filter;
 }
 
 
