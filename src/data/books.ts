@@ -265,7 +265,7 @@ export const books: Book[] = [
  jlptLevel:'N2',
  coverColor:'#6B4F8F',
  readingTimeMin: 10,
- synopsis:"A Buddhist parable by Akutagawa. One morning in paradise, the Buddha lowers a single spider's thread into hell to save Kandata, a murderer who once spared the life of a spider. As Kandata climbs, other sinners follow him up the thread — and his reaction decides his fate. A short, luminous meditation on selfishness and compassion.",
+ synopsis:"A Buddhist parable by Akutagawa. One morning in paradise, the Buddha lowers a single spider's thread into hell to save Kandata, a murderer who once spared the life of a spider. As Kandata climbs, other sinners follow him up the thread, and his reaction decides his fate. A short, luminous meditation on selfishness and compassion.",
  content: { simplified: kumoSimplified, intermediate: kumoIntermediate, original: kumoOriginal },
  parts: { simplified: kumoSimplifiedParts, intermediate: kumoIntermediateParts, original: kumoOriginalParts },
  anchors: kumoAnchors,
