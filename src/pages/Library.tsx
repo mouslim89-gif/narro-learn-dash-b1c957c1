@@ -8,12 +8,27 @@ import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { romajiToKana } from'@/lib/romaji';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
+
+const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
+const smooth = (a: number, b: number, p: number) => {
+  const t = Math.max(0, Math.min(1, (p - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
 
 const genres = Object.keys(genreLabels) as Genre[];
 
 export default function Library() {
  const [search, setSearch] = useState('');
  const { progress, darkMode, setDarkMode } = useReadingProgressStore();
+ const p = useScrollProgress(0, 90);
+ const largeOpacity = 1 - smooth(0.3, 0.65, p);
+ const largeScale = lerp(1, 0.5, p);
+ const smallOpacity = smooth(0.45, 0.85, p);
+ const headerPt = lerp(48, 10, p);
+ const headerPb = lerp(24, 10, p);
+ const headerBgAlpha = smooth(0.05, 0.85, p) * 0.92;
+ const watermarkOpacity = Math.max(0, 1 - p * 1.6);
 
  // Find most recently read book
  // Find books in progress, most recently read first
@@ -36,12 +51,41 @@ export default function Library() {
 
  return (
  <div className="pb-20">
- <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
- <span className="library-kanji-watermark"aria-hidden="true">積</span>
- <div className="relative z-10">
-         <AnimatedTitle text="Tsundoku"className="wordmark font-serif font-bold tracking-tight text-[42px] md:text-[48px] leading-none text-foreground"/>
+ <header
+ className="library-header-bg sticky top-0 z-30 px-6 flex items-center justify-between overflow-hidden border-b border-border/0"
+ style={{
+ paddingTop: `${headerPt}px`,
+ paddingBottom: `${headerPb}px`,
+ backgroundColor: `hsl(var(--background) / ${headerBgAlpha})`,
+ backdropFilter: p > 0.05 ? `blur(${p * 18}px) saturate(140%)` : undefined,
+ WebkitBackdropFilter: p > 0.05 ? `blur(${p * 18}px) saturate(140%)` : undefined,
+ borderBottomColor: `hsl(var(--border) / ${smooth(0.7, 1, p) * 0.6})`,
+ }}
+ >
+ <span className="library-kanji-watermark" aria-hidden="true" style={{ opacity: watermarkOpacity }}>積</span>
+ {/* Title stack — large wordmark crossfades into compact title (B pattern) */}
+ <div className="relative z-10 flex-1 min-w-0">
+ <div className="relative h-[42px] md:h-[48px] flex items-center">
+ <AnimatedTitle
+ text="Tsundoku"
+ className="wordmark font-serif font-bold tracking-tight leading-none text-foreground absolute left-0 origin-left whitespace-nowrap pointer-events-none"
+ style={{
+ fontSize: '42px',
+ opacity: largeOpacity,
+ transform: `scale(${largeScale})`,
+ willChange: 'transform, opacity',
+ }}
+ />
+ <h1
+ className="font-serif font-bold tracking-tight leading-none text-foreground absolute left-0 whitespace-nowrap"
+ style={{ fontSize: '19px', fontWeight: 700, opacity: smallOpacity }}
+ aria-hidden={smallOpacity < 0.5}
+ >
+ Tsundoku
+ </h1>
  </div>
- <div className="relative z-10 flex items-center gap-2">
+ </div>
+ <div className="relative z-10 flex items-center gap-2 flex-shrink-0">
  <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"onClick={() => setDarkMode(!darkMode)}>
  {darkMode ? <Sun className="h-[18px] w-[18px]"/> : <Moon className="h-[18px] w-[18px]"/>}
  </Button>

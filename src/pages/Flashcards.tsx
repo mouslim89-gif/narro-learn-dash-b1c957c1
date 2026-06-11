@@ -7,7 +7,7 @@ import { Button } from'@/components/ui/button';
 import { Input } from'@/components/ui/input';
 import { Progress } from'@/components/ui/progress';
 import { FlashcardReview } from'@/components/FlashcardReview';
-import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { ShrinkHeader } from'@/components/ShrinkHeader';
 import { cn } from'@/lib/utils';
 import { romajiToKana } from'@/lib/romaji';
 import {
@@ -113,16 +113,17 @@ export default function Flashcards() {
  return (
  <div className="pb-24">
  {/* Masthead */}
- <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
- <div>
- <AnimatedTitle text="Flashcards" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
- </div>
- <Link to="/settings">
- <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
- <Settings className="h-[18px] w-[18px]"/>
- </Button>
- </Link>
- </header>
+  {/* Masthead */}
+  <ShrinkHeader
+  title="Flashcards"
+  actions={
+  <Link to="/settings">
+  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
+  <Settings className="h-[18px] w-[18px]" />
+  </Button>
+  </Link>
+  }
+  />
 
  {savedWords.length > 0 && (
  <>

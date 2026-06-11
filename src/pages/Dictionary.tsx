@@ -9,7 +9,7 @@ import { PlayWordButton } from'@/components/PlayWordButton';
 import { toRomaji } from'wanakana';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { Input } from'@/components/ui/input';
-import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { ShrinkHeader } from'@/components/ShrinkHeader';
 import { romajiToKana } from'@/lib/romaji';
 
 export default function DictionaryPage() {
@@ -91,18 +91,20 @@ export default function DictionaryPage() {
  return (
  <div className="pb-24">
  {/* Masthead */}
- <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
- <AnimatedTitle text="Dictionary" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
+ <ShrinkHeader
+ title="Dictionary"
+ actions={
  <Link to="/settings">
  <Button
  variant="ghost"
  size="icon"
  className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
  >
- <Settings className="h-[18px] w-[18px]"/>
+ <Settings className="h-[18px] w-[18px]" />
  </Button>
  </Link>
- </header>
+ }
+ />
 
  {/* Search pill */}
  <div className="mt-5 px-6 relative">
