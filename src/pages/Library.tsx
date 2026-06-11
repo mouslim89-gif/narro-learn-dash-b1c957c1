@@ -62,7 +62,7 @@ export default function Library() {
  text="Tsundoku"
  className="wordmark font-serif font-bold tracking-tight leading-none text-foreground"
  style={{ 
-   '--title-scale': 'calc(1 - var(--p, 0) * 0.595)', 
+   '--title-scale': 'calc(1 - var(--p, 0) * 0.429)', 
    fontSize: '42px',
    marginBottom: 'calc(var(--p, 0) * -18px)'
  } as any}

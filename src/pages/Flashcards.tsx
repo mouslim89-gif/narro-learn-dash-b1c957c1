@@ -133,7 +133,7 @@ export default function Flashcards() {
  text="Flashcards"
  className="font-serif font-bold leading-none tracking-tight"
  style={{ 
-   '--title-scale': 'calc(1 - var(--p, 0) * 0.469)', 
+   '--title-scale': 'calc(1 - var(--p, 0) * 0.25)', 
    fontSize: '32px',
    marginBottom: 'calc(var(--p, 0) * -10px)'
  } as any}
