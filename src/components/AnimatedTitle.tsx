@@ -42,13 +42,11 @@ export function AnimatedTitle({
       style={restStyle}
     >
       <span 
-        className="inline-block origin-left will-change-transform"
+        className="inline-block origin-left"
         style={{ 
           transform: titleScale ? `scale(${titleScale})` : undefined,
           fontSize: fontSize || undefined,
           marginBottom: marginBottom || undefined,
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden'
         }}
       >
         {chars.map((ch, i) => {
