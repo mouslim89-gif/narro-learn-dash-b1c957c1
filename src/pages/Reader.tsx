@@ -726,7 +726,11 @@ export default function Reader() {
         }
       }, 100);
     } else {
-      toast.error('Sentence not found in this version of the text.');
+      toast({
+        title: 'Sentence not found',
+        description: 'Could not locate this example in the text.',
+        variant: 'destructive'
+      });
     }
   }, [sentences]);
 
