@@ -1228,7 +1228,6 @@ export default function Reader() {
   const englishLine = showTranslations && sentenceHash ? translations.get(sentenceHash) : undefined;
   const dimmed = miniPopup && miniPopup.sentenceIdx !== globalIdx;
   const activeAudio = audioCurrentSentence === globalIdx;
- const activeAudio = audioCurrentSentence === globalIdx;
 
  return (
  <Fragment key={sIdx}>
