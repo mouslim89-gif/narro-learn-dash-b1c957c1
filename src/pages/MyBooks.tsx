@@ -1,4 +1,5 @@
-import { useMemo } from'react';
+import { useMemo, useRef } from'react';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
