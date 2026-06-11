@@ -61,7 +61,11 @@ export default function Library() {
          <AnimatedTitle
  text="Tsundoku"
  className="wordmark font-serif font-bold tracking-tight leading-none text-foreground"
- style={{ fontSize: 'calc(42px - var(--p, 0) * 25px)' }}
+ style={{ 
+   '--title-scale': 'calc(1 - var(--p, 0) * 0.595)', 
+   fontSize: '42px',
+   marginBottom: 'calc(var(--p, 0) * -18px)'
+ } as any}
  />
  </div>
  <div className="relative z-10 flex items-center gap-2">

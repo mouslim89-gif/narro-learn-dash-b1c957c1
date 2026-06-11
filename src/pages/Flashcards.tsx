@@ -129,10 +129,14 @@ export default function Flashcards() {
  }}
  >
  <div className="min-w-0">
- <AnimatedTitle
+  <AnimatedTitle
  text="Flashcards"
  className="font-serif font-bold leading-none tracking-tight"
- style={{ fontSize: 'calc(32px - var(--p, 0) * 15px)' }}
+ style={{ 
+   '--title-scale': 'calc(1 - var(--p, 0) * 0.469)', 
+   fontSize: '32px',
+   marginBottom: 'calc(var(--p, 0) * -10px)'
+ } as any}
  />
  </div>
  <Link to="/settings">
