@@ -188,7 +188,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                       {expanded && (
                         <div className="mt-3 space-y-2.5 animate-in fade-in">
                           <div 
-                            className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3 relative group transition-colors hover:bg-muted/60"
+                            className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3 relative tap-scale-sm transition-colors active:bg-muted/70"
                             role="button"
                             tabIndex={0}
                             onClick={(e) => {
@@ -196,9 +196,9 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                               onJumpToExample?.(note.example);
                             }}
                           >
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-2">
                               <p className={sectionLabel}>Example from text</p>
-                              <span className="text-[10px] font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-accent">
                                 Jump to text →
                               </span>
                             </div>
