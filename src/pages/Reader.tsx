@@ -1225,11 +1225,9 @@ export default function Reader() {
  const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
  const sentenceText = sentence.tokens.map(t => t.t).join('');
  const sentenceHash = sentenceHashes[globalIdx];
- const englishLine = showTranslations && sentenceHash ? translations.get(sentenceHash) : undefined;
- const dimmed =
- (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
- (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
- const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
+  const englishLine = showTranslations && sentenceHash ? translations.get(sentenceHash) : undefined;
+  const dimmed = miniPopup && miniPopup.sentenceIdx !== globalIdx;
+  const activeAudio = audioCurrentSentence === globalIdx;
  const activeAudio = audioCurrentSentence === globalIdx;
 
  return (
