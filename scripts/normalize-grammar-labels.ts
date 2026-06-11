@@ -55,7 +55,7 @@ const rashomonJPMap: [RegExp, string][] = [
   [/^(動詞のない形|ない形)\s*(\+|＋)/, "Plain negative +"],
   [/^(動詞のば形|ば形)\s*(\+|＋)/, "Conditional form +"],
   [/^い形容詞（いを除く）\s*(\+|＋)/, "I-adjective +"],
-  [/^い形容詞のい除く\s*(\+|＋)/, "I-adjective +"],
+  [/^い形容詞 de い除く\s*(\+|＋)/, "I-adjective +"],
   [/^（い形容詞）\s*(\+|＋)/, "I-adjective +"],
   [/^な形容詞\s*(\+|＋)/, "Na-adjective +"],
   [/^（な形容詞）\s*(\+|＋)/, "Na-adjective +"],
@@ -228,6 +228,9 @@ function normalize(s: string, book: string, key: string): string {
   }
 
   for (const [re, rep] of labelMap) out = out.replace(re, rep);
+
+  // cleanup double Volitional form form
+  out = out.replace(/\bVolitional form form\b/gi, "Volitional form");
 
   // capitalize first letter (skip if starts with non-letter like ～ or 〜 or Japanese)
   const first = out.charAt(0);
