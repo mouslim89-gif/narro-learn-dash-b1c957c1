@@ -1,4 +1,5 @@
 import { cn } from"@/lib/utils";
+import type { CSSProperties } from"react";
 
 interface AnimatedTitleProps {
  text: string;
@@ -8,6 +9,7 @@ interface AnimatedTitleProps {
  stagger?: number;
  /** Initial delay before first letter, ms */
  delay?: number;
+ style?: CSSProperties;
 }
 
 /**
@@ -21,10 +23,11 @@ export function AnimatedTitle({
  as: Tag ="h1",
  stagger = 22,
  delay = 0,
+ style,
 }: AnimatedTitleProps) {
  const chars = Array.from(text);
  return (
- <Tag className={cn("animated-title", className)} aria-label={text}>
+ <Tag className={cn("animated-title", className)} aria-label={text} style={style}>
  {chars.map((ch, i) => {
  if (ch ==="") {
  return (
