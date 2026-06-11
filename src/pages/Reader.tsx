@@ -198,8 +198,6 @@ export default function Reader() {
  const [difficulty, setDifficulty] = useState<Difficulty>(
  (diffParam as Difficulty) || saved?.difficulty ||'simplified');
  const [showSettings, setShowSettings] = useState(false);
- const [showChapters, setShowChapters] = useState(false);
- const progressMap = useReadingProgressStore((s) => s.progress);
  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
  const [levelOpen, setLevelOpen] = useState(false);
