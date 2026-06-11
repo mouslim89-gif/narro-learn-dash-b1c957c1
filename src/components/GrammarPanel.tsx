@@ -15,9 +15,10 @@ interface GrammarPanelProps {
   partIdx?: number | null;
   open: boolean;
   onClose: () => void;
+  onJumpToExample?: (example: string) => void;
 }
 
-export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose }: GrammarPanelProps) {
+export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -186,8 +187,21 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
 
                       {expanded && (
                         <div className="mt-3 space-y-2.5 animate-in fade-in">
-                          <div className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3">
-                            <p className={sectionLabel}>Example from text</p>
+                          <div 
+                            className="rounded-xl bg-muted/40 ring-1 ring-border/30 p-3 relative group transition-colors hover:bg-muted/60"
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onJumpToExample?.(note.example);
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <p className={sectionLabel}>Example from text</p>
+                              <span className="text-[10px] font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                                Jump to text →
+                              </span>
+                            </div>
                             <div className="mt-1 h-px w-8 bg-accent/60" />
                             <p className="mt-2 font-japanese text-sm">{note.example}</p>
                             {translation && (

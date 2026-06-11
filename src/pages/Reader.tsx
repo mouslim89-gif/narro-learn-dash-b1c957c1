@@ -214,8 +214,9 @@ export default function Reader() {
  });
 
  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
- const [showGrammar, setShowGrammar] = useState(false);
- const [activeSentence, setActiveSentence] = useState<number | null>(null);
+  const [showGrammar, setShowGrammar] = useState(false);
+  const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
+  const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
  const restoredScroll = useRef(false);
  // Top-most visible sentence index (updated by IntersectionObserver).
@@ -676,8 +677,62 @@ export default function Reader() {
  scrollAnimationFrameRef.current = requestAnimationFrame(step);
  };
 
- scrollAnimationFrameRef.current = requestAnimationFrame(step);
- }, []);
+  scrollAnimationFrameRef.current = requestAnimationFrame(step);
+  }, []);
+
+  const jumpToExample = useCallback((example: string) => {
+    if (!example) return;
+    
+    // Normalize string for comparison (remove whitespace, punctuation normalization)
+    const normalize = (s: string) => s.replace(/[\s　]/g, '').trim();
+    const normalizedTarget = normalize(example);
+    
+    // Search for the sentence in the text
+    let targetIdx = -1;
+    for (let i = 0; i < sentences.length; i++) {
+      const sText = normalize(sentences[i].tokens.map(t => t.t).join(''));
+      if (sText === normalizedTarget) {
+        targetIdx = i;
+        break;
+      }
+    }
+
+    // Fallback search (partial match if exact fails)
+    if (targetIdx === -1) {
+      for (let i = 0; i < sentences.length; i++) {
+        const sText = normalize(sentences[i].tokens.map(t => t.t).join(''));
+        if (sText.includes(normalizedTarget) || normalizedTarget.includes(sText)) {
+          targetIdx = i;
+          break;
+        }
+      }
+    }
+
+    if (targetIdx !== -1) {
+      setShowGrammar(false);
+      
+      // Delay to allow GrammarPanel to close and layout to settle
+      setTimeout(() => {
+        const el = sentenceRefs.current.get(targetIdx);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({
+            top: Math.max(0, top - 120),
+            behavior: 'smooth'
+          });
+          
+          setHighlightedSentenceIdx(targetIdx);
+          setTimeout(() => setHighlightedSentenceIdx(null), 2000);
+        }
+      }, 100);
+    } else {
+      toast({
+        title: 'Sentence not found',
+        description: 'Could not locate this example in the text.',
+        variant: 'destructive'
+      });
+    }
+  }, [sentences]);
 
  const queueSentenceScroll = useCallback(
  (sentenceIdx: number) => {
@@ -1246,7 +1301,13 @@ export default function Reader() {
  const ts = audioSync.sentences[globalIdx];
  if (ts) audioSeekRef.current(ts.startSec);
  }}
- className={`transition-all duration-200 rounded ${dimmed ?'opacity-25':''} ${activeTranslation ?'bg-primary/5':''} ${activeAudio ?'bg-primary/10 px-0.5 -mx-0.5':''}`}
+  className={cn(
+    "transition-all duration-200 rounded",
+    dimmed && "opacity-25",
+    activeTranslation && "bg-primary/5",
+    activeAudio && "bg-primary/10 px-0.5 -mx-0.5",
+    highlightedSentenceIdx === globalIdx && "bg-accent/20 ring-1 ring-accent/40 px-1 -mx-1"
+  )}
  >
  {sentence.tokens.map((token, i) => {
  if (!token.j && !tokenEditMode) {
@@ -1462,8 +1523,9 @@ export default function Reader() {
  difficulty={difficulty}
  partIdx={partIdx}
  open={showGrammar}
- onClose={() => setShowGrammar(false)}
- />
+  onClose={() => setShowGrammar(false)}
+  onJumpToExample={jumpToExample}
+  />
 
  {audioUrl && (
  <AudioPlayer
