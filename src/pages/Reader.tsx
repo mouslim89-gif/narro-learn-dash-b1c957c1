@@ -15,11 +15,11 @@ import { FuriganaWord } from'@/components/FuriganaWord';
 import { WordPopup } from'@/components/WordPopup';
 import { WordMiniPopup } from'@/components/WordMiniPopup';
 import { ReaderToken } from'@/components/ReaderToken';
-import { SentenceTranslationPopup } from'@/components/SentenceTranslationPopup';
+
 import { GrammarPanel } from'@/components/GrammarPanel';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from'@/stores/reading-progress';
-import { useLongPress } from'@/hooks/use-long-press';
+
 import { toast } from'@/hooks/use-toast';
 
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from'@/lib/audio-sync';
@@ -199,7 +199,7 @@ export default function Reader() {
  (diffParam as Difficulty) || saved?.difficulty ||'simplified');
  const [showSettings, setShowSettings] = useState(false);
  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
- const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
+ 
  const [levelOpen, setLevelOpen] = useState(false);
  const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
@@ -874,18 +874,6 @@ export default function Reader() {
 
 
  // Trigger sentence translation for a given sentence
- const triggerSentenceTranslation = useCallback((sentenceIdx: number, japanese: string) => {
- const spanEl = sentenceRefs.current.get(sentenceIdx);
- if (!spanEl) return;
- const rect = spanEl.getBoundingClientRect();
- setMiniPopup(null);
- setLevelOpen(false);
- setSentenceTranslation({
- sentenceIdx,
- japanese,
- sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
- });
- }, []);
 
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
@@ -901,13 +889,12 @@ export default function Reader() {
  </HeaderChip>
  <Popover
  open={levelOpen}
- onOpenChange={(o) => {
- setLevelOpen(o);
- if (o) {
- setMiniPopup(null);
- setSentenceTranslation(null);
- }
- }}
+        onOpenChange={(o) => {
+          setLevelOpen(o);
+          if (o) {
+            setMiniPopup(null);
+          }
+        }}
  >
  <PopoverTrigger asChild>
                 <button
@@ -1129,10 +1116,9 @@ export default function Reader() {
  <Switch
  checked={tokenEditMode}
  onCheckedChange={(on) => {
- setTokenEditMode(on);
- setSelectedIdx([]);
- setMiniPopup(null);
- setSentenceTranslation(null);
+    setTokenEditMode(on);
+    setSelectedIdx([]);
+    setMiniPopup(null);
  }}
  />
  </div>
@@ -1239,12 +1225,9 @@ export default function Reader() {
  const globalIdx = paragraphs.slice(0, pIdx).reduce((sum, p) => sum + p.length, 0) + sIdx;
  const sentenceText = sentence.tokens.map(t => t.t).join('');
  const sentenceHash = sentenceHashes[globalIdx];
- const englishLine = showTranslations && sentenceHash ? translations.get(sentenceHash) : undefined;
- const dimmed =
- (miniPopup && miniPopup.sentenceIdx !== globalIdx) ||
- (sentenceTranslation && sentenceTranslation.sentenceIdx !== globalIdx);
- const activeTranslation = sentenceTranslation?.sentenceIdx === globalIdx;
- const activeAudio = audioCurrentSentence === globalIdx;
+  const englishLine = showTranslations && sentenceHash ? translations.get(sentenceHash) : undefined;
+  const dimmed = miniPopup && miniPopup.sentenceIdx !== globalIdx;
+  const activeAudio = audioCurrentSentence === globalIdx;
 
  return (
  <Fragment key={sIdx}>
@@ -1260,7 +1243,7 @@ export default function Reader() {
  const ts = audioSync.sentences[globalIdx];
  if (ts) audioSeekRef.current(ts.startSec);
  }}
- className={`transition-all duration-200 rounded ${dimmed ?'opacity-25':''} ${activeTranslation ?'bg-primary/5':''} ${activeAudio ?'bg-primary/10 px-0.5 -mx-0.5':''}`}
+ className={`transition-all duration-200 rounded ${dimmed ? 'opacity-25' : ''} ${activeAudio ? 'bg-primary/10 px-0.5 -mx-0.5' : ''}`}
  >
  {sentence.tokens.map((token, i) => {
  if (!token.j && !tokenEditMode) {
@@ -1310,8 +1293,7 @@ export default function Reader() {
  const spanEl = sentenceRefs.current.get(globalIdx);
  const rect = spanEl?.getBoundingClientRect();
  if (!rect) return;
- setSentenceTranslation(null);
- setLevelOpen(false);
+    setLevelOpen(false);
  setMiniPopup({
  text: token.t,
  baseForm: token.b,
@@ -1323,13 +1305,6 @@ export default function Reader() {
  sentenceIdx: globalIdx,
  tokenIdx: i,
  });
- }}
- onLongPress={() => {
- if (tokenEditMode) {
- setSelectedIdx((arr) => arr.includes(tokKey) ? arr : [...arr, tokKey].sort((a, b) => a - b));
- return;
- }
- triggerSentenceTranslation(globalIdx, sentenceText);
  }}
  />
  );
@@ -1449,21 +1424,9 @@ export default function Reader() {
  setMiniPopup(null);
  setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
  }}
- onTranslateSentence={() => {
- const idx = miniPopup.sentenceIdx;
- const jp = miniPopup.contextSentence ||'';
- triggerSentenceTranslation(idx, jp);
- }}
  />
  )}
 
- {sentenceTranslation && (
- <SentenceTranslationPopup
- japanese={sentenceTranslation.japanese}
- sentenceRect={sentenceTranslation.sentenceRect}
- onClose={() => setSentenceTranslation(null)}
- />
- )}
 
  {fullPopupWord && (
  <WordPopup
