@@ -1116,10 +1116,9 @@ export default function Reader() {
  <Switch
  checked={tokenEditMode}
  onCheckedChange={(on) => {
- setTokenEditMode(on);
- setSelectedIdx([]);
- setMiniPopup(null);
- setSentenceTranslation(null);
+    setTokenEditMode(on);
+    setSelectedIdx([]);
+    setMiniPopup(null);
  }}
  />
  </div>
