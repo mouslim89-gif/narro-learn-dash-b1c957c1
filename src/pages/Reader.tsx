@@ -1293,8 +1293,7 @@ export default function Reader() {
  const spanEl = sentenceRefs.current.get(globalIdx);
  const rect = spanEl?.getBoundingClientRect();
  if (!rect) return;
- setSentenceTranslation(null);
- setLevelOpen(false);
+    setLevelOpen(false);
  setMiniPopup({
  text: token.t,
  baseForm: token.b,
