@@ -99,6 +99,12 @@
  @apply border-border;
  }
 
+ html {
+ /* Prevent scroll-anchoring feedback loop with the collapsing sticky headers:
+    header shrinks → browser re-anchors scroll → --p changes → header grows → infinite jitter */
+ overflow-anchor: none;
+ }
+
  body {
  @apply bg-background text-foreground;
  font-family:'Inter', sans-serif;
