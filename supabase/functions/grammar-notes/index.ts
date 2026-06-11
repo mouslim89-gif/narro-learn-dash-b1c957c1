@@ -46,7 +46,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-2.5-flash",
           messages: [
             {
               role: "system",
@@ -153,6 +153,9 @@ Return every distinct meaningful grammar point — no fixed minimum or maximum. 
     );
 
     if (!response.ok) {
+      const t = await response.text();
+      console.error("AI gateway error:", response.status, t);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limited. Please try again shortly." }),
@@ -173,9 +176,7 @@ Return every distinct meaningful grammar point — no fixed minimum or maximum. 
           }
         );
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
+      throw new Error(`AI gateway error: ${response.status} ${t}`);
     }
 
     const data = await response.json();
