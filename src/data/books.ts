@@ -307,7 +307,7 @@ export const books: Book[] = [
  jlptLevel:'N2',
  coverColor:'#E8C547',
  readingTimeMin: 12,
- synopsis:"A young man weighed down by illness, debt, and an unnameable malaise wanders the back streets of Kyoto. A single lemon at a fruit stand transfigures his mood — and at the Maruzen bookstore, he leaves it perched atop a tower of art books, imagining it as a bright yellow bomb. Kajii's luminous Taishō-era prose poem on beauty, melancholy, and small acts of mischief.",
+ synopsis:"A young man weighed down by illness, debt, and an unnameable malaise wanders the back streets of Kyoto. A single lemon at a fruit stand transfigures his mood, and at the Maruzen bookstore, he leaves it perched atop a tower of art books, imagining it as a bright yellow bomb. Kajii's luminous Taishō-era prose poem on beauty, melancholy, and small acts of mischief.",
  content: { simplified: lemonSimplified, intermediate: lemonIntermediate, original: lemonOriginal },
  parts: { simplified: lemonSimplifiedParts, intermediate: lemonIntermediateParts, original: lemonOriginalParts },
  anchors: lemonAnchors,
