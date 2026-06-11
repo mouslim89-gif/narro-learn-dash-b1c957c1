@@ -1,5 +1,5 @@
 import { FuriganaWord } from'@/components/FuriganaWord';
-import { useLongPress } from'@/hooks/use-long-press';
+
 import type { BookToken } from'@/data/book-tokens';
 import type { KnownLevel } from'@/lib/known-words';
 
