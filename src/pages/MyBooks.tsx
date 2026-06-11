@@ -7,7 +7,7 @@ import { tokenWordCounts } from'@/data/book-tokens';
 import { Link } from'react-router-dom';
 import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
 import { Button } from'@/components/ui/button';
-import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { ShrinkHeader } from'@/components/ShrinkHeader';
 import { ShrinkHeader } from'@/components/ShrinkHeader';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { useDelayed } from'@/hooks/use-delayed';
