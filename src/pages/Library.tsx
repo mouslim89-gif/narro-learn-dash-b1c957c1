@@ -21,6 +21,14 @@ const genres = Object.keys(genreLabels) as Genre[];
 export default function Library() {
  const [search, setSearch] = useState('');
  const { progress, darkMode, setDarkMode } = useReadingProgressStore();
+ const p = useScrollProgress(0, 90);
+ const largeOpacity = 1 - smooth(0.3, 0.65, p);
+ const largeScale = lerp(1, 0.5, p);
+ const smallOpacity = smooth(0.45, 0.85, p);
+ const headerPt = lerp(48, 10, p);
+ const headerPb = lerp(24, 10, p);
+ const headerBgAlpha = smooth(0.05, 0.85, p) * 0.92;
+ const watermarkOpacity = Math.max(0, 1 - p * 1.6);
 
  // Find most recently read book
  // Find books in progress, most recently read first
