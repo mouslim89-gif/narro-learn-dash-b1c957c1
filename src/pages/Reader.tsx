@@ -19,7 +19,7 @@ import { ReaderToken } from'@/components/ReaderToken';
 import { GrammarPanel } from'@/components/GrammarPanel';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from'@/stores/reading-progress';
-import { useLongPress } from'@/hooks/use-long-press';
+
 import { toast } from'@/hooks/use-toast';
 
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from'@/lib/audio-sync';
