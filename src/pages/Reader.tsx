@@ -1306,13 +1306,6 @@ export default function Reader() {
  tokenIdx: i,
  });
  }}
- onLongPress={() => {
- if (tokenEditMode) {
- setSelectedIdx((arr) => arr.includes(tokKey) ? arr : [...arr, tokKey].sort((a, b) => a - b));
- return;
- }
- triggerSentenceTranslation(globalIdx, sentenceText);
- }}
  />
  );
 
