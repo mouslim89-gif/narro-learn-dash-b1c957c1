@@ -15,6 +15,8 @@ const genres = Object.keys(genreLabels) as Genre[];
 export default function Library() {
  const [search, setSearch] = useState('');
  const { progress, darkMode, setDarkMode } = useReadingProgressStore();
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 64);
 
  // Find most recently read book
  // Find books in progress, most recently read first
