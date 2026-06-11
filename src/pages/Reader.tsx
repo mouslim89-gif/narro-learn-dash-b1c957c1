@@ -1456,7 +1456,7 @@ export default function Reader() {
  {partIdx > 0 ? (
  <button
  onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
- className="tap-scale smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm"
+ className="tap-scale-sm smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm"
  >
  <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform"/>
  Chapter {partIdx}
@@ -1465,7 +1465,7 @@ export default function Reader() {
  {partIdx < book.anchors.length - 1 ? (
  <button
  onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
- className="tap-scale smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md"
+ className="tap-scale-sm smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md"
  >
  Chapter {partIdx + 2}
  <ArrowRight className="h-4 w-4 transition-transform"/>
