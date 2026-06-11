@@ -250,13 +250,6 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
             </div>
           )}
         </div>
-
-          {!loading && !error && notes.length === 0 && fetched && (
-            <p className="text-center text-sm text-muted-foreground py-8">
-              No grammar notes found for this text.
-            </p>
-          )}
-        </div>
       </SheetContent>
     </Sheet>
   );
