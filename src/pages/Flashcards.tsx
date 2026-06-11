@@ -38,6 +38,8 @@ export default function Flashcards() {
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
  const [reviewMode, setReviewMode] = useState(false);
  const showEmpty = useDelayed(300);
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 56);
 
  const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
