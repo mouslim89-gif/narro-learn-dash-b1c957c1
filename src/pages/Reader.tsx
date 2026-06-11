@@ -1427,13 +1427,6 @@ export default function Reader() {
  />
  )}
 
- {sentenceTranslation && (
- <SentenceTranslationPopup
- japanese={sentenceTranslation.japanese}
- sentenceRect={sentenceTranslation.sentenceRect}
- onClose={() => setSentenceTranslation(null)}
- />
- )}
 
  {fullPopupWord && (
  <WordPopup
