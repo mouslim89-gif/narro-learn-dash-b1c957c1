@@ -799,19 +799,6 @@ export default function Reader() {
  return () => document.documentElement.classList.remove('dark');
  }, [readerDarkMode]);
 
- // Discoverability hint (once per user)
- useEffect(() => {
- if (!hasSeenLongPressHint && book) {
- const t = setTimeout(() => {
- toast({
- title:'Tip',
- description:'Long-press a word to translate the whole sentence.',
- });
- setHasSeenLongPressHint(true);
- }, 1200);
- return () => clearTimeout(t);
- }
-  }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
 
   // Switch reading difficulty: capture % to restore the same relative spot
   // after the new text mounts, and auto-close the popover.
