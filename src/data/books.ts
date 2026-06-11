@@ -293,7 +293,7 @@ export const books: Book[] = [
  jlptLevel:'N2',
  coverColor:'#C8956D',
  readingTimeMin: 25,
- synopsis:"Melos, a simple shepherd, is condemned to death after attempting to kill a paranoid tyrant. Granted three days to attend his sister's wedding, he leaves his best friend behind as hostage — and must race back through floods, bandits, and his own despair to save him. Dazai's celebrated tale of friendship, trust, and the impossible weight of a promise.",
+ synopsis: "Melos, a simple shepherd, is condemned to death after attempting to kill a paranoid tyrant. Granted three days to attend his sister's wedding, he leaves his best friend behind as hostage and must race back through floods, bandits, and his own despair to save him. Dazai's celebrated tale of friendship, trust, and the impossible weight of a promise.",
  content: { simplified: merosuSimplified, intermediate: merosuIntermediate, original: merosuOriginal },
  parts: { simplified: merosuSimplifiedParts, intermediate: merosuIntermediateParts, original: merosuOriginalParts },
  anchors: merosuAnchors,
