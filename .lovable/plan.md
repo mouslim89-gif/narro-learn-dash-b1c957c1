@@ -1,22 +1,29 @@
-## Goal
+## Objectif
 
-Free up space in the Reader header so the book title is fully visible and doesn't overlap with the action buttons.
+Augmenter la taille du titre une fois le header réduit (état scrollé) à **24px**, au lieu des ~17px actuels.
 
-## Change
+## Changements
 
-In `src/pages/Reader.tsx`, remove the chapter-list `HeaderChip` (the `List` icon button, ~lines 971-974) that opens the chapters sheet.
+Ajuster uniquement le facteur `--title-scale` dans les 3 headers animés. Les tailles initiales (`fontSize`) restent inchangées.
 
-The Sheet itself (`showChapters`) and the navigation between parts/chapters remain available through the existing Prev/Next chapter pills at the bottom of the Reader and via the BookDetail page.
+### `src/pages/Library.tsx`
+- Titre "Tsundoku" : `fontSize: 42px` initial
+- Scale actuel : `1 - p * 0.595` → 42→17px
+- **Nouveau** : `1 - p * 0.429` → 42→24px
 
-## Notes
+### `src/pages/Dictionary.tsx`
+- Titre "Dictionary" : `fontSize: 32px` initial
+- Scale actuel : `1 - p * 0.469` → 32→17px
+- **Nouveau** : `1 - p * 0.25` → 32→24px
 
-- Also remove the now-unused `List` icon import and the `showChapters` state + `<Sheet>` block if no other trigger remains — keeps the file clean.
-- Optional: I can also slightly widen the title's max-width since one button slot is freed. Tell me if you want that, otherwise I leave the rest of the header layout untouched.
+### `src/pages/MyBooks.tsx`
+- Titre "My Books" : `fontSize: 32px` initial
+- Même changement que Dictionary : `1 - p * 0.25` → 32→24px
 
-## Question
+### `src/pages/Flashcards.tsx`
+- Vérifier et appliquer le même ajustement si un `--title-scale` y est utilisé (le harmoniser à 24px final).
 
-Do you want me to fully remove the chapters Sheet (no way to jump to an arbitrary part from inside the Reader anymore — only Prev/Next at the bottom), or keep the Sheet code and just hide the header button (so we can re-add a trigger later)? 
+## Hors scope
 
-&nbsp;
-
-U can remove it
+- Pas de changement aux paddings du header, à la couleur/blur de fond, au comportement de scroll, ni aux animations lettre-par-lettre.
+- Pas de modification de `marginBottom` (l'offset compense déjà la baseline).
