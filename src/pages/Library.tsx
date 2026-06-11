@@ -8,6 +8,13 @@ import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { romajiToKana } from'@/lib/romaji';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
+
+const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
+const smooth = (a: number, b: number, p: number) => {
+  const t = Math.max(0, Math.min(1, (p - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
 
 const genres = Object.keys(genreLabels) as Genre[];
 
