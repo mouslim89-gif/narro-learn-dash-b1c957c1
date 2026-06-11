@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { translateSentence } from '@/lib/translate';
 
 interface GrammarPanelProps {
   text: string;
@@ -23,14 +22,12 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
   const [error, setError] = useState<string | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [fetched, setFetched] = useState(false);
-  const [translations, setTranslations] = useState<Record<number, { text?: string; loading: boolean; error?: boolean }>>({});
 
   // Reset when the part changes so the panel re-pulls the matching subset.
   useEffect(() => {
     setFetched(false);
     setNotes([]);
     setExpandedIdx(null);
-    setTranslations({});
   }, [bookId, difficulty, partIdx]);
 
   useEffect(() => {
@@ -63,19 +60,6 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
       })
       .finally(() => setLoading(false));
   }, [open, fetched, text, bookId, difficulty, partIdx]);
-
-  const fetchTranslation = async (idx: number, sentence: string) => {
-    if (translations[idx]?.text || translations[idx]?.loading) return;
-
-    setTranslations(prev => ({ ...prev, [idx]: { loading: true } }));
-    try {
-      const result = await translateSentence(sentence);
-      setTranslations(prev => ({ ...prev, [idx]: { text: result, loading: false } }));
-    } catch (err) {
-      console.error('Failed to translate grammar example:', err);
-      setTranslations(prev => ({ ...prev, [idx]: { loading: false, error: true } }));
-    }
-  };
 
   const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
@@ -129,18 +113,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
                 })
                 .map((note, i) => {
                   const expanded = expandedIdx === i;
-                  const translation = translations[i];
-                  
                   return (
                     <button
                       key={i}
-                      onClick={() => {
-                        const newExpanded = expanded ? null : i;
-                        setExpandedIdx(newExpanded);
-                        if (newExpanded !== null) {
-                          fetchTranslation(i, note.example);
-                        }
-                      }}
+                      onClick={() => setExpandedIdx(expanded ? null : i)}
                       className="card-lift tap-scale w-full rounded-xl border border-border/40 bg-card p-4 text-left ring-1 ring-border/30 smooth-colors"
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -168,17 +144,6 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
                             <p className={sectionLabel}>Example from text</p>
                             <div className="mt-1 h-px w-8 bg-accent/60" />
                             <p className="mt-2 font-japanese text-sm">{note.example}</p>
-                            {translation?.loading && (
-                              <div className="mt-1.5 flex items-center gap-1.5 text-muted-foreground/60">
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                                <span className="text-[10px] italic">Translating…</span>
-                              </div>
-                            )}
-                            {translation?.text && (
-                              <p className="mt-1.5 text-xs text-muted-foreground italic leading-snug">
-                                {translation.text}
-                              </p>
-                            )}
                           </div>
                           <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Tip</p>
