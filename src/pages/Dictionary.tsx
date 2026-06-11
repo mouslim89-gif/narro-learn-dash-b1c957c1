@@ -32,6 +32,8 @@ export default function DictionaryPage() {
  const [searching, setSearching] = useState(false);
  const inputRef = useRef<HTMLInputElement>(null);
  const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial :'');
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 56);
 
  useEffect(() => {
  sessionStorage.setItem('dictionary:query', query);
