@@ -1424,11 +1424,6 @@ export default function Reader() {
  setMiniPopup(null);
  setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
  }}
- onTranslateSentence={() => {
- const idx = miniPopup.sentenceIdx;
- const jp = miniPopup.contextSentence ||'';
- triggerSentenceTranslation(idx, jp);
- }}
  />
  )}
 
