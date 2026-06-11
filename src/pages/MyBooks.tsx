@@ -7,7 +7,7 @@ import { tokenWordCounts } from'@/data/book-tokens';
 import { Link } from'react-router-dom';
 import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
 import { Button } from'@/components/ui/button';
-import { ShrinkHeader } from'@/components/ShrinkHeader';
+import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { useDelayed } from'@/hooks/use-delayed';
 
@@ -70,16 +70,16 @@ export default function MyBooks() {
 
  return (
  <div className="pb-20">
- <ShrinkHeader
- title="My Books"
- actions={
+ <header className="relative px-6 pt-10 pb-2 flex items-end justify-between">
+ <div>
+         <AnimatedTitle text="My Books" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
+ </div>
  <Link to="/settings">
- <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
- <Settings className="h-[18px] w-[18px]" />
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
+ <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
- }
- />
+ </header>
 
  <div className="px-6">
  {bookProgressList.length > 0 && (
