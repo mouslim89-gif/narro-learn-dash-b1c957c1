@@ -1,26 +1,25 @@
-import { useParams, useNavigate } from'react-router-dom';
-import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown } from'lucide-react';
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown } from 'lucide-react';
 
-import { cn } from'@/lib/utils';
-import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from'@/data/books';
-import { loadBookTokens, type BookToken, type BookTokenMap } from'@/data/book-tokens';
-import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from'@/lib/merge-tokens';
-import { applyTokenOverrides, applyRules } from'@/data/token-overrides';
-import { hydrateDictionaryForBook } from'@/lib/dictionary-db';
-import { bookGrammar } from'@/data/book-grammar';
-import { AudioPlayer } from'@/components/AudioPlayer';
-import { FuriganaWord } from'@/components/FuriganaWord';
-import { WordPopup } from'@/components/WordPopup';
-import { WordMiniPopup } from'@/components/WordMiniPopup';
-import { ReaderToken } from'@/components/ReaderToken';
-import { SentenceTranslationPopup } from'@/components/SentenceTranslationPopup';
-import { GrammarPanel } from'@/components/GrammarPanel';
-import { Progress } from'@/components/ui/progress';
-import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from'@/stores/reading-progress';
-import { useLongPress } from'@/hooks/use-long-press';
-import { toast } from'@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
+import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
+import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
+import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
+import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
+import { bookGrammar } from '@/data/book-grammar';
+import { AudioPlayer } from '@/components/AudioPlayer';
+import { FuriganaWord } from '@/components/FuriganaWord';
+import { WordPopup } from '@/components/WordPopup';
+import { WordMiniPopup } from '@/components/WordMiniPopup';
+import { ReaderToken } from '@/components/ReaderToken';
+import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
+import { GrammarPanel } from '@/components/GrammarPanel';
+import { Progress } from '@/components/ui/progress';
+import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
+import { toast } from '@/hooks/use-toast';
 
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from'@/lib/audio-sync';
 import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from'@/lib/known-words';
@@ -184,7 +183,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
  const navigate = useNavigate();
- const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, hasSeenLongPressHint, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+ const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
  const knownIndex = useKnownWordsIndex();
  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
@@ -800,19 +799,6 @@ export default function Reader() {
  return () => document.documentElement.classList.remove('dark');
  }, [readerDarkMode]);
 
- // Discoverability hint (once per user)
- useEffect(() => {
- if (!hasSeenLongPressHint && book) {
- const t = setTimeout(() => {
- toast({
- title:'Tip',
- description:'Long-press a word to translate the whole sentence.',
- });
- setHasSeenLongPressHint(true);
- }, 1200);
- return () => clearTimeout(t);
- }
-  }, [hasSeenLongPressHint, book, setHasSeenLongPressHint]);
 
   // Switch reading difficulty: capture % to restore the same relative spot
   // after the new text mounts, and auto-close the popover.
@@ -1323,13 +1309,6 @@ export default function Reader() {
  sentenceIdx: globalIdx,
  tokenIdx: i,
  });
- }}
- onLongPress={() => {
- if (tokenEditMode) {
- setSelectedIdx((arr) => arr.includes(tokKey) ? arr : [...arr, tokKey].sort((a, b) => a - b));
- return;
- }
- triggerSentenceTranslation(globalIdx, sentenceText);
  }}
  />
  );

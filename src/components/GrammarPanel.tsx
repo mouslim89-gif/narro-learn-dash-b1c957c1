@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
 
 interface GrammarPanelProps {
   text: string;
@@ -22,20 +23,29 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
   const [error, setError] = useState<string | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [fetched, setFetched] = useState(false);
+  const [translations, setTranslations] = useState<TranslationMap>(new Map());
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Reset when the part changes so the panel re-pulls the matching subset.
   useEffect(() => {
     setFetched(false);
     setNotes([]);
     setExpandedIdx(null);
+    setTranslations(new Map());
   }, [bookId, difficulty, partIdx]);
 
   useEffect(() => {
-    if (!open || fetched || !text) return;
+    if (!open) {
+      abortControllerRef.current?.abort();
+      return;
+    }
+
+    if (fetched || !text) return;
 
     const prebaked = (partIdx !== null && partIdx !== undefined)
       ? getGrammarForPart(bookId, difficulty, partIdx)
       : getGrammarFlat(bookId, difficulty);
+    
     if (prebaked.length > 0) {
       setNotes(prebaked);
       setFetched(true);
@@ -61,7 +71,40 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
       .finally(() => setLoading(false));
   }, [open, fetched, text, bookId, difficulty, partIdx]);
 
+  // Batch preload translations for examples once notes are loaded
+  useEffect(() => {
+    if (notes.length === 0 || !open) return;
+
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+
+    const examples = notes.map(n => n.example).filter(Boolean);
+    if (examples.length === 0) return;
+
+    preloadTranslations(examples, {
+      onProgress: (map) => {
+        setTranslations(map);
+      },
+      signal: abortControllerRef.current.signal
+    });
+
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, [notes, open]);
+
   const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
+
+  // Cache of hashes to avoid repeated async calls in render
+  const [hashes, setHashes] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    if (notes.length === 0) return;
+    Promise.all(notes.map(n => hashSentence(n.example))).then(hList => {
+      const newHashes = new Map();
+      notes.forEach((n, i) => newHashes.set(n.example, hList[i]));
+      setHashes(newHashes);
+    });
+  }, [notes]);
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
@@ -113,6 +156,9 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
                 })
                 .map((note, i) => {
                   const expanded = expandedIdx === i;
+                  const hash = hashes.get(note.example);
+                  const translation = hash ? translations.get(hash) : null;
+
                   return (
                     <button
                       key={i}
@@ -144,6 +190,11 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose 
                             <p className={sectionLabel}>Example from text</p>
                             <div className="mt-1 h-px w-8 bg-accent/60" />
                             <p className="mt-2 font-japanese text-sm">{note.example}</p>
+                            {translation && (
+                              <p className="mt-1.5 text-[12px] text-muted-foreground leading-snug italic animate-in fade-in duration-300">
+                                {translation}
+                              </p>
+                            )}
                           </div>
                           <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Tip</p>
