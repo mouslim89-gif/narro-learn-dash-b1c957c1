@@ -167,7 +167,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                   return (
                     <div
                       key={i}
-                      className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors card-lift"
+                      className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors"
                     >
                       <button
                         onClick={() => setExpandedIdx(expanded ? null : i)}
