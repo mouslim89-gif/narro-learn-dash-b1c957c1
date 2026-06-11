@@ -14,10 +14,8 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Temporary: disabled auth for internal generation script
-  // const auth = await requireUser(req, corsHeaders);
-  // if ("error" in auth) return auth.error;
-  const auth = { user: { id: "system" } };
+  const auth = await requireUser(req, corsHeaders);
+  if ("error" in auth) return auth.error;
 
   try {
     const { text } = await req.json();
