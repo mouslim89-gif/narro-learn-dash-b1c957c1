@@ -94,8 +94,23 @@ export default function DictionaryPage() {
  return (
  <div className="pb-24">
  {/* Masthead */}
- <header className="relative px-6 pt-10 pb-2 flex items-start justify-between">
- <AnimatedTitle text="Dictionary" className="font-serif text-[32px] font-bold leading-none tracking-tight" />
+ <header
+ ref={headerRef}
+ className="sticky top-0 z-30 px-6 flex items-center justify-between"
+ style={{
+ paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ }}
+ >
+ <AnimatedTitle
+ text="Dictionary"
+ className="font-serif font-bold leading-none tracking-tight"
+ style={{ fontSize: 'calc(32px - var(--p, 0) * 15px)' }}
+ />
  <Link to="/settings">
  <Button
  variant="ghost"
