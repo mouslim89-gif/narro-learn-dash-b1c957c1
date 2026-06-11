@@ -16,6 +16,8 @@ export default function MyBooks() {
  const { progress, getBookProgress } = useReadingProgressStore();
  const savedWords = useFlashcardStore(s => s.savedWords);
  const showEmpty = useDelayed(300);
+ const headerRef = useRef<HTMLElement>(null);
+ useScrollProgress(headerRef, 0, 56);
 
  const bookProgressList = useMemo(() => {
  const list: { book: typeof books[number]; progress: NonNullable<ReturnType<typeof getBookProgress>> }[] = [];
