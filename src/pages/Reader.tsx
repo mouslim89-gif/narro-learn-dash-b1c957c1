@@ -914,7 +914,7 @@ export default function Reader() {
  <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className={cn('flex-1 min-w-0 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
+                  className={cn('flex-1 min-w-0 mx-1 text-center tap-scale-sm rounded-lg px-1.5 py-0.5 -my-0.5 smooth-colors',
                     levelOpen
                       ?'bg-foreground/10 ring-1 ring-border/50':'',
                   )}
@@ -931,6 +931,9 @@ export default function Reader() {
  </PopoverTrigger>
  <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
  <div className="flex flex-col gap-1.5">
+                  <p className="font-japanese text-sm font-bold text-center px-2 pt-1 pb-2 max-w-[260px] break-words border-b border-border/40">
+                    {book.titleJp}
+                  </p>
  <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
  <div className="flex gap-1 rounded-full bg-muted p-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
