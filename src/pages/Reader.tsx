@@ -1306,7 +1306,7 @@ export default function Reader() {
     dimmed && "opacity-25",
     activeTranslation && "bg-primary/5",
     activeAudio && "bg-primary/10 px-0.5 -mx-0.5",
-    highlightedSentenceIdx === globalIdx && "bg-accent/20 ring-1 ring-accent/40 px-1 -mx-1"
+    highlightedSentenceIdx === globalIdx && "sentence-highlight-flash"
   )}
  >
  {sentence.tokens.map((token, i) => {
