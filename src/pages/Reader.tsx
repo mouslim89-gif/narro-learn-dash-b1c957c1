@@ -968,11 +968,6 @@ export default function Reader() {
  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
  <BookType className="h-5 w-5"/>
  </HeaderChip>
- {(hasParts(book) || (book.chapters && book.chapters.length > 1)) && (
- <HeaderChip onClick={() => setShowChapters(true)} title="Chapters">
- <List className="h-5 w-5"/>
- </HeaderChip>
- )}
  <HeaderChip
  onClick={() => setShowSettings(!showSettings)}
  active={showSettings}
