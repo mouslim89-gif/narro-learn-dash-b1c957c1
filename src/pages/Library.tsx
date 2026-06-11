@@ -1,4 +1,5 @@
-import { useState, useMemo } from'react';
+import { useState, useMemo, useRef } from'react';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { books, genreLabels, type Genre } from'@/data/books';
 import { BookCard } from'@/components/BookCard';
 import { Link } from'react-router-dom';
