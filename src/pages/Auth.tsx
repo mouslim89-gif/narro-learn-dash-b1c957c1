@@ -1,5 +1,5 @@
 import { useState } from'react';
-import { Navigate, useLocation } from'react-router-dom';
+import { Navigate, useLocation, useNavigate } from'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2 } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Input } from'@/components/ui/input';
@@ -14,6 +14,7 @@ type Mode ='signin'|'signup'|'forgot';
 export default function Auth() {
  const { user, loading: authLoading } = useAuth();
  const location = useLocation();
+ const navigate = useNavigate();
  const [mode, setMode] = useState<Mode>('signin');
  const [email, setEmail] = useState('');
  const [password, setPassword] = useState('');
@@ -202,6 +203,17 @@ export default function Auth() {
  </button>
  )}
  </div>
+
+ <button
+ type="button"
+ onClick={() => {
+ localStorage.setItem('guest-bypass', '1');
+ navigate(from, { replace: true });
+ }}
+ className="mt-4 w-full text-center text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+ >
+ Continue without signing in (temporary)
+ </button>
  </div>
  </div>
  );
