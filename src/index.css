@@ -645,23 +645,40 @@
    Glass surfaces — experimental
    ────────────────────────────────────────── */
 .glass-subtle {
-  background: hsl(0 0% 100% / 0.25);
-  backdrop-filter: url(#liquid-glass) blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border-bottom: 1px solid hsl(var(--border) / 0.35);
+  position: relative;
+  background: hsl(0 0% 100% / 0.18);
+  backdrop-filter: url(#liquid-glass) blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
   box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.22),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.04);
+    inset 0 0 0 1px hsl(0 0% 100% / 0.22),
+    inset 0 -6px 10px -8px hsl(0 0% 0% / 0.18);
   transform: translateZ(0);
-  will-change: backdrop-filter;
   isolation: isolate;
 }
-.dark .glass-subtle {
-  background: hsl(0 0% 0% / 0.18);
-  box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.08),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.2);
+/* Top reflet — very subtle white gradient at the very top of the glass. */
+.glass-subtle::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 35%;
+  background: linear-gradient(to bottom, hsl(0 0% 100% / 0.18), hsl(0 0% 100% / 0));
+  pointer-events: none;
+  z-index: 1;
 }
+.glass-subtle > * {
+  position: relative;
+  z-index: 2;
+}
+.dark .glass-subtle {
+  background: hsl(0 0% 0% / 0.22);
+  box-shadow:
+    inset 0 0 0 1px hsl(0 0% 100% / 0.10),
+    inset 0 -6px 10px -8px hsl(0 0% 0% / 0.4);
+}
+.dark .glass-subtle::before {
+  background: linear-gradient(to bottom, hsl(0 0% 100% / 0.07), hsl(0 0% 100% / 0));
+}
+
 
 .glass-chip {
   background: hsl(0 0% 100% / 0.55);
