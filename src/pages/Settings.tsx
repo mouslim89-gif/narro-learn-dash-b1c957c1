@@ -1,6 +1,6 @@
 import { Link, useNavigate } from'react-router-dom';
 import { ArrowLeft, LogOut, Loader2, User as UserIcon } from'lucide-react';
-import { useEffect, useState } from'react';
+import { useState } from'react';
 import { Switch } from'@/components/ui/switch';
 import { Label } from'@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from'@/stores/reading-progress';
@@ -45,14 +45,6 @@ export default function Settings() {
  const { user, signOut } = useAuth();
  const navigate = useNavigate();
  const [deleting, setDeleting] = useState(false);
- const [scrolled, setScrolled] = useState(false);
-
- useEffect(() => {
- const onScroll = () => setScrolled(window.scrollY > 8);
- onScroll();
- window.addEventListener('scroll', onScroll, { passive: true });
- return () => window.removeEventListener('scroll', onScroll);
- }, []);
 
  const handleSignOut = async () => {
  await signOut();
@@ -79,12 +71,7 @@ export default function Settings() {
  return (
  <div className="pb-24 min-h-screen">
  {/* Editorial header */}
- <header
- className={cn(
- "library-header-bg sticky top-0 z-30 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-5 flex items-end justify-between overflow-hidden transition-[background-color,box-shadow,backdrop-filter] duration-200",
- scrolled && "bg-background/85 backdrop-blur-xl shadow-sm ring-1 ring-border/40"
- )}
- >
+ <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
  <span className="library-kanji-watermark"aria-hidden="true">設</span>
  <div className="relative z-10 flex items-center gap-3">
  <button
