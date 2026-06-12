@@ -950,10 +950,8 @@ export default function Reader() {
 
  return (
  <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
- <header
- className="sticky top-0 z-30 backdrop-blur-xl"
- style={{ backgroundImage:`linear-gradient(180deg, ${book.coverColor}1f 0%, hsl(var(--background) / 0.85) 100%)`}}
- >
+  <header className={cn('sticky top-0 z-30', glassHeaderClass[glassVariant])}>
+
  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
  <ArrowLeft className="h-5 w-5"/>
