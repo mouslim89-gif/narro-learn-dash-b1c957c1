@@ -231,18 +231,20 @@ export default function DictionaryPage() {
  className="group cursor-pointer -m-1 p-1 pr-6 rounded-lg relative"
  >
  {/* Word + reading inline */}
- <div className="flex items-center gap-1.5 pr-12">
- <p className="font-japanese text-xl font-bold">{word}</p>
- {reading && reading !== word && (
- <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
- )}
- {reading && (
- <span className="text-xs text-muted-foreground/70 italic">{toRomaji(reading)}</span>
- )}
- <span onClick={(e) => e.stopPropagation()}>
- <PlayWordButton word={word} reading={reading} size={16} />
- </span>
- </div>
+				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 pr-12">
+					<p className="font-japanese text-xl font-bold whitespace-nowrap shrink-0">{word}</p>
+					<div className="flex items-center gap-1.5 flex-wrap">
+						{reading && reading !== word && (
+							<span className="font-japanese text-sm text-muted-foreground whitespace-nowrap">{reading}</span>
+						)}
+						{reading && (
+							<span className="text-xs text-muted-foreground/70 italic whitespace-nowrap">{toRomaji(reading)}</span>
+						)}
+						<span onClick={(e) => e.stopPropagation()}>
+							<PlayWordButton word={word} reading={reading} size={16} />
+						</span>
+					</div>
+				</div>
 
  {/* Tags row */}
  <div className="mt-2 flex flex-wrap items-center gap-1.5">
