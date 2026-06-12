@@ -218,7 +218,7 @@ export default function Reader() {
 
  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
-  const [glassVariant, setGlassVariant] = useState<GlassVariant>('A');
+  
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
