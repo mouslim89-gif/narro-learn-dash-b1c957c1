@@ -21,13 +21,18 @@ import { romajiToKana } from'@/lib/romaji';
 function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
   const q = query.trim().toLowerCase();
   if (!q || !/[a-zA-Z]/.test(q)) return results;
-  const wordRe = new RegExp(`\\b${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i');
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const wordRe = new RegExp(`\\b${escaped}\\b`,'i');
+  // Matches definitions that START with the query followed by a word boundary
+  // (end of string, space, parenthesis, bracket). Catches "cat (esp. ...)" as exact.
+  const exactPrefixRe = new RegExp(`^${escaped}(?:[\\s(\\[]|$)`,'i');
   const score = (r: JishoResult): number => {
     let best = 0;
     for (const sense of r.senses) {
       for (const def of sense.english_definitions) {
         const d = def.toLowerCase();
         if (d === q) return 3;
+        if (exactPrefixRe.test(d)) { best = Math.max(best, 3); continue; }
         if (d.split(/[;,]\s*/).some((p) => p.trim() === q)) best = Math.max(best, 2);
         else if (wordRe.test(def)) best = Math.max(best, 1);
       }
@@ -39,8 +44,8 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
     return best;
   };
   return [...results]
-    .map((r, i) => ({ r, i, s: score(r) }))
-    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map((r, i) => ({ r, i, s: score(r), c: r.is_common ? 1 : 0 }))
+    .sort((a, b) => b.s - a.s || b.c - a.c || a.i - b.i)
     .map((x) => x.r);
 }
 
