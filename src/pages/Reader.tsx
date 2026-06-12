@@ -223,6 +223,7 @@ export default function Reader() {
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
+ const headerRef = useRef<HTMLElement>(null);
  const restoredScroll = useRef(false);
  // Top-most visible sentence index (updated by IntersectionObserver).
  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
