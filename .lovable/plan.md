@@ -1,73 +1,84 @@
-## Goal
+## Objectif
 
-Transform the Reader's sticky header into a **floating glass slab** (v3 prototype): a rounded rectangle that hovers inside its own padding above the text, with crisp specular edges, inset top highlight, drop shadow, and individual glass chip buttons.
+1. **Glass plus clair** : baisser de 16px/70% → **12px blur / 78% bg** sur la variante A (qu'on va garder).
+2. **Stabiliser le flou pendant le scroll** : éliminer le "tremblement frame-to-frame" causé par le redimensionnement du header pendant que `backdrop-filter` est actif.
 
-## Scope
+---
 
-ONLY the Reader header (`<header>` in `src/pages/Reader.tsx`) and the chip styling. No icon, layout, or behavior changes. Light + dark modes both supported.
+## Diagnostic du tremblement
 
-## Changes
+Le flou (`blur(16px)`) est constant. Ce qui change à chaque frame, c'est la **taille et le padding du header** (animés via `--p`). Comme `backdrop-filter` ré-échantillonne la zone derrière le header à chaque frame, et que cette zone bouge en sous-pixels (le lissage exponentiel produit des deltas non-uniformes : 0.35 × diff → grandes variations au début, microscopiques à la fin), on perçoit le verre comme "vivant".
 
-### 1. `src/index.css` — rewrite `.glass-subtle` + `.glass-chip-subtle`
+Combiné à iOS Safari qui re-compose le layer floutant à chaque sub-pixel change → shimmer.
 
-Replace the current flat-bar treatment with a "slab" treatment:
+---
 
-- `.glass-subtle` becomes a **wrapper helper** (no background itself — just the sticky container with safe-area padding). We add a new inner class `.glass-slab` carrying the actual glass material:
-  - `border-radius: 20px`
-  - `background: hsl(var(--background) / 0.18)` (very transparent)
-  - `backdrop-filter: blur(20px) saturate(180%)`
-  - `border: 1px solid hsl(var(--foreground) / 0.10)`
-  - `box-shadow:` inset 0 1px 0 hsl(255 255 255 / 0.18) (top specular), inset 0 -1px 0 hsl(0 0 0 / 0.08), 0 10px 30px -8px hsl(0 0 0 / 0.35) (lift)
-  - bottom hairline gradient pseudo-element for the refraction edge
-- `.glass-chip-subtle` gets a glossier finish:
-  - `background: hsl(var(--background) / 0.14)`
-  - `backdrop-filter: blur(16px) saturate(180%)`
-  - `border: 1px solid hsl(var(--foreground) / 0.12)`
-  - `box-shadow: inset 0 1px 1px hsl(255 255 255 / 0.22), 0 2px 8px hsl(0 0 0 / 0.18)`
+## Changements
 
-Keep `transform: translateZ(0)`, `will-change`, `isolation: isolate` to keep the no-shimmer fix.
+### 1. `src/index.css` — Glass plus clair + stabilisation
 
-### 2. `src/pages/Reader.tsx` — wrap header content in a slab
+**`.glass-subtle`** (la variante qu'on garde) :
+- `blur(16px) saturate(140%)` → **`blur(12px) saturate(135%)`**
+- `bg hsl(var(--background) / 0.70)` → **`/ 0.78`**
+- Ajouter : `transform: translateZ(0); will-change: backdrop-filter; isolation: isolate;` → force un layer GPU dédié, le navigateur ne recompose plus la couche à chaque sub-pixel.
 
-Change:
-```tsx
-<header className="sticky top-0 z-30 glass-subtle">
-  <div className="..."> {/* current row */}
-```
-to:
-```tsx
-<header className="sticky top-0 z-30 px-3 pt-3 pb-2">
-  <div className="glass-slab flex items-center justify-between gap-2 px-2 h-14 rounded-[20px]">
-    {/* current row content */}
-```
+**`.glass-chip-subtle`** :
+- `blur(12px)` → **`blur(10px)`**, bg `0.55` → **`0.65`**
+- Mêmes propriétés GPU.
 
-Adjust inner horizontal padding so the chips don't touch the slab edge. The progress bar (if currently inside header) stays directly under the slab — sits in the header's bottom padding area.
+(Variantes B et C : on les supprime puisqu'on a tranché sur A.)
 
-### 3. Progress bar placement
+### 2. `src/hooks/use-scroll-progress.ts` — Quantisation + arrondi pixel-aware
 
-Verify where the slim `.reader-progress-track` lives. If it's a child of `<header>` and currently sits at the bottom edge, move it just below the slab (still inside `<header>`) with a small `mt-2` so the slab floats cleanly. If it's outside the header, leave untouched.
+Le lissage actuel écrit `--p` avec `toFixed(4)` → trop de granularité. Le header se redimensionne en fractions de pixel → backdrop-filter shimmer.
 
-## Visual reference
+- **Quantiser `--p` à 2 décimales** (`toFixed(2)`) : limite les redraws du backdrop à ~100 valeurs distinctes maximum sur toute la course.
+- **Snap quand on est proche de la cible** : si `|diff| < 0.01`, snap direct à `target` (au lieu de continuer à lerp en sous-pixels).
+- **Snapper le scroll au pixel** : `Math.round(...)` la position scroll utilisée pour calculer `target`, pour que des wheel events fractionnaires ne génèrent pas de micro-variations.
 
-```
-┌─────────────────────────────────────────┐   ← page edge
-│  ┌─────────────────────────────────┐   │   ← slab padding (12px)
-│  │ ← │  浦島太郎       │ ◎ A ⚙ ⋯ │   │   ← floating glass slab
-│  └─────────────────────────────────┘   │
-│  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁│   ← progress bar (still sticky)
-│                                          │
-│   しかし、村は全然違っていました…       │   ← article scrolls behind
+```ts
+const SMOOTH = 0.35;       // inchangé
+const EPS = 0.01;          // plus tolérant (était 0.0005)
+
+const computeTarget = () => {
+  const y = Math.round(window.scrollY);   // snap pixel
+  target = Math.min(1, Math.max(0, (y - start) / range));
+};
+
+const write = (v: number) => {
+  el.style.setProperty(varName, v.toFixed(2));  // 2 décimales
+};
 ```
 
-## Risks / notes
+### 3. `src/pages/Reader.tsx` — Cleanup post-test
 
-- Backdrop-filter on a rounded rectangle still triggers GPU layer; with the existing scroll-progress quantization (toFixed(2), pixel-snap) shimmer should stay gone.
-- The slab needs `overflow: hidden` only if we add a pseudo-element gradient — otherwise leave it off so chip shadows aren't clipped.
-- Light mode: top inset highlight uses pure white at low alpha, works on both light and dark backgrounds.
+- Retirer le switcher A/B/C (les 3 boutons sticky en haut).
+- Retirer le state `glassVariant`, le type `GlassVariant`, les maps `glassChipClass`/`glassHeaderClass`.
+- `HeaderChip` : prop `glass` → simple booléen (ou retirer la prop et coder en dur `glass-chip-subtle` puisqu'il n'y a plus qu'une variante).
+- Header : `className="... glass-subtle ..."` en dur.
+
+---
+
+## Détails techniques
+
+- `isolation: isolate` crée un nouveau stacking context → le backdrop-filter n'échantillonne que ce qui est derrière le header dans son propre contexte de composition.
+- `translateZ(0)` force la promotion en couche GPU. Ça coûte un peu de mémoire vidéo mais c'est négligeable pour un header.
+- La quantisation à 2 décimales ne sera pas visible à l'œil (la hauteur header passe de ~120px à ~64px, soit ~56px de course → 56/100 = 0.56px par step, en dessous du seuil de perception).
+
+---
+
+## Risques
+
+- Sur Android Chrome très bas de gamme, `will-change: backdrop-filter` peut augmenter l'usage mémoire. Acceptable, c'est juste un élément.
+- Si après ces 3 changements il reste un léger shimmer, il faudra envisager l'option **B** précédente (header taille fixe, n'animer que le contenu intérieur).
+
+---
 
 ## Validation
 
-Preview at 390px in both light + dark, scroll the article, confirm:
-1. Slab visibly floats (text shows through left/right of it on first scroll).
-2. Chips read as individual glass pills, not flat icons.
-3. No frame-to-frame shimmer during scroll.
+1. Scroller lentement et rapidement sur Reader (mobile preview 390px).
+2. Vérifier que :
+   - Le flou est visiblement plus clair (texte derrière mieux lisible).
+   - Plus de shimmer/tremblement pendant le scroll.
+   - L'animation de rétrécissement du header reste fluide.
+3. Puis on décide si on généralise (BottomNav, Library, popups).

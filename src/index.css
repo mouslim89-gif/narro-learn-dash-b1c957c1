@@ -644,46 +644,20 @@
 /* ──────────────────────────────────────────
    Glass surfaces — experimental
    ────────────────────────────────────────── */
-/* Floating liquid-glass slab — used for sticky headers */
-.glass-slab {
-  background: hsl(var(--background) / 0.18);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid hsl(var(--foreground) / 0.10);
-  box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.22),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.06),
-    0 10px 30px -8px hsl(0 0% 0% / 0.18);
+.glass-subtle {
+  background: hsl(var(--background) / 0.32);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid hsl(var(--border) / 0.3);
   transform: translateZ(0);
   will-change: backdrop-filter;
   isolation: isolate;
 }
-.dark .glass-slab {
-  background: hsl(var(--background) / 0.28);
-  border-color: hsl(0 0% 100% / 0.08);
-  box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.10),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.30),
-    0 10px 30px -6px hsl(0 0% 0% / 0.55);
-}
-
-/* Individual glass pill — for chip buttons inside a slab */
 .glass-chip-subtle {
-  background: hsl(var(--background) / 0.14) !important;
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: 1px solid hsl(var(--foreground) / 0.10);
-  box-shadow:
-    inset 0 1px 1px hsl(0 0% 100% / 0.22),
-    0 2px 8px hsl(0 0% 0% / 0.10);
+  background: hsl(var(--background) / 0.22) !important;
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
   transform: translateZ(0);
   will-change: backdrop-filter;
   isolation: isolate;
-}
-.dark .glass-chip-subtle {
-  background: hsl(var(--background) / 0.22) !important;
-  border-color: hsl(0 0% 100% / 0.10);
-  box-shadow:
-    inset 0 1px 1px hsl(0 0% 100% / 0.10),
-    0 2px 8px hsl(0 0% 0% / 0.35);
 }
