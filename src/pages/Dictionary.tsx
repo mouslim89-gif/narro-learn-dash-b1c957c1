@@ -176,11 +176,18 @@ export default function DictionaryPage() {
  />
  {query && (
  <button
- onClick={clearQuery}
+ type="button"
+ onPointerDown={(e) => {
+ // Fire on press and prevent the input below from stealing focus,
+ // which used to require a second tap and visually shifted the icon.
+ e.preventDefault();
+ e.stopPropagation();
+ clearQuery();
+ }}
  aria-label="Clear search"
- className="absolute right-9 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground smooth-colors tap-scale-sm"
+ className="absolute right-8 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted active:bg-muted/80 smooth-colors"
  >
- <X className="h-3.5 w-3.5"/>
+ <X className="h-4 w-4"/>
  </button>
  )}
  </div>
