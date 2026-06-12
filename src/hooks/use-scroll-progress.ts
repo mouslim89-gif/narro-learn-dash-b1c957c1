@@ -25,11 +25,11 @@ export function useScrollProgress(
       raf = 0;
       const y = window.scrollY;
       const p = Math.min(1, Math.max(0, (y - start) / range));
-      // Quantize to 2 decimals → 100 discrete rest positions, no GPU shimmer
-      const q = Math.round(p * 100) / 100;
+      // Quantize to 3 decimals → 200 discrete rest positions, no GPU shimmer
+      const q = Math.round(p * 200) / 200;
       if (q === last) return;
       last = q;
-      el.style.setProperty(varName, q.toFixed(2));
+      el.style.setProperty(varName, q.toFixed(3));
     };
 
     const onScroll = () => {

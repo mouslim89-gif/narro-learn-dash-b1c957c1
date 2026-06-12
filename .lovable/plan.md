@@ -1,29 +1,16 @@
-## Objectif
+## Goal
+Make the header title scale animation feel 60fps during scroll, while keeping the no-shimmer-at-rest behavior.
 
-Augmenter la taille du titre une fois le header réduit (état scrollé) à **24px**, au lieu des ~17px actuels.
+## Change
+Single file: `src/hooks/use-scroll-progress.ts`
 
-## Changements
+Replace the quantization factor from `100` to `200`:
+- `Math.round(p * 100) / 100` → `Math.round(p * 200) / 200`
+- `q.toFixed(2)` → `q.toFixed(3)`
 
-Ajuster uniquement le facteur `--title-scale` dans les 3 headers animés. Les tailles initiales (`fontSize`) restent inchangées.
+## Why
+- Current: 100 paliers on a ~56-64px scroll range → step every ~0.6px scrolled, scale jumps of ~0.0025 (~0.08px font-size at 32px). Visible stepping.
+- New: 200 paliers → step every ~0.3px scrolled, ~0.04px font-size jumps — below visual threshold, still discrete enough to prevent GPU sub-pixel shimmer at rest.
 
-### `src/pages/Library.tsx`
-- Titre "Tsundoku" : `fontSize: 42px` initial
-- Scale actuel : `1 - p * 0.595` → 42→17px
-- **Nouveau** : `1 - p * 0.429` → 42→24px
-
-### `src/pages/Dictionary.tsx`
-- Titre "Dictionary" : `fontSize: 32px` initial
-- Scale actuel : `1 - p * 0.469` → 32→17px
-- **Nouveau** : `1 - p * 0.25` → 32→24px
-
-### `src/pages/MyBooks.tsx`
-- Titre "My Books" : `fontSize: 32px` initial
-- Même changement que Dictionary : `1 - p * 0.25` → 32→24px
-
-### `src/pages/Flashcards.tsx`
-- Vérifier et appliquer le même ajustement si un `--title-scale` y est utilisé (le harmoniser à 24px final).
-
-## Hors scope
-
-- Pas de changement aux paddings du header, à la couleur/blur de fond, au comportement de scroll, ni aux animations lettre-par-lettre.
-- Pas de modification de `marginBottom` (l'offset compense déjà la baseline).
+## Out of scope
+No changes to pages, AnimatedTitle, CSS variables, easing, or padding/blur interpolation. Just the resolution bump.
