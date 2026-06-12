@@ -203,6 +203,17 @@ export default function Auth() {
  </button>
  )}
  </div>
+
+ <button
+ type="button"
+ onClick={() => {
+ localStorage.setItem('guest-bypass', '1');
+ navigate(from, { replace: true });
+ }}
+ className="mt-4 w-full text-center text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+ >
+ Continue without signing in (temporary)
+ </button>
  </div>
  </div>
  );
