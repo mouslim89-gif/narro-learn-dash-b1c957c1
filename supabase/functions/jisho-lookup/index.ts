@@ -224,7 +224,7 @@ Deno.serve(async (req) => {
 
     if (keywords) {
       const words = keywords.split(',').map(w => w.trim()).filter(Boolean).slice(0, 50);
-      const results = await Promise.all(words.map(fetchWord));
+      const results = await Promise.all(words.map((w) => fetchWord(w, 5)));
       persistLookups(results).catch(() => {});
       return new Response(JSON.stringify({ batch: results }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
