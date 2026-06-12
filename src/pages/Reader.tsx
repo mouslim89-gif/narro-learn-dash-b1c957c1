@@ -938,7 +938,9 @@ export default function Reader() {
 
  return (
  <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
-  <header className="sticky top-0 z-30 glass-subtle">
+  <header ref={headerRef} className="sticky top-0 z-30 glass-subtle">
+   <LiquidGlassFilter targetRef={headerRef} filterId="liquid-glass" radius={0} edge={20} scale={24} />
+
 
   <div className="flex items-center justify-between gap-2 px-3 py-2.5">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
