@@ -36,6 +36,7 @@ import { useIsMobile } from'@/hooks/use-mobile';
 import { Sheet, SheetContent } from'@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from'@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from'@/lib/sentence-translations';
+import { LiquidGlassFilter } from '@/components/LiquidGlassFilter';
 
 const fontSizes: FontSize[] = ['small','medium','large'];
 const fontSizeLabels: Record<FontSize, string> = { small:'S', medium:'M', large:'L'};
