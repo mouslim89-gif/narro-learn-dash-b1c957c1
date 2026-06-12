@@ -31,14 +31,16 @@
 </head>
 
   <body>
-    <!-- Liquid-glass edge-refraction filter. The displacement map is generated
-         procedurally at runtime (see src/lib/liquid-glass-map.ts) and set as
-         the href of #liquid-glass-map. Center pixels are neutral gray, so only
-         the bottom edge band actually refracts. -->
+    <!-- Liquid-glass edge-refraction filter. userSpaceOnUse + sRGB are required
+         for backdrop-filter url() to work in Chromium. The displacement map and
+         the filter geometry are kept in sync with the header's real pixel size
+         at runtime (see src/lib/liquid-glass-map.ts). The inline href is a 1x1
+         neutral-gray placeholder (no displacement) until the real map loads. -->
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <defs>
-        <filter id="liquid-glass" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox" primitiveUnits="objectBoundingBox">
-          <feImage id="liquid-glass-map" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>
+        <filter id="liquid-glass" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" x="0" y="0" width="430" height="64">
+          <feImage id="liquid-glass-map" x="0" y="0" width="430" height="64" preserveAspectRatio="none" result="map"
+                   href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNoaGgAAAMEAYFL09IQAAAAAElFTkSuQmCC"/>
           <feDisplacementMap in="SourceGraphic" in2="map" scale="20" xChannelSelector="R" yChannelSelector="G"/>
         </filter>
       </defs>

@@ -1,76 +1,120 @@
 /**
  * Procedural displacement map for the Reader header "liquid glass" effect.
  *
- * Physical model: a flat glass lens with no distortion across its interior,
- * and refraction concentrated on a narrow band along the bottom edge only
- * (the top/left/right edges sit at the screen edge and don't refract).
+ * Physical model: a flat glass lens — no geometric distortion across the
+ * interior, refraction concentrated in a narrow band along the bottom edge
+ * (top/left/right edges sit on the screen edge and don't refract).
  *
- * The map encodes a displacement vector per pixel:
- *   R = 128 + dx   (here always 128 → no horizontal shift)
- *   G = 128 + dy   (positive → sample from further below → content gets
- *                   pulled UP toward the interior of the bar)
+ * Map encoding (read by feDisplacementMap, color-interpolation sRGB):
+ *   R = 128 + dx → horizontal shift (always 128 here: vertical-only)
+ *   G = 128 + dy → vertical shift (G > 128 samples from below → content
+ *                  is pulled up toward the interior of the bar)
  *
- * Combined with feDisplacementMap scale=20, max vertical displacement is
- * ~10px, ramped via pow(t, 2.5) over the bottom 14px of a ~64px header.
- *
- * Map is 1D (vertical gradient stretched horizontally via preserveAspectRatio="none").
+ * Chromium only resolves backdrop-filter url() filters reliably when the
+ * filter uses filterUnits="userSpaceOnUse" with explicit pixel geometry,
+ * so the filter region, the feImage and the canvas map are all kept in
+ * sync with the header element's real size at runtime.
  */
 
-const MAP_WIDTH = 8;
-const MAP_HEIGHT = 64;      // assumed header height in CSS px
-const EDGE_ZONE = 14;       // bottom band where refraction happens (px)
-const EASE_POWER = 2.5;
+const EDGE_ZONE = 14; // bottom band where refraction happens (CSS px)
+const EASE_POWER = 2.5; // falloff: 0 at band top → 1 at the very bottom
+const SCALE = 20; // feDisplacementMap scale → max ~10px displacement
 
-let cachedDataUrl: string | null = null;
+let lastW = 0;
+let lastH = 0;
 
-function buildDataUrl(): string {
-  if (cachedDataUrl) return cachedDataUrl;
-
+function buildDataUrl(w: number, h: number): string {
   const canvas = document.createElement("canvas");
-  canvas.width = MAP_WIDTH;
-  canvas.height = MAP_HEIGHT;
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext("2d");
   if (!ctx) return "";
 
-  const img = ctx.createImageData(MAP_WIDTH, MAP_HEIGHT);
-  for (let y = 0; y < MAP_HEIGHT; y++) {
-    // distance from the bottom edge in px (0 = bottom row)
-    const dFromBottom = MAP_HEIGHT - 1 - y;
+  const img = ctx.createImageData(w, h);
+  for (let y = 0; y < h; y++) {
+    const dFromBottom = h - 1 - y;
     let g = 128;
     if (dFromBottom < EDGE_ZONE) {
-      // t: 0 at the top of the edge zone → 1 at the very bottom
       const t = 1 - dFromBottom / EDGE_ZONE;
-      const falloff = Math.pow(t, EASE_POWER);
-      // G > 128 → sample below → visually content is dragged upward
-      g = 128 + Math.round(falloff * 127);
+      g = 128 + Math.round(Math.pow(t, EASE_POWER) * 127);
     }
-    for (let x = 0; x < MAP_WIDTH; x++) {
-      const i = (y * MAP_WIDTH + x) * 4;
-      img.data[i] = 128;     // R: no horizontal displacement
-      img.data[i + 1] = g;   // G: vertical displacement
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      img.data[i] = 128; // R: no horizontal displacement
+      img.data[i + 1] = g; // G: vertical displacement
       img.data[i + 2] = 128; // B: unused
       img.data[i + 3] = 255;
     }
   }
   ctx.putImageData(img, 0, 0);
-  cachedDataUrl = canvas.toDataURL("image/png");
-  return cachedDataUrl;
+  return canvas.toDataURL("image/png");
 }
 
+function syncFilter(el: Element) {
+  const rect = el.getBoundingClientRect();
+  const w = Math.round(rect.width);
+  const h = Math.round(rect.height);
+  if (!w || !h || (w === lastW && h === lastH)) return;
+
+  const filter = document.getElementById("liquid-glass");
+  const map = document.getElementById("liquid-glass-map");
+  if (!filter || !map) return;
+
+  const url = buildDataUrl(w, h);
+  if (!url) return;
+
+  lastW = w;
+  lastH = h;
+
+  filter.setAttribute("x", "0");
+  filter.setAttribute("y", "0");
+  filter.setAttribute("width", String(w));
+  filter.setAttribute("height", String(h));
+  map.setAttribute("x", "0");
+  map.setAttribute("y", "0");
+  map.setAttribute("width", String(w));
+  map.setAttribute("height", String(h));
+  map.setAttribute("href", url);
+  map.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", url);
+}
+
+/**
+ * Watches for the `.glass-subtle` header (mounted/unmounted with the Reader
+ * route) and keeps the SVG filter geometry + displacement map in sync with
+ * its actual size.
+ */
 export function installLiquidGlassMap() {
-  if (typeof document === "undefined") return;
-  const apply = () => {
-    const el = document.getElementById("liquid-glass-map");
-    if (!el) return;
-    const url = buildDataUrl();
-    if (!url) return;
-    // Set both href and the legacy xlink:href for broader support.
-    el.setAttribute("href", url);
-    el.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", url);
+  if (typeof document === "undefined" || typeof ResizeObserver === "undefined") return;
+
+  let current: Element | null = null;
+
+  const ro = new ResizeObserver((entries) => {
+    for (const entry of entries) syncFilter(entry.target);
+  });
+
+  const attach = () => {
+    if (current && current.isConnected) return;
+    if (current) {
+      ro.unobserve(current);
+      current = null;
+    }
+    const el = document.querySelector(".glass-subtle");
+    if (el) {
+      current = el;
+      ro.observe(el);
+      syncFilter(el);
+    }
   };
+
+  const start = () => {
+    const mo = new MutationObserver(attach);
+    mo.observe(document.body, { childList: true, subtree: true });
+    attach();
+  };
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", apply, { once: true });
+    document.addEventListener("DOMContentLoaded", start, { once: true });
   } else {
-    apply();
+    start();
   }
 }
