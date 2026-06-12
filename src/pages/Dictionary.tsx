@@ -53,10 +53,11 @@ export default function DictionaryPage() {
  setSearching(true);
  try {
  const results = await searchJisho(romajiToKana(query) ?? query);
- setJishoResults(results);
+ const ranked = rankByRelevance(results, query);
+ setJishoResults(ranked);
  lastFetchedRef.current = query;
  try {
- sessionStorage.setItem('dictionary:results', JSON.stringify(results));
+ sessionStorage.setItem('dictionary:results', JSON.stringify(ranked));
  } catch {/* quota — ignore */}
  } catch {
  setJishoResults([]);
