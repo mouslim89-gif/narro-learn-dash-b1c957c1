@@ -61,9 +61,12 @@ Deno.serve(async (req) => {
           : [];
 
       const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
+      const shorts = filtered.filter((s) => isShortEnough(s.japanese));
       const best = pickBest(filtered, limit);
 
-      if (best.length >= limit) {
+      // Only trust the cache if it contains at least one short-enough sentence;
+      // otherwise fall through to refetch fresh (shorter) examples.
+      if (shorts.length > 0 && best.length >= limit) {
         return new Response(
           JSON.stringify({
             japanese: best[0]?.japanese ?? null,
