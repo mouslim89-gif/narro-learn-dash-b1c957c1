@@ -152,14 +152,11 @@ function getDeinflections(word: string): string[] {
   return [...new Set(forms)];
 }
 
-async function fetchWord(keyword: string) {
+async function fetchWord(keyword: string, limit = 20) {
   try {
     const res = await fetch(`${JISHO_API}?keyword=${encodeURIComponent(keyword)}`);
     if (!res.ok) return { keyword, results: [], deinflected: null };
     const json = await res.json();
-    // For single-keyword lookups we keep more candidates so the client can rank
-    // English-definition matches (e.g. "super" → 激, 超高) above slug-only matches.
-    const limit = 20;
     let results = (json.data || []).slice(0, limit).map(mapResult);
 
     let deinflectedForm: string | null = null;
