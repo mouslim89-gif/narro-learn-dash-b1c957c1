@@ -645,11 +645,13 @@
    Glass surfaces — experimental
    ────────────────────────────────────────── */
 .glass-subtle {
-  background: hsl(var(--background) / 0.55);
+  background: hsl(var(--background) / 0.38);
   backdrop-filter: url(#liquid-glass) blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  border: 1px solid hsl(var(--border) / 0.4);
-  box-shadow: 0 8px 24px -10px hsl(220 15% 8% / 0.22);
+  border-bottom: 1px solid hsl(var(--border) / 0.35);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.22),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.04);
   transform: translateZ(0);
   will-change: backdrop-filter;
   isolation: isolate;

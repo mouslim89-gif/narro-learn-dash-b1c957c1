@@ -1,45 +1,84 @@
-## Three fixes on the Reader header
+## Objectif
 
-### 1. Remove the tint visible in dark mode
+1. **Glass plus clair** : baisser de 16px/70% → **12px blur / 78% bg** sur la variante A (qu'on va garder).
+2. **Stabiliser le flou pendant le scroll** : éliminer le "tremblement frame-to-frame" causé par le redimensionnement du header pendant que `backdrop-filter` est actif.
 
-The "teinte" comes from `box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.22)` on `.glass-subtle` — it paints a bright white hairline at the top that, combined with the bg opacity, reads as a colored film over dark mode.
+---
 
-- In `src/index.css`, drop the inset highlights on `.glass-subtle` (or set them to ~`0.06` so they're invisible in dark).
-- Keep `background: hsl(var(--background) / 0.38)` neutral (no saturate, already done).
+## Diagnostic du tremblement
 
-### 2. Chips — back to soft transparent + relief (no liquid glass)
+Le flou (`blur(16px)`) est constant. Ce qui change à chaque frame, c'est la **taille et le padding du header** (animés via `--p`). Comme `backdrop-filter` ré-échantillonne la zone derrière le header à chaque frame, et que cette zone bouge en sous-pixels (le lissage exponentiel produit des deltas non-uniformes : 0.35 × diff → grandes variations au début, microscopiques à la fin), on perçoit le verre comme "vivant".
 
-In `src/pages/Reader.tsx`, restyle `HeaderChip`:
+Combiné à iOS Safari qui re-compose le layer floutant à chaque sub-pixel change → shimmer.
 
-- Background: `bg-card/70` + `backdrop-blur-md` (soft frosted, no SVG filter).
-- Relief: keep `shadow-sm` + add a subtle inner top highlight via `ring-1 ring-border/40` and an `inset 0 1px 0 hsl(0 0% 100% / 0.08)` shadow (small utility class or inline `style`).
-- No `url(#liquid-glass)` reference on chips.
+---
 
-### 3. Distortion + detach header from the edges
+## Changements
 
-**Smoother distortion** — current `feTurbulence baseFrequency="0.006 0.014"` produces visibly anisotropic waves (different X/Y frequency) which reads as "not uniform". In `index.html`:
+### 1. `src/index.css` — Glass plus clair + stabilisation
 
-- Use a single isotropic frequency, e.g. `baseFrequency="0.012"`, `numOctaves="1"`, `seed="3"`.
-- Lower `scale` to `18` for a calmer, more even refraction.
-- Keep the `feGaussianBlur stdDeviation="2"` to soften noise.
+**`.glass-subtle`** (la variante qu'on garde) :
+- `blur(16px) saturate(140%)` → **`blur(12px) saturate(135%)`**
+- `bg hsl(var(--background) / 0.70)` → **`/ 0.78`**
+- Ajouter : `transform: translateZ(0); will-change: backdrop-filter; isolation: isolate;` → force un layer GPU dédié, le navigateur ne recompose plus la couche à chaque sub-pixel.
 
-**Floating header (detached like the bottom nav)**:
+**`.glass-chip-subtle`** :
+- `blur(12px)` → **`blur(10px)`**, bg `0.55` → **`0.65`**
+- Mêmes propriétés GPU.
 
-- Change `<header className="sticky top-0 z-30 glass-subtle">` to a floating bar:
-  - `fixed top-3 left-3 right-3 z-30 rounded-2xl glass-subtle` with `border` (not just `border-bottom`).
-  - Update `.glass-subtle` so the border applies on all sides when used as a floating element (switch `border-bottom` → full `border` of `1px solid hsl(var(--border)/0.35)`, or add a sibling class `.glass-floating`).
-- Add top padding to the page content so it doesn't slide under the floating header (`pt-[4.5rem]` instead of the current header-height offset). Update the scroll-to / sticky offsets that currently assume `top-0` (line 553 comment, the chapter title `sticky top-[3.25rem]` at line 1214 → `top-[4.25rem]`).
+(Variantes B et C : on les supprime puisqu'on a tranché sur A.)
 
-### Technical notes
+### 2. `src/hooks/use-scroll-progress.ts` — Quantisation + arrondi pixel-aware
 
-- `.glass-subtle` becomes the floating-pill style: full rounded border, neutral shadow (e.g. `0 6px 20px -8px hsl(220 15% 8% / 0.18)`), backdrop blur + SVG displacement filter for the bar background only.
-- Chips no longer use `glass-*` — they're a separate visual element (frosted card pill with relief).
-- The SVG filter (`#liquid-glass`) only applies to the header bar; tweaking it to `baseFrequency="0.012"` / `scale="18"` / `numOctaves="1"` gives uniform, gentle refraction.
+Le lissage actuel écrit `--p` avec `toFixed(4)` → trop de granularité. Le header se redimensionne en fractions de pixel → backdrop-filter shimmer.
 
-### Files touched
+- **Quantiser `--p` à 2 décimales** (`toFixed(2)`) : limite les redraws du backdrop à ~100 valeurs distinctes maximum sur toute la course.
+- **Snap quand on est proche de la cible** : si `|diff| < 0.01`, snap direct à `target` (au lieu de continuer à lerp en sous-pixels).
+- **Snapper le scroll au pixel** : `Math.round(...)` la position scroll utilisée pour calculer `target`, pour que des wheel events fractionnaires ne génèrent pas de micro-variations.
 
-- `src/index.css` — `.glass-subtle` (remove white inset, full border, floating shadow)
-- `src/pages/Reader.tsx` — `HeaderChip` styling; header element classes; sticky offsets
-- `index.html` — `feTurbulence` + `feDisplacementMap` params
+```ts
+const SMOOTH = 0.35;       // inchangé
+const EPS = 0.01;          // plus tolérant (était 0.0005)
 
-Want me to proceed, or tweak anything (e.g. corner radius of the floating bar, exact distortion intensity)?
+const computeTarget = () => {
+  const y = Math.round(window.scrollY);   // snap pixel
+  target = Math.min(1, Math.max(0, (y - start) / range));
+};
+
+const write = (v: number) => {
+  el.style.setProperty(varName, v.toFixed(2));  // 2 décimales
+};
+```
+
+### 3. `src/pages/Reader.tsx` — Cleanup post-test
+
+- Retirer le switcher A/B/C (les 3 boutons sticky en haut).
+- Retirer le state `glassVariant`, le type `GlassVariant`, les maps `glassChipClass`/`glassHeaderClass`.
+- `HeaderChip` : prop `glass` → simple booléen (ou retirer la prop et coder en dur `glass-chip-subtle` puisqu'il n'y a plus qu'une variante).
+- Header : `className="... glass-subtle ..."` en dur.
+
+---
+
+## Détails techniques
+
+- `isolation: isolate` crée un nouveau stacking context → le backdrop-filter n'échantillonne que ce qui est derrière le header dans son propre contexte de composition.
+- `translateZ(0)` force la promotion en couche GPU. Ça coûte un peu de mémoire vidéo mais c'est négligeable pour un header.
+- La quantisation à 2 décimales ne sera pas visible à l'œil (la hauteur header passe de ~120px à ~64px, soit ~56px de course → 56/100 = 0.56px par step, en dessous du seuil de perception).
+
+---
+
+## Risques
+
+- Sur Android Chrome très bas de gamme, `will-change: backdrop-filter` peut augmenter l'usage mémoire. Acceptable, c'est juste un élément.
+- Si après ces 3 changements il reste un léger shimmer, il faudra envisager l'option **B** précédente (header taille fixe, n'animer que le contenu intérieur).
+
+---
+
+## Validation
+
+1. Scroller lentement et rapidement sur Reader (mobile preview 390px).
+2. Vérifier que :
+   - Le flou est visiblement plus clair (texte derrière mieux lisible).
+   - Plus de shimmer/tremblement pendant le scroll.
+   - L'animation de rétrécissement du header reste fluide.
+3. Puis on décide si on généralise (BottomNav, Library, popups).
