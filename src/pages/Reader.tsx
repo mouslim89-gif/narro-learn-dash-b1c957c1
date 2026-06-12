@@ -36,7 +36,6 @@ import { useIsMobile } from'@/hooks/use-mobile';
 import { Sheet, SheetContent } from'@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from'@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from'@/lib/sentence-translations';
-import { LiquidGlassFilter } from '@/components/LiquidGlassFilter';
 
 const fontSizes: FontSize[] = ['small','medium','large'];
 const fontSizeLabels: Record<FontSize, string> = { small:'S', medium:'M', large:'L'};
@@ -223,7 +222,6 @@ export default function Reader() {
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
- const headerRef = useRef<HTMLElement>(null);
  const restoredScroll = useRef(false);
  // Top-most visible sentence index (updated by IntersectionObserver).
  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
@@ -938,9 +936,7 @@ export default function Reader() {
 
  return (
  <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
-  <header ref={headerRef} className="sticky top-0 z-30 glass-subtle">
-   <LiquidGlassFilter targetRef={headerRef} filterId="liquid-glass" radius={0} edge={20} scale={24} />
-
+  <header className="sticky top-0 z-30 glass-subtle">
 
   <div className="flex items-center justify-between gap-2 px-3 py-2.5">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
