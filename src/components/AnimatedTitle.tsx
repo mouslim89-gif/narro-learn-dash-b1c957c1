@@ -49,7 +49,7 @@ export function AnimatedTitle({
         className="inline-block"
         style={{ 
           transform,
-          transformOrigin: 'left top',
+          transformOrigin: 'left center',
           willChange: transform ? 'transform' : undefined,
           fontSize: fontSize || undefined,
         }}
