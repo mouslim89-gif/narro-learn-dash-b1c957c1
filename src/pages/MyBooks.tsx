@@ -90,9 +90,9 @@ export default function MyBooks() {
  text="My Books"
  className="font-serif font-bold leading-none tracking-tight"
  style={{ 
-   '--title-scale': 'calc(1 - var(--p, 0) * 0.25)', 
-   fontSize: '32px',
-   marginBottom: 'calc(var(--p, 0) * -10px)'
+    '--title-scale': 'calc(1 - var(--p, 0) * 0.25)', 
+    '--title-ty': 'calc(var(--p, 0) * -10px)',
+    fontSize: '32px'
  } as any}
  />
  </div>
