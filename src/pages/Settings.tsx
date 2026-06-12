@@ -1,6 +1,6 @@
 import { Link, useNavigate } from'react-router-dom';
 import { ArrowLeft, LogOut, Loader2, User as UserIcon } from'lucide-react';
-import { useEffect, useState } from'react';
+import { useState } from'react';
 import { Switch } from'@/components/ui/switch';
 import { Label } from'@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from'@/stores/reading-progress';
@@ -45,13 +45,6 @@ export default function Settings() {
  const { user, signOut } = useAuth();
  const navigate = useNavigate();
  const [deleting, setDeleting] = useState(false);
- const [scrolled, setScrolled] = useState(false);
- useEffect(() => {
- const onScroll = () => setScrolled(window.scrollY > 120);
- onScroll();
- window.addEventListener('scroll', onScroll, { passive: true });
- return () => window.removeEventListener('scroll', onScroll);
- }, []);
 
  const handleSignOut = async () => {
  await signOut();
@@ -77,23 +70,20 @@ export default function Settings() {
 
  return (
  <div className="pb-24 min-h-screen">
+ {/* Editorial header */}
+ <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
+ <span className="library-kanji-watermark"aria-hidden="true">設</span>
+ <div className="relative z-10 flex items-center gap-3">
  <button
  onClick={() => window.history.back()}
  aria-label="Back"
- className={cn(
- "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm transition-[background-color,box-shadow,backdrop-filter] duration-200",
- scrolled
- ?"bg-background/85 backdrop-blur-xl ring-border/60 shadow-sm"
- :"bg-background/70 backdrop-blur-md ring-border/40"
- )}
+ className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 flex items-center justify-center smooth-colors tap-scale-sm"
  >
  <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
- {/* Editorial header */}
- <header className="library-header-bg relative px-6 pt-12 pb-6 pl-[4.5rem] flex items-end justify-between overflow-hidden">
- <span className="library-kanji-watermark"aria-hidden="true">設</span>
- <div className="relative z-10">
-        <AnimatedTitle text="Settings"className="wordmark font-serif text-[32px] leading-none text-foreground"/>
+ <div>
+         <AnimatedTitle text="Settings"className="wordmark font-serif text-[32px] leading-none text-foreground"/>
+ </div>
  </div>
  </header>
  <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0"/>
