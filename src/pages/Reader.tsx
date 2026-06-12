@@ -935,8 +935,8 @@ export default function Reader() {
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
  return (
- <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
-  <header className="sticky top-0 z-30 glass-subtle">
+ <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background pt-[4.5rem]`}>
+  <header className="fixed top-3 left-3 right-3 z-30 glass-subtle rounded-2xl">
 
   <div className="flex items-center justify-between gap-2 px-3 py-2.5">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
