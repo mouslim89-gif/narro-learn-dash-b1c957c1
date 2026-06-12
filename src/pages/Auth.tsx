@@ -14,6 +14,7 @@ type Mode ='signin'|'signup'|'forgot';
 export default function Auth() {
  const { user, loading: authLoading } = useAuth();
  const location = useLocation();
+ const navigate = useNavigate();
  const [mode, setMode] = useState<Mode>('signin');
  const [email, setEmail] = useState('');
  const [password, setPassword] = useState('');
