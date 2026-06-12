@@ -152,12 +152,12 @@ function getDeinflections(word: string): string[] {
   return [...new Set(forms)];
 }
 
-async function fetchWord(keyword: string) {
+async function fetchWord(keyword: string, limit = 20) {
   try {
     const res = await fetch(`${JISHO_API}?keyword=${encodeURIComponent(keyword)}`);
     if (!res.ok) return { keyword, results: [], deinflected: null };
     const json = await res.json();
-    let results = (json.data || []).slice(0, 5).map(mapResult);
+    let results = (json.data || []).slice(0, limit).map(mapResult);
 
     let deinflectedForm: string | null = null;
 
@@ -224,7 +224,7 @@ Deno.serve(async (req) => {
 
     if (keywords) {
       const words = keywords.split(',').map(w => w.trim()).filter(Boolean).slice(0, 50);
-      const results = await Promise.all(words.map(fetchWord));
+      const results = await Promise.all(words.map((w) => fetchWord(w, 5)));
       persistLookups(results).catch(() => {});
       return new Response(JSON.stringify({ batch: results }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
