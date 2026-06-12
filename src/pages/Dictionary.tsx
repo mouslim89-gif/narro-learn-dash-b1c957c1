@@ -21,13 +21,18 @@ import { romajiToKana } from'@/lib/romaji';
 function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
   const q = query.trim().toLowerCase();
   if (!q || !/[a-zA-Z]/.test(q)) return results;
-  const wordRe = new RegExp(`\\b${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i');
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const wordRe = new RegExp(`\\b${escaped}\\b`,'i');
+  // Matches definitions that START with the query followed by a word boundary
+  // (end of string, space, parenthesis, bracket). Catches "cat (esp. ...)" as exact.
+  const exactPrefixRe = new RegExp(`^${escaped}(?:[\\s(\\[]|$)`,'i');
   const score = (r: JishoResult): number => {
     let best = 0;
     for (const sense of r.senses) {
       for (const def of sense.english_definitions) {
         const d = def.toLowerCase();
         if (d === q) return 3;
+        if (exactPrefixRe.test(d)) { best = Math.max(best, 3); continue; }
         if (d.split(/[;,]\s*/).some((p) => p.trim() === q)) best = Math.max(best, 2);
         else if (wordRe.test(def)) best = Math.max(best, 1);
       }
@@ -39,8 +44,8 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
     return best;
   };
   return [...results]
-    .map((r, i) => ({ r, i, s: score(r) }))
-    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map((r, i) => ({ r, i, s: score(r), c: r.is_common ? 1 : 0 }))
+    .sort((a, b) => b.s - a.s || b.c - a.c || a.i - b.i)
     .map((x) => x.r);
 }
 
@@ -226,18 +231,20 @@ export default function DictionaryPage() {
  className="group cursor-pointer -m-1 p-1 pr-6 rounded-lg relative"
  >
  {/* Word + reading inline */}
- <div className="flex items-center gap-1.5 pr-12">
- <p className="font-japanese text-xl font-bold">{word}</p>
- {reading && reading !== word && (
- <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
- )}
- {reading && (
- <span className="text-xs text-muted-foreground/70 italic">{toRomaji(reading)}</span>
- )}
- <span onClick={(e) => e.stopPropagation()}>
- <PlayWordButton word={word} reading={reading} size={16} />
- </span>
- </div>
+				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 pr-12">
+					<p className="font-japanese text-xl font-bold whitespace-nowrap shrink-0">{word}</p>
+					<div className="flex items-center gap-1.5 flex-wrap">
+						{reading && reading !== word && (
+							<span className="font-japanese text-sm text-muted-foreground whitespace-nowrap">{reading}</span>
+						)}
+						{reading && (
+							<span className="text-xs text-muted-foreground/70 italic whitespace-nowrap">{toRomaji(reading)}</span>
+						)}
+						<span onClick={(e) => e.stopPropagation()}>
+							<PlayWordButton word={word} reading={reading} size={16} />
+						</span>
+					</div>
+				</div>
 
  {/* Tags row */}
  <div className="mt-2 flex flex-wrap items-center gap-1.5">
