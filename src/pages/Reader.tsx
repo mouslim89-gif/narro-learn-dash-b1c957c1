@@ -119,13 +119,13 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
  ({ active, children, className, ...props }, ref) => (
  <button
  ref={ref}
- className={cn('flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm bg-card shadow-sm',
+ className={cn('flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm bg-card/70 backdrop-blur-md shadow-sm',
  active
  ? 'text-primary ring-primary/25 !bg-primary/15'
  : 'text-foreground/70 ring-border/40',
  className,
  )}
-
+ style={{ boxShadow: '0 1px 2px hsl(220 15% 8% / 0.08), inset 0 1px 0 hsl(0 0% 100% / 0.10)' }}
  {...props}
  >
  {children}
@@ -935,8 +935,8 @@ export default function Reader() {
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
  return (
- <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
-  <header className="sticky top-0 z-30 glass-subtle">
+ <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background pt-[4.5rem]`}>
+  <header className="fixed top-3 left-3 right-3 z-30 glass-subtle rounded-2xl">
 
   <div className="flex items-center justify-between gap-2 px-3 py-2.5">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
@@ -1211,7 +1211,7 @@ export default function Reader() {
  }
 
  return showSettings ? (
- <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in-soft">
+ <div className="sticky top-[4.5rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in-soft">
  <div className="mx-auto max-w-2xl">
  <div className="mb-5 flex items-center gap-3">
  <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
