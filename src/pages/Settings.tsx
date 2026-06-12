@@ -1,6 +1,6 @@
 import { Link, useNavigate } from'react-router-dom';
 import { ArrowLeft, LogOut, Loader2, User as UserIcon } from'lucide-react';
-import { useState } from'react';
+import { useEffect, useState } from'react';
 import { Switch } from'@/components/ui/switch';
 import { Label } from'@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from'@/stores/reading-progress';
