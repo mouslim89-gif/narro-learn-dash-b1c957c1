@@ -1,84 +1,62 @@
-## Objectif
+## 3 fixes ciblés
 
-1. **Glass plus clair** : baisser de 16px/70% → **12px blur / 78% bg** sur la variante A (qu'on va garder).
-2. **Stabiliser le flou pendant le scroll** : éliminer le "tremblement frame-to-frame" causé par le redimensionnement du header pendant que `backdrop-filter` est actif.
+### 1. Teinte dans le verre (dark mode)
 
----
+**Cause** : `.glass-subtle` utilise `background: hsl(var(--background) / 0.38)`. En dark, `--background` (220 15% 8%) est posé par-dessus l'article (`--card` 220 15% 12%) → le header apparaît plus sombre/bleuté que ce qui est derrière. C'est ce "filtre couleur" qu'on voit.
 
-## Diagnostic du tremblement
+**Fix** dans `src/index.css` `.glass-subtle` :
+- Remplacer `background: hsl(var(--background) / 0.38)` par une teinte **neutre** alignée avec la luminance derrière, et beaucoup plus faible :
+  - Light mode : `background: hsl(0 0% 100% / 0.25)` (blanc pur très léger)
+  - Dark mode (via `.dark .glass-subtle`) : `background: hsl(0 0% 0% / 0.18)` (noir pur très léger)
+- Le verre ne réinjecte plus la couleur du token `--background` → plus de cast bleuté.
+- Garder `inset 0 1px 0 hsl(0 0% 100% / 0.22)` pour le highlight (c'est l'effet "verre", pas un cast couleur).
 
-Le flou (`blur(16px)`) est constant. Ce qui change à chaque frame, c'est la **taille et le padding du header** (animés via `--p`). Comme `backdrop-filter` ré-échantillonne la zone derrière le header à chaque frame, et que cette zone bouge en sous-pixels (le lissage exponentiel produit des deltas non-uniformes : 0.35 × diff → grandes variations au début, microscopiques à la fin), on perçoit le verre comme "vivant".
+### 2. Chips : transparence légère + flou + relief (sans liquid glass)
 
-Combiné à iOS Safari qui re-compose le layer floutant à chaque sub-pixel change → shimmer.
+**Cause** : on est revenu à `bg-card shadow-sm` opaque → trop massif et plus de relief verre.
 
----
+**Fix** :
+- Recréer la classe `.glass-chip` dans `index.css` :
+  ```css
+  .glass-chip {
+    background: hsl(0 0% 100% / 0.55);              /* light */
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.35),          /* relief haut */
+      inset 0 -1px 0 hsl(0 0% 0% / 0.06),
+      0 1px 2px hsl(0 0% 0% / 0.06);                /* shadow externe douce */
+  }
+  .dark .glass-chip {
+    background: hsl(0 0% 0% / 0.30);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.10),
+      inset 0 -1px 0 hsl(0 0% 0% / 0.4),
+      0 1px 2px hsl(0 0% 0% / 0.3);
+  }
+  ```
+- Dans `src/pages/Reader.tsx`, `HeaderChip` : remplacer `bg-card shadow-sm` par `glass-chip`. Garder `ring-1`/`ring-border/40` et le `tap-scale-sm`.
+- Pas de SVG filter sur les chips → pas d'effet "centre de déformation" parasite, juste flou + relief.
 
-## Changements
+### 3. Distorsion non uniforme (faux "centre" sur le titre)
 
-### 1. `src/index.css` — Glass plus clair + stabilisation
+**Cause** : `baseFrequency="0.006 0.014"` produit des **grosses bosses** de bruit basse fréquence — ça crée des zones de déplacement très différentes (une grosse "lentille" au milieu), d'où l'impression d'un verre bombé localisé.
 
-**`.glass-subtle`** (la variante qu'on garde) :
-- `blur(16px) saturate(140%)` → **`blur(12px) saturate(135%)`**
-- `bg hsl(var(--background) / 0.70)` → **`/ 0.78`**
-- Ajouter : `transform: translateZ(0); will-change: backdrop-filter; isolation: isolate;` → force un layer GPU dédié, le navigateur ne recompose plus la couche à chaque sub-pixel.
+**Fix** dans `index.html` filtre `#liquid-glass` :
+- Monter `baseFrequency` à `"0.018 0.024"` (bruit plus fin, plus dense) → la distorsion devient un grain régulier sur toute la surface, comme du verre dépoli homogène.
+- Baisser `scale` de `32` à `18` pour compenser (sinon ça devient agressif avec une fréquence + haute).
+- Garder `numOctaves="2"`, `stdDeviation="2"`, `seed="4"`.
+- Étendre la zone du filtre pour éviter les artefacts de bord : `x="-20%" y="-20%" width="140%" height="140%"`.
 
-**`.glass-chip-subtle`** :
-- `blur(12px)` → **`blur(10px)`**, bg `0.55` → **`0.65`**
-- Mêmes propriétés GPU.
+### Validation
 
-(Variantes B et C : on les supprime puisqu'on a tranché sur A.)
+1. Ouvrir Reader en dark : header doit avoir la même luminance que l'article derrière, sans cast bleu.
+2. Vérifier en light que ça marche aussi.
+3. Chips : flou visible, légère transparence, petit highlight en haut (relief).
+4. Scroller doucement : la distorsion doit paraître uniforme sur toute la largeur du header, sans "lentille" autour du titre.
 
-### 2. `src/hooks/use-scroll-progress.ts` — Quantisation + arrondi pixel-aware
+### Fichiers touchés
 
-Le lissage actuel écrit `--p` avec `toFixed(4)` → trop de granularité. Le header se redimensionne en fractions de pixel → backdrop-filter shimmer.
-
-- **Quantiser `--p` à 2 décimales** (`toFixed(2)`) : limite les redraws du backdrop à ~100 valeurs distinctes maximum sur toute la course.
-- **Snap quand on est proche de la cible** : si `|diff| < 0.01`, snap direct à `target` (au lieu de continuer à lerp en sous-pixels).
-- **Snapper le scroll au pixel** : `Math.round(...)` la position scroll utilisée pour calculer `target`, pour que des wheel events fractionnaires ne génèrent pas de micro-variations.
-
-```ts
-const SMOOTH = 0.35;       // inchangé
-const EPS = 0.01;          // plus tolérant (était 0.0005)
-
-const computeTarget = () => {
-  const y = Math.round(window.scrollY);   // snap pixel
-  target = Math.min(1, Math.max(0, (y - start) / range));
-};
-
-const write = (v: number) => {
-  el.style.setProperty(varName, v.toFixed(2));  // 2 décimales
-};
-```
-
-### 3. `src/pages/Reader.tsx` — Cleanup post-test
-
-- Retirer le switcher A/B/C (les 3 boutons sticky en haut).
-- Retirer le state `glassVariant`, le type `GlassVariant`, les maps `glassChipClass`/`glassHeaderClass`.
-- `HeaderChip` : prop `glass` → simple booléen (ou retirer la prop et coder en dur `glass-chip-subtle` puisqu'il n'y a plus qu'une variante).
-- Header : `className="... glass-subtle ..."` en dur.
-
----
-
-## Détails techniques
-
-- `isolation: isolate` crée un nouveau stacking context → le backdrop-filter n'échantillonne que ce qui est derrière le header dans son propre contexte de composition.
-- `translateZ(0)` force la promotion en couche GPU. Ça coûte un peu de mémoire vidéo mais c'est négligeable pour un header.
-- La quantisation à 2 décimales ne sera pas visible à l'œil (la hauteur header passe de ~120px à ~64px, soit ~56px de course → 56/100 = 0.56px par step, en dessous du seuil de perception).
-
----
-
-## Risques
-
-- Sur Android Chrome très bas de gamme, `will-change: backdrop-filter` peut augmenter l'usage mémoire. Acceptable, c'est juste un élément.
-- Si après ces 3 changements il reste un léger shimmer, il faudra envisager l'option **B** précédente (header taille fixe, n'animer que le contenu intérieur).
-
----
-
-## Validation
-
-1. Scroller lentement et rapidement sur Reader (mobile preview 390px).
-2. Vérifier que :
-   - Le flou est visiblement plus clair (texte derrière mieux lisible).
-   - Plus de shimmer/tremblement pendant le scroll.
-   - L'animation de rétrécissement du header reste fluide.
-3. Puis on décide si on généralise (BottomNav, Library, popups).
+- `src/index.css` — `.glass-subtle` (neutralise teinte) + nouvelle classe `.glass-chip`
+- `src/pages/Reader.tsx` — `HeaderChip` : swap classes
+- `index.html` — paramètres du filtre `#liquid-glass`
