@@ -19,6 +19,14 @@ export default function BookDetail() {
  const [difficulty, setDifficulty] = useState<Difficulty>(
  bookProgress?.difficulty ||'simplified');
 
+ const [scrolled, setScrolled] = useState(false);
+ useEffect(() => {
+ const onScroll = () => setScrolled(window.scrollY > 120);
+ onScroll();
+ window.addEventListener('scroll', onScroll, { passive: true });
+ return () => window.removeEventListener('scroll', onScroll);
+ }, []);
+
  if (!book) {
  return (
  <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 px-6 text-center">
