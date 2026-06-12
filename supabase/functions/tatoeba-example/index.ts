@@ -61,14 +61,14 @@ Deno.serve(async (req) => {
           : [];
 
       const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
+      const best = pickBest(filtered, limit);
 
-      if (filtered.length >= limit) {
-        const sliced = filtered.slice(0, limit);
+      if (best.length >= limit) {
         return new Response(
           JSON.stringify({
-            japanese: sliced[0]?.japanese ?? null,
-            english: sliced[0]?.english ?? null,
-            sentences: sliced,
+            japanese: best[0]?.japanese ?? null,
+            english: best[0]?.english ?? null,
+            sentences: best,
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
         );
