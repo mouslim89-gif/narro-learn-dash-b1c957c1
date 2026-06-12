@@ -110,18 +110,32 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
 
 // ============= Inline editorial UI helpers (Reader-only) =============
 
+type GlassVariant = 'A' | 'B' | 'C';
+const glassChipClass: Record<GlassVariant, string> = {
+  A: 'glass-chip-subtle',
+  B: 'glass-chip-standard',
+  C: 'glass-chip-heavy',
+};
+const glassHeaderClass: Record<GlassVariant, string> = {
+  A: 'glass-subtle',
+  B: 'glass-standard',
+  C: 'glass-heavy',
+};
+
 interface HeaderChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  active?: boolean;
  children: ReactNode;
+ glass?: GlassVariant;
 }
 
 const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
- ({ active, children, className, ...props }, ref) => (
+ ({ active, children, className, glass, ...props }, ref) => (
  <button
  ref={ref}
- className={cn('flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 smooth-colors tap-scale-sm',
+ className={cn('flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm',
+   glass ? glassChipClass[glass] : 'bg-background/70 backdrop-blur-md',
  active
- ?'bg-primary/15 text-primary ring-primary/25':'bg-background/70 text-foreground/70 ring-border/40',
+ ?'text-primary ring-primary/25':'text-foreground/70 ring-border/40',
  className,
  )}
  {...props}
@@ -131,6 +145,7 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
  ),
 );
 HeaderChip.displayName ='HeaderChip';
+
 
 const SettingsSection = ({ label, children }: { label: string; children: ReactNode }) => (
  <div>
