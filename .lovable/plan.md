@@ -1,98 +1,84 @@
-# Glass effect — Reader test (3 intensities, A/B/C switcher)
+## Objectif
 
-Goal: tester l'effet glass sur le header sticky du Reader et les `HeaderChip` (back + furigana + translations + grammar + settings), avec un toggle temporaire pour comparer 3 intensités. Si une variante plaît, on la généralise ensuite (BottomNav, sticky headers Library/MyBooks, popups).
+1. **Glass plus clair** : baisser de 16px/70% → **12px blur / 78% bg** sur la variante A (qu'on va garder).
+2. **Stabiliser le flou pendant le scroll** : éliminer le "tremblement frame-to-frame" causé par le redimensionnement du header pendant que `backdrop-filter` est actif.
 
-## Scope (test uniquement)
+---
 
-- Header sticky du Reader (`src/pages/Reader.tsx` lignes 935-1025)
-- Composant `HeaderChip` (lignes 113-133) — partagé par 5 boutons
-- Aucun autre fichier touché tant que tu n'as pas validé
+## Diagnostic du tremblement
 
-## Note importante
+Le flou (`blur(16px)`) est constant. Ce qui change à chaque frame, c'est la **taille et le padding du header** (animés via `--p`). Comme `backdrop-filter` ré-échantillonne la zone derrière le header à chaque frame, et que cette zone bouge en sous-pixels (le lissage exponentiel produit des deltas non-uniformes : 0.35 × diff → grandes variations au début, microscopiques à la fin), on perçoit le verre comme "vivant".
 
-Le header actuel a déjà `backdrop-blur-xl` mais avec un `linear-gradient` opaque par-dessus (`book.coverColor` à 0x1f + `--background / 0.85`). Le blur ne se voit quasiment pas. Le vrai gain visuel viendra de réduire l'opacité du fond pour laisser passer le texte/contenu derrière le verre.
+Combiné à iOS Safari qui re-compose le layer floutant à chaque sub-pixel change → shimmer.
 
-## Les 3 intensités (CSS utilities à ajouter dans `src/index.css`)
+---
 
-```css
-/* A — Subtle (warm paper-friendly) */
-.glass-subtle {
-  background: hsl(var(--background) / 0.70);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-}
+## Changements
 
-/* B — Standard iOS-like */
-.glass-standard {
-  background: hsl(var(--background) / 0.55);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid hsl(var(--border) / 0.4);
-  box-shadow: 0 1px 0 hsl(0 0% 100% / 0.04) inset;
-}
+### 1. `src/index.css` — Glass plus clair + stabilisation
 
-/* C — Heavy frosted */
-.glass-heavy {
-  background: hsl(var(--background) / 0.40);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border-bottom: 1px solid hsl(var(--border) / 0.35);
-  box-shadow:
-    0 1px 0 hsl(0 0% 100% / 0.06) inset,
-    0 4px 16px -8px hsl(220 15% 8% / 0.10);
-}
+**`.glass-subtle`** (la variante qu'on garde) :
+- `blur(16px) saturate(140%)` → **`blur(12px) saturate(135%)`**
+- `bg hsl(var(--background) / 0.70)` → **`/ 0.78`**
+- Ajouter : `transform: translateZ(0); will-change: backdrop-filter; isolation: isolate;` → force un layer GPU dédié, le navigateur ne recompose plus la couche à chaque sub-pixel.
 
-/* Variantes chips — même grain, padding identique au .reader-icon-btn */
-.glass-chip-subtle   { background: hsl(var(--background) / 0.55); backdrop-filter: blur(12px) saturate(140%); }
-.glass-chip-standard { background: hsl(var(--background) / 0.40); backdrop-filter: blur(18px) saturate(180%); }
-.glass-chip-heavy    { background: hsl(var(--background) / 0.25); backdrop-filter: blur(24px) saturate(200%); }
+**`.glass-chip-subtle`** :
+- `blur(12px)` → **`blur(10px)`**, bg `0.55` → **`0.65`**
+- Mêmes propriétés GPU.
+
+(Variantes B et C : on les supprime puisqu'on a tranché sur A.)
+
+### 2. `src/hooks/use-scroll-progress.ts` — Quantisation + arrondi pixel-aware
+
+Le lissage actuel écrit `--p` avec `toFixed(4)` → trop de granularité. Le header se redimensionne en fractions de pixel → backdrop-filter shimmer.
+
+- **Quantiser `--p` à 2 décimales** (`toFixed(2)`) : limite les redraws du backdrop à ~100 valeurs distinctes maximum sur toute la course.
+- **Snap quand on est proche de la cible** : si `|diff| < 0.01`, snap direct à `target` (au lieu de continuer à lerp en sous-pixels).
+- **Snapper le scroll au pixel** : `Math.round(...)` la position scroll utilisée pour calculer `target`, pour que des wheel events fractionnaires ne génèrent pas de micro-variations.
+
+```ts
+const SMOOTH = 0.35;       // inchangé
+const EPS = 0.01;          // plus tolérant (était 0.0005)
+
+const computeTarget = () => {
+  const y = Math.round(window.scrollY);   // snap pixel
+  target = Math.min(1, Math.max(0, (y - start) / range));
+};
+
+const write = (v: number) => {
+  el.style.setProperty(varName, v.toFixed(2));  // 2 décimales
+};
 ```
 
-Toutes les variantes gardent le `ring-1 ring-border/40` existant (le ring fait 90% du sentiment "verre" sur mobile).
+### 3. `src/pages/Reader.tsx` — Cleanup post-test
 
-## Le switcher temporaire
+- Retirer le switcher A/B/C (les 3 boutons sticky en haut).
+- Retirer le state `glassVariant`, le type `GlassVariant`, les maps `glassChipClass`/`glassHeaderClass`.
+- `HeaderChip` : prop `glass` → simple booléen (ou retirer la prop et coder en dur `glass-chip-subtle` puisqu'il n'y a plus qu'une variante).
+- Header : `className="... glass-subtle ..."` en dur.
 
-Petit segmented control flottant en haut-droit du Reader, visible uniquement en dev (ou toujours, à toi de voir), 3 boutons A / B / C. État local (`useState<'A'|'B'|'C'>`), pas persisté. Switche la classe appliquée au header **et** aux HeaderChips en temps réel.
+---
 
-```
-┌─────────────────────────────┐
-│ [←]   雲の糸 ▾    [A│B│C]   │  ← switcher en mini-pill
-│ ─── progress ─────────────  │
-└─────────────────────────────┘
-```
+## Détails techniques
 
-Le switcher remplace temporairement aucun bouton — il s'ajoute à droite des chips existants, en petit (h-6, text-[10px]). Une fois la variante choisie, on retire le switcher et on fige la classe.
+- `isolation: isolate` crée un nouveau stacking context → le backdrop-filter n'échantillonne que ce qui est derrière le header dans son propre contexte de composition.
+- `translateZ(0)` force la promotion en couche GPU. Ça coûte un peu de mémoire vidéo mais c'est négligeable pour un header.
+- La quantisation à 2 décimales ne sera pas visible à l'œil (la hauteur header passe de ~120px à ~64px, soit ~56px de course → 56/100 = 0.56px par step, en dessous du seuil de perception).
 
-## Changements précis
+---
 
-### `src/index.css`
-Ajouter le bloc CSS ci-dessus à la fin du fichier, sous un commentaire `/* Glass surfaces — experimental */`.
+## Risques
 
-### `src/pages/Reader.tsx`
+- Sur Android Chrome très bas de gamme, `will-change: backdrop-filter` peut augmenter l'usage mémoire. Acceptable, c'est juste un élément.
+- Si après ces 3 changements il reste un léger shimmer, il faudra envisager l'option **B** précédente (header taille fixe, n'animer que le contenu intérieur).
 
-1. Ajouter `const [glassVariant, setGlassVariant] = useState<'A'|'B'|'C'>('A')` près des autres états UI.
-2. `HeaderChip` : prop optionnelle `glass?: 'A'|'B'|'C'`. Si fournie, remplace `bg-background/70 backdrop-blur-md` par la `.glass-chip-*` correspondante. Reste rétro-compatible (les autres usages ne changent pas — il n'y en a pas hors Reader).
-3. Header (ligne 935) :
-   - Retirer le `style={{ backgroundImage: ... }}` (le gradient masque le glass).
-   - Remplacer `backdrop-blur-xl` par la classe `glass-{subtle|standard|heavy}` selon `glassVariant`.
-   - Garder un fin trait coloré du livre comme accent : repasser `book.coverColor` en `border-bottom` 2px à la place du tracker, OU laisser la progress bar 2px existante (déjà coloriée avec `book.coverColor`) — pas de changement à ce niveau.
-4. Passer `glass={glassVariant}` à chaque `HeaderChip`.
-5. Ajouter le mini-switcher segmented à droite du dernier chip (ou en absolu top-right si trop serré sur 360px).
+---
 
-## Aucun autre fichier modifié
+## Validation
 
-Pas de BottomNav, pas de Library, pas de popups. Test isolé au Reader.
-
-## Étape suivante (après validation)
-
-Une fois que tu choisis A, B ou C :
-1. Retirer le switcher.
-2. Figer la classe glass dans le header + HeaderChip.
-3. Te demander pour quels autres surfaces on l'applique (BottomNav, sticky headers Library/MyBooks/Dictionary, WordMiniPopup, settings panel reader, etc.).
-
-## Risques / points d'attention
-
-- `backdrop-filter` est OK partout sur iOS Safari 15+ / Android Chrome moderne — pas de fallback nécessaire pour ta cible.
-- Sur le reader avec beaucoup de texte dense, la variante C (heavy) peut rendre le titre japonais derrière le chip illisible 1-2 frames pendant le scroll. À surveiller à l'œil.
-- Le gradient retiré (`book.coverColor`) faisait office d'identité visuelle par livre. Si ça te manque, on peut le réintroduire en `::before` à opacité 0.10 derrière le glass, sans casser le blur.
+1. Scroller lentement et rapidement sur Reader (mobile preview 390px).
+2. Vérifier que :
+   - Le flou est visiblement plus clair (texte derrière mieux lisible).
+   - Plus de shimmer/tremblement pendant le scroll.
+   - L'animation de rétrécissement du header reste fluide.
+3. Puis on décide si on généralise (BottomNav, Library, popups).
