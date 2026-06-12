@@ -936,9 +936,8 @@ export default function Reader() {
 
  return (
  <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
-  <header className="sticky top-0 z-30 glass-subtle">
-
-  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+   <header className="sticky top-0 z-30 px-3 pt-3 pb-2">
+    <div className="glass-slab flex items-center justify-between gap-2 px-2 h-14 rounded-[20px]">
  <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
  <ArrowLeft className="h-5 w-5"/>
  </HeaderChip>
@@ -1021,8 +1020,8 @@ export default function Reader() {
  </HeaderChip>
 
  </div>
- </div>
- <div className="h-[2px] w-full bg-border/30">
+    </div>
+    <div className="h-[2px] w-full bg-border/30 mt-2 rounded-full overflow-hidden">
  <div
  className="h-full transition-[width] duration-200"
  style={{ width:`${scrollPercent}%`, backgroundColor: book.coverColor }}
