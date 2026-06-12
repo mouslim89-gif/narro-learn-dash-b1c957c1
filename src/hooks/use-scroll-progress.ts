@@ -23,8 +23,9 @@ export function useScrollProgress(
     const range = Math.max(1, end - start);
     // Smoothing factor per frame (~60fps). Higher = snappier, lower = silkier.
     const SMOOTH = 0.35;
-    // Stop animating once we're within this delta of the target.
-    const EPS = 0.0005;
+    // Snap to target once within this delta — avoids endless sub-pixel lerp
+    // that makes backdrop-filter shimmer.
+    const EPS = 0.01;
 
     let current = 0;
     let target = 0;
@@ -32,13 +33,16 @@ export function useScrollProgress(
     let running = false;
 
     const computeTarget = () => {
-      const y = window.scrollY;
+      // Snap scrollY to integer pixels so fractional wheel/momentum events
+      // don't generate micro-variations in --p.
+      const y = Math.round(window.scrollY);
       target = Math.min(1, Math.max(0, (y - start) / range));
     };
 
     const write = (v: number) => {
-      // Quantize lightly to avoid sub-pixel churn while staying smooth.
-      el.style.setProperty(varName, v.toFixed(4));
+      // Quantize to 2 decimals (~100 distinct values across the whole course)
+      // so backdrop-filter only re-renders on meaningful steps.
+      el.style.setProperty(varName, v.toFixed(2));
     };
 
     const tick = () => {
