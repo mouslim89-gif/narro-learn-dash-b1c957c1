@@ -22,7 +22,7 @@ export function useScrollProgress(
 
     const range = Math.max(1, end - start);
     // Smoothing factor per frame (~60fps). Higher = snappier, lower = silkier.
-    const SMOOTH = 0.18;
+    const SMOOTH = 0.35;
     // Stop animating once we're within this delta of the target.
     const EPS = 0.0005;
 
