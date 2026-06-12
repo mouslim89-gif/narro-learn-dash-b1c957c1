@@ -44,12 +44,9 @@ export function AnimatedTitle({
       <span 
         className="inline-block origin-left"
         style={{ 
-          transform: titleScale ? `scale(${titleScale}) translateZ(0)` : undefined,
+          transform: titleScale ? `scale(${titleScale})` : undefined,
           fontSize: fontSize || undefined,
           marginBottom: marginBottom || undefined,
-          willChange: titleScale ? 'transform' : undefined,
-          backfaceVisibility: 'hidden',
-          transition: titleScale ? 'transform 60ms linear' : undefined,
         }}
       >
         {chars.map((ch, i) => {
