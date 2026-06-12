@@ -27,13 +27,17 @@ export function AnimatedTitle({
 }: AnimatedTitleProps) {
   const chars = Array.from(text);
   
-  // Extract custom scale variable and margin/font-size if provided
+  // Extract custom scale variable, optional translateY, and font-size if provided
   const { 
     '--title-scale': titleScale, 
+    '--title-ty': titleTy,
     fontSize,
-    marginBottom,
     ...restStyle 
   } = (style || {}) as any;
+
+  const scalePart = titleScale ? `scale(${titleScale})` : '';
+  const translatePart = titleTy ? `translateY(${titleTy})` : '';
+  const transform = [scalePart, translatePart].filter(Boolean).join(' ') || undefined;
 
   return (
     <Tag 
@@ -42,11 +46,12 @@ export function AnimatedTitle({
       style={restStyle}
     >
       <span 
-        className="inline-block origin-left"
+        className="inline-block"
         style={{ 
-          transform: titleScale ? `scale(${titleScale})` : undefined,
+          transform,
+          transformOrigin: 'left top',
+          willChange: transform ? 'transform' : undefined,
           fontSize: fontSize || undefined,
-          marginBottom: marginBottom || undefined,
         }}
       >
         {chars.map((ch, i) => {
