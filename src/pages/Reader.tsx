@@ -110,20 +110,36 @@ const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
 
 // ============= Inline editorial UI helpers (Reader-only) =============
 
+type GlassVariant = 'A' | 'B' | 'C';
+const glassChipClass: Record<GlassVariant, string> = {
+  A: 'glass-chip-subtle',
+  B: 'glass-chip-standard',
+  C: 'glass-chip-heavy',
+};
+const glassHeaderClass: Record<GlassVariant, string> = {
+  A: 'glass-subtle',
+  B: 'glass-standard',
+  C: 'glass-heavy',
+};
+
 interface HeaderChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  active?: boolean;
  children: ReactNode;
+ glass?: GlassVariant;
 }
 
 const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
- ({ active, children, className, ...props }, ref) => (
+ ({ active, children, className, glass, ...props }, ref) => (
  <button
  ref={ref}
- className={cn('flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ring-1 smooth-colors tap-scale-sm',
+ className={cn('flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm',
+   glass ? glassChipClass[glass] : 'bg-background/70 backdrop-blur-md',
  active
- ?'bg-primary/15 text-primary ring-primary/25':'bg-background/70 text-foreground/70 ring-border/40',
+ ? 'text-primary ring-primary/25 !bg-primary/15'
+ : 'text-foreground/70 ring-border/40',
  className,
  )}
+
  {...props}
  >
  {children}
@@ -131,6 +147,7 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
  ),
 );
 HeaderChip.displayName ='HeaderChip';
+
 
 const SettingsSection = ({ label, children }: { label: string; children: ReactNode }) => (
  <div>
@@ -215,6 +232,7 @@ export default function Reader() {
 
  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
+  const [glassVariant, setGlassVariant] = useState<GlassVariant>('A');
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
@@ -932,12 +950,10 @@ export default function Reader() {
 
  return (
  <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
- <header
- className="sticky top-0 z-30 backdrop-blur-xl"
- style={{ backgroundImage:`linear-gradient(180deg, ${book.coverColor}1f 0%, hsl(var(--background) / 0.85) 100%)`}}
- >
- <div className="flex items-center justify-between gap-2 px-3 py-2.5">
- <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
+  <header className={cn('sticky top-0 z-30', glassHeaderClass[glassVariant])}>
+
+  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+ <HeaderChip glass={glassVariant} onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
  <ArrowLeft className="h-5 w-5"/>
  </HeaderChip>
  <Popover
@@ -990,6 +1006,7 @@ export default function Reader() {
  </Popover>
  <div className="flex items-center gap-1">
  <HeaderChip
+ glass={glassVariant}
  onClick={() => setShowFurigana(!showFurigana)}
  active={showFurigana}
  title={showFurigana ?'Hide Furigana':'Show Furigana'}
@@ -997,6 +1014,7 @@ export default function Reader() {
  {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
  </HeaderChip>
  <HeaderChip
+ glass={glassVariant}
  onClick={handleToggleTranslations}
  active={showTranslations}
  title={showTranslations ?'Hide translations':'Show translations'}
@@ -1004,16 +1022,18 @@ export default function Reader() {
  <Languages className="h-5 w-5"/>
  </HeaderChip>
 
- <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
+ <HeaderChip glass={glassVariant} onClick={() => setShowGrammar(true)} title="Grammar Notes">
  <BookType className="h-5 w-5"/>
  </HeaderChip>
  <HeaderChip
+ glass={glassVariant}
  onClick={() => setShowSettings(!showSettings)}
  active={showSettings}
  title="Settings"
  >
  <Settings className="h-5 w-5"/>
  </HeaderChip>
+
  </div>
  </div>
  <div className="h-[2px] w-full bg-border/30">
@@ -1023,6 +1043,26 @@ export default function Reader() {
  />
  </div>
  </header>
+
+ {/* TEMP: Glass intensity switcher — remove after picking A/B/C */}
+ <div className="sticky top-[3.5rem] z-30 flex justify-center pointer-events-none">
+   <div className="pointer-events-auto mt-2 flex gap-0.5 rounded-full bg-foreground/10 p-0.5 backdrop-blur-md ring-1 ring-border/40">
+     {(['A','B','C'] as GlassVariant[]).map((v) => (
+       <button
+         key={v}
+         onClick={() => setGlassVariant(v)}
+         className={cn('h-6 w-8 rounded-full text-[10px] font-bold smooth-colors tap-scale-sm',
+           glassVariant === v
+             ? 'bg-background text-foreground shadow-sm'
+             : 'text-muted-foreground')}
+         aria-label={`Glass variant ${v}`}
+       >
+         {v}
+       </button>
+     ))}
+   </div>
+ </div>
+
 
  {(() => {
  const SectionLabel = ({ children }: { children: ReactNode }) => (
