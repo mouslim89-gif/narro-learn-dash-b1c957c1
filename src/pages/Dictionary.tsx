@@ -13,6 +13,33 @@ import { Input } from'@/components/ui/input';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { romajiToKana } from'@/lib/romaji';
 
+/**
+ * Rerank Jisho results so exact English-definition matches come first.
+ * Score: 3 = exact word match in a definition, 2 = exact match as one of multiple defs,
+ *        1 = whole-word substring, 0 = other. Stable sort preserves Jisho's order within ties.
+ */
+function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
+  const q = query.trim().toLowerCase();
+  if (!q || !/[a-zA-Z]/.test(q)) return results;
+  const wordRe = new RegExp(`\\b${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i');
+  const score = (r: JishoResult): number => {
+    let best = 0;
+    for (const sense of r.senses) {
+      for (const def of sense.english_definitions) {
+        const d = def.toLowerCase();
+        if (d === q) return 3;
+        if (d.split(/[;,]\s*/).some((p) => p.trim() === q)) best = Math.max(best, 2);
+        else if (wordRe.test(def)) best = Math.max(best, 1);
+      }
+    }
+    return best;
+  };
+  return [...results]
+    .map((r, i) => ({ r, i, s: score(r) }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map((x) => x.r);
+}
+
 export default function DictionaryPage() {
  const navigate = useNavigate();
  const [searchParams] = useSearchParams();
