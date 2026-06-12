@@ -111,7 +111,12 @@ export default function BookDetail() {
  
  <button
  onClick={() => navigate('/')}
- className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 smooth-colors tap-scale-sm"
+ className={cn(
+ "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm transition-[background-color,box-shadow,backdrop-filter] duration-200",
+ scrolled
+ ?"bg-background/85 backdrop-blur-xl ring-border/60 shadow-sm"
+ :"bg-background/70 backdrop-blur-md ring-border/40"
+ )}
  aria-label="Back"
  >
  <ArrowLeft className="h-[18px] w-[18px]"/>
