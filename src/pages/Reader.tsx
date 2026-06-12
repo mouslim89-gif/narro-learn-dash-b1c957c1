@@ -952,8 +952,8 @@ export default function Reader() {
  <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
   <header className={cn('sticky top-0 z-30', glassHeaderClass[glassVariant])}>
 
- <div className="flex items-center justify-between gap-2 px-3 py-2.5">
- <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
+  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+ <HeaderChip glass={glassVariant} onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
  <ArrowLeft className="h-5 w-5"/>
  </HeaderChip>
  <Popover
@@ -1006,6 +1006,7 @@ export default function Reader() {
  </Popover>
  <div className="flex items-center gap-1">
  <HeaderChip
+ glass={glassVariant}
  onClick={() => setShowFurigana(!showFurigana)}
  active={showFurigana}
  title={showFurigana ?'Hide Furigana':'Show Furigana'}
@@ -1013,6 +1014,7 @@ export default function Reader() {
  {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
  </HeaderChip>
  <HeaderChip
+ glass={glassVariant}
  onClick={handleToggleTranslations}
  active={showTranslations}
  title={showTranslations ?'Hide translations':'Show translations'}
@@ -1020,16 +1022,18 @@ export default function Reader() {
  <Languages className="h-5 w-5"/>
  </HeaderChip>
 
- <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
+ <HeaderChip glass={glassVariant} onClick={() => setShowGrammar(true)} title="Grammar Notes">
  <BookType className="h-5 w-5"/>
  </HeaderChip>
  <HeaderChip
+ glass={glassVariant}
  onClick={() => setShowSettings(!showSettings)}
  active={showSettings}
  title="Settings"
  >
  <Settings className="h-5 w-5"/>
  </HeaderChip>
+
  </div>
  </div>
  <div className="h-[2px] w-full bg-border/30">
