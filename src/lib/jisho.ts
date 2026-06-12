@@ -74,7 +74,8 @@ export function seedCache(entries: Record<string, CacheEntry>): void {
  }
 }
 
-export async function lookupWord(keyword: string): Promise<CacheEntry> {
+export async function lookupWord(keyword: string, forceLive = false): Promise<CacheEntry> {
+ if (!forceLive) {
  const existing = cache.get(keyword);
  // Use cache only if the entry actually has results, OR if we've already
  // attempted a live lookup for this keyword (to avoid hammering the API).
@@ -91,6 +92,7 @@ export async function lookupWord(keyword: string): Promise<CacheEntry> {
      return persisted;
    }
  } catch { /* ignore */ }
+ }
 
  const url =`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
  const response = await fetch(url, {
@@ -155,7 +157,12 @@ export async function preloadWords(
 }
 
 export async function searchJisho(query: string): Promise<JishoResult[]> {
- const entry = await lookupWord(query);
+ const hasLatin = /[a-zA-Z]/.test(query);
+ // English queries: lowercase (Jisho treats "Super" as a proper-noun search →
+ // Wikipedia-only results) and always fetch live so stale persisted entries
+ // (cached before this fix) can't shadow the corrected results.
+ const keyword = hasLatin ? query.toLowerCase() : query;
+ const entry = await lookupWord(keyword, hasLatin);
  return entry.results;
 }
 

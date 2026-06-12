@@ -32,6 +32,10 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
         else if (wordRe.test(def)) best = Math.max(best, 1);
       }
     }
+    // Push Wikipedia-only entries (proper nouns like band/album names) below real words.
+    if (best === 0 && r.senses.length > 0 && r.senses.every((s) => s.parts_of_speech.includes('Wikipedia definition'))) {
+      return -1;
+    }
     return best;
   };
   return [...results]
@@ -48,8 +52,10 @@ export default function DictionaryPage() {
  const { addWord, removeWord, hasWord } = useFlashcardStore();
  const [jishoResults, setJishoResults] = useState<JishoResult[]>(() => {
  try {
+ // v2: invalidates results cached before the English-search fix.
+ sessionStorage.removeItem('dictionary:results');
  const cachedQuery = sessionStorage.getItem('dictionary:query');
- const cachedResults = sessionStorage.getItem('dictionary:results');
+ const cachedResults = sessionStorage.getItem('dictionary:results:v2');
  if (cachedQuery && cachedQuery === initial && cachedResults) {
  return JSON.parse(cachedResults) as JishoResult[];
  }
@@ -69,7 +75,7 @@ export default function DictionaryPage() {
  useEffect(() => {
  if (!query.trim()) {
  setJishoResults([]);
- sessionStorage.removeItem('dictionary:results');
+ sessionStorage.removeItem('dictionary:results:v2');
  lastFetchedRef.current ='';
  return;
  }
@@ -84,7 +90,7 @@ export default function DictionaryPage() {
  setJishoResults(ranked);
  lastFetchedRef.current = query;
  try {
- sessionStorage.setItem('dictionary:results', JSON.stringify(ranked));
+ sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
  } catch {/* quota — ignore */}
  } catch {
  setJishoResults([]);

@@ -154,7 +154,10 @@ function getDeinflections(word: string): string[] {
 
 async function fetchWord(keyword: string, limit = 20) {
   try {
-    const res = await fetch(`${JISHO_API}?keyword=${encodeURIComponent(keyword)}`);
+    // Jisho treats capitalized Latin queries as proper-noun searches and returns
+    // only Wikipedia entries (e.g. "Super" → Superfly). Lowercase English queries.
+    const searchTerm = /[a-zA-Z]/.test(keyword) ? keyword.toLowerCase() : keyword;
+    const res = await fetch(`${JISHO_API}?keyword=${encodeURIComponent(searchTerm)}`);
     if (!res.ok) return { keyword, results: [], deinflected: null };
     const json = await res.json();
     let results = (json.data || []).slice(0, limit).map(mapResult);
