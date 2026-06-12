@@ -1044,6 +1044,26 @@ export default function Reader() {
  </div>
  </header>
 
+ {/* TEMP: Glass intensity switcher — remove after picking A/B/C */}
+ <div className="sticky top-[3.5rem] z-30 flex justify-center pointer-events-none">
+   <div className="pointer-events-auto mt-2 flex gap-0.5 rounded-full bg-foreground/10 p-0.5 backdrop-blur-md ring-1 ring-border/40">
+     {(['A','B','C'] as GlassVariant[]).map((v) => (
+       <button
+         key={v}
+         onClick={() => setGlassVariant(v)}
+         className={cn('h-6 w-8 rounded-full text-[10px] font-bold smooth-colors tap-scale-sm',
+           glassVariant === v
+             ? 'bg-background text-foreground shadow-sm'
+             : 'text-muted-foreground')}
+         aria-label={`Glass variant ${v}`}
+       >
+         {v}
+       </button>
+     ))}
+   </div>
+ </div>
+
+
  {(() => {
  const SectionLabel = ({ children }: { children: ReactNode }) => (
  <div className="flex items-center gap-3 mb-3 px-1">
