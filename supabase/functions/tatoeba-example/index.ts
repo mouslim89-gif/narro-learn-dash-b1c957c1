@@ -36,8 +36,15 @@ Deno.serve(async (req) => {
       );
     }
 
+    const MAX_JP_LEN = 60;
     const matchesTarget = (jp: string) =>
       jp.includes(word) || (altWord ? jp.includes(altWord) : false);
+    const isShortEnough = (jp: string) => [...jp].length <= MAX_JP_LEN;
+    const pickBest = (arr: Sentence[], n: number): Sentence[] => {
+      const short = arr.filter((s) => isShortEnough(s.japanese));
+      const pool = short.length > 0 ? short : arr;
+      return [...pool].sort((a, b) => [...a.japanese].length - [...b.japanese].length).slice(0, n);
+    };
 
     // 1. DB cache
     const { data: cached } = await supabase
@@ -54,14 +61,17 @@ Deno.serve(async (req) => {
           : [];
 
       const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
+      const shorts = filtered.filter((s) => isShortEnough(s.japanese));
+      const best = pickBest(filtered, limit);
 
-      if (filtered.length >= limit) {
-        const sliced = filtered.slice(0, limit);
+      // Only trust the cache if it contains at least one short-enough sentence;
+      // otherwise fall through to refetch fresh (shorter) examples.
+      if (shorts.length > 0 && best.length >= limit) {
         return new Response(
           JSON.stringify({
-            japanese: sliced[0]?.japanese ?? null,
-            english: sliced[0]?.english ?? null,
-            sentences: sliced,
+            japanese: best[0]?.japanese ?? null,
+            english: best[0]?.english ?? null,
+            sentences: best,
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
         );
@@ -75,7 +85,7 @@ Deno.serve(async (req) => {
     const seen = new Set<string>();
 
     for (const q of queries) {
-      const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&limit=${Math.max(8, limit + 4)}`;
+      const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&sort=words&limit=20`;
       const res = await fetch(url);
       if (!res.ok) {
         console.error('Tatoeba API error:', res.status);
@@ -96,25 +106,25 @@ Deno.serve(async (req) => {
             break;
           }
         }
-        if (collected.length >= limit) break;
       }
-      if (collected.length >= limit) break;
     }
 
-    if (collected.length > 0) {
+    const best = pickBest(collected, limit);
+
+    if (best.length > 0) {
       await supabase.from('example_sentences').upsert({
         word,
-        japanese: collected[0].japanese,
-        english: collected[0].english,
-        sentences: collected,
+        japanese: best[0].japanese,
+        english: best[0].english,
+        sentences: best,
       });
     }
 
     return new Response(
       JSON.stringify({
-        japanese: collected[0]?.japanese ?? null,
-        english: collected[0]?.english ?? null,
-        sentences: collected,
+        japanese: best[0]?.japanese ?? null,
+        english: best[0]?.english ?? null,
+        sentences: best,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
     );
