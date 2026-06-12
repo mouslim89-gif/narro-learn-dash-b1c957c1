@@ -32,6 +32,10 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
         else if (wordRe.test(def)) best = Math.max(best, 1);
       }
     }
+    // Push Wikipedia-only entries (proper nouns like band/album names) below real words.
+    if (best === 0 && r.senses.length > 0 && r.senses.every((s) => s.parts_of_speech.includes('Wikipedia definition'))) {
+      return -1;
+    }
     return best;
   };
   return [...results]
