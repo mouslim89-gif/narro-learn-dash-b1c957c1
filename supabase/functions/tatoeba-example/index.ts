@@ -36,8 +36,15 @@ Deno.serve(async (req) => {
       );
     }
 
+    const MAX_JP_LEN = 60;
     const matchesTarget = (jp: string) =>
       jp.includes(word) || (altWord ? jp.includes(altWord) : false);
+    const isShortEnough = (jp: string) => [...jp].length <= MAX_JP_LEN;
+    const pickBest = (arr: Sentence[], n: number): Sentence[] => {
+      const short = arr.filter((s) => isShortEnough(s.japanese));
+      const pool = short.length > 0 ? short : arr;
+      return [...pool].sort((a, b) => [...a.japanese].length - [...b.japanese].length).slice(0, n);
+    };
 
     // 1. DB cache
     const { data: cached } = await supabase
