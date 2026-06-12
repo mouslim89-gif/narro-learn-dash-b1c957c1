@@ -642,25 +642,40 @@
 }
 
 /* ──────────────────────────────────────────
-   Glass surfaces — experimental
+   Glass surfaces — Reader header
+   Flat lens model: uniform blur + saturation across the interior,
+   refraction only on the bottom edge band (SVG #liquid-glass filter
+   whose displacement map is built procedurally in JS).
    ────────────────────────────────────────── */
 .glass-subtle {
-  background: hsl(0 0% 100% / 0.25);
-  backdrop-filter: url(#liquid-glass) blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border-bottom: 1px solid hsl(var(--border) / 0.35);
+  background: transparent;
+  backdrop-filter: blur(14px) saturate(170%) url(#liquid-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  /* Bottom hairline + top reflection + soft inner shadow at the bottom edge */
   box-shadow:
     inset 0 1px 0 hsl(0 0% 100% / 0.22),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.04);
+    inset 0 -1px 0 hsl(0 0% 100% / 0.12),
+    inset 0 -10px 14px -10px hsl(0 0% 0% / 0.08);
+  /* Very light reflection sheen near the top */
+  background-image: linear-gradient(
+    to bottom,
+    hsl(0 0% 100% / 0.06) 0%,
+    hsl(0 0% 100% / 0) 35%
+  );
   transform: translateZ(0);
-  will-change: backdrop-filter;
   isolation: isolate;
 }
 .dark .glass-subtle {
-  background: hsl(0 0% 0% / 0.18);
+  background: transparent;
   box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.08),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.2);
+    inset 0 1px 0 hsl(0 0% 100% / 0.10),
+    inset 0 -1px 0 hsl(0 0% 100% / 0.05),
+    inset 0 -10px 14px -10px hsl(0 0% 0% / 0.35);
+  background-image: linear-gradient(
+    to bottom,
+    hsl(0 0% 100% / 0.04) 0%,
+    hsl(0 0% 100% / 0) 35%
+  );
 }
 
 .glass-chip {
