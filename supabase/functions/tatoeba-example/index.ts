@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
     const seen = new Set<string>();
 
     for (const q of queries) {
-      const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&limit=${Math.max(8, limit + 4)}`;
+      const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&sort=words&limit=20`;
       const res = await fetch(url);
       if (!res.ok) {
         console.error('Tatoeba API error:', res.status);
@@ -103,25 +103,25 @@ Deno.serve(async (req) => {
             break;
           }
         }
-        if (collected.length >= limit) break;
       }
-      if (collected.length >= limit) break;
     }
 
-    if (collected.length > 0) {
+    const best = pickBest(collected, limit);
+
+    if (best.length > 0) {
       await supabase.from('example_sentences').upsert({
         word,
-        japanese: collected[0].japanese,
-        english: collected[0].english,
-        sentences: collected,
+        japanese: best[0].japanese,
+        english: best[0].english,
+        sentences: best,
       });
     }
 
     return new Response(
       JSON.stringify({
-        japanese: collected[0]?.japanese ?? null,
-        english: collected[0]?.english ?? null,
-        sentences: collected,
+        japanese: best[0]?.japanese ?? null,
+        english: best[0]?.english ?? null,
+        sentences: best,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
     );
