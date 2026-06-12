@@ -71,7 +71,12 @@ export default function Settings() {
  return (
  <div className="pb-24 min-h-screen">
  {/* Editorial header */}
- <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
+ <header
+ className={cn(
+ "library-header-bg sticky top-0 z-30 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-5 flex items-end justify-between overflow-hidden transition-[background-color,box-shadow,backdrop-filter] duration-200",
+ scrolled && "bg-background/85 backdrop-blur-xl shadow-sm ring-1 ring-border/40"
+ )}
+ >
  <span className="library-kanji-watermark"aria-hidden="true">設</span>
  <div className="relative z-10 flex items-center gap-3">
  <button
