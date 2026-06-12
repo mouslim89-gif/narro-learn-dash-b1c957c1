@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from'react-router-dom';
 import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasParts, partChapterId, DEFAULT_CHAPTER_ID, type Difficulty } from'@/data/books';
 
-import { useState } from'react';
+import { useEffect, useState } from'react';
 import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
