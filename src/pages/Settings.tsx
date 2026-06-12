@@ -1,6 +1,6 @@
 import { Link, useNavigate } from'react-router-dom';
 import { ArrowLeft, LogOut, Loader2, User as UserIcon } from'lucide-react';
-import { useState } from'react';
+import { useEffect, useState } from'react';
 import { Switch } from'@/components/ui/switch';
 import { Label } from'@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from'@/stores/reading-progress';
@@ -45,6 +45,14 @@ export default function Settings() {
  const { user, signOut } = useAuth();
  const navigate = useNavigate();
  const [deleting, setDeleting] = useState(false);
+ const [scrolled, setScrolled] = useState(false);
+
+ useEffect(() => {
+ const onScroll = () => setScrolled(window.scrollY > 8);
+ onScroll();
+ window.addEventListener('scroll', onScroll, { passive: true });
+ return () => window.removeEventListener('scroll', onScroll);
+ }, []);
 
  const handleSignOut = async () => {
  await signOut();
