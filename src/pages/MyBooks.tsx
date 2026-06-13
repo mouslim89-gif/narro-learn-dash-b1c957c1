@@ -79,10 +79,10 @@ export default function MyBooks() {
  style={{
  paddingTop: 'calc(40px - var(--p, 0) * 28px)',
  paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
- backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
- backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.42))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 6px)) saturate(180%)',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 6px)) saturate(180%)',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.35))',
  }}
  >
  <div className="min-w-0">
