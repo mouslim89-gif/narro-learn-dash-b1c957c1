@@ -32,7 +32,7 @@ export function BottomNav() {
  <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
  <SyncIndicator />
  <div className="mx-auto max-w-lg px-3 pb-2 pt-1">
- <div className="relative flex items-center justify-between rounded-full border border-border/40 bg-card/80 px-1.5 py-1.5 shadow-lg backdrop-blur-xl">
+ <div className="nav-dock relative flex items-center justify-between rounded-full border border-border/40 bg-card/90 px-1.5 py-1.5 backdrop-blur-xl">
  {tabs.map(({ path, label, icon: Icon }) => {
  const active = path ==='/'? pathname ==='/': pathname.startsWith(path);
  const showBadge = path ==='/flashcards'&& dueCount > 0;
@@ -46,7 +46,7 @@ export function BottomNav() {
  {active && (
  <motion.span
  layoutId="bottom-nav-pill"
- className="absolute inset-0 rounded-full bg-foreground/10"
+ className="nav-pill-active absolute inset-0 rounded-full"
  transition={{ type:'spring', stiffness: 380, damping: 32 }}
  />
  )}
