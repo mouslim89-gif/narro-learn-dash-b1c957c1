@@ -119,9 +119,9 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
  ({ active, children, className, ...props }, ref) => (
  <button
  ref={ref}
- className={cn('flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm glass-chip-subtle header-chip',
+  className={cn('flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm glass-chip-header header-chip',
  active
- ? 'text-primary ring-primary/25 !bg-primary/15'
+ ? 'text-primary ring-primary/25'
  : 'text-foreground/70 ring-border/40',
  className,
  )}
