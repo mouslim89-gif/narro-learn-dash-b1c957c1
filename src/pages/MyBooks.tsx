@@ -96,7 +96,7 @@ export default function MyBooks() {
  />
  </div>
  <Link to="/settings">
- <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full ring-1 ring-border/40 chip-relief">
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40">
  <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
