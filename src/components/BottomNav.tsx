@@ -46,7 +46,7 @@ export function BottomNav() {
  {active && (
  <motion.span
  layoutId="bottom-nav-pill"
- className="nav-pill-active absolute inset-0 rounded-full"
+ className="nav-pill-active absolute inset-0 overflow-hidden rounded-full"
  transition={{ type:'spring', stiffness: 380, damping: 32 }}
  />
  )}
