@@ -77,7 +77,7 @@ export default function Settings() {
  <button
  onClick={() => window.history.back()}
  aria-label="Back"
- className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 flex items-center justify-center smooth-colors tap-scale-sm"
+ className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip flex items-center justify-center smooth-colors tap-scale-sm"
  >
  <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
