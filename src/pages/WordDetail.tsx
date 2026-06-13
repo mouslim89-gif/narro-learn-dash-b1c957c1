@@ -121,7 +121,7 @@ export default function WordDetail() {
  return (
  <div className="pb-24">
  {/* Top bar */}
- <header className="sticky top-0 z-20 flex items-center gap-3 px-4 pt-4 pb-3 bg-background/80 backdrop-blur-md">
+ <header className="sticky top-0 z-20 flex items-center gap-3 px-4 pt-4 pb-3 glass-subtle">
  <Button
  variant="ghost"
  size="icon"
