@@ -1,60 +1,56 @@
-## Goal
+# Two dictionary bugs
 
-Transformer la pilule active de la BottomNav en effet **liquid glass + lentille radiale** (CSS only). Pas d'animation de reflet, pas de changement de centrage.
+## 1. "Cat" → 猫 ねこま (nekoma) instead of ねこ (neko)
 
-## Changements
+**Root cause.** Jisho actually returns two entries that contain 猫:
+- `猫` (common): senses = `["cat (esp. the domestic cat, Felis catus)", ...]` → scored **1** by `rankByRelevance` (only a `\bcat\b` substring match, not an exact "cat").
+- `猫-1` (uncommon, archaic): senses = `[["cat"]]` → scored **3** (exact match). Its first japanese entry is `{word:"猫", reading:"ねこま"}`.
 
-### 1. `src/index.css` — refonte de `.nav-pill-active`
+So `猫-1` wins the rerank, and the card renders the kanji 猫 with reading ねこま. It's a real Jisho entry, just an obscure archaic reading that shouldn't outrank the common 猫/ねこ.
 
-Remplacer la définition actuelle par un empilement de couches glass + lentille :
+**Fix in `src/pages/Dictionary.tsx` → `rankByRelevance`:**
+1. Treat a definition that **starts with the query followed by space, `(`, `[`, or end** as an exact match (score 3). This catches `"cat (esp. the domestic cat…)"` → 3.
+2. Add `is_common` as a tie-breaker after the score so common entries float to the top when scores tie.
 
-- **Base translucide** : `hsl(var(--card) / 0.55)` au lieu du `foreground/0.08` actuel — vrai feeling verre, pas un gris terne.
-- **Backdrop-filter** : `blur(10px) saturate(180%)` → reprend le contenu derrière (utile car le dock est déjà flouté, ça crée un second niveau de réfraction).
-- **Lentille radiale** (effet bombé sans SVG) via `background-image` empilés :
-  - Highlight haut bombé : `radial-gradient(ellipse 80% 90% at 50% 30%, hsl(0 0% 100% / 0.35), transparent 60%)`.
-  - Ombre douce du bas : `radial-gradient(ellipse 70% 50% at 50% 100%, hsl(var(--foreground) / 0.05), transparent 70%)`.
-- **Bord cristallin** : `border: 1px solid hsl(0 0% 100% / 0.28)`.
-- **Insets** affinés : top highlight `0.6`, bottom shadow `0.08`, + ombre externe minimale `0 1px 2px`.
-- **Variante dark** : base `hsl(var(--card) / 0.4)`, highlight top `0.12`, border `hsl(0 0% 100% / 0.10)`.
+Result for "cat": 猫 (common, score 3) ranks above 猫-1 (uncommon, score 3).
 
-Aucun pseudo-élément, aucune animation — le slide entre tabs reste géré par Framer Motion (`layoutId`).
+## 2. 超絶 rendered vertically (one kanji per line)
 
-### 2. `src/components/BottomNav.tsx` — ajustement mineur
+**Root cause.** In `src/pages/Dictionary.tsx`, the title row is:
 
-- Ajouter `overflow-hidden` au `motion.span` actif pour que les gradients respectent le `rounded-full`.
-
-## Détails techniques
-
-```css
-.nav-pill-active {
-  background:
-    radial-gradient(ellipse 80% 90% at 50% 30%, hsl(0 0% 100% / 0.35), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 50% 100%, hsl(var(--foreground) / 0.05), transparent 70%),
-    hsl(var(--card) / 0.55);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  border: 1px solid hsl(0 0% 100% / 0.28);
-  box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.6),
-    inset 0 -1px 1px hsl(var(--foreground) / 0.08),
-    0 1px 2px hsl(210 22% 15% / 0.06);
-}
-.dark .nav-pill-active {
-  background:
-    radial-gradient(ellipse 80% 90% at 50% 30%, hsl(0 0% 100% / 0.12), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 50% 100%, hsl(0 0% 0% / 0.20), transparent 70%),
-    hsl(var(--card) / 0.40);
-  border: 1px solid hsl(0 0% 100% / 0.10);
-  box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.10),
-    inset 0 -1px 1px hsl(0 0% 0% / 0.30),
-    0 1px 2px hsl(0 0% 0% / 0.30);
-}
+```tsx
+<div className="flex items-center gap-1.5 pr-12">
+  <p className="font-japanese text-xl font-bold">{word}</p>
+  <span className="font-japanese text-sm text-muted-foreground">{reading}</span>
+  <span className="text-xs italic">{toRomaji(reading)}</span>
+  <PlayWordButton ... />
+</div>
 ```
 
-## Hors scope
+On a 360px viewport, `超絶 + ちょうぜつ + chouzetsu + 🔊` overflows. Because nothing has `whitespace-nowrap` or `flex-shrink-0`, the browser breaks every text node character-by-character — kanji and kana both go vertical.
 
-- Pas de centrage modifié.
-- Pas d'animation de reflet / shimmer.
-- Pas de SVG filter.
-- Pas de modification du `.nav-dock`.
+**Fix:**
+- Add `flex-wrap` to the row so overflow wraps onto a new line instead of breaking inside words.
+- Add `whitespace-nowrap` (and `shrink-0` for the kanji) to the three text spans so each one stays on a single line.
+- Keep the reading + romaji together so they wrap as a unit below the kanji when space is tight.
+
+Concretely:
+```tsx
+<div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 pr-12">
+  <p className="font-japanese text-xl font-bold whitespace-nowrap shrink-0">{word}</p>
+  <div className="flex items-center gap-1.5 flex-wrap">
+    {reading && reading !== word && (
+      <span className="font-japanese text-sm text-muted-foreground whitespace-nowrap">{reading}</span>
+    )}
+    {reading && (
+      <span className="text-xs text-muted-foreground/70 italic whitespace-nowrap">{toRomaji(reading)}</span>
+    )}
+    <span onClick={(e) => e.stopPropagation()}>
+      <PlayWordButton word={word} reading={reading} size={16} />
+    </span>
+  </div>
+</div>
+```
+
+## Scope
+Only `src/pages/Dictionary.tsx`. No edge function or store changes. Same fix path applies to both result cards on the Dictionary page.
