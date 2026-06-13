@@ -157,7 +157,7 @@ export default function DictionaryPage() {
  <Button
  variant="ghost"
  size="icon"
- className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40 shadow-sm"
+ className="h-10 w-10 rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
  >
  <Settings className="h-[18px] w-[18px]"/>
  </Button>
