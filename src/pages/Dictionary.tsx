@@ -256,19 +256,19 @@ export default function DictionaryPage() {
  {/* Tags row */}
  <div className="mt-2 flex flex-wrap items-center gap-1.5">
  {isCommon && (
- <span className="rounded-full bg-gradient-to-b from-primary/20 to-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/25 shadow-sm shadow-primary/10 [text-shadow:0_1px_0_hsl(var(--background)/0.4)]">
+ <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
  ✦ Common
  </span>
  )}
  {result.jlpt.length > 0 && (
- <span className="rounded-full bg-gradient-to-b from-accent/20 to-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/25 shadow-sm shadow-accent/10 [text-shadow:0_1px_0_hsl(var(--background)/0.4)]">
+ <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/20">
  {result.jlpt[0]?.replace('jlpt-','JLPT')}
  </span>
  )}
  {result.senses[0]?.parts_of_speech?.map((pos, i) => (
  <span
  key={i}
- className="rounded-full bg-gradient-to-b from-muted to-muted/60 px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground ring-1 ring-border/50 shadow-sm shadow-foreground/5 [text-shadow:0_1px_0_hsl(var(--background)/0.4)]"
+ className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground ring-1 ring-border/40"
  >
  {pos}
  </span>
