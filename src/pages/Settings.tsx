@@ -134,7 +134,7 @@ export default function Settings() {
  onClick={() => setFontSize(opt.value)}
  className={cn('h-7 w-9 rounded-full text-sm font-semibold smooth-colors tap-scale-sm',
  fontSize === opt.value
- ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground')}
+ ?'relief-raised bg-card text-foreground ring-1 ring-border/40':'text-muted-foreground')}
  >
  {opt.label}
  </button>
