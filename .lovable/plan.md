@@ -1,60 +1,45 @@
-## Goal
+## Scope
 
-Make the soft, slightly-diffuse relief currently used on the active bottom-nav pill the **standard relief language** of the app. Expose it as a single reusable utility class so any future raised element can opt in with one class.
+Deux changements visuels distincts, ciblés.
 
-## Changes (only `src/index.css`)
+### 1. Relief `.relief-raised` sur les toggles segmentés des settings
 
-### 1. New utility `.relief-raised`
+Les "toggles" ici = boutons-pills des segmented rows (pas les `Switch` Radix qui ont déjà leur propre relief interne).
 
-Holds the box-shadow recipe that's currently in `.nav-pill-active`, with light + dark mode variants. No background-color — callers keep their own `bg-*` (e.g. header chips stay on `bg-card`).
+**Cibles concrètes :**
+- `src/pages/Settings.tsx` — pills S/M/L de la rangée *Font size* (lignes 131–141) : le pill **actif** reçoit `.relief-raised`, les inactifs restent plats (cohérent avec le pattern actuel actif=relevé).
+- `src/pages/Reader.tsx` — composant `SegmentedRow` (lignes 156–184) utilisé pour Difficulty, Font size, Japanese font, etc. dans le panneau de settings du Reader. Le bouton **sélectionné** reçoit `.relief-raised`. On garde le `linear-gradient` actuel + le ring primary. Les non-sélectionnés restent plats.
 
-Light mode:
+Pas de changement sur les `Switch` Radix (déjà ok, leur thumb a déjà une ombre).
+Pas de changement sur les autres CTA / cards, hors scope.
+
+### 2. Reader header chips — "incolores" + plus flous que le header
+
+État actuel (`HeaderChip` ligne 118 de `Reader.tsx`) :
 ```
-box-shadow:
-  0 1px 0 hsl(210 22% 15% / 0.15),
-  0 2px 4px -1px hsl(210 22% 15% / 0.18),
-  inset 0 1px 0 hsl(0 0% 100% / 0.75),
-  inset 0 -1px 0 hsl(210 22% 15% / 0.10);
+glass-chip-subtle header-chip + ring-1 ring-border/40
+glass-chip-subtle = bg hsl(--background)/0.32, blur(5px)
+header = glass-subtle = bg hsl(--background)/0.42, blur(6px)
 ```
+Donc actuellement les chips sont **plus transparents** que le header → ils se découpent visuellement.
 
-Dark mode (`.dark .relief-raised`):
-```
-box-shadow:
-  0 1px 2px hsl(0 0% 0% / 0.35),
-  0 2px 6px -1px hsl(0 0% 0% / 0.40),
-  inset 0 1px 0 hsl(0 0% 100% / 0.08),
-  inset 0 -1px 0 hsl(0 0% 0% / 0.30);
-```
+**Changement :** créer une nouvelle classe `.glass-chip-header` (dans `src/index.css`) qui :
+- supprime toute teinte propre : background `transparent` (ou `hsl(--background)/0.10` très léger pour la lisibilité de l'icône)
+- pousse le `backdrop-filter: blur(14px) saturate(180%)` (vs 6px du header)
 
-Also add a `:active` state that softens the relief slightly (for tappable surfaces like header chips):
-```
-.relief-raised:active {
-  box-shadow:
-    0 1px 2px hsl(210 22% 15% / 0.10),
-    inset 0 1px 2px hsl(210 22% 15% / 0.10);
-}
-```
+Le chip apparaît alors comme une zone du header un peu plus floue/laiteuse, sans coloration propre. On **conserve** `.header-chip` (le relief = standard de l'app) et le `ring-1 ring-border/40`.
 
-### 2. Refactor `.header-chip`
+Remplacer `glass-chip-subtle` → `glass-chip-header` uniquement dans `HeaderChip` (Reader.tsx ligne 122). L'autre usage de `glass-chip-subtle` (BookDetail back/favorite) n'est **pas** touché — c'est un contexte différent (overlay sur cover, pas sur header).
 
-Replace its current crisp/hard-edged shadows (the ones I just gave it in the previous turn) with the same recipe as `.relief-raised`. Background stays `bg-card` (handled by the consumer, not the class). Drop its custom `:active` block since `.relief-raised:active` covers it.
+État actif (chip avec `active=true`) : on **enlève** le tint `!bg-primary/15` et on garde uniquement `text-primary` + `ring-primary/25` → reste incolore comme demandé, l'état actif se lit par la couleur de l'icône + le ring.
 
-### 3. Refactor `.nav-pill-active`
+### Hors scope (sécurité "si je dis n'importe quoi")
+- Pas de touche au `nav-dock`, aux cards, aux CTA primaires.
+- Pas de touche aux chips header des autres pages (Library/MyBooks/Dictionary) — ceux-là ont déjà le bon style sur fond opaque.
+- Pas de touche au back-button de BookDetail / favorite (contexte overlay).
 
-Keep only the background-color (`hsl(var(--foreground) / 0.08)` light, `/0.10` dark) — delegate the shadow to `.relief-raised`. In `BottomNav.tsx` this means the active pill `motion.span` gets both classes: `nav-pill-active relief-raised`.
+### Risques
+- Le blur 14px peut être lourd sur mobile bas de gamme. Mitigation : `will-change: backdrop-filter` est déjà actif via `.glass-*`. Si test perçu lourd, on redescend à 10px.
+- État actif sans tint : risque de moindre lisibilité. Mitigation : on garde `text-primary` + `ring-primary/25` qui suffisent à signaler.
 
-### 4. Keep `.nav-dock` as-is
-
-The dock keeps its crisp layered relief — different role (container, not raised chip). Not in scope per your earlier feedback flow.
-
-## Files touched
-
-- `src/index.css` — add `.relief-raised`, simplify `.header-chip` and `.nav-pill-active`
-- `src/components/BottomNav.tsx` — add `relief-raised` to the active pill `motion.span`
-
-## Result
-
-- Single source of truth for "raised element" relief
-- Header chips and active nav pill share identical shadows (your standard)
-- Future raised surfaces just need `className="... relief-raised"`
-- Visually: header chips become softer/more elevated, matching the active tab — exactly the effect you liked
+Confirme et je passe en build.
