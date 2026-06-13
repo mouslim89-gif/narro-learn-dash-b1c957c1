@@ -45,10 +45,10 @@ export default function Library() {
  style={{
  paddingTop: 'calc(48px - var(--p, 0) * 36px)',
  paddingBottom: 'calc(24px - var(--p, 0) * 16px)',
- backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
- backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.42))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 6px)) saturate(180%)',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 6px)) saturate(180%)',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.35))',
  transition: 'border-color 120ms linear',
  }}
  >
