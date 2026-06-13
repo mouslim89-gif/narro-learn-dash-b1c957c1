@@ -126,7 +126,7 @@ export default function WordDetail() {
  variant="ghost"
  size="icon"
  onClick={handleBack}
- className="h-9 w-9 rounded-full bg-muted/60 ring-1 ring-border/40 shrink-0"
+ className="h-9 w-9 rounded-full bg-muted/60 ring-1 ring-border/40 shrink-0 header-chip"
  aria-label="Back"
  >
  <ArrowLeft className="h-[18px] w-[18px]"/>
@@ -139,8 +139,8 @@ export default function WordDetail() {
  <button
  onClick={toggleSave}
  aria-label={saved ?'Remove from flashcards':'Save word'}
- className={`h-9 w-9 rounded-full ring-1 ring-border/40 bg-muted/60 flex items-center justify-center shrink-0 transition-colors ${
- saved ?'text-accent':'text-muted-foreground'}`}
+  className={`h-9 w-9 rounded-full ring-1 ring-border/40 bg-muted/60 flex items-center justify-center shrink-0 header-chip transition-colors ${
+  saved ?'text-accent':'text-muted-foreground'}`}
  >
  <Star className="h-4 w-4"fill={saved ?'currentColor':'none'} />
  </button>
