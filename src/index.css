@@ -234,22 +234,20 @@
  inset 0 1px 2px hsl(210 22% 15% / 0.10);
 }
 
-/* Bottom nav dock — subtle floating relief on the whole pill bar. */
+/* Bottom nav dock — crisp, defined relief (no diffuse blur). */
 .nav-dock {
  box-shadow:
- 0 1px 1px hsl(210 22% 15% / 0.04),
- 0 4px 12px -2px hsl(210 22% 15% / 0.08),
- 0 10px 24px -8px hsl(210 22% 15% / 0.10),
- inset 0 1px 0 hsl(0 0% 100% / 0.7),
- inset 0 -1px 0 hsl(210 22% 15% / 0.05);
+ 0 1px 0 hsl(210 22% 15% / 0.10),
+ 0 2px 0 hsl(210 22% 15% / 0.05),
+ inset 0 1px 0 hsl(0 0% 100% / 0.8),
+ inset 0 -1px 0 hsl(210 22% 15% / 0.06);
 }
 .dark .nav-dock {
  box-shadow:
- 0 1px 1px hsl(0 0% 0% / 0.30),
- 0 4px 12px -2px hsl(0 0% 0% / 0.40),
- 0 10px 24px -8px hsl(0 0% 0% / 0.45),
- inset 0 1px 0 hsl(0 0% 100% / 0.06),
- inset 0 -1px 0 hsl(0 0% 0% / 0.30);
+ 0 1px 0 hsl(0 0% 0% / 0.5),
+ 0 2px 0 hsl(0 0% 0% / 0.35),
+ inset 0 1px 0 hsl(0 0% 100% / 0.08),
+ inset 0 -1px 0 hsl(0 0% 0% / 0.35);
 }
 
 /* Active nav pill — stronger relief on the selected tab, sits above the dock. */
