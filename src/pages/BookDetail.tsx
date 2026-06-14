@@ -171,7 +171,7 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
- <p className="text-sm leading-relaxed text-muted-foreground">A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home, only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final and devastating gift. pour les section labels, c'est le style de settings qu'il faut définir comme la norme.</p>
+ <p className="text-sm leading-relaxed text-muted-foreground">A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home, only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final and devastating gift. pour le hairline du header, j'ai pas très bien compris. tu peux expliquer c'est quoi ?</p>
 
  <section className="mt-8">
         <SectionLabel>Reading Level</SectionLabel>
