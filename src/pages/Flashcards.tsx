@@ -265,31 +265,40 @@ export default function Flashcards() {
  const pct = Math.min(100, (mastery / 5) * 100);
  return (
  <li key={w.id}>
- <div className="relative flex items-center gap-3 rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift">
- <span className={cn('h-10 w-1.5 flex-shrink-0 rounded-full', LEVEL_BAR[level])} aria-hidden />
- <div className="min-w-0 flex-1">
- <div className="flex items-baseline gap-2">
- <p className="font-japanese text-[18px] font-bold leading-tight truncate">{w.word}</p>
- {w.reading && w.reading !== w.word && (
- <p className="font-japanese text-[12px] text-muted-foreground truncate">{w.reading}</p>
- )}
- {isDue && <span className="ml-auto rounded-full bg-[hsl(var(--state-due)/0.15)] px-2 py-0.5 text-[10px] font-bold text-[hsl(var(--state-due))]">Due</span>}
- </div>
- <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{w.meanings.join(',')}</p>
- <div className="mt-2 flex items-center gap-2">
- <Progress value={pct} className="h-1 flex-1"/>
- <span className="text-[10px] font-semibold tabular-nums text-foreground/60">{Math.round(pct)}%</span>
- </div>
- </div>
- <PlayWordButton word={w.word} reading={w.reading} className="flex-shrink-0"/>
- <button
- onClick={() => removeWord(w.id)}
- className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground smooth-colors tap-scale-sm"
- aria-label="Delete"
- >
- <Trash2 className="h-3.5 w-3.5"/>
- </button>
- </div>
+              <Link 
+                to={`/dictionary/${encodeURIComponent(w.word)}`}
+                className="relative flex items-center gap-3 rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift tap-scale group"
+              >
+                <span className={cn('h-10 w-1.5 flex-shrink-0 rounded-full', LEVEL_BAR[level])} aria-hidden />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <p className="font-japanese text-[18px] font-bold leading-tight truncate">{w.word}</p>
+                    {w.reading && w.reading !== w.word && (
+                      <p className="font-japanese text-[12px] text-muted-foreground truncate">{w.reading}</p>
+                    )}
+                    {isDue && <span className="ml-auto rounded-full bg-[hsl(var(--state-due)/0.15)] px-2 py-0.5 text-[10px] font-bold text-[hsl(var(--state-due))]">Due</span>}
+                  </div>
+                  <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{w.meanings.join(',')}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Progress value={pct} className="h-1 flex-1"/>
+                    <span className="text-[10px] font-semibold tabular-nums text-foreground/60">{Math.round(pct)}%</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                  <PlayWordButton word={w.word} reading={w.reading} className="flex-shrink-0"/>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      removeWord(w.id);
+                    }}
+                    className="flex-shrink-0 rounded-full p-1.5 text-muted-foreground hover:text-destructive smooth-colors tap-scale-sm"
+                    aria-label="Delete"
+                  >
+                    <Trash2 className="h-3.5 w-3.5"/>
+                  </button>
+                </div>
+              </Link>
  </li>
  );
  })}
