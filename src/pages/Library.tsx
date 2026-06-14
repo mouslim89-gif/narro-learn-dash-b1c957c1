@@ -47,9 +47,10 @@ export default function Library() {
  paddingBottom: 'calc(24px - var(--p, 0) * 16px)',
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- }}
- >
+    WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+    borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+  }}
+>
  <span
  className="library-kanji-watermark"
  aria-hidden="true"
@@ -75,12 +76,6 @@ export default function Library() {
  </Button>
  </Link>
  </div>
-  <div
-  className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-border"
-  style={{ opacity: 'calc(var(--p, 0) * 0.5)' }}
-  aria-hidden="true"
-  />
- </header>
 
  {/* Search */}
  <div className="px-6 pt-1 pb-3">
