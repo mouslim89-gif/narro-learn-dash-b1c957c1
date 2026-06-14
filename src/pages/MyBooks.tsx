@@ -141,12 +141,13 @@ export default function MyBooks() {
           <span className="section-bullet" />Bookshelf
         </p>
         <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
- {bookProgressList.map(({ book, progress: p }) => (
- <BookShelfRow key={book.id} book={book} progress={p} />
- ))}
- </div>
- )}
- </div>
- </div>
+          {bookProgressList.map(({ book, progress: p }) => (
+            <BookShelfRow key={book.id} book={book} progress={p} />
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
  );
 }
