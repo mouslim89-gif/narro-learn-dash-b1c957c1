@@ -171,8 +171,10 @@ export default function BookDetail() {
  <div className="stagger-children px-6">
  <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
-      <section className="mt-8">
-        <h2 className="font-serif text-lg font-semibold mb-3">Reading Level</h2>
+ <section className="mt-8">
+ <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+ <span className="section-bullet"/>Reading Level
+ </p>
  <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];

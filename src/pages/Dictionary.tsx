@@ -136,19 +136,15 @@ export default function DictionaryPage() {
  <header
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
-      style={{
-        paddingTop: 'calc(40px - var(--p, 0) * 28px)',
-        paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
-        backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
-        backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
-        WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
-      }}
-    >
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-border"
-        style={{ opacity: 'calc(var(--p, 0) * 0.5)' }}
-        aria-hidden="true"
-      />
+ style={{
+ paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ }}
+ >
  <AnimatedTitle
  text="Dictionary"
  className="font-serif font-bold leading-none tracking-tight"

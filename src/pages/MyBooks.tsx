@@ -76,19 +76,15 @@ export default function MyBooks() {
  <header
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
-      style={{
-        paddingTop: 'calc(40px - var(--p, 0) * 28px)',
-        paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
-        backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
-        backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
-        WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
-      }}
-    >
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-border"
-        style={{ opacity: 'calc(var(--p, 0) * 0.5)' }}
-        aria-hidden="true"
-      />
+ style={{
+ paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+ }}
+ >
  <div className="min-w-0">
          <AnimatedTitle
  text="My Books"
@@ -117,7 +113,7 @@ export default function MyBooks() {
  >
  <Icon className="h-4 w-4"style={{ color:`hsl(${tint})`}} />
  <p className="mt-3 text-3xl font-bold tabular-nums text-foreground">{value}</p>
- <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">{label}</p>
+ <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
  </div>
  ))}
  </div>

@@ -1,16 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Star, Loader2 } from 'lucide-react';
-import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
-import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
-import { PlayWordButton } from '@/components/PlayWordButton';
-import { ConjugationTable, getConjugations } from '@/components/ConjugationTable';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { toRomaji } from 'wanakana';
-import { fetchExamples, type ExampleSentence } from '@/lib/tatoeba';
-import { extractKanji, fetchKanji, type KanjiDetails } from '@/lib/kanji';
-import { cn } from '@/lib/utils';
+import { useEffect, useState } from'react';
+import { useNavigate, useParams, Link } from'react-router-dom';
+import { ArrowLeft, Star, Loader2 } from'lucide-react';
+import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
+import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
+import { PlayWordButton } from'@/components/PlayWordButton';
+import { ConjugationTable, getConjugations } from'@/components/ConjugationTable';
+import { Button } from'@/components/ui/button';
+import { Skeleton } from'@/components/ui/skeleton';
+import { toRomaji } from'wanakana';
+import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
+import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
@@ -119,26 +118,26 @@ export default function WordDetail() {
  );
  };
 
-  return (
-    <div className="pb-24">
-      {/* Top bar */}
-      <header className="sticky top-0 z-30 flex items-center gap-3 px-6 h-16 bg-background/85 backdrop-blur-xl border-b border-border/50">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleBack}
-          className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
-          aria-label="Back"
-        >
-          <ArrowLeft className="h-[18px] w-[18px]"/>
-        </Button>
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-medium tracking-wider text-muted-foreground leading-none">Dictionary</p>
-          <p className="font-sans text-base font-bold truncate mt-0.5">{display || word}</p>
-        </div>
-        {result && (
-          <button
-            onClick={toggleSave}
+ return (
+ <div className="pb-24">
+ {/* Top bar */}
+ <header className="sticky top-0 z-20 flex items-center gap-3 px-6 pt-3 pb-3 bg-background/80 backdrop-blur-md border-b border-border/50">
+ <Button
+ variant="ghost"
+ size="icon"
+ onClick={handleBack}
+ className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
+ aria-label="Back"
+ >
+ <ArrowLeft className="h-[18px] w-[18px]"/>
+ </Button>
+ <div className="flex-1 min-w-0">
+ <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">Dictionary</p>
+ <p className="font-japanese text-base font-bold truncate mt-0.5">{display || word}</p>
+ </div>
+ {result && (
+ <button
+ onClick={toggleSave}
  aria-label={saved ?'Remove from flashcards':'Save word'}
   className={`h-10 w-10 rounded-full ring-1 ring-border/40 bg-background/80 backdrop-blur-md flex items-center justify-center shrink-0 header-chip transition-colors ${
   saved ?'text-accent':'text-muted-foreground'}`}
@@ -164,8 +163,8 @@ export default function WordDetail() {
  </div>
  )}
 
-      {!loading && result && (
-        <div className="stagger-children px-6 mt-0 space-y-5">
+ {!loading && result && (
+ <div className="stagger-children px-6 mt-2 space-y-5">
  {/* Header card */}
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
  <div className="flex items-start gap-2">
@@ -265,14 +264,14 @@ export default function WordDetail() {
  </div>
  <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
  <div>
- <p className="text-[10px] font-medium tracking-wider text-muted-foreground">On'yomi</p>
+ <p className="text-[10px] uppercase tracking-wider text-muted-foreground">On'yomi</p>
  <p className="font-japanese mt-0.5">
  {k.on_readings.length ? k.on_readings.join('、') :'—'}
  </p>
  </div>
-              <div>
-                <p className="text-[10px] font-medium tracking-wider text-muted-foreground">Kun'yomi</p>
-                <p className="font-japanese mt-0.5">
+ <div>
+ <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Kun'yomi</p>
+ <p className="font-japanese mt-0.5">
  {k.kun_readings.length ? k.kun_readings.join('、') :'—'}
  </p>
  </div>
