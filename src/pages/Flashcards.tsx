@@ -159,7 +159,7 @@ export default function Flashcards() {
  <Flame className="h-6 w-6"style={{ color:'hsl(36 80% 55%)'}} />
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Due today</p>
+ <h3 className="font-serif text-lg font-semibold">Due today</h3>
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
@@ -189,7 +189,7 @@ export default function Flashcards() {
  >
  <Icon className="h-4 w-4"style={{ color: iconColor }} />
  <p className="mt-1.5 text-2xl font-bold tabular-nums leading-none">{count}</p>
- <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
+ <p className="mt-1 font-serif text-[15px] font-semibold">{label}</p>
  </button>
  );
  })}
