@@ -75,7 +75,8 @@ export default function Library() {
  <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
- </div>
+      </div>
+    </header>
 
  {/* Search */}
  <div className="px-6 pt-1 pb-3">
