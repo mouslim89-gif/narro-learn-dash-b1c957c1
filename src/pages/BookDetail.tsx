@@ -169,7 +169,7 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
- <p className="text-sm leading-relaxed text-muted-foreground">A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home, only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final and devastating gift. pour section labels, j'aime bien celui de settings mais j'aime aussi beacoup celui de library par exemple (continue reading, etc). qu'est ce qu'on devrait faire ?</p>
+ <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
  <section className="mt-8">
  <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
