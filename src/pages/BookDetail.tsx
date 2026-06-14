@@ -172,9 +172,9 @@ export default function BookDetail() {
  <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
  <section className="mt-8">
-        <h3 className="mb-3 font-serif text-lg font-semibold text-foreground">
-          <span className="section-bullet"/>Reading Level
-        </h3>
+ <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+ <span className="section-bullet"/>Reading Level
+ </p>
  <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];
@@ -207,7 +207,7 @@ export default function BookDetail() {
  {isMultiChapter && (
  <section className="mt-8">
  <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="font-serif text-lg font-semibold"><span className="section-bullet"/>Chapters</h2>
+ <h2 className="font-serif text-lg font-semibold">Chapters</h2>
  <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
  </div>
  <ul className="space-y-2">
@@ -247,7 +247,7 @@ export default function BookDetail() {
  {isMultiPart && (
  <section className="mt-8">
  <div className="mb-3 flex items-baseline justify-between">
- <h2 className="font-serif text-lg font-semibold"><span className="section-bullet"/>Chapters</h2>
+ <h2 className="font-serif text-lg font-semibold">Chapters</h2>
  <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
  </div>
  <ul className="space-y-2">
