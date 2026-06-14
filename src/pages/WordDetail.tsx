@@ -1,4 +1,4 @@
-import { useEffect, useState } from'react';
+import { useEffect, useRef, useState } from'react';
 import { useNavigate, useParams, Link } from'react-router-dom';
 import { ArrowLeft, Star, Loader2 } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
@@ -7,6 +7,8 @@ import { PlayWordButton } from'@/components/PlayWordButton';
 import { ConjugationTable, getConjugations } from'@/components/ConjugationTable';
 import { Button } from'@/components/ui/button';
 import { Skeleton } from'@/components/ui/skeleton';
+import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { toRomaji } from'wanakana';
 import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
@@ -14,8 +16,10 @@ import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
  const navigate = useNavigate();
- const word = rawWord ? decodeURIComponent(rawWord) :'';
- const { addWord, removeWord, hasWord } = useFlashcardStore();
+  const word = rawWord ? decodeURIComponent(rawWord) :'';
+  const { addWord, removeWord, hasWord } = useFlashcardStore();
+  const headerRef = useRef<HTMLElement>(null);
+  useScrollProgress(headerRef, 0, 64);
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
@@ -118,34 +122,77 @@ export default function WordDetail() {
  );
  };
 
- return (
- <div className="pb-24">
- {/* Top bar */}
- <header className="sticky top-0 z-20 flex items-center gap-3 px-4 pt-4 pb-3 bg-background/80 backdrop-blur-md">
- <Button
- variant="ghost"
- size="icon"
- onClick={handleBack}
- className="h-9 w-9 rounded-full bg-muted/60 ring-1 ring-border/40 shrink-0 header-chip"
- aria-label="Back"
- >
- <ArrowLeft className="h-[18px] w-[18px]"/>
- </Button>
- <div className="flex-1 min-w-0">
- <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">Dictionary</p>
- <p className="font-japanese text-base font-bold truncate mt-0.5">{display || word}</p>
- </div>
- {result && (
- <button
- onClick={toggleSave}
- aria-label={saved ?'Remove from flashcards':'Save word'}
-  className={`h-9 w-9 rounded-full ring-1 ring-border/40 bg-muted/60 flex items-center justify-center shrink-0 header-chip transition-colors ${
-  saved ?'text-accent':'text-muted-foreground'}`}
- >
- <Star className="h-4 w-4"fill={saved ?'currentColor':'none'} />
- </button>
- )}
- </header>
+  const titleText = display || word;
+  const watermarkChar = (extractKanji(titleText)[0]) || titleText[0] || '?';
+  const titleFontSize = titleText.length >= 5 ? 30 : titleText.length === 4 ? 36 : 42;
+
+  return (
+    <div className="pb-24">
+      {/* Top bar — home-style scroll-shrink header */}
+      <header
+        ref={headerRef}
+        className="library-header-bg sticky top-0 z-30 px-4 flex items-center gap-2 overflow-hidden"
+        style={{
+          paddingTop: 'calc(48px - var(--p, 0) * 36px)',
+          paddingBottom: 'calc(24px - var(--p, 0) * 16px)',
+          backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+          backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+          WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+          borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
+          transition: 'border-color 120ms linear',
+        }}
+      >
+        <span
+          className="library-kanji-watermark font-japanese"
+          aria-hidden="true"
+          style={{ opacity: 'calc(1 - var(--p, 0))' }}
+        >{watermarkChar}</span>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleBack}
+          className="relative z-10 h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-[18px] w-[18px]" />
+        </Button>
+
+        <div className="relative z-10 flex-1 min-w-0">
+          <AnimatedTitle
+            key={titleText}
+            text={titleText}
+            className="wordmark font-japanese font-bold tracking-tight leading-none text-foreground truncate"
+            style={{
+              '--title-scale': 'calc(1 - var(--p, 0) * 0.429)',
+              fontSize: `${titleFontSize}px`,
+            } as any}
+          />
+          {result && reading && reading !== titleText && (
+            <p
+              className="font-japanese text-sm text-muted-foreground truncate mt-1"
+              style={{ opacity: 'calc(1 - var(--p, 0))' }}
+            >
+              {reading} <span className="italic text-muted-foreground/70">· {toRomaji(reading)}</span>
+            </p>
+          )}
+        </div>
+
+        {result ? (
+          <button
+            onClick={toggleSave}
+            aria-label={saved ? 'Remove from flashcards' : 'Save word'}
+            className={`relative z-10 h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 flex items-center justify-center shrink-0 header-chip transition-colors ${
+              saved ? 'text-accent' : 'text-muted-foreground'
+            }`}
+          >
+            <Star className="h-[18px] w-[18px]" fill={saved ? 'currentColor' : 'none'} />
+          </button>
+        ) : (
+          <div className="h-10 w-10 shrink-0" aria-hidden />
+        )}
+      </header>
+
 
  {loading && (
  <div className="mt-10 flex justify-center">
