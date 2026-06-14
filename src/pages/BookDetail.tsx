@@ -169,7 +169,7 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
- <p className="text-sm leading-relaxed text-muted-foreground">A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home, only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final and devastating gift.</p>
+ <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
  <section className="mt-8">
  <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -206,10 +206,8 @@ export default function BookDetail() {
 
  {isMultiChapter && (
  <section className="mt-8">
-  <div className="mb-3 flex items-baseline justify-between">
-  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-  <span className="section-bullet"/>Chapters
-  </p>
+ <div className="mb-3 flex items-baseline justify-between">
+ <h2 className="font-serif text-lg font-semibold">Chapters</h2>
  <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
  </div>
  <ul className="space-y-2">
@@ -248,10 +246,8 @@ export default function BookDetail() {
 
  {isMultiPart && (
  <section className="mt-8">
-  <div className="mb-3 flex items-baseline justify-between">
-  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-  <span className="section-bullet"/>Chapters
-  </p>
+ <div className="mb-3 flex items-baseline justify-between">
+ <h2 className="font-serif text-lg font-semibold">Chapters</h2>
  <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
  </div>
  <ul className="space-y-2">
