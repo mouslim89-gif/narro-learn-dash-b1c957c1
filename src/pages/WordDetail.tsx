@@ -1,4 +1,4 @@
-import { useEffect, useState } from'react';
+import { useEffect, useMemo, useRef, useState } from'react';
 import { useNavigate, useParams, Link } from'react-router-dom';
 import { ArrowLeft, Star, Loader2 } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
@@ -7,6 +7,8 @@ import { PlayWordButton } from'@/components/PlayWordButton';
 import { ConjugationTable, getConjugations } from'@/components/ConjugationTable';
 import { Button } from'@/components/ui/button';
 import { Skeleton } from'@/components/ui/skeleton';
+import { AnimatedTitle } from'@/components/AnimatedTitle';
+import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { toRomaji } from'wanakana';
 import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
