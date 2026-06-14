@@ -168,14 +168,6 @@ export default function WordDetail() {
               fontSize: `${titleFontSize}px`,
             } as any}
           />
-          {result && reading && reading !== titleText && (
-            <p
-              className="font-japanese text-sm text-muted-foreground truncate mt-1"
-              style={{ opacity: 'calc(1 - var(--p, 0))' }}
-            >
-              {reading} <span className="italic text-muted-foreground/70">· {toRomaji(reading)}</span>
-            </p>
-          )}
         </div>
 
         {result ? (
