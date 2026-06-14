@@ -17,7 +17,9 @@ import {
  DropdownMenuItem,
  DropdownMenuTrigger,
 } from'@/components/ui/dropdown-menu';
-import { useDelayed } from'@/hooks/use-delayed';
+import { useDelayed } from '@/hooks/use-delayed';
+import { SectionLabel } from '@/components/SectionLabel';
+
 
 type StatusFilter ='all'|'due'|'new'|'learning'|'known';
 type SortOption ='added'|'mastery';
@@ -159,7 +161,7 @@ export default function Flashcards() {
  <Flame className="h-6 w-6"style={{ color:'hsl(36 80% 55%)'}} />
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Due today</p>
+ <SectionLabel>Due today</SectionLabel>
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
