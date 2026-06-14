@@ -10,7 +10,9 @@ import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
-import { useDelayed } from'@/hooks/use-delayed';
+import { useDelayed } from '@/hooks/use-delayed';
+import { SectionLabel } from '@/components/SectionLabel';
+
 
 export default function MyBooks() {
  const { progress, getBookProgress } = useReadingProgressStore();

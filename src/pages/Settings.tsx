@@ -30,7 +30,6 @@ const fontSizeOptions: { label: string; value: FontSize }[] = [
  { label:'L', value:'large'},
 ];
 
-import { SectionLabel } from '@/components/SectionLabel';
 
 
 export default function Settings() {

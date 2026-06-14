@@ -6,7 +6,9 @@ import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, Chevr
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
-import { cn } from'@/lib/utils';
+import { cn } from '@/lib/utils';
+import { SectionLabel } from '@/components/SectionLabel';
+
 
 export default function BookDetail() {
  const { id } = useParams();
