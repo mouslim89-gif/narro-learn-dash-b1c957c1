@@ -1,78 +1,45 @@
+## Scope
 
-## Objectif
+Deux changements visuels distincts, ciblés.
 
-Remplacer le header actuel de `src/pages/WordDetail.tsx` (compact, back+titre+star) par un header de type **page d'accueil** (Library/MyBooks/Dictionary), adapté au contexte japonais : le mot consulté devient le grand titre.
+### 1. Relief `.relief-raised` sur les toggles segmentés des settings
 
-## Comportement visuel
+Les "toggles" ici = boutons-pills des segmented rows (pas les `Switch` Radix qui ont déjà leur propre relief interne).
 
-Reproduire à l'identique le pattern de `Library.tsx` :
+**Cibles concrètes :**
+- `src/pages/Settings.tsx` — pills S/M/L de la rangée *Font size* (lignes 131–141) : le pill **actif** reçoit `.relief-raised`, les inactifs restent plats (cohérent avec le pattern actuel actif=relevé).
+- `src/pages/Reader.tsx` — composant `SegmentedRow` (lignes 156–184) utilisé pour Difficulty, Font size, Japanese font, etc. dans le panneau de settings du Reader. Le bouton **sélectionné** reçoit `.relief-raised`. On garde le `linear-gradient` actuel + le ring primary. Les non-sélectionnés restent plats.
 
-- `<header>` `sticky top-0 z-30` avec `library-header-bg`
-- Watermark **adapté JP** : le caractère affiché en watermark devient le **premier kanji** du mot (fallback : premier caractère du mot) — au lieu de 積/漢
-- Scroll-shrink piloté par `useScrollProgress(headerRef, 0, 64)` :
-  - paddings, backdrop-blur, fond background/0.85 et border-bottom qui apparaissent à mesure que `--p` monte
-  - `AnimatedTitle` qui rétrécit via `--title-scale: calc(1 - var(--p) * 0.429)` (42px → 24px)
-- **Titre** = le mot japonais (`display`), rendu via `AnimatedTitle` avec :
-  - `className="wordmark font-japanese font-bold tracking-tight leading-none text-foreground"`
-  - `fontSize: '42px'`
-  - `key={display}` pour rejouer l'animation lettre par lettre quand le mot change
-- **Sous-ligne** sous le titre (dans le bloc `min-w-0`) : reading en `font-japanese text-muted-foreground` + romaji italique muted/70 — uniquement quand `result` est chargé et que `reading !== display`. Masquée progressivement avec `opacity: calc(1 - var(--p))`.
+Pas de changement sur les `Switch` Radix (déjà ok, leur thumb a déjà une ombre).
+Pas de changement sur les autres CTA / cards, hors scope.
 
-## Actions à droite/gauche
+### 2. Reader header chips — "incolores" + plus flous que le header
 
-Conservé "intégrés dans le header" (pas de chip flottant) :
-
-- **Gauche** : à l'intérieur du `<header>`, avant le bloc titre, bouton back rond `h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip` avec `<ArrowLeft />`. Garde la logique `handleBack` actuelle (reopen-word-popup → returnPath).
-- **Droite** : star button en chip `header-chip` même style que Library (`h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40`), couleur `text-accent` quand `saved`, sinon `text-muted-foreground`. Affichée seulement si `result` est chargé (sinon placeholder invisible pour ne pas faire sauter le layout).
-
-Layout du header : `flex items-center justify-between` avec back (gauche, z-10), bloc titre (centre flex-1 min-w-0, z-10), star (droite, z-10). Watermark en background.
-
-## Hors header
-
-Ne **rien changer** au contenu sous le header (card "Header card" avec tags + CTA, sections Kanji / Meanings / Examples / Conjugation). On supprime juste la duplication visuelle du titre dans la card du haut ? **Non** — on garde la card telle quelle, elle reste utile pour les tags, le PlayWordButton et le CTA "Add to flashcards". Le grand titre du header et le titre de la card coexistent comme dans Library (header "Tsundoku" + cards livres).
-
-## Détails techniques
-
-Fichier modifié : `src/pages/WordDetail.tsx` uniquement.
-
-Nouveaux imports : `useRef` (react), `useScrollProgress` (`@/hooks/use-scroll-progress`), `AnimatedTitle` (`@/components/AnimatedTitle`), `toRomaji` déjà importé.
-
-Calcul du watermark :
-```ts
-const watermarkChar = useMemo(() => {
-  const kanji = extractKanji(display)[0];
-  return kanji || display[0] || '?';
-}, [display]);
+État actuel (`HeaderChip` ligne 118 de `Reader.tsx`) :
 ```
-
-Structure JSX du header (remplace lignes ~129-153) :
-```tsx
-<header
-  ref={headerRef}
-  className="library-header-bg sticky top-0 z-30 px-4 flex items-center gap-2 overflow-hidden"
-  style={{ paddingTop, paddingBottom, backgroundColor, backdropFilter, borderBottom, transition }}
->
-  <span className="library-kanji-watermark font-japanese" aria-hidden style={{ opacity: 'calc(1 - var(--p, 0))' }}>
-    {watermarkChar}
-  </span>
-  <Button ... back chip ... className="... header-chip relative z-10 shrink-0" />
-  <div className="relative z-10 flex-1 min-w-0">
-    <AnimatedTitle key={display} text={display} className="wordmark font-japanese font-bold ..." style={{...}} />
-    {result && reading && reading !== display && (
-      <p className="font-japanese text-sm text-muted-foreground truncate mt-1" style={{ opacity: 'calc(1 - var(--p, 0))' }}>
-        {reading} · <span className="italic text-muted-foreground/70">{toRomaji(reading)}</span>
-      </p>
-    )}
-  </div>
-  {result && <button ... star chip ... className="... header-chip relative z-10 shrink-0" />}
-</header>
+glass-chip-subtle header-chip + ring-1 ring-border/40
+glass-chip-subtle = bg hsl(--background)/0.32, blur(5px)
+header = glass-subtle = bg hsl(--background)/0.42, blur(6px)
 ```
+Donc actuellement les chips sont **plus transparents** que le header → ils se découpent visuellement.
 
-Padding initial similaire à Library : `calc(48px - var(--p) * 36px)` top, `calc(24px - var(--p) * 16px)` bottom. La marge `mt-2` du contenu actuel reste.
+**Changement :** créer une nouvelle classe `.glass-chip-header` (dans `src/index.css`) qui :
+- supprime toute teinte propre : background `transparent` (ou `hsl(--background)/0.10` très léger pour la lisibilité de l'icône)
+- pousse le `backdrop-filter: blur(14px) saturate(180%)` (vs 6px du header)
 
-## Risques / arbitrages
+Le chip apparaît alors comme une zone du header un peu plus floue/laiteuse, sans coloration propre. On **conserve** `.header-chip` (le relief = standard de l'app) et le `ring-1 ring-border/40`.
 
-- **Watermark JP** : `.library-kanji-watermark` est dimensionné pour un caractère unique — un kanji japonais s'y rend bien. Ajout de `font-japanese` pour assurer le rendu Noto.
-- **AnimatedTitle sur du japonais** : l'animation letter-by-letter fonctionne avec `Array.from(text)`, donc chaque kanji/kana est animé individuellement. OK.
-- **Largeur du titre 42px sur mots longs (3-4 kanji)** : truncate sur le wrapper `min-w-0` évite le débordement ; à l'extrême le titre passe en `text-overflow` car le `<span>` interne d'`AnimatedTitle` est `inline-block`. Si besoin, on scope `fontSize` à 36px quand `display.length > 4` (à confirmer après preview).
-- **Scope** : aucun changement sur le contenu sous le header ni sur les autres pages.
+Remplacer `glass-chip-subtle` → `glass-chip-header` uniquement dans `HeaderChip` (Reader.tsx ligne 122). L'autre usage de `glass-chip-subtle` (BookDetail back/favorite) n'est **pas** touché — c'est un contexte différent (overlay sur cover, pas sur header).
+
+État actif (chip avec `active=true`) : on **enlève** le tint `!bg-primary/15` et on garde uniquement `text-primary` + `ring-primary/25` → reste incolore comme demandé, l'état actif se lit par la couleur de l'icône + le ring.
+
+### Hors scope (sécurité "si je dis n'importe quoi")
+- Pas de touche au `nav-dock`, aux cards, aux CTA primaires.
+- Pas de touche aux chips header des autres pages (Library/MyBooks/Dictionary) — ceux-là ont déjà le bon style sur fond opaque.
+- Pas de touche au back-button de BookDetail / favorite (contexte overlay).
+
+### Risques
+- Le blur 14px peut être lourd sur mobile bas de gamme. Mitigation : `will-change: backdrop-filter` est déjà actif via `.glass-*`. Si test perçu lourd, on redescend à 10px.
+- État actif sans tint : risque de moindre lisibilité. Mitigation : on garde `text-primary` + `ring-primary/25` qui suffisent à signaler.
+
+Confirme et je passe en build.
