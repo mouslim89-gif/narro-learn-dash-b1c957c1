@@ -163,10 +163,7 @@ export default function Flashcards() {
  <Flame className="h-6 w-6"style={{ color:'hsl(36 80% 55%)'}} />
  </div>
  <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="font-serif text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Due today</h2>
-              <div className="flex-1 h-px bg-border/60" />
-            </div>
+            <h2 className="font-serif text-lg font-semibold mb-1">Due today</h2>
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>

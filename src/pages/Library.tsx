@@ -119,47 +119,45 @@ export default function Library() {
  </section>
  ) : (
  <>
-      {/* Continue Reading */}
-      {continueBooks.length > 0 && (
-        <section className="py-5">
-          <div className="px-6 flex items-center gap-3 mb-4">
-            <h3 className="font-serif text-[13px] tracking-[0.14em] text-muted-foreground uppercase whitespace-nowrap">
-              Continue Reading
-            </h3>
-            <div className="flex-1 h-px bg-border/60" />
-            <span className="text-[11px] text-muted-foreground tabular-nums">
-              {continueBooks.length} book{continueBooks.length !== 1 ? 's' : ''}
-            </span>
-          </div>
-          <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
-            {continueBooks.map((book) => (
-              <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
-            ))}
-          </div>
-        </section>
-      )}
+ {/* Continue Reading */}
+ {continueBooks.length > 0 && (
+ <section className="py-5">
+ <div className="px-6 flex items-baseline justify-between">
+ <h3 className="font-serif text-lg font-semibold text-foreground">
+ Continue Reading
+ </h3>
+ <span className="text-[11px] text-muted-foreground tabular-nums">
+ {continueBooks.length} book{continueBooks.length !== 1 ?'s':''}
+ </span>
+ </div>
+ <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+ {continueBooks.map((book) => (
+ <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
+ ))}
+ </div>
+ </section>
+ )}
 
-      {/* Genre sections */}
-      {genres.map((genre) => {
-        const genreBooks = books.filter((b) => b.genre === genre);
-        if (genreBooks.length === 0) return null;
-        return (
-          <section key={genre} className="py-5">
-            <div className="px-6 flex items-center gap-3 mb-4">
-              <h3 className="font-serif text-[13px] tracking-[0.14em] text-muted-foreground uppercase whitespace-nowrap">
-                {genreLabels[genre]}
-              </h3>
-              <div className="flex-1 h-px bg-border/60" />
-              <span className="text-[11px] text-muted-foreground tabular-nums">{genreBooks.length} books</span>
-            </div>
-            <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
-              {genreBooks.map((book) => (
-                <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
-              ))}
-            </div>
-          </section>
-        );
-      })}
+ {/* Genre sections */}
+ {genres.map((genre) => {
+ const genreBooks = books.filter((b) => b.genre === genre);
+ if (genreBooks.length === 0) return null;
+ return (
+ <section key={genre} className="py-5">
+ <div className="px-6 flex items-baseline justify-between">
+ <h3 className="font-serif text-lg font-semibold text-foreground">
+ {genreLabels[genre]}
+ </h3>
+ <span className="text-[11px] text-muted-foreground tabular-nums">{genreBooks.length} books</span>
+ </div>
+ <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+ {genreBooks.map((book) => (
+ <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
+ ))}
+ </div>
+ </section>
+ );
+ })}
  </>
  )}
  </div>

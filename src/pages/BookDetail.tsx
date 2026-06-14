@@ -172,10 +172,7 @@ export default function BookDetail() {
  <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
       <section className="mt-8">
-    <div className="flex items-center gap-3 mb-3">
-      <h2 className="font-serif text-[13px] tracking-[0.14em] text-muted-foreground uppercase">Reading Level</h2>
-      <div className="flex-1 h-px bg-border/60" />
-    </div>
+        <h2 className="font-serif text-lg font-semibold mb-3">Reading Level</h2>
  <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];
@@ -207,11 +204,10 @@ export default function BookDetail() {
 
  {isMultiChapter && (
  <section className="mt-8">
-          <div className="mb-4 flex items-center gap-3">
-            <h2 className="font-serif text-[13px] tracking-[0.14em] text-muted-foreground uppercase whitespace-nowrap">Chapters</h2>
-            <div className="flex-1 h-px bg-border/60" />
-            <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
-          </div>
+ <div className="mb-3 flex items-baseline justify-between">
+ <h2 className="font-serif text-lg font-semibold">Chapters</h2>
+ <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
+ </div>
  <ul className="space-y-2">
  {book.chapters!.map((ch, idx) => {
  const cp = chapterProgressMap[ch.id];
@@ -248,11 +244,10 @@ export default function BookDetail() {
 
  {isMultiPart && (
  <section className="mt-8">
-          <div className="mb-4 flex items-center gap-3">
-            <h2 className="font-serif text-[13px] tracking-[0.14em] text-muted-foreground uppercase whitespace-nowrap">Chapters</h2>
-            <div className="flex-1 h-px bg-border/60" />
-            <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
-          </div>
+ <div className="mb-3 flex items-baseline justify-between">
+ <h2 className="font-serif text-lg font-semibold">Chapters</h2>
+ <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
+ </div>
  <ul className="space-y-2">
  {book.anchors!.map((title, idx) => {
  const partId = partChapterId(idx);
