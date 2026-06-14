@@ -216,7 +216,7 @@ export default function WordDetail() {
  </>
  ) : (
  <>
- <Star className="h-4 w-4 mr-1.5"/> Add to flashcards
+ <Star className="h-4 w-4 mr-1.5"/> Add to Flashcards
  </>
  )}
  </Button>
