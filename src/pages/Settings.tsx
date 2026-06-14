@@ -31,7 +31,7 @@ const fontSizeOptions: { label: string; value: FontSize }[] = [
 function SectionLabel({ children }: { children: React.ReactNode }) {
  return (
  <div className="flex items-center gap-3 mb-3 px-1">
- <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
+ <h2 className="font-serif text-[13px] tracking-[0.14em] text-muted-foreground">
  {children}
  </h2>
  <div className="flex-1 h-px bg-border/60"/>
@@ -98,7 +98,7 @@ export default function Settings() {
  {initial}
  </div>
  <div className="min-w-0 flex-1">
- <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Signed in as</div>
+ <div className="text-[11px] font-medium tracking-wider text-muted-foreground">Signed in as</div>
  <div className="text-sm font-medium truncate">{user?.email ??'—'}</div>
  </div>
  </div>

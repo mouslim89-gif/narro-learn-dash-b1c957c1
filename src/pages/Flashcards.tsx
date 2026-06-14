@@ -119,15 +119,19 @@ export default function Flashcards() {
  <header
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
- style={{
- paddingTop: 'calc(40px - var(--p, 0) * 28px)',
- paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
- backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
- backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- borderBottom: '1px solid hsl(var(--border) / calc(var(--p, 0) * 0.5))',
- }}
- >
+      style={{
+        paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+        paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+        backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+        backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+        WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+      }}
+    >
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-border"
+        style={{ opacity: 'calc(var(--p, 0) * 0.5)' }}
+        aria-hidden="true"
+      />
  <div className="min-w-0">
   <AnimatedTitle
  text="Flashcards"
@@ -159,7 +163,7 @@ export default function Flashcards() {
  <Flame className="h-6 w-6"style={{ color:'hsl(36 80% 55%)'}} />
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Due today</p>
+            <h2 className="font-serif text-lg font-semibold mb-1">Due today</h2>
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
@@ -189,7 +193,7 @@ export default function Flashcards() {
  >
  <Icon className="h-4 w-4"style={{ color: iconColor }} />
  <p className="mt-1.5 text-2xl font-bold tabular-nums leading-none">{count}</p>
- <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
+ <p className="mt-1 text-[11px] font-medium text-muted-foreground">{label}</p>
  </button>
  );
  })}
