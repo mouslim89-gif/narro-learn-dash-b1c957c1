@@ -349,16 +349,18 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  </Collapsible>
  )}
 
- <div className="mt-2 flex gap-2">
- <button
- onClick={handleSave}
- className={`tap-scale-sm flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold smooth-colors ring-1 ${
- saved
- ?'bg-muted/40 text-muted-foreground ring-border/40':'bg-card text-accent ring-accent/40'}`}
- >
- <Star className="h-4 w-4"fill={saved ?'currentColor':'none'} />
- {saved ?'Saved':'Add to Flashcards'}
- </button>
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={handleSave}
+              className={`tap-scale-sm flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold smooth-colors ring-1 transition-all ${
+                saved
+                  ? 'bg-accent/15 text-accent ring-accent/30'
+                  : 'bg-accent text-accent-foreground ring-transparent'
+              }`}
+            >
+              <Star className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
+              {saved ? 'Saved' : 'Add to Flashcards'}
+            </button>
  <button
  onClick={() => {
  try {
