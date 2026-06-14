@@ -17,7 +17,9 @@ import {
  DropdownMenuItem,
  DropdownMenuTrigger,
 } from'@/components/ui/dropdown-menu';
-import { useDelayed } from'@/hooks/use-delayed';
+import { useDelayed } from '@/hooks/use-delayed';
+import { SectionLabel } from '@/components/SectionLabel';
+
 
 type StatusFilter ='all'|'due'|'new'|'learning'|'known';
 type SortOption ='added'|'mastery';

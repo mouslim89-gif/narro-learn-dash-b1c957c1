@@ -102,23 +102,25 @@ export default function MyBooks() {
  </Link>
  </header>
 
- <div className="px-6">
-      <SectionLabel className="mt-5 px-0">Stats</SectionLabel>
+    <div className="px-6">
       {bookProgressList.length > 0 && (
- <div className="stagger-children mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
- {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
- <div
- key={key}
- className="relative overflow-hidden rounded-xl border bg-card p-4 card-lift"
- style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
- >
- <Icon className="h-4 w-4"style={{ color:`hsl(${tint})`}} />
- <p className="mt-3 text-3xl font-bold tabular-nums text-foreground">{value}</p>
- <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
- </div>
- ))}
- </div>
- )}
+        <>
+          <SectionLabel className="mt-5 px-0">Stats</SectionLabel>
+          <div className="stagger-children mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
+              <div
+                key={key}
+                className="relative overflow-hidden rounded-xl border bg-card p-4 card-lift"
+                style={{ backgroundImage: `linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)` }}
+              >
+                <Icon className="h-4 w-4" style={{ color: `hsl(${tint})` }} />
+                <p className="mt-3 text-3xl font-bold tabular-nums text-foreground">{value}</p>
+                <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
  {bookProgressList.length === 0 ? (
  <div className={`mt-24 flex flex-col items-center text-center transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
@@ -131,14 +133,16 @@ export default function MyBooks() {
  <Button size="sm"className="rounded-full px-5">Browse Library</Button>
  </Link>
  </div>
- ) : (
-      <SectionLabel className="mt-6 px-0">Your Bookshelf</SectionLabel>
-      <div className="stagger-children mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
- {bookProgressList.map(({ book, progress: p }) => (
- <BookShelfRow key={book.id} book={book} progress={p} />
- ))}
- </div>
- )}
+      ) : (
+        <>
+          <SectionLabel className="mt-6 px-0">Your Bookshelf</SectionLabel>
+          <div className="stagger-children mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {bookProgressList.map(({ book, progress: p }) => (
+              <BookShelfRow key={book.id} book={book} progress={p} />
+            ))}
+          </div>
+        </>
+      )}
  </div>
  </div>
  );

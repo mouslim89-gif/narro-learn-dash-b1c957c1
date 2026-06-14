@@ -1,5 +1,7 @@
 import { Link, useNavigate } from'react-router-dom';
-import { ArrowLeft, LogOut, Loader2, User as UserIcon } from'lucide-react';
+import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
+import { SectionLabel } from '@/components/SectionLabel';
+
 import { useState } from'react';
 import { Switch } from'@/components/ui/switch';
 import { Label } from'@/components/ui/label';
