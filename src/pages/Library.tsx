@@ -121,11 +121,18 @@ export default function Library() {
  <>
  {/* Continue Reading */}
  {continueBooks.length > 0 && (
- <section className="py-5">
- <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- Continue Reading
- </h3>
+  <section className="py-5">
+    <div className="px-6 mb-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground flex items-center justify-between">
+        <span className="flex items-center">
+          <span className="section-bullet" />
+          Continue Reading
+        </span>
+        <span className="text-[11px] font-normal lowercase tracking-normal text-muted-foreground/80 tabular-nums">
+          {continueBooks.length} book{continueBooks.length !== 1 ? 's' : ''}
+        </span>
+      </p>
+    </div>
  <span className="text-[11px] text-muted-foreground tabular-nums">
  {continueBooks.length} book{continueBooks.length !== 1 ?'s':''}
  </span>
@@ -143,11 +150,16 @@ export default function Library() {
  const genreBooks = books.filter((b) => b.genre === genre);
  if (genreBooks.length === 0) return null;
  return (
- <section key={genre} className="py-5">
- <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- {genreLabels[genre]}
- </h3>
+  <section key={genre} className="py-5">
+    <div className="px-6 mb-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground flex items-center justify-between">
+        <span className="flex items-center">
+          <span className="section-bullet" />
+          {genreLabels[genre]}
+        </span>
+        <span className="text-[11px] font-normal lowercase tracking-normal text-muted-foreground/80 tabular-nums">{genreBooks.length} books</span>
+      </p>
+    </div>
  <span className="text-[11px] text-muted-foreground tabular-nums">{genreBooks.length} books</span>
  </div>
  <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
