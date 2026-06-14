@@ -16,8 +16,10 @@ import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
  const navigate = useNavigate();
- const word = rawWord ? decodeURIComponent(rawWord) :'';
- const { addWord, removeWord, hasWord } = useFlashcardStore();
+  const word = rawWord ? decodeURIComponent(rawWord) :'';
+  const { addWord, removeWord, hasWord } = useFlashcardStore();
+  const headerRef = useRef<HTMLElement>(null);
+  useScrollProgress(headerRef, 0, 64);
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
