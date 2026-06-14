@@ -119,42 +119,26 @@ export default function WordDetail() {
  );
  };
 
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
     <div className="pb-24">
       {/* Top bar */}
-      <header className={cn(
-        "sticky top-0 z-30 flex items-center gap-3 px-6 transition-all duration-300",
-        scrolled 
-          ? "h-16 bg-background/85 backdrop-blur-xl border-b border-border/50" 
-          : "h-20 bg-transparent border-transparent"
-      )}>
- <Button
- variant="ghost"
- size="icon"
- onClick={handleBack}
- className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
- aria-label="Back"
- >
- <ArrowLeft className="h-[18px] w-[18px]"/>
- </Button>
-        <div className={cn(
-          "flex-1 min-w-0 transition-opacity duration-300",
-          scrolled ? "opacity-100" : "opacity-0"
-        )}>
+      <header className="sticky top-0 z-30 flex items-center gap-3 px-6 h-16 bg-background/85 backdrop-blur-xl border-b border-border/50">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleBack}
+          className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-[18px] w-[18px]"/>
+        </Button>
+        <div className="flex-1 min-w-0">
           <p className="text-[11px] font-medium tracking-wider text-muted-foreground leading-none">Dictionary</p>
-          <p className="font-japanese text-base font-bold truncate mt-0.5">{display || word}</p>
+          <p className="font-sans text-base font-bold truncate mt-0.5">{display || word}</p>
         </div>
- {result && (
- <button
- onClick={toggleSave}
+        {result && (
+          <button
+            onClick={toggleSave}
  aria-label={saved ?'Remove from flashcards':'Save word'}
   className={`h-10 w-10 rounded-full ring-1 ring-border/40 bg-background/80 backdrop-blur-md flex items-center justify-center shrink-0 header-chip transition-colors ${
   saved ?'text-accent':'text-muted-foreground'}`}
