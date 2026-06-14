@@ -125,7 +125,9 @@ export default function Flashcards() {
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
  WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
- borderBottom: '1px solid hsla(var(--border) / calc(var(--p, 0) * 0.5))',
+    borderBottom: '1px solid hsla(var(--border) / calc(var(--p, 0) * 0.5))',
+    borderBottomColor: 'hsla(var(--border) / calc(var(--p, 0) * 0.5))',
+    borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
  }}
  >
  <div className="min-w-0">
