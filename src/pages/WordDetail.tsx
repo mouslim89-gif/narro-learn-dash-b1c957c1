@@ -225,7 +225,7 @@ export default function WordDetail() {
  {/* Kanji breakdown */}
  {kanjiList && kanjiList.length > 0 && (
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-bold mb-3"><span className="section-bullet"/>Kanji</h2>
+ <h2 className="font-serif text-lg font-semibold mb-3"><span className="section-bullet"/>Kanji</h2>
  <div className="space-y-3">
  {kanjiList.map((k, i) => {
  const ch = extractKanji(display)[i];
@@ -285,7 +285,7 @@ export default function WordDetail() {
 
  {/* All meanings */}
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-bold mb-3"><span className="section-bullet"/>Meanings</h2>
+ <h2 className="font-serif text-lg font-semibold mb-3"><span className="section-bullet"/>Meanings</h2>
  <ol className="space-y-3">
  {result.senses.map((sense, i) => (
  <li key={i} className="text-sm">
@@ -316,7 +316,7 @@ export default function WordDetail() {
 
  {/* Examples */}
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-bold mb-3"><span className="section-bullet"/>Examples</h2>
+ <h2 className="font-serif text-lg font-semibold mb-3"><span className="section-bullet"/>Examples</h2>
  {!examples && (
  <div className="space-y-2">
  <Skeleton className="h-4 w-3/4"/>
@@ -348,7 +348,7 @@ export default function WordDetail() {
  {/* Conjugation — wrapped card */}
  {getConjugations(display, result.senses.flatMap((s) => s.parts_of_speech)) && (
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-bold mb-3"><span className="section-bullet"/>Conjugation</h2>
+ <h2 className="font-serif text-lg font-semibold mb-3"><span className="section-bullet"/>Conjugation</h2>
  <ConjugationTable
  dictForm={display}
  partsOfSpeech={result.senses.flatMap((s) => s.parts_of_speech)}
