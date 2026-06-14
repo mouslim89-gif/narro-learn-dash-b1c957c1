@@ -169,10 +169,12 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
- <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis} pour section labels, garder le style de chapter dans bookdetail, de continue reading dans library. et le generaliser partout sauf pour la page setting. (traite ceci comme un prompt) (ne fais pas d'autres modifications que ce que je te demande là) </p>
+ <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
  <section className="mt-8">
-  <h2 className="mb-3 font-serif text-lg font-semibold">Reading Level</h2>
+ <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+ <span className="section-bullet"/>Reading Level
+ </p>
  <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];

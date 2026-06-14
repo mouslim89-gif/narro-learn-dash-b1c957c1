@@ -113,7 +113,7 @@ export default function MyBooks() {
  >
  <Icon className="h-4 w-4"style={{ color:`hsl(${tint})`}} />
  <p className="mt-3 text-3xl font-bold tabular-nums text-foreground">{value}</p>
- <p className="mt-0.5 font-serif text-[15px] font-semibold">{label}</p>
+ <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
  </div>
  ))}
  </div>
