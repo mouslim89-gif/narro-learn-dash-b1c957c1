@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from'react';
+import { useEffect, useRef, useState } from'react';
 import { useNavigate, useParams, Link } from'react-router-dom';
 import { ArrowLeft, Star, Loader2 } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
