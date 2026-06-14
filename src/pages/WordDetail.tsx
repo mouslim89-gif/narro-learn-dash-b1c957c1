@@ -1,15 +1,16 @@
-import { useEffect, useState } from'react';
-import { useNavigate, useParams, Link } from'react-router-dom';
-import { ArrowLeft, Star, Loader2 } from'lucide-react';
-import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
-import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
-import { PlayWordButton } from'@/components/PlayWordButton';
-import { ConjugationTable, getConjugations } from'@/components/ConjugationTable';
-import { Button } from'@/components/ui/button';
-import { Skeleton } from'@/components/ui/skeleton';
-import { toRomaji } from'wanakana';
-import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
-import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Star, Loader2 } from 'lucide-react';
+import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
+import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
+import { PlayWordButton } from '@/components/PlayWordButton';
+import { ConjugationTable, getConjugations } from '@/components/ConjugationTable';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toRomaji } from 'wanakana';
+import { fetchExamples, type ExampleSentence } from '@/lib/tatoeba';
+import { extractKanji, fetchKanji, type KanjiDetails } from '@/lib/kanji';
+import { cn } from '@/lib/utils';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
@@ -285,9 +286,9 @@ export default function WordDetail() {
  {k.on_readings.length ? k.on_readings.join('、') :'—'}
  </p>
  </div>
- <div>
- <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Kun'yomi</p>
- <p className="font-japanese mt-0.5">
+              <div>
+                <p className="text-[10px] font-medium tracking-wider text-muted-foreground">Kun'yomi</p>
+                <p className="font-japanese mt-0.5">
  {k.kun_readings.length ? k.kun_readings.join('、') :'—'}
  </p>
  </div>
