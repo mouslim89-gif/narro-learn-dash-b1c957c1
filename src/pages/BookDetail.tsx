@@ -169,12 +169,10 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
- <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
+ <p className="text-sm leading-relaxed text-muted-foreground">A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home, only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final and devastating gift. pour les section labels, c'est le style de settings qu'il faut définir comme la norme.</p>
 
  <section className="mt-8">
- <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
- <span className="section-bullet"/>Reading Level
- </p>
+        <SectionLabel>Reading Level</SectionLabel>
  <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];

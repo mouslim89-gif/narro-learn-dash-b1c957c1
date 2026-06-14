@@ -123,9 +123,7 @@ export default function Library() {
  {continueBooks.length > 0 && (
  <section className="py-5">
  <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- Continue Reading
- </h3>
+        <SectionLabel className="px-0">Continue Reading</SectionLabel>
  <span className="text-[11px] text-muted-foreground tabular-nums">
  {continueBooks.length} book{continueBooks.length !== 1 ?'s':''}
  </span>
@@ -145,9 +143,7 @@ export default function Library() {
  return (
  <section key={genre} className="py-5">
  <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- {genreLabels[genre]}
- </h3>
+        <SectionLabel className="px-0">{genreLabels[genre]}</SectionLabel>
  <span className="text-[11px] text-muted-foreground tabular-nums">{genreBooks.length} books</span>
  </div>
  <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">

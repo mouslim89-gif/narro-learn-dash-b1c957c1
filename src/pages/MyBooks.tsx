@@ -103,7 +103,8 @@ export default function MyBooks() {
  </header>
 
  <div className="px-6">
- {bookProgressList.length > 0 && (
+      <SectionLabel className="mt-5 px-0">Stats</SectionLabel>
+      {bookProgressList.length > 0 && (
  <div className="stagger-children mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
  {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
  <div
@@ -131,7 +132,8 @@ export default function MyBooks() {
  </Link>
  </div>
  ) : (
- <div className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <SectionLabel className="mt-6 px-0">Your Bookshelf</SectionLabel>
+      <div className="stagger-children mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
  {bookProgressList.map(({ book, progress: p }) => (
  <BookShelfRow key={book.id} book={book} progress={p} />
  ))}
