@@ -29,14 +29,12 @@ const fontSizeOptions: { label: string; value: FontSize }[] = [
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
- return (
- <div className="flex items-center gap-3 mb-3 px-1">
- <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
- {children}
- </h2>
- <div className="flex-1 h-px bg-border/60"/>
- </div>
- );
+  return (
+    <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <span className="section-bullet" />
+      {children}
+    </p>
+  );
 }
 
 export default function Settings() {
