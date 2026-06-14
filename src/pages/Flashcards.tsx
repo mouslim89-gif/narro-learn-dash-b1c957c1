@@ -206,12 +206,8 @@ export default function Flashcards() {
  />
  </div>
 
-  {/* Sort */}
-  <div className="mt-6 flex items-center justify-between px-6">
-    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-      <span className="section-bullet" />All words
-    </p>
-    <div className="flex items-center gap-2">
+ {/* Sort */}
+ <div className="mt-3 flex items-center justify-end px-6 gap-2">
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <button
@@ -247,8 +243,7 @@ export default function Flashcards() {
  {sortDir ==='asc'? <ArrowUp className="h-4 w-4"/>
  : <ArrowDown className="h-4 w-4"/>}
  </button>
-    </div>
-  </div>
+ </div>
  </>
  )}
 

@@ -102,13 +102,9 @@ export default function MyBooks() {
  </Link>
  </header>
 
-  <div className="px-6">
-    {bookProgressList.length > 0 && (
-      <div className="mt-5">
-        <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <span className="section-bullet" />Your statistics
-        </p>
-        <div className="stagger-children grid grid-cols-2 gap-3 sm:grid-cols-4">
+ <div className="px-6">
+ {bookProgressList.length > 0 && (
+ <div className="stagger-children mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
  {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
  <div
  key={key}
@@ -121,10 +117,9 @@ export default function MyBooks() {
  </div>
  ))}
  </div>
-      </div>
-    )}
+ )}
 
-    {bookProgressList.length === 0 ? (
+ {bookProgressList.length === 0 ? (
  <div className={`mt-24 flex flex-col items-center text-center transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
  <BookOpen className="h-9 w-9 text-primary"/>
@@ -135,19 +130,14 @@ export default function MyBooks() {
  <Button size="sm"className="rounded-full px-5">Browse Library</Button>
  </Link>
  </div>
-    ) : (
-      <div className="mt-8">
-        <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <span className="section-bullet" />Bookshelf
-        </p>
-        <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {bookProgressList.map(({ book, progress: p }) => (
-            <BookShelfRow key={book.id} book={book} progress={p} />
-          ))}
-        </div>
-      </div>
-    )}
-  </div>
-</div>
+ ) : (
+ <div className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+ {bookProgressList.map(({ book, progress: p }) => (
+ <BookShelfRow key={book.id} book={book} progress={p} />
+ ))}
+ </div>
+ )}
+ </div>
+ </div>
  );
 }
