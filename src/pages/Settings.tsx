@@ -1,7 +1,5 @@
 import { Link, useNavigate } from'react-router-dom';
-import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
-import { SectionLabel } from '@/components/SectionLabel';
-
+import { ArrowLeft, LogOut, Loader2, User as UserIcon } from'lucide-react';
 import { useState } from'react';
 import { Switch } from'@/components/ui/switch';
 import { Label } from'@/components/ui/label';
@@ -30,7 +28,16 @@ const fontSizeOptions: { label: string; value: FontSize }[] = [
  { label:'L', value:'large'},
 ];
 
-
+function SectionLabel({ children }: { children: React.ReactNode }) {
+ return (
+ <div className="flex items-center gap-3 mb-3 px-1">
+ <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
+ {children}
+ </h2>
+ <div className="flex-1 h-px bg-border/60"/>
+ </div>
+ );
+}
 
 export default function Settings() {
  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
