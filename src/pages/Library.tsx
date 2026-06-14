@@ -120,17 +120,17 @@ export default function Library() {
  ) : (
  <>
  {/* Continue Reading */}
- {continueBooks.length > 0 && (
- <section className="py-5">
- <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- Continue Reading
- </h3>
+      {continueBooks.length > 0 && (
+        <section className="py-5">
+          <div className="px-6 flex items-baseline justify-between mb-4">
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="section-bullet" />Continue Reading
+            </h3>
  <span className="text-[11px] text-muted-foreground tabular-nums">
  {continueBooks.length} book{continueBooks.length !== 1 ?'s':''}
  </span>
  </div>
- <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+          <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
  {continueBooks.map((book) => (
  <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
  ))}
@@ -142,15 +142,15 @@ export default function Library() {
  {genres.map((genre) => {
  const genreBooks = books.filter((b) => b.genre === genre);
  if (genreBooks.length === 0) return null;
- return (
- <section key={genre} className="py-5">
- <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- {genreLabels[genre]}
- </h3>
+        return (
+          <section key={genre} className="py-5">
+            <div className="px-6 flex items-baseline justify-between mb-4">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <span className="section-bullet" />{genreLabels[genre]}
+              </h3>
  <span className="text-[11px] text-muted-foreground tabular-nums">{genreBooks.length} books</span>
  </div>
- <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+ <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
  {genreBooks.map((book) => (
  <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
  ))}
