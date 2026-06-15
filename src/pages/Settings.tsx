@@ -87,7 +87,7 @@ export default function Settings() {
           borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
         }}
       >
-        <span className="library-kanji-watermark" aria-hidden="true">設</span>
+        <span className="library-kanji-watermark translate-y-[15%]" aria-hidden="true">設</span>
         <div className="flex items-center gap-3 min-w-0 relative z-10">
           <button
             onClick={() => window.history.back()}
