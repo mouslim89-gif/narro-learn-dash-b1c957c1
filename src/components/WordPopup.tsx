@@ -292,11 +292,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  {displayReading && (
  <span className="text-xs italic text-muted-foreground/70">{toRomaji(displayReading)}</span>
  )}
- {isCommon && (
- <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold text-accent ring-1 ring-accent/20">
- ✦ Common
- </span>
- )}
+                {isCommon && (
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
+                    ✦ Common
+                  </span>
+                )}
  </div>
  )}
  {result.senses[0]?.parts_of_speech && result.senses[0].parts_of_speech.length > 0 && (
