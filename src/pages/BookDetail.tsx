@@ -136,26 +136,29 @@ export default function BookDetail() {
  <h1 className="mt-6 font-serif text-3xl font-bold leading-tight">{book.titleEn}</h1>
  <p className="mt-1.5 text-sm text-muted-foreground">{book.author}</p>
 
- <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[12px] text-muted-foreground">
- <span className="inline-flex items-center gap-1.5">
- <span className="h-1.5 w-1.5 rounded-full bg-foreground/40"/>
- {genreLabels[book.genre]}
- </span>
- <span className="text-foreground/20">·</span>
- <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5"/>{book.readingTimeMin}m</span>
- {hasAnyAudio(book) && (
- <>
- <span className="text-foreground/20">·</span>
- <span className="inline-flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5"/>Audio</span>
- </>
- )}
- {book.chapters && book.chapters.length > 1 && (
- <>
- <span className="text-foreground/20">·</span>
- <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5"/>{book.chapters.length} chapters</span>
- </>
- )}
- </div>
+  <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[12px] text-muted-foreground">
+    <span className="inline-flex h-5 items-center rounded-full bg-foreground/5 px-2 text-[10px] font-bold tracking-tight text-foreground/60 ring-1 ring-inset ring-foreground/10">
+      {book.jlptLevel}
+    </span>
+    <span className="inline-flex items-center gap-1.5">
+      <span className="h-1.5 w-1.5 rounded-full bg-foreground/40"/>
+      {genreLabels[book.genre]}
+    </span>
+    <span className="text-foreground/20">·</span>
+    <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5"/>{book.readingTimeMin}m</span>
+    {hasAnyAudio(book) && (
+      <>
+        <span className="text-foreground/20">·</span>
+        <span className="inline-flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5"/>Audio</span>
+      </>
+    )}
+    {book.chapters && book.chapters.length > 1 && (
+      <>
+        <span className="text-foreground/20">·</span>
+        <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5"/>{book.chapters.length} chapters</span>
+      </>
+    )}
+  </div>
 
  {hasProgress && (
  <div className="mx-auto mt-5 flex w-full max-w-xs items-center gap-3">
