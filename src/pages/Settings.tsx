@@ -75,7 +75,7 @@ export default function Settings() {
     <div className="pb-24">
       <header
         ref={headerRef}
-        className="library-header-bg sticky top-0 z-30 px-6 flex items-center justify-between overflow-hidden"
+        className="sticky top-0 z-30 px-6 flex items-center justify-between"
         style={{
           paddingTop: 'calc(40px - var(--p, 0) * 28px)',
           paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
@@ -87,11 +87,6 @@ export default function Settings() {
           borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
         }}
       >
-        <span
-          className="library-kanji-watermark"
-          aria-hidden="true"
-          style={{ opacity: 'calc(1 - var(--p, 0))' }}
-        >設</span>
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => window.history.back()}

@@ -118,23 +118,18 @@ export default function Flashcards() {
  {/* Masthead */}
  <header
  ref={headerRef}
-  className="library-header-bg sticky top-0 z-30 px-6 flex items-center justify-between overflow-hidden"
-  style={{
-    paddingTop: 'calc(40px - var(--p, 0) * 28px)',
-    paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
-    backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
-    backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
-    WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ className="sticky top-0 z-30 px-6 flex items-center justify-between"
+ style={{
+ paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+ backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+ backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+ WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
     borderBottom: '1px solid hsla(var(--border) / calc(var(--p, 0) * 0.5))',
     borderBottomColor: 'hsla(var(--border) / calc(var(--p, 0) * 0.5))',
     borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
-  }}
->
-  <span
-    className="library-kanji-watermark"
-    aria-hidden="true"
-    style={{ opacity: 'calc(1 - var(--p, 0))' }}
-  >憶</span>
+ }}
+ >
  <div className="min-w-0">
   <AnimatedTitle
  text="Flashcards"
