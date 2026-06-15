@@ -145,13 +145,16 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  };
 
  return (
- <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-        <SheetHeader className="pt-10 pb-4">
-          <SheetTitle className="text-left">
+  <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
+    <DrawerContent className="rounded-t-[32px] max-h-[85vh] bg-background border-none focus:outline-none">
+      <div className="mx-auto w-12 h-1.5 rounded-full bg-muted/60 mt-2" />
+      <div className="overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+        <DrawerHeader className="px-0 pt-6 pb-4">
+          <DrawerTitle className="text-left wordmark font-serif text-[24px] leading-none">
             {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
-          </SheetTitle>
-        </SheetHeader>
+          </DrawerTitle>
+          <div className="h-px bg-border/60 mt-1" />
+        </DrawerHeader>
 
  <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
  <span className="text-muted-foreground">Match: </span>
@@ -282,7 +285,8 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </Button>
  </div>
  </div>
- </SheetContent>
- </Sheet>
+      </div>
+    </DrawerContent>
+  </Drawer>
  );
 }

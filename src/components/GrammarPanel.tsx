@@ -5,7 +5,7 @@ import { jlptColors } from '@/data/books';
 import { cn } from '@/lib/utils';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerTitle, DrawerHeader } from '@/components/ui/drawer';
 import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
 
 interface GrammarPanelProps {
@@ -109,14 +109,16 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
   }, [notes]);
 
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0"
-      >
-        <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
+    <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
+      <DrawerContent className="rounded-t-[32px] max-h-[85vh] bg-background border-none focus:outline-none">
+        <DrawerHeader className="sr-only">
+          <DrawerTitle>Grammar Notes</DrawerTitle>
+        </DrawerHeader>
+
+        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md px-5 pt-2 pb-3 border-b border-border/40">
+          <div className="mx-auto w-12 h-1.5 rounded-full bg-muted/60 mb-4" />
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="wordmark font-serif text-[20px] leading-none">Grammar Notes</h2>
+            <h2 className="wordmark font-serif text-[24px] leading-none">Grammar Notes</h2>
             {notes.length > 0 && (
               <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">
                 {notes.length} {notes.length === 1 ? 'note' : 'notes'}
@@ -125,7 +127,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           </div>
         </div>
 
-        <div className="px-4 py-4">
+        <div className="px-4 py-4 overflow-y-auto">
           {loading && (
             <div className="flex flex-col gap-3">
               <Skeleton className="h-16 w-full rounded-2xl" />
@@ -245,7 +247,8 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
             </div>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
