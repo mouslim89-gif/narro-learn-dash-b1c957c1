@@ -146,12 +146,16 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
 
  return (
  <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-        <SheetHeader className="pt-10 pb-4">
-          <SheetTitle className="text-left">
-            {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
-          </SheetTitle>
-        </SheetHeader>
+      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-[32px] p-0">
+        <div className="px-5">
+          <SheetHeader className="pt-10 pb-4">
+            <SheetTitle className="text-left">
+              {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
+            </SheetTitle>
+          </SheetHeader>
+        </div>
+
+        <div className="px-5 pb-6">
 
  <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
  <span className="text-muted-foreground">Match: </span>
@@ -280,9 +284,9 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  >
  Save rule
  </Button>
- </div>
- </div>
- </SheetContent>
+          </div>
+        </div>
+      </SheetContent>
  </Sheet>
  );
 }
