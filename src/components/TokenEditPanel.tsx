@@ -146,12 +146,21 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
 
  return (
   <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
-       <DrawerContent className="max-h-[85vh] overflow-y-auto bg-card ring-1 ring-border/40 shadow-lg border-0">
-         <DrawerHeader className="pt-10 pb-4">
-           <DrawerTitle className="text-left">
-             {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
-           </DrawerTitle>
-         </DrawerHeader>
+       <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
+         <DrawerTitle className="sr-only">Edit Token</DrawerTitle>
+         <div className="flex flex-col h-full overflow-hidden pt-7 px-5 pb-8">
+           <div className="mb-5 flex items-center gap-3">
+             <h2 className="wordmark font-serif text-[20px] leading-none">
+               {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
+             </h2>
+             <div className="flex-1 h-px bg-border/60"/>
+           </div>
+           <div className="flex-1 overflow-y-auto overscroll-contain">
+             <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
+               <span className="text-muted-foreground">Match: </span>
+               <span className="font-japanese">{matched.map((m) => m.t).join('|')}</span>
+             </div>
+             <div className="space-y-4 pb-4">
 
  <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
  <span className="text-muted-foreground">Match: </span>
