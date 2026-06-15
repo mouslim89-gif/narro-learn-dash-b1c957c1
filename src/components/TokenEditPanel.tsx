@@ -146,12 +146,14 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
 
  return (
   <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
-       <DrawerContent className="max-h-[85vh] overflow-y-auto bg-card ring-1 ring-border/40 shadow-lg border-0">
-         <DrawerHeader className="pt-10 pb-4">
-           <DrawerTitle className="text-left">
-             {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
-           </DrawerTitle>
-         </DrawerHeader>
+      <DrawerContent className="bg-card ring-1 ring-border/40 shadow-lg border-0">
+        <DrawerTitle className="sr-only">
+          {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
+        </DrawerTitle>
+        <div className="max-h-[85vh] overflow-y-auto px-5 pb-6 pt-4">
+          <h2 className="text-lg font-semibold leading-none tracking-tight mb-4">
+            {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
+          </h2>
 
  <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
  <span className="text-muted-foreground">Match: </span>
@@ -266,10 +268,10 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  <label className="flex items-center justify-between rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
  <div className="flex flex-col">
  <span className="text-xs font-semibold text-primary">Publish for all accounts</span>
- <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
- </div>
- <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
- </label>
+              <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
+            </div>
+            <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
+          </label>
  )}
  <div className="flex gap-2">
  <Button variant="outline"onClick={onClose} className="flex-1">Cancel</Button>
@@ -282,7 +284,8 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </Button>
  </div>
  </div>
-      </DrawerContent>
-    </Drawer>
+ </div>
+ </DrawerContent>
+ </Drawer>
  );
 }
