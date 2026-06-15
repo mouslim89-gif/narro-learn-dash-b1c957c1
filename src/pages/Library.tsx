@@ -53,11 +53,6 @@ export default function Library() {
     borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
   }}
 >
- <span
- className="library-kanji-watermark"
- aria-hidden="true"
- style={{ opacity: 'calc(1 - var(--p, 0))' }}
- >積</span>
  <div className="relative z-10 min-w-0">
          <AnimatedTitle
  text="Tsundoku"
