@@ -33,8 +33,7 @@ import { TokenEditPanel } from'@/components/TokenEditPanel';
 import { TokenEditFloatingBar } from'@/components/TokenEditFloatingBar';
 import { tokensToRule } from'@/lib/token-edit-rules';
 import { useIsMobile } from'@/hooks/use-mobile';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent } from'@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from'@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from'@/lib/sentence-translations';
 
@@ -1194,24 +1193,22 @@ export default function Reader() {
  </div>
  );
 
-  if (isMobile) {
-    return (
-      <Drawer open={showSettings} onOpenChange={(o) => !o && setShowSettings(false)}>
-        <DrawerContent className="rounded-t-[32px] max-h-[85vh] bg-background border-none focus:outline-none">
-          <div className="mx-auto w-12 h-1.5 rounded-full bg-muted/60 mt-2" />
-          <div className="px-5 pt-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] overflow-y-auto">
-            <DrawerHeader className="px-0 mb-5 p-0">
-              <div className="flex items-center gap-3">
-                <DrawerTitle className="wordmark font-serif text-[24px] leading-none">Reader Settings</DrawerTitle>
-                <div className="flex-1 h-px bg-border/60"/>
-              </div>
-            </DrawerHeader>
-            {settingsBody}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
+ if (isMobile) {
+ return (
+ <Sheet open={showSettings} onOpenChange={setShowSettings}>
+ <SheetContent
+ side="bottom"
+ className="max-h-[85vh] overflow-y-auto rounded-t-3xl bg-background px-5 pt-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
+ >
+ <div className="mb-5 flex items-center gap-3">
+ <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
+ <div className="flex-1 h-px bg-border/60"/>
+ </div>
+ {settingsBody}
+ </SheetContent>
+ </Sheet>
+ );
+ }
 
  return showSettings ? (
  <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in-soft">
