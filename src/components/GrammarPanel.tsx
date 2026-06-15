@@ -112,7 +112,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-[32px] max-h-[80vh] overflow-y-auto bg-background p-0"
+        className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0"
       >
         <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
           <div className="flex items-baseline justify-between gap-3">
