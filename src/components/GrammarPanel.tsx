@@ -116,19 +116,18 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
         <DrawerHeader className="sr-only">
           <DrawerTitle>Grammar Notes</DrawerTitle>
         </DrawerHeader>
-        <div className="max-h-[85vh] overflow-y-auto overscroll-contain" onPointerDown={(e) => e.stopPropagation()}>
-          <div className="sticky top-0 z-10 bg-background px-5 pt-0 pb-3 border-b border-border/40">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="wordmark font-serif text-[20px] leading-none">Grammar Notes</h2>
+        <div className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]" onPointerDown={(e) => e.stopPropagation()}>
+          <div className="mb-5 flex items-center gap-3">
+            <h1 className="wordmark font-serif text-[24px] leading-none">Grammar Notes</h1>
             {notes.length > 0 && (
               <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">
-                {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+                {notes.length}
               </span>
             )}
+            <div className="flex-1 h-px bg-border/60"/>
           </div>
-        </div>
 
-        <div className="px-4 py-4">
+        <div className="">
           {loading && (
             <div className="flex flex-col gap-3">
               <Skeleton className="h-16 w-full rounded-2xl" />
