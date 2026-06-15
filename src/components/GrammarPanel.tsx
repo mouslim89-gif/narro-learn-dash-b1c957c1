@@ -117,7 +117,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           <DrawerTitle>Grammar Notes</DrawerTitle>
         </DrawerHeader>
         <div className="max-h-[85vh] overflow-y-auto overscroll-contain" onPointerDown={(e) => e.stopPropagation()}>
-          <div className="sticky top-0 z-10 bg-background px-5 pt-2 pb-3 border-b border-border/40">
+          <div className="sticky top-0 z-10 bg-background px-5 pt-1 pb-3 border-b border-border/40">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="wordmark font-serif text-[20px] leading-none">Grammar Notes</h2>
             {notes.length > 0 && (
