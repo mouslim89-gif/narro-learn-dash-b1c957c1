@@ -99,10 +99,10 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  setDrafts([{
  t: matched.map((m) => m.t).join(''),
  r: matched.map((m) => m.r ??'').join('') || undefined,
- p: matched[0]?.p,
- pMode:'auto',
- j: true,
- icon: matched[0]?.p,
+  p: matched[0]?.p,
+  pMode:'auto',
+  j: true,
+  origP: matched[0]?.p,
  }]);
  }
  }
