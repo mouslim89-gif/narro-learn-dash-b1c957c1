@@ -1197,12 +1197,12 @@ export default function Reader() {
   return (
   <Drawer open={showSettings} onOpenChange={setShowSettings}>
         <DrawerContent
-          className="bg-card ring-1 ring-border/40 shadow-lg border-0 pt-2"
+          className="bg-card ring-1 ring-border/40 shadow-lg border-0 pt-7"
         >
           <DrawerHeader className="sr-only">
             <DrawerTitle>Reader Settings</DrawerTitle>
           </DrawerHeader>
-          <div className="overflow-y-auto max-h-[85vh] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+          <div className="overflow-y-auto max-h-[85vh] px-5 pt-0 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
             <div className="mb-5 flex items-center gap-3">
               <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
               <div className="flex-1 h-px bg-border/60"/>
