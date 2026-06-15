@@ -270,7 +270,7 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  <span className="text-xs font-semibold text-primary">Publish for all accounts</span>
  <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
  </div>
- <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
+ <Switch checked={sharedScope} onCheckedChange={sharedScope} />
  </label>
  )}
  <div className="flex gap-2">
@@ -282,9 +282,10 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  >
  Save rule
  </Button>
-          </div>
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
+ </div>
+ </div>
+ </div>
+ </DrawerContent>
+ </Drawer>
+ );
 }
