@@ -38,11 +38,6 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
  <div className="px-0.5">
  <p className="truncate text-[13px] font-semibold text-foreground">{book.titleEn}</p>
  <div className="mt-1.5 flex items-center gap-2">
-  <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: book.coverColor }} />
-  {book.jlptLevel}
-  </span>
-  <span className="text-foreground/20">·</span>
   <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
   <Clock className="h-3 w-3"/> {book.readingTimeMin}m
   </span>
