@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo } from'react';
 import type { BookToken } from'@/data/book-tokens';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from'@/components/ui/sheet';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import { Input } from'@/components/ui/input';
 import { Label } from'@/components/ui/label';
 import { Switch } from'@/components/ui/switch';
@@ -144,14 +149,16 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  toast({ title:'Copied', description:'Rule copied to clipboard.'});
  };
 
- return (
- <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-        <SheetHeader className="pt-10 pb-4">
-          <SheetTitle className="text-left">
+  return (
+    <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
+      <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
+        <DrawerHeader className="px-5 pt-10 pb-4">
+          <DrawerTitle className="text-left font-serif text-[20px]">
             {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
-          </SheetTitle>
-        </SheetHeader>
+          </DrawerTitle>
+        </DrawerHeader>
+
+        <div className="px-5 pb-6 overflow-y-auto">
 
  <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
  <span className="text-muted-foreground">Match: </span>
@@ -282,7 +289,8 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </Button>
  </div>
  </div>
- </SheetContent>
- </Sheet>
- );
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
 }
