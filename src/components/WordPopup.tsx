@@ -264,10 +264,12 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
  return (
  <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
-  <DrawerContent className="bg-card ring-1 ring-border/40 shadow-lg border-0">
-    <DrawerTitle className="sr-only">{displayWord}</DrawerTitle>
+ <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
+        <DrawerHeader className="text-left pt-10 pb-4">
+          <DrawerTitle className="sr-only">{displayWord}</DrawerTitle>
+        </DrawerHeader>
 
-    <div className="px-5 pt-4 pb-6 space-y-5 max-h-[85vh] overflow-y-auto overscroll-contain" onPointerDown={(e) => e.stopPropagation()}>
+ <div className="px-5 pb-6 space-y-5 overflow-y-auto">
  {loading && <LoadingSkeleton />}
 
  {error && !loading && (
