@@ -108,11 +108,8 @@ export default function MyBooks() {
  {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
  <div
  key={key}
-                className="relative overflow-hidden rounded-xl border bg-card p-4 card-lift"
-                style={{ 
-                  backgroundImage: `linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`,
-                  borderColor: `hsl(${tint} / 0.25)`
-                }}
+ className="relative overflow-hidden rounded-xl border border-border/40 bg-card p-4 card-lift"
+ style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
  >
  <Icon className="h-4 w-4"style={{ color:`hsl(${tint})`}} />
  <p className="mt-3 text-3xl font-bold tabular-nums text-foreground">{value}</p>

@@ -186,11 +186,8 @@ export default function Flashcards() {
  key={key}
  onClick={() => setFilter(active ?'all': key)}
                 className={cn('rounded-xl border bg-card p-3 text-left card-lift tap-scale smooth-colors',
-                active ? 'ring-1 ring-primary/30' : '')}
-                style={{ 
-                  backgroundImage: `linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`,
-                  borderColor: active ? 'hsl(var(--primary) / 0.4)' : `hsl(${tint} / 0.25)`
-                }}
+                active ?'border-primary/40 ring-1 ring-primary/30':'border-border/40')}
+ style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
  >
  <Icon className="h-4 w-4"style={{ color: iconColor }} />
  <p className="mt-1.5 text-2xl font-bold tabular-nums leading-none">{count}</p>
