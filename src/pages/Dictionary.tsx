@@ -257,11 +257,11 @@ export default function DictionaryPage() {
 
  {/* Tags row */}
  <div className="mt-2 flex flex-wrap items-center gap-1.5">
- {isCommon && (
- <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
- ✦ Common
- </span>
- )}
+              {isCommon && (
+                <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold text-accent ring-1 ring-accent/20">
+                  ✦ Common
+                </span>
+              )}
  {result.jlpt.length > 0 && (
  <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/20">
  {result.jlpt[0]?.replace('jlpt-','JLPT')}
