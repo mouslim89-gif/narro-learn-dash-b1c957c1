@@ -111,13 +111,12 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
       <DrawerContent
-        className="bg-background p-0 ring-1 ring-border/40 shadow-lg border-0"
+        className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0 ring-1 ring-border/40 shadow-lg border-0"
       >
         <DrawerHeader className="sr-only">
           <DrawerTitle>Grammar Notes</DrawerTitle>
         </DrawerHeader>
-        <div className="max-h-[85vh] overflow-y-auto overscroll-contain">
-        <div className="sticky top-0 z-10 bg-background px-5 pt-2 pb-3 border-b border-border/40">
+        <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="wordmark font-serif text-[20px] leading-none">Grammar Notes</h2>
             {notes.length > 0 && (
@@ -247,7 +246,6 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
               </p>
             </div>
           )}
-        </div>
         </div>
       </DrawerContent>
     </Drawer>
