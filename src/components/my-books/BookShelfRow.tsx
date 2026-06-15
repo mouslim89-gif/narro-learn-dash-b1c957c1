@@ -33,12 +33,7 @@ export function BookShelfRow({ book, progress }: { book: Book; progress: Reading
  )}
  </div>
  <p className="text-[11px] text-muted-foreground truncate">{book.author}</p>
-  <div className="mt-2 flex items-center gap-1.5">
-  <span className="flex items-center gap-1 text-[10px] font-semibold text-foreground/70">
-    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: book.coverColor }} />
-    {book.jlptLevel}
-  </span>
-  <span className="text-foreground/20">·</span>
+  <div className="mt-2 flex items-center gap-2">
   <span className="text-[10px] font-semibold text-foreground/70 truncate">{difficultyConfig[progress.difficulty].label}</span>
   {hasAnyAudio(book) && <Headphones className="h-3 w-3 text-muted-foreground"/>}
   </div>
