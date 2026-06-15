@@ -1,7 +1,7 @@
 import { Link } from'react-router-dom';
 import { Clock, Headphones } from'lucide-react';
-import type { Book } from'@/data/books';
-import { hasAnyAudio } from'@/data/books';
+import type { Book } from '@/data/books';
+import { hasAnyAudio, jlptColors } from '@/data/books';
 
 export function BookCard({ book, progress }: { book: Book; progress?: number }) {
  return (
@@ -34,9 +34,17 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
  {Math.round(progress)}%
  </div>
  )}
- </div>
- <div className="px-0.5">
- <p className="truncate text-[13px] font-semibold text-foreground">{book.titleEn}</p>
+      </div>
+      <div className="flex items-center justify-between px-0.5 mt-2">
+        <p className="truncate text-[13px] font-semibold text-foreground flex-1">{book.titleEn}</p>
+        <span 
+          className="ml-2 inline-flex h-4 items-center justify-center rounded-full px-1.5 text-[9px] font-bold text-white shadow-sm flex-shrink-0"
+          style={{ backgroundColor: jlptColors[book.jlptLevel] }}
+        >
+          {book.jlptLevel}
+        </span>
+      </div>
+      <div className="px-0.5">
  <div className="mt-1.5 flex items-center gap-2">
  <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
  <Clock className="h-3 w-3"/> {book.readingTimeMin}m

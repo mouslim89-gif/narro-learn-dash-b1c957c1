@@ -155,7 +155,14 @@ export default function BookDetail() {
  <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5"/>{book.chapters.length} chapters</span>
  </>
  )}
- </div>
+        <span className="text-foreground/20">·</span>
+        <span 
+          className="inline-flex h-5 items-center justify-center rounded-full px-2 text-[10px] font-bold text-white shadow-sm"
+          style={{ backgroundColor: jlptColors[book.jlptLevel] }}
+        >
+          {book.jlptLevel}
+        </span>
+      </div>
 
  {hasProgress && (
  <div className="mx-auto mt-5 flex w-full max-w-xs items-center gap-3">
