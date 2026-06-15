@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from'react';
 import type { BookToken } from'@/data/book-tokens';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from'@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Input } from'@/components/ui/input';
 import { Label } from'@/components/ui/label';
 import { Switch } from'@/components/ui/switch';
