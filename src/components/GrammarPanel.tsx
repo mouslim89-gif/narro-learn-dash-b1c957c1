@@ -5,12 +5,7 @@ import { jlptColors } from '@/data/books';
 import { cn } from '@/lib/utils';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
 
 interface GrammarPanelProps {
@@ -114,14 +109,12 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
   }, [notes]);
 
   return (
-    <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent
-        className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0"
+    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background p-0"
       >
-        <DrawerHeader className="sr-only">
-          <DrawerTitle>Grammar Notes</DrawerTitle>
-        </DrawerHeader>
-        <div className="sticky top-0 z-10 bg-card px-5 pt-4 pb-3 border-b border-border/40">
+        <div className="sticky top-0 z-10 bg-background px-5 pt-6 pb-3 border-b border-border/40">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="wordmark font-serif text-[20px] leading-none">Grammar Notes</h2>
             {notes.length > 0 && (
@@ -132,7 +125,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           </div>
         </div>
 
-        <div className="px-4 py-4 overflow-y-auto">
+        <div className="px-4 py-4">
           {loading && (
             <div className="flex flex-col gap-3">
               <Skeleton className="h-16 w-full rounded-2xl" />
@@ -252,7 +245,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
             </div>
           )}
         </div>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
