@@ -185,8 +185,8 @@ export default function Flashcards() {
  <button
  key={key}
  onClick={() => setFilter(active ?'all': key)}
- className={cn('rounded-xl border bg-card p-3 text-left card-lift tap-scale smooth-colors',
- active ?'border-primary/40 ring-1 ring-primary/30':'border-border/40')}
+                className={cn('rounded-xl border bg-card p-3 text-left card-lift tap-scale smooth-colors',
+                active ?'border-primary/40 ring-1 ring-primary/30':'border-border/40')}
  style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
  >
  <Icon className="h-4 w-4"style={{ color: iconColor }} />
