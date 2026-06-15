@@ -268,10 +268,10 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  <label className="flex items-center justify-between rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
  <div className="flex flex-col">
  <span className="text-xs font-semibold text-primary">Publish for all accounts</span>
- <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
- </div>
- <Switch checked={sharedScope} onCheckedChange={sharedScope} />
- </label>
+              <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
+            </div>
+            <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
+          </label>
  )}
  <div className="flex gap-2">
  <Button variant="outline"onClick={onClose} className="flex-1">Cancel</Button>
