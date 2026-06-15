@@ -169,7 +169,7 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
-  <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
+      <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}</p>
 
  <section className="mt-8">
  <h2 className="mb-3 font-serif text-lg font-semibold">Reading Level</h2>
@@ -216,7 +216,7 @@ export default function BookDetail() {
  return (
  <li key={ch.id}>
  <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
- <div className="card-lift tap-scale w-full rounded-xl border bg-card p-4 text-left ring-1 ring-border/30">
+                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left ring-1 ring-border/40 shadow-sm">
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
@@ -257,7 +257,7 @@ export default function BookDetail() {
  return (
  <li key={partId}>
  <Link to={`/reader/${book.id}/${difficulty}/${partId}`} className="block">
- <div className="card-lift tap-scale w-full rounded-xl border bg-card p-4 text-left ring-1 ring-border/30">
+ <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left ring-1 ring-border/40 shadow-sm">
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
