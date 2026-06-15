@@ -150,7 +150,7 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
         <DrawerTitle className="sr-only">
           {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
         </DrawerTitle>
-        <div className="max-h-[85vh] overflow-y-auto px-5 pb-6 pt-4">
+        <div className="max-h-[85vh] overflow-y-auto px-5 pb-6 pt-0">
           <h2 className="text-lg font-semibold leading-none tracking-tight mb-4">
             {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
           </h2>

@@ -266,7 +266,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
     <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
       <DrawerTitle className="sr-only">{displayWord}</DrawerTitle>
-      <div className="px-5 pb-6 pt-4 space-y-5 overflow-y-auto">
+      <div className="px-5 pb-6 pt-0 space-y-5 overflow-y-auto">
  {loading && <LoadingSkeleton />}
 
  {error && !loading && (
