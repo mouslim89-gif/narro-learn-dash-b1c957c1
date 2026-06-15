@@ -10,11 +10,11 @@ import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult
 import { ConjugationTable, getWordType } from'@/components/ConjugationTable';
 import { Skeleton } from'@/components/ui/skeleton';
 import {
- Drawer,
- DrawerContent,
- DrawerHeader,
- DrawerTitle,
-} from'@/components/ui/drawer';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 interface WordPopupProps {
  word: string;
