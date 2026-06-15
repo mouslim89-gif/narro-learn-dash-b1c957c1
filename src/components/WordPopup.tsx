@@ -10,11 +10,11 @@ import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult
 import { ConjugationTable, getWordType } from'@/components/ConjugationTable';
 import { Skeleton } from'@/components/ui/skeleton';
 import {
- Drawer,
- DrawerContent,
- DrawerHeader,
- DrawerTitle,
-} from'@/components/ui/drawer';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 interface WordPopupProps {
  word: string;
@@ -262,12 +262,12 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
  const sectionLabel ="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
- return (
- <Drawer open onOpenChange={(open) => { if (!open) onClose(); }}>
- <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
-        <DrawerHeader className="text-left pt-10 pb-4">
-          <DrawerTitle className="sr-only">{displayWord}</DrawerTitle>
-        </DrawerHeader>
+  return (
+    <Sheet open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <SheetContent side="bottom" className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0 rounded-t-[32px] p-0 overflow-hidden">
+        <SheetHeader className="text-left pt-10 pb-4 px-5">
+          <SheetTitle className="sr-only">{displayWord}</SheetTitle>
+        </SheetHeader>
 
  <div className="px-5 pb-6 space-y-5 overflow-y-auto">
  {loading && <LoadingSkeleton />}
@@ -382,8 +382,8 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  </>
  )}
  </div>
- </DrawerContent>
- </Drawer>
+      </SheetContent>
+    </Sheet>
  );
 }
 
