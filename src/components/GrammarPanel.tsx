@@ -247,7 +247,6 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
             </div>
           )}
         </div>
-        </div>
       </DrawerContent>
     </Drawer>
   );
