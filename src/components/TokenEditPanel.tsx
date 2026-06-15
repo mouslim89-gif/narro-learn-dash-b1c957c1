@@ -278,10 +278,10 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  >
  Save rule
  </Button>
-            </div>
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </DrawerContent>
+  </Drawer>
  );
 }
