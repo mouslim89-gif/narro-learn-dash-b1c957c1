@@ -284,9 +284,7 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  </Button>
           </div>
         </div>
-      </div>
-        </div>
       </DrawerContent>
     </Drawer>
- );
+  );
 }
