@@ -43,8 +43,10 @@ export default function Settings() {
  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
  useReadingProgressStore();
  const { user, signOut } = useAuth();
- const navigate = useNavigate();
- const [deleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  useScrollProgress(headerRef, 0, 56);
 
  const handleSignOut = async () => {
  await signOut();
@@ -69,26 +71,41 @@ export default function Settings() {
  const initial = (user?.email ??'?').slice(0, 1).toUpperCase();
 
  return (
- <div className="pb-24 min-h-screen">
- {/* Editorial header */}
- <header className="library-header-bg relative px-6 pt-12 pb-6 flex items-end justify-between overflow-hidden">
- <span className="library-kanji-watermark"aria-hidden="true">設</span>
- <div className="relative z-10 flex items-center gap-3">
- <button
- onClick={() => window.history.back()}
- aria-label="Back"
- className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip flex items-center justify-center smooth-colors tap-scale-sm"
- >
- <ArrowLeft className="h-[18px] w-[18px]"/>
- </button>
- <div>
-         <AnimatedTitle text="Settings"className="wordmark font-serif text-[32px] leading-none text-foreground"/>
- </div>
- </div>
- </header>
- <div className="bg-gradient-to-b from-transparent to-background h-6 -mt-6 relative z-0"/>
+    <div className="pb-24">
+      <header
+        ref={headerRef}
+        className="sticky top-0 z-30 px-6 flex items-center justify-between"
+        style={{
+          paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+          paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+          backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
+          backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+          WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',
+          borderBottom: '1px solid hsla(var(--border) / calc(var(--p, 0) * 0.5))',
+          borderBottomColor: 'hsla(var(--border) / calc(var(--p, 0) * 0.5))',
+          borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
+        }}
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            onClick={() => window.history.back()}
+            aria-label="Back"
+            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip flex items-center justify-center smooth-colors tap-scale-sm"
+          >
+            <ArrowLeft className="h-[18px] w-[18px]" />
+          </button>
+          <AnimatedTitle
+            text="Settings"
+            className="font-serif font-bold leading-none tracking-tight"
+            style={{
+              '--title-scale': 'calc(1 - var(--p, 0) * 0.25)',
+              fontSize: '32px'
+            } as any}
+          />
+        </div>
+      </header>
 
- <div className="stagger-children px-5 pt-2 space-y-7">
+      <div className="stagger-children px-5 pt-5 space-y-7">
  {/* Account */}
  <section>
  <SectionLabel>Account</SectionLabel>
