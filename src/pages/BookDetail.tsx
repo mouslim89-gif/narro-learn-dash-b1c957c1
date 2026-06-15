@@ -137,10 +137,14 @@ export default function BookDetail() {
  <p className="mt-1.5 text-sm text-muted-foreground">{book.author}</p>
 
  <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[12px] text-muted-foreground">
- <span className="inline-flex items-center gap-1.5">
- <span className="h-1.5 w-1.5 rounded-full bg-foreground/40"/>
- {genreLabels[book.genre]}
- </span>
+  <span className="inline-flex items-center gap-1.5">
+  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: book.coverColor }} />
+  {book.jlptLevel}
+  </span>
+  <span className="text-foreground/20">·</span>
+  <span className="inline-flex items-center gap-1.5">
+  {genreLabels[book.genre]}
+  </span>
  <span className="text-foreground/20">·</span>
  <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5"/>{book.readingTimeMin}m</span>
  {hasAnyAudio(book) && (
