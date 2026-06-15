@@ -212,10 +212,10 @@ export default function DictionaryPage() {
  const isCommon = (result as any).is_common;
 
  return (
- <div
- key={idx}
- className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 card-lift overflow-hidden"
- >
+          <div
+            key={idx}
+            className="relative rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm card-lift overflow-hidden"
+          >
  {/* Save / unsave button */}
  <button
  onClick={() => handleToggleSave(result)}
