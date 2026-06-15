@@ -33,7 +33,8 @@ import { TokenEditPanel } from'@/components/TokenEditPanel';
 import { TokenEditFloatingBar } from'@/components/TokenEditFloatingBar';
 import { tokensToRule } from'@/lib/token-edit-rules';
 import { useIsMobile } from'@/hooks/use-mobile';
-import { Sheet, SheetContent } from'@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from'@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from'@/lib/sentence-translations';
 
