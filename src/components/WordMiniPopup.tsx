@@ -204,11 +204,11 @@ export function WordMiniPopup({
  </button>
  )}
  <div className="flex-1"/>
- {(result as any)?.is_common && (
- <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary/80 ring-1 ring-primary/15">
- ✦
- </span>
- )}
+      {(result as any)?.is_common && (
+        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary ring-1 ring-primary/20">
+          ✦ Common
+        </span>
+      )}
  {result && !loading && onTranslateSentence && contextSentence && (
  <button
  onClick={onTranslateSentence}
