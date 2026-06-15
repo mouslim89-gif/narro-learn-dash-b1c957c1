@@ -99,10 +99,10 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  setDrafts([{
  t: matched.map((m) => m.t).join(''),
  r: matched.map((m) => m.r ??'').join('') || undefined,
-  p: matched[0]?.p,
-  pMode:'auto',
-  j: true,
-  origP: matched[0]?.p,
+ p: matched[0]?.p,
+ pMode:'auto',
+ j: true,
+ origP: matched[0]?.p,
  }]);
  }
  }
@@ -145,144 +145,144 @@ export function TokenEditPanel({ open, onClose, matched, isAdmin = false, onSubm
  };
 
  return (
-   <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
-     <DrawerContent className="max-h-[85vh] bg-card ring-1 ring-border/40 shadow-lg border-0">
-       <DrawerTitle className="sr-only">Edit Token</DrawerTitle>
-       <div className="flex flex-col h-full overflow-hidden pt-7 px-5 pb-8">
-         <div className="mb-5 flex items-center gap-3">
-           <h2 className="wordmark font-serif text-[20px] leading-none">
+  <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
+       <DrawerContent className="max-h-[85vh] overflow-y-auto bg-card ring-1 ring-border/40 shadow-lg border-0">
+         <DrawerHeader className="pt-10 pb-4">
+           <DrawerTitle className="text-left">
              {matched.length === 1 ? `Edit token 「${matched[0].t}」` : `Merge ${matched.length} tokens`}
-           </h2>
-           <div className="flex-1 h-px bg-border/60"/>
-         </div>
-         <div className="flex-1 overflow-y-auto overscroll-contain">
-           <div className="space-y-4">
-             {drafts.map((d, i) => (
-               <div key={i} className="rounded-lg border p-3 space-y-2 bg-card">
-                 <div className="flex items-center justify-between">
-                   <span className="text-xs font-semibold text-muted-foreground">Output token {i + 1}</span>
-                   <div className="flex gap-1">
-                     <Button size="sm" variant="ghost" onClick={() => splitTokenAt(i)} title="Split this token">
-                       Split
-                     </Button>
-                     {drafts.length > 1 && (
-                       <Button size="sm" variant="ghost" onClick={() => removeDraft(i)} title="Remove">
-                         <Trash2 className="h-3.5 w-3.5"/>
-                       </Button>
-                     )}
-                   </div>
-                 </div>
+           </DrawerTitle>
+         </DrawerHeader>
 
-                 <div className="grid grid-cols-2 gap-2">
-                   <div>
-                     <Label className="text-[10px]">Surface (t)</Label>
-                     <Input value={d.t} onChange={(e) => updateDraft(i, { t: e.target.value })} className="font-japanese"/>
-                   </div>
-                   <div>
-                     <Label className="text-[10px]">Reading / furigana (r)</Label>
-                     <Input value={d.r ??''} onChange={(e) => updateDraft(i, { r: e.target.value || undefined })} className="font-japanese" placeholder="kana"/>
-                   </div>
-                   <div>
-                     <Label className="text-[10px]">Base / dico key (b)</Label>
-                     <Input value={d.b ??''} onChange={(e) => updateDraft(i, { b: e.target.value || undefined })} className="font-japanese" placeholder="optional"/>
-                   </div>
-                   <div>
-                     <Label className="text-[10px]">POS (p)</Label>
-                     <div className="flex gap-1">
-                       <select
-                         value={d.pMode}
-                         onChange={(e) => updateDraft(i, { pMode: e.target.value as PMode })}
-                         className="rounded-md border bg-background px-2 py-1.5 text-xs"
-                         title="POS handling"
-                       >
-                         <option value="auto">Keep original</option>
-                         <option value="omit">No filter (any POS)</option>
-                         <option value="set">Force POS…</option>
-                       </select>
-                       {d.pMode ==='set'&& (
-                         <select
-                           value={d.p ??'名詞'}
-                           onChange={(e) => updateDraft(i, { p: e.target.value })}
-                           className="flex-1 rounded-md border bg-background px-2 py-1.5 text-sm"
-                         >
-                           {POS_OPTIONS.map((o) => (
-                             <option key={o.value} value={o.value}>{o.label}</option>
-                           ))}
-                           {d.p && !POS_OPTIONS.some((o) => o.value === d.p) && (
-                             <option value={d.p}>{d.p}</option>
-                           )}
-                         </select>
-                       )}
-                       {d.pMode ==='auto'&& d.origP && (
-                         <span className="flex-1 truncate rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground" title="Inherited from original token">
-                           ↻ {posLabel(d.origP)}
-                         </span>
-                       )}
-                       {d.pMode ==='omit'&& (
-                         <span className="flex-1 rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground">
-                           dictionary will not filter by POS
-                         </span>
-                       )}
-                     </div>
-                   </div>
-                 </div>
+ <div className="mt-2 mb-3 rounded-md bg-muted/50 px-3 py-2 text-xs">
+ <span className="text-muted-foreground">Match: </span>
+ <span className="font-japanese">{matched.map((m) => m.t).join('|')}</span>
+ </div>
 
-                 <label className="flex items-center justify-between rounded bg-muted/40 px-2 py-1.5">
-                   <span className="text-xs">Punctuation (j=false)</span>
-                   <Switch checked={d.j === false} onCheckedChange={(v) => updateDraft(i, { j: !v })} />
-                 </label>
-               </div>
-             ))}
+ <div className="space-y-4">
+ {drafts.map((d, i) => (
+ <div key={i} className="rounded-lg border p-3 space-y-2 bg-card">
+ <div className="flex items-center justify-between">
+ <span className="text-xs font-semibold text-muted-foreground">Output token {i + 1}</span>
+ <div className="flex gap-1">
+ <Button size="sm"variant="ghost"onClick={() => splitTokenAt(i)} title="Split this token">
+ Split
+ </Button>
+ {drafts.length > 1 && (
+ <Button size="sm"variant="ghost"onClick={() => removeDraft(i)} title="Remove">
+ <Trash2 className="h-3.5 w-3.5"/>
+ </Button>
+ )}
+ </div>
+ </div>
 
-             <Button variant="outline" size="sm" onClick={addDraft} className="w-full">
-               <Plus className="mr-1 h-3.5 w-3.5"/> Add another output token
-             </Button>
-           </div>
+ <div className="grid grid-cols-2 gap-2">
+ <div>
+ <Label className="text-[10px]">Surface (t)</Label>
+ <Input value={d.t} onChange={(e) => updateDraft(i, { t: e.target.value })} className="font-japanese"/>
+ </div>
+ <div>
+ <Label className="text-[10px]">Reading / furigana (r)</Label>
+ <Input value={d.r ??''} onChange={(e) => updateDraft(i, { r: e.target.value || undefined })} className="font-japanese"placeholder="kana"/>
+ </div>
+ <div>
+ <Label className="text-[10px]">Base / dico key (b)</Label>
+ <Input value={d.b ??''} onChange={(e) => updateDraft(i, { b: e.target.value || undefined })} className="font-japanese"placeholder="optional"/>
+ </div>
+ <div>
+ <Label className="text-[10px]">POS (p)</Label>
+ <div className="flex gap-1">
+ <select
+ value={d.pMode}
+ onChange={(e) => updateDraft(i, { pMode: e.target.value as PMode })}
+ className="rounded-md border bg-background px-2 py-1.5 text-xs"
+ title="POS handling"
+ >
+ <option value="auto">Keep original</option>
+ <option value="omit">No filter (any POS)</option>
+ <option value="set">Force POS…</option>
+ </select>
+ {d.pMode ==='set'&& (
+ <select
+ value={d.p ??'名詞'}
+ onChange={(e) => updateDraft(i, { p: e.target.value })}
+ className="flex-1 rounded-md border bg-background px-2 py-1.5 text-sm"
+ >
+ {POS_OPTIONS.map((o) => (
+ <option key={o.value} value={o.value}>{o.label}</option>
+ ))}
+ {d.p && !POS_OPTIONS.some((o) => o.value === d.p) && (
+ <option value={d.p}>{d.p}</option>
+ )}
+ </select>
+ )}
+ {d.pMode ==='auto'&& d.origP && (
+ <span className="flex-1 truncate rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground"title="Inherited from original token">
+ ↻ {posLabel(d.origP)}
+ </span>
+ )}
+ {d.pMode ==='omit'&& (
+ <span className="flex-1 rounded-md bg-muted/60 px-2 py-1.5 text-xs text-muted-foreground">
+ dictionary will not filter by POS
+ </span>
+ )}
+ </div>
+ </div>
+ </div>
 
-           {/* Live preview */}
-           <div className="mt-4 rounded-md border bg-muted/30 p-2">
-             <div className="mb-1 flex items-center justify-between">
-               <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Rule preview</span>
-               <Button size="sm" variant="ghost" onClick={copyPreview} disabled={!previewStr} className="h-6 px-2">
-                 <Copy className="h-3 w-3"/>
-               </Button>
-             </div>
-             <pre className="overflow-x-auto text-[11px] leading-relaxed">
-               <code>{previewStr ||'// fill in the surface to preview'}</code>
-             </pre>
-           </div>
+ <label className="flex items-center justify-between rounded bg-muted/40 px-2 py-1.5">
+ <span className="text-xs">Punctuation (j=false)</span>
+ <Switch checked={d.j === false} onCheckedChange={(v) => updateDraft(i, { j: !v })} />
+ </label>
+ </div>
+ ))}
 
-           <div className="mt-4 space-y-2 bg-background pt-3">
-             <label className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
-               <div className="flex flex-col">
-                 <span className="text-xs font-semibold">Apply globally</span>
-                 <span className="text-[10px] text-muted-foreground">Use across all books (scope: *)</span>
-               </div>
-               <Switch checked={globalScope} onCheckedChange={setGlobalScope} />
-             </label>
-             {isAdmin && (
-               <label className="flex items-center justify-between rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
-                 <div className="flex flex-col">
-                   <span className="text-xs font-semibold text-primary">Publish for all accounts</span>
-                   <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
-                 </div>
-                 <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
-               </label>
-             )}
-             <div className="flex gap-2 pb-4">
-               <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
-               <Button
-                 disabled={!valid}
-                 onClick={() => onSubmit(drafts.map(toToken), { global: globalScope, shared: sharedScope })}
-                 className="flex-1"
-               >
-                 Save rule
-               </Button>
-             </div>
-           </div>
-         </div>
-       </div>
-     </DrawerContent>
-   </Drawer>
+ <Button variant="outline"size="sm"onClick={addDraft} className="w-full">
+ <Plus className="mr-1 h-3.5 w-3.5"/> Add another output token
+ </Button>
+ </div>
+
+ {/* Live preview */}
+ <div className="mt-4 rounded-md border bg-muted/30 p-2">
+ <div className="mb-1 flex items-center justify-between">
+ <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Rule preview</span>
+ <Button size="sm"variant="ghost"onClick={copyPreview} disabled={!previewStr} className="h-6 px-2">
+ <Copy className="h-3 w-3"/>
+ </Button>
+ </div>
+ <pre className="overflow-x-auto text-[11px] leading-relaxed">
+ <code>{previewStr ||'// fill in the surface to preview'}</code>
+ </pre>
+ </div>
+
+ <div className="sticky bottom-0 mt-4 space-y-2 bg-background pt-3">
+ <label className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
+ <div className="flex flex-col">
+ <span className="text-xs font-semibold">Apply globally</span>
+ <span className="text-[10px] text-muted-foreground">Use across all books (scope: *)</span>
+ </div>
+ <Switch checked={globalScope} onCheckedChange={setGlobalScope} />
+ </label>
+ {isAdmin && (
+ <label className="flex items-center justify-between rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
+ <div className="flex flex-col">
+ <span className="text-xs font-semibold text-primary">Publish for all accounts</span>
+ <span className="text-[10px] text-muted-foreground">Admin: visible to every user</span>
+ </div>
+ <Switch checked={sharedScope} onCheckedChange={setSharedScope} />
+ </label>
+ )}
+ <div className="flex gap-2">
+ <Button variant="outline"onClick={onClose} className="flex-1">Cancel</Button>
+ <Button
+ disabled={!valid}
+ onClick={() => onSubmit(drafts.map(toToken), { global: globalScope, shared: sharedScope })}
+ className="flex-1"
+ >
+ Save rule
+ </Button>
+ </div>
+ </div>
+      </DrawerContent>
+    </Drawer>
  );
 }
