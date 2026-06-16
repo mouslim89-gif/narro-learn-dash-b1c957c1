@@ -1232,9 +1232,7 @@ export default function Reader() {
  <div className="mx-auto mt-3 h-px w-12 bg-border/60"/>
   </div>
   );
-})()}
-
- })()}
+  })()}
 
  {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
  <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-soft">
