@@ -1176,11 +1176,28 @@ export default function Reader() {
             </div>
           </DrawerContent>
         </Drawer>
+      </div>
+    );
+  }
 
+  return (
+    <div 
+      className={cn(
+        "min-h-screen transition-colors duration-300",
+        readerDarkMode ? "dark bg-background" : "bg-background"
+      )}
+    >
+      <ReaderHeader
+        scrolled={scrolled}
+        onBack={() => navigate(`/book/${id}`)}
+        title={book.titleEn}
+        onShowSettings={() => setShowSettings(!showSettings)}
+      />
 
+      <div className="h-14" />
 
+      <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
 
- <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
 
  {(() => {
  const isFirstChapter = book.chapters && book.chapters.length > 1
