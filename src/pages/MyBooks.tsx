@@ -19,6 +19,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
+
 function ActivityHeatmap({ readDateStrings }: { readDateStrings: Set<string> }) {
   const weeks = 12;
   const daysInWeek = 7;
