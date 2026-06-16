@@ -1,5 +1,4 @@
-import { useMemo, useRef } from'react';
-import { useScrollProgress } from'@/hooks/use-scroll-progress';
+import { useMemo, useRef, useEffect, useState, useCallback } from'react';
 import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
@@ -11,6 +10,82 @@ import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { useDelayed } from'@/hooks/use-delayed';
+import { useKnownWordsIndex } from '@/lib/known-words';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { useScrollProgress } from '@/hooks/use-scroll-progress';
+
+
+function ActivityHeatmap({ readDateStrings }: { readDateStrings: Set<string> }) {
+  const weeks = 12;
+  const daysInWeek = 7;
+  const today = new Date();
+  
+  const cells = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < weeks * daysInWeek; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (weeks * daysInWeek - 1 - i));
+      const dateStr = format(d, 'yyyy-MM-dd');
+      arr.push({
+        date: d,
+        dateStr,
+        hasActivity: readDateStrings.has(dateStr)
+      });
+    }
+    return arr;
+  }, [readDateStrings]);
+
+  return (
+    <div className="rounded-2xl bg-card p-4 ring-1 ring-border/30 shadow-sm mt-5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3 flex items-center gap-2">
+        <span className="section-bullet" />Activity
+      </p>
+      <TooltipProvider delayDuration={0}>
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-[3px]">
+            {Array.from({ length: weeks }).map((_, wIdx) => {
+              const date = cells[wIdx * 7].date;
+              const showMonth = date.getDate() <= 7;
+              return (
+                <div key={wIdx} className="w-[10px] text-[8px] text-muted-foreground/60 h-3">
+                  {showMonth ? MONTHS[date.getMonth()] : ''}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex gap-[3px]">
+            {Array.from({ length: weeks }).map((_, wIdx) => (
+              <div key={wIdx} className="flex flex-col gap-[3px]">
+                {Array.from({ length: daysInWeek }).map((_, dIdx) => {
+                  const cell = cells[wIdx * 7 + dIdx];
+                  return (
+                    <Tooltip key={cell.dateStr}>
+                      <TooltipTrigger asChild>
+                        <div 
+                          className={cn(
+                            "h-[10px] w-[10px] rounded-[1.5px] transition-colors",
+                            cell.hasActivity 
+                              ? "bg-accent shadow-[0_0_8px_hsl(var(--accent)/0.3)]" 
+                              : "bg-muted/40"
+                          )}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-[10px] py-1 px-2">
+                        {format(cell.date, 'MMM d, yyyy')} {cell.hasActivity ? '• Read' : ''}
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </TooltipProvider>
+    </div>
+  );
+}
+
 
 export default function MyBooks() {
  const { progress, getBookProgress } = useReadingProgressStore();
@@ -119,7 +194,10 @@ export default function MyBooks() {
  </div>
  )}
 
- {bookProgressList.length === 0 ? (
+  <ActivityHeatmap readDateStrings={stats.readDateStrings} />
+
+  {bookProgressList.length === 0 ? (
+
  <div className={`mt-24 flex flex-col items-center text-center transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
  <BookOpen className="h-9 w-9 text-primary"/>

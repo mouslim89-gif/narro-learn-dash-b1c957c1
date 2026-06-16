@@ -28,6 +28,9 @@ export function ReaderToken({
   knownLevel,
   onTap,
 }: Props) {
+  // Hide furigana if the word is marked as "known" (mastery level >= 3)
+  const effectivelyShowFurigana = showFurigana && (knownLevel !== 'known');
+
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onTap();
@@ -45,7 +48,7 @@ export function ReaderToken({
       <FuriganaWord
         text={token.t}
         reading={token.r}
-        furiganaVisible={showFurigana}
+        furiganaVisible={effectivelyShowFurigana}
         colorClass={cls}
         onClick={handleClick}
         onMouseDown={stopDown}
