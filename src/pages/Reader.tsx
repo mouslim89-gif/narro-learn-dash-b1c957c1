@@ -226,41 +226,44 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 }
 
 export default function Reader() {
- const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
- const navigate = useNavigate();
- const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
+  const navigate = useNavigate();
+  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
- const knownIndex = useKnownWordsIndex();
- const knownTogglesByLevel: Record<KnownLevel, boolean> = {
- new: highlightNew,
- learning: highlightLearning,
- known: highlightKnown,
- };
- const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
- const saved = id ? getProgress(id, chapterId) : undefined;
+  const knownIndex = useKnownWordsIndex();
+  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
+    new: highlightNew,
+    learning: highlightLearning,
+    known: highlightKnown,
+  };
+  const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
+  const saved = id ? getProgress(id, chapterId) : undefined;
 
- const [difficulty, setDifficulty] = useState<Difficulty>(
- (diffParam as Difficulty) || saved?.difficulty ||'simplified');
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    (diffParam as Difficulty) || saved?.difficulty || 'simplified'
+  );
+  const [scrolled, setScrolled] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const initialSentenceIdx = useMemo(() => {
     const key = chapterKey(id!, chapterId);
     return useReadingProgressStore.getState().progress[key]?.sentenceIdx;
   }, [id, chapterId]);
   const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
- const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
- const [levelOpen, setLevelOpen] = useState(false);
- const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
- const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
- try {
- const stored = sessionStorage.getItem('reopen-word-popup');
- if (!stored) return null;
- sessionStorage.removeItem('reopen-word-popup');
- const data = JSON.parse(stored);
- return data?.word ?? null;
- } catch {
- return null;
- }
- });
+  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
+  const [levelOpen, setLevelOpen] = useState(false);
+  const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
+    try {
+      const stored = sessionStorage.getItem('reopen-word-popup');
+      if (!stored) return null;
+      sessionStorage.removeItem('reopen-word-popup');
+      const data = JSON.parse(stored);
+      return data?.word ?? null;
+    } catch {
+      return null;
+    }
+  });
+
 
  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
@@ -1139,6 +1142,7 @@ export default function Reader() {
     </div>
   );
 
+
   if (isMobile) {
     return (
       <div 
@@ -1149,11 +1153,14 @@ export default function Reader() {
         )}
       >
         <ReaderHeader
-          scrolled={scrolled}
+          scrolled={false}
           onBack={() => navigate(`/book/${id}`)}
           title={book.titleEn}
           onShowSettings={() => setShowSettings(!showSettings)}
         />
+
+
+
 
         <div className="h-14" />
 
@@ -1174,11 +1181,30 @@ export default function Reader() {
             </div>
           </DrawerContent>
         </Drawer>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className={cn(
+        "min-h-screen transition-colors duration-300",
+        readerDarkMode ? "dark bg-background" : "bg-background"
+      )}
+    >
+      <ReaderHeader
+        scrolled={scrolled}
+        onBack={() => navigate(`/book/${id}`)}
+        title={book.titleEn}
+        onShowSettings={() => setShowSettings(!showSettings)}
+      />
 
 
 
+      <div className="h-14" />
 
- <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+      <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+
 
  {(() => {
  const isFirstChapter = book.chapters && book.chapters.length > 1
@@ -1546,4 +1572,5 @@ export default function Reader() {
     </div>
   );
 }
+
 
