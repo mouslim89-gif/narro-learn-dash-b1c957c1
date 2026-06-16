@@ -95,6 +95,47 @@ const ReaderHeader = ({
 );
 
 
+const ReaderHeader = ({ 
+  scrolled, 
+  onBack, 
+  title, 
+  onShowSettings 
+}: { 
+  scrolled: boolean; 
+  onBack: () => void; 
+  title: string; 
+  onShowSettings: () => void;
+}) => (
+  <header className="fixed top-0 z-40 w-full">
+    <div className={cn(
+      "flex h-14 items-center justify-between px-4 transition-all duration-300",
+      scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border/40 shadow-sm" : "bg-transparent"
+    )}>
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          onClick={onBack}
+          className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <h1 className={cn(
+          "font-serif font-bold transition-all truncate",
+          scrolled ? "opacity-100 text-lg translate-y-0" : "opacity-0 -translate-y-2"
+        )}>
+          {title}
+        </h1>
+      </div>
+      <button
+        onClick={onShowSettings}
+        className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
+      >
+        <Settings className="h-4 w-4" />
+      </button>
+    </div>
+  </header>
+);
+
+
 const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
  const out: BookToken[] = [];
  const isHorizontalSpace = (text: string) => /^[ \t　]+$/.test(text);
@@ -240,8 +281,12 @@ export default function Reader() {
 
  const [difficulty, setDifficulty] = useState<Difficulty>(
  (diffParam as Difficulty) || saved?.difficulty ||'simplified');
- const [showSettings, setShowSettings] = useState(false);
- const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const initialSentenceIdx = useMemo(() => {
+    const key = chapterKey(id!, chapterId);
+    return useReadingProgressStore.getState().progress[key]?.sentenceIdx;
+  }, [id, chapterId]);
+  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
  const [levelOpen, setLevelOpen] = useState(false);
  const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
@@ -262,7 +307,7 @@ export default function Reader() {
   
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
- const articleRef = useRef<HTMLDivElement>(null);
+ const articleRef = useRef<HTMLElement>(null);
  const restoredScroll = useRef(false);
  // Top-most visible sentence index (updated by IntersectionObserver).
  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
@@ -1256,18 +1301,22 @@ export default function Reader() {
     );
   }
 
- return showSettings ? (
- <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in-soft">
- <div className="mx-auto max-w-2xl">
- <div className="mb-5 flex items-center gap-3">
- <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
- <div className="flex-1 h-px bg-border/60"/>
- </div>
- {settingsBody}
- </div>
- </div>
- ) : null;
- })()}
+  return (
+    <div 
+      className={cn(
+        "min-h-screen transition-colors duration-300",
+        readerDarkMode ? "dark bg-background" : "bg-background"
+      )}
+    >
+      <ReaderHeader
+        scrolled={scrolled}
+        onBack={() => navigate(`/book/${id}`)}
+        title={book.titleEn}
+        onShowSettings={() => setShowSettings(!showSettings)}
+      />
+
+      <div className="h-14" /> {/* Spacer for fixed header */}
+
 
 
  <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
