@@ -1136,15 +1136,15 @@ export default function Reader() {
  </div>
  </section>
  )}
+    </div>
   );
-
-
 
   if (isMobile) {
     return (
       <div 
         className={cn(
           "min-h-screen transition-colors duration-300",
+
           readerDarkMode ? "dark bg-background" : "bg-background"
         )}
       >
@@ -1543,6 +1543,6 @@ export default function Reader() {
   }}
   />
   )}
-  </div>
+    </div>
   );
 }
