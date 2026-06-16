@@ -1276,8 +1276,9 @@ export default function Reader() {
  </div>
  </section>
  )}
- </div>
- );
+  </div>
+  );
+
 
   if (isMobile) {
     return (
@@ -1684,6 +1685,6 @@ export default function Reader() {
  }}
  />
  )}
- </div>
- );
+    </div>
+  );
 }
