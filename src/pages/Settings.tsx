@@ -3,6 +3,7 @@ import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useFlashcardStore } from '@/stores/flashcards';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
