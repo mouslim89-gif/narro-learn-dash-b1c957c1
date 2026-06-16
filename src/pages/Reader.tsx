@@ -1002,6 +1002,7 @@ export default function Reader() {
 
 
 
+
  {(() => {
  const SectionLabel = ({ children }: { children: ReactNode }) => (
  <div className="flex items-center gap-3 mb-3 px-1">
