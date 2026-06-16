@@ -22,7 +22,7 @@ import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSi
 import { toast } from '@/hooks/use-toast';
 
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from'@/lib/audio-sync';
-import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from'@/lib/known-words';
+import { useKnownWordsIndex, getKnownLevel, type KnownLevel, getMastery } from'@/lib/known-words';
 import { Switch } from'@/components/ui/switch';
 import { useIsAdmin } from'@/lib/admin';
 import { useTokenEditStore } from'@/stores/token-edit';
@@ -51,8 +51,49 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 const stripParens = (text: string): string =>
  text
  .replace(/[（(][^（）()\n\r]*[）)]/g,'')
- .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g,'$1$2')
- .replace(/^一$/gm,'​');
+  .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g,'$1$2')
+  .replace(/^一$/gm,'​');
+
+const ReaderHeader = ({ 
+  scrolled, 
+  onBack, 
+  title, 
+  onShowSettings 
+}: { 
+  scrolled: boolean; 
+  onBack: () => void; 
+  title: string; 
+  onShowSettings: () => void;
+}) => (
+  <header className="fixed top-0 z-40 w-full">
+    <div className={cn(
+      "flex h-14 items-center justify-between px-4 transition-all duration-300",
+      scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border/40 shadow-sm" : "bg-transparent"
+    )}>
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          onClick={onBack}
+          className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <h1 className={cn(
+          "font-serif font-bold transition-all truncate",
+          scrolled ? "opacity-100 text-lg translate-y-0" : "opacity-0 -translate-y-2"
+        )}>
+          {title}
+        </h1>
+      </div>
+      <button
+        onClick={onShowSettings}
+        className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
+      >
+        <Settings className="h-4 w-4" />
+      </button>
+    </div>
+  </header>
+);
+
 
 const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
  const out: BookToken[] = [];
@@ -1337,8 +1378,14 @@ export default function Reader() {
 
  let knownLevel: KnownLevel | null = null;
  if (!tokenEditMode && showKnownHighlights) {
- const lvl = getKnownLevel(token, knownIndex);
- if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
+  const lvl = getKnownLevel(token, knownIndex);
+  if (lvl && knownTogglesByLevel[lvl]) {
+    knownLevel = lvl;
+  } else if (!lvl) {
+    // If not in known index, check flashcards for mastery-based furigana hiding
+    const mastery = getMastery(token, knownIndex);
+    if (mastery >= 3) knownLevel = 'known';
+  }
  }
 
  const editClass = tokenEditMode
