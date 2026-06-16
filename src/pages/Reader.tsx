@@ -997,22 +997,6 @@ export default function Reader() {
       <div className="h-14" /> {/* Spacer for fixed header */}
 
 
- onClick={() => setShowSettings(!showSettings)}
- active={showSettings}
- title="Settings"
- >
- <Settings className="h-5 w-5"/>
- </HeaderChip>
-
- </div>
- </div>
- <div className="h-[2px] w-full bg-border/30">
- <div
- className="h-full transition-[width] duration-200"
- style={{ width:`${scrollPercent}%`, backgroundColor: book.coverColor }}
- />
- </div>
- </header>
 
 
 
