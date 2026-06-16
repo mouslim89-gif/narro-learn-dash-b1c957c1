@@ -1153,11 +1153,12 @@ export default function Reader() {
         )}
       >
         <ReaderHeader
-          scrolled={scrolled}
+          scrolled={false}
           onBack={() => navigate(`/book/${id}`)}
           title={book.titleEn}
           onShowSettings={() => setShowSettings(!showSettings)}
         />
+
 
 
         <div className="h-14" />
