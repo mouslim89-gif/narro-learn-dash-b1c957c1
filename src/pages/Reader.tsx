@@ -996,14 +996,7 @@ export default function Reader() {
 
       <div className="h-14" /> {/* Spacer for fixed header */}
 
-
-
-
-
-
-
-
- {(() => {
+  {(() => {
  const SectionLabel = ({ children }: { children: ReactNode }) => (
  <div className="flex items-center gap-3 mb-3 px-1">
  <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
@@ -1237,8 +1230,10 @@ export default function Reader() {
  </p>
  <p className="mt-1 font-serif text-lg font-bold">{chapter.title}</p>
  <div className="mx-auto mt-3 h-px w-12 bg-border/60"/>
- </div>
- );
+  </div>
+  );
+})()}
+
  })()}
 
  {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
