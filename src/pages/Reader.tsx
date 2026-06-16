@@ -1139,6 +1139,7 @@ export default function Reader() {
     </div>
   );
 
+
   if (isMobile) {
     return (
       <div 
@@ -1154,6 +1155,7 @@ export default function Reader() {
           title={book.titleEn}
           onShowSettings={() => setShowSettings(!showSettings)}
         />
+
 
         <div className="h-14" />
 
