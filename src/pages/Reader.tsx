@@ -95,48 +95,8 @@ const ReaderHeader = ({
 );
 
 
-const ReaderHeader = ({ 
-  scrolled, 
-  onBack, 
-  title, 
-  onShowSettings 
-}: { 
-  scrolled: boolean; 
-  onBack: () => void; 
-  title: string; 
-  onShowSettings: () => void;
-}) => (
-  <header className="fixed top-0 z-40 w-full">
-    <div className={cn(
-      "flex h-14 items-center justify-between px-4 transition-all duration-300",
-      scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border/40 shadow-sm" : "bg-transparent"
-    )}>
-      <div className="flex items-center gap-2 min-w-0">
-        <button
-          onClick={onBack}
-          className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <h1 className={cn(
-          "font-serif font-bold transition-all truncate",
-          scrolled ? "opacity-100 text-lg translate-y-0" : "opacity-0 -translate-y-2"
-        )}>
-          {title}
-        </h1>
-      </div>
-      <button
-        onClick={onShowSettings}
-        className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
-      >
-        <Settings className="h-4 w-4" />
-      </button>
-    </div>
-  </header>
-);
-
-
 const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
+
  const out: BookToken[] = [];
  const isHorizontalSpace = (text: string) => /^[ \t　]+$/.test(text);
  const isOpen = (text: string) => text ==='（'|| text ==='(';
@@ -1020,84 +980,22 @@ export default function Reader() {
 
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
- return (
- <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
-  <header className="sticky top-0 z-30 glass-subtle">
+  return (
+    <div 
+      className={cn(
+        "min-h-screen transition-colors duration-300",
+        readerDarkMode ? "dark bg-background" : "bg-background"
+      )}
+    >
+      <ReaderHeader
+        scrolled={scrolled}
+        onBack={() => navigate(`/book/${id}`)}
+        title={book.titleEn}
+        onShowSettings={() => setShowSettings(!showSettings)}
+      />
 
-  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
- <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
- <ArrowLeft className="h-5 w-5"/>
- </HeaderChip>
- <Popover
- open={levelOpen}
- onOpenChange={(o) => {
- setLevelOpen(o);
- if (o) {
- setMiniPopup(null);
- setSentenceTranslation(null);
- }
- }}
- >
- <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className={cn('flex-1 min-w-0 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
-                    levelOpen
-                      ?'bg-foreground/10 ring-1 ring-border/50':'',
-                  )}
-                  aria-label="Change reading level"
-                >
-                  <p className="font-japanese text-sm font-bold leading-tight truncate">{book.titleJp}</p>
-                  <p className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5 mt-0.5">
-                    {difficultyConfig[difficulty].label}
-                    <ChevronDown
-                      className={cn('h-3 w-3 transition-transform', levelOpen &&'rotate-180')}
-                    />
-                  </p>
-                </button>
- </PopoverTrigger>
- <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
- <div className="flex flex-col gap-1.5">
- <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
- <div className="flex gap-1 rounded-full bg-muted p-1">
- {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
- <button
- key={d}
-  onClick={() => handleChangeDifficulty(d)}
- className={cn('h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
- d === difficulty
- ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground',
- )}
- >
- {difficultyConfig[d].label}
- </button>
- ))}
- </div>
- </div>
- </PopoverContent>
- </Popover>
- <div className="flex items-center gap-1">
- <HeaderChip
+      <div className="h-14" /> {/* Spacer for fixed header */}
 
- onClick={() => setShowFurigana(!showFurigana)}
- active={showFurigana}
- title={showFurigana ?'Hide Furigana':'Show Furigana'}
- >
- {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
- </HeaderChip>
- <HeaderChip
-
- onClick={handleToggleTranslations}
- active={showTranslations}
- title={showTranslations ?'Hide translations':'Show translations'}
- >
- <Languages className="h-5 w-5"/>
- </HeaderChip>
-
- <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
- <BookType className="h-5 w-5"/>
- </HeaderChip>
- <HeaderChip
 
  onClick={() => setShowSettings(!showSettings)}
  active={showSettings}
