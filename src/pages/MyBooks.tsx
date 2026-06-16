@@ -1,5 +1,4 @@
-import { useMemo, useRef } from'react';
-import { useScrollProgress } from'@/hooks/use-scroll-progress';
+import { useMemo, useRef, useEffect, useState, useCallback } from'react';
 import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
@@ -14,10 +13,8 @@ import { useDelayed } from'@/hooks/use-delayed';
 import { useKnownWordsIndex } from '@/lib/known-words';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { useScrollProgress } from '@/hooks/use-scroll-progress';
 
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function ActivityHeatmap({ readDateStrings }: { readDateStrings: Set<string> }) {
   const weeks = 12;

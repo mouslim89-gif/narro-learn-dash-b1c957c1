@@ -1538,11 +1538,11 @@ export default function Reader() {
  toast({ title:'Rule pending', description: opts.global ?'Global rule — click Apply to save.':'Click Apply to save it.'});
  }
  }
- setEditPanel(null);
- setSelectedIdx([]);
- }}
- />
- )}
-    </div>
+  setEditPanel(null);
+  setSelectedIdx([]);
+  }}
+  />
+  )}
+  </div>
   );
 }
