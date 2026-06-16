@@ -978,58 +978,42 @@ export default function Reader() {
  });
  }, []);
 
- if (!book) return <div className="p-8 text-center">Book not found.</div>;
+  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
-  return (
-    <div 
-      className={cn(
-        "min-h-screen transition-colors duration-300",
-        readerDarkMode ? "dark bg-background" : "bg-background"
-      )}
-    >
-      <ReaderHeader
-        scrolled={scrolled}
-        onBack={() => navigate(`/book/${id}`)}
-        title={book.titleEn}
-        onShowSettings={() => setShowSettings(!showSettings)}
-      />
+  const SectionLabel = ({ children }: { children: ReactNode }) => (
+    <div className="flex items-center gap-3 mb-3 px-1">
+      <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
+        {children}
+      </h2>
+      <div className="flex-1 h-px bg-border/60"/>
+    </div>
+  );
 
-      <div className="h-14" /> {/* Spacer for fixed header */}
+  const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
+  const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
+  const pillIdle ='text-muted-foreground';
 
-  {(() => {
- const SectionLabel = ({ children }: { children: ReactNode }) => (
- <div className="flex items-center gap-3 mb-3 px-1">
- <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
- {children}
- </h2>
- <div className="flex-1 h-px bg-border/60"/>
- </div>
- );
+  const settingsBody = (
+    <div className="space-y-7">
+      {/* Reading */}
+      <section>
+        <SectionLabel>Reading</SectionLabel>
+        <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+          <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-[15px] font-medium">Reading level</span>
+            <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
+              {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => handleChangeDifficulty(d)}
+                  className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
+                >
+                  {difficultyConfig[d].label}
+                </button>
+              ))}
+            </div>
+          </div>
 
- const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
- const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
- const pillIdle ='text-muted-foreground';
-
- const settingsBody = (
- <div className="space-y-7">
- {/* Reading */}
- <section>
- <SectionLabel>Reading</SectionLabel>
- <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
- <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
- <span className="text-[15px] font-medium">Reading level</span>
- <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
- {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
- <button
- key={d}
- onClick={() => handleChangeDifficulty(d)}
- className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
- >
- {difficultyConfig[d].label}
- </button>
- ))}
- </div>
- </div>
  <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
  <span className="text-[15px] font-medium">Font size</span>
  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
@@ -1152,47 +1136,45 @@ export default function Reader() {
  </div>
  </section>
  )}
-  </div>
   );
+
 
 
   if (isMobile) {
     return (
-      <Drawer open={showSettings} onOpenChange={setShowSettings}>
-        <DrawerContent className="rounded-t-3xl bg-background p-0 ring-1 ring-border/40 shadow-lg border-0">
-          <DrawerHeader className="sr-only">
-            <DrawerTitle>Reader Settings</DrawerTitle>
-          </DrawerHeader>
-          <div 
-            className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <div className="mb-5 flex items-center gap-3">
-              <h1 className="wordmark font-serif text-[24px] leading-none">Settings</h1>
-              <div className="flex-1 h-px bg-border/60"/>
+      <div 
+        className={cn(
+          "min-h-screen transition-colors duration-300",
+          readerDarkMode ? "dark bg-background" : "bg-background"
+        )}
+      >
+        <ReaderHeader
+          scrolled={scrolled}
+          onBack={() => navigate(`/book/${id}`)}
+          title={book.titleEn}
+          onShowSettings={() => setShowSettings(!showSettings)}
+        />
+
+        <div className="h-14" />
+
+        <Drawer open={showSettings} onOpenChange={setShowSettings}>
+          <DrawerContent className="rounded-t-3xl bg-background p-0 ring-1 ring-border/40 shadow-lg border-0">
+            <DrawerHeader className="sr-only">
+              <DrawerTitle>Reader Settings</DrawerTitle>
+            </DrawerHeader>
+            <div 
+              className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <div className="mb-5 flex items-center gap-3">
+                <h1 className="wordmark font-serif text-[24px] leading-none">Settings</h1>
+                <div className="flex-1 h-px bg-border/60"/>
+              </div>
+              {settingsBody}
             </div>
-            {settingsBody}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
+          </DrawerContent>
+        </Drawer>
 
-  return (
-    <div 
-      className={cn(
-        "min-h-screen transition-colors duration-300",
-        readerDarkMode ? "dark bg-background" : "bg-background"
-      )}
-    >
-      <ReaderHeader
-        scrolled={scrolled}
-        onBack={() => navigate(`/book/${id}`)}
-        title={book.titleEn}
-        onShowSettings={() => setShowSettings(!showSettings)}
-      />
-
-      <div className="h-14" /> {/* Spacer for fixed header */}
 
 
 
