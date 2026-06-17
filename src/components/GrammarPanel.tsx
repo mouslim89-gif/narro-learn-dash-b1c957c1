@@ -26,6 +26,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [fetched, setFetched] = useState(false);
   const [translations, setTranslations] = useState<TranslationMap>(new Map());
+  const [scrolled, setScrolled] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Reset when the part changes so the panel re-pulls the matching subset.
