@@ -45,11 +45,12 @@ export function SrsButtons({ card, onAnswer }: Props) {
  {ORDER.map(({ key, quality, label, Icon, cls }) => {
  const days = previewIntervalDays(card, quality);
  return (
- <button
- key={key}
- onClick={() => onAnswer(key)}
- className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-[11px] font-semibold smooth-colors tap-scale-sm ${cls}`}
- >
+          <button
+            key={key}
+            onClick={() => onAnswer(key)}
+            aria-label={`${label} (next review in ${formatInterval(days)})`}
+            className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-[11px] font-semibold smooth-colors tap-scale-sm ${cls}`}
+          >
  <Icon className="h-3.5 w-3.5"/>
  <span className="leading-none">{label}</span>
  <span className="text-[9px] font-medium opacity-70 leading-none">
