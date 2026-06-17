@@ -9,8 +9,6 @@ import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { romajiToKana } from'@/lib/romaji';
-import { OnboardingModal } from '@/components/OnboardingModal';
-
 
 const genres = Object.keys(genreLabels) as Genre[];
 
@@ -153,10 +151,8 @@ export default function Library() {
  </section>
  );
  })}
-  </>
-  )}
-  <OnboardingModal />
-  </div>
-
+ </>
+ )}
+ </div>
  );
 }

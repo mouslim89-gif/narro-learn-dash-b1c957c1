@@ -48,27 +48,19 @@ interface ReadingProgressState {
  readerDarkMode: boolean;
  darkMode: boolean;
  showFurigana: boolean;
-  showTranslations: boolean;
-  displayMode: DisplayMode;
+ showTranslations: boolean;
+ displayMode: DisplayMode;
 
-  japaneseFont: JapaneseFont;
-  hasSeenLongPressHint: boolean;
-  // Onboarding
-  hasCompletedOnboarding: boolean;
-  targetJlpt: string;
-  dailyGoalMinutes: number;
-  // Known-word highlights (local-only)
-  showKnownHighlights: boolean;
-  highlightNew: boolean;
-  highlightLearning: boolean;
-  highlightKnown: boolean;
-  // Auth-synced user
-  syncUserId: string | null;
-  // Actions
-  setHasCompletedOnboarding: (v: boolean) => void;
-  setTargetJlpt: (v: string) => void;
-  setDailyGoalMinutes: (v: number) => void;
-
+ japaneseFont: JapaneseFont;
+ hasSeenLongPressHint: boolean;
+ // Known-word highlights (local-only)
+ showKnownHighlights: boolean;
+ highlightNew: boolean;
+ highlightLearning: boolean;
+ highlightKnown: boolean;
+ // Auth-synced user
+ syncUserId: string | null;
+ // Actions
  updateProgress: (
  bookId: string,
  chapterId: string | undefined,
@@ -117,12 +109,8 @@ const DEFAULT_PREFS: UserPreferences = {
  showKnownHighlights: true,
  highlightNew: true,
  highlightLearning: true,
-  highlightKnown: false,
-  hasCompletedOnboarding: false,
-  targetJlpt: 'N4',
-  dailyGoalMinutes: 20,
+ highlightKnown: false,
 };
-
 
 export function currentPrefs(state: ReadingProgressState): UserPreferences {
  return {
@@ -138,11 +126,8 @@ export function currentPrefs(state: ReadingProgressState): UserPreferences {
  showKnownHighlights: state.showKnownHighlights,
  highlightNew: state.highlightNew,
  highlightLearning: state.highlightLearning,
-    highlightKnown: state.highlightKnown,
-    hasCompletedOnboarding: state.hasCompletedOnboarding,
-    targetJlpt: state.targetJlpt,
-    dailyGoalMinutes: state.dailyGoalMinutes,
-  };
+ highlightKnown: state.highlightKnown,
+ };
 }
 
 let prefsTimer: number | null = null;
@@ -198,12 +183,9 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  showKnownHighlights: true,
  highlightNew: true,
  highlightLearning: true,
-  highlightKnown: false,
-  hasCompletedOnboarding: false,
-  targetJlpt: 'N4',
-  dailyGoalMinutes: 20,
-  syncUserId: null,
-  updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
+ highlightKnown: false,
+ syncUserId: null,
+ updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
  const cid = chapterId || DEFAULT_CHAPTER_ID;
  const key = chapterKey(bookId, cid);
  const prev = get().progress[key];
@@ -277,11 +259,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  setShowKnownHighlights: (showKnownHighlights) => { set({ showKnownHighlights }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setHighlightNew: (highlightNew) => { set({ highlightNew }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setHighlightLearning: (highlightLearning) => { set({ highlightLearning }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-  setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-  setHasCompletedOnboarding: (hasCompletedOnboarding) => { set({ hasCompletedOnboarding }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-  setTargetJlpt: (targetJlpt) => { set({ targetJlpt }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-  setDailyGoalMinutes: (dailyGoalMinutes) => { set({ dailyGoalMinutes }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
-
+ setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  hydrateProgress: (incoming, userId) => {
  // Merge instead of replace: keep whichever side is newer per chapter so
  // a slow cloud pull can't clobber a fresh local write (or vice-versa).

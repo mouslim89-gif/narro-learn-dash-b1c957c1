@@ -1,8 +1,7 @@
 import { useParams, useNavigate, Link } from'react-router-dom';
 import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasParts, partChapterId, DEFAULT_CHAPTER_ID, type Difficulty } from'@/data/books';
-import { useScrollProgress } from'@/hooks/use-scroll-progress';
 
-import { useEffect, useState, useRef } from'react';
+import { useEffect, useState } from'react';
 import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
@@ -18,11 +17,15 @@ export default function BookDetail() {
  const hasProgress = !!bookProgress && bookProgress.progressPercent > 0;
 
  const [difficulty, setDifficulty] = useState<Difficulty>(
-  bookProgress?.difficulty ||'simplified');
+ bookProgress?.difficulty ||'simplified');
 
-  const headerRef = useRef<HTMLElement>(null);
-  useScrollProgress(headerRef, 0, 120);
-
+ const [scrolled, setScrolled] = useState(false);
+ useEffect(() => {
+ const onScroll = () => setScrolled(window.scrollY > 120);
+ onScroll();
+ window.addEventListener('scroll', onScroll, { passive: true });
+ return () => window.removeEventListener('scroll', onScroll);
+ }, []);
 
  if (!book) {
  return (
@@ -99,30 +102,23 @@ export default function BookDetail() {
  return`Start Chapter ${num}`;
  }
 
-  return (
-    <div className="pb-24">
-      <header
-        ref={headerRef}
-        className="relative overflow-hidden px-6 pt-10 pb-6"
-        style={{ 
-          backgroundImage: `linear-gradient(160deg, ${book.coverColor}1f 0%, hsl(var(--background)) 65%)`,
-          // Note: we don't use the standard scroll-background/blur here to preserve the cover aesthetic
-        }}
-      >
-
+ return (
+ <div className="pb-24">
+ <header
+ className="relative overflow-hidden px-6 pt-10 pb-6"
+ style={{ backgroundImage:`linear-gradient(160deg, ${book.coverColor}1f 0%, hsl(var(--background)) 65%)`}}
+ >
  
-  <button
-    onClick={() => navigate('/')}
-    className="fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip"
-    style={{
-      backgroundColor: 'hsl(var(--background) / calc(0.7 + var(--p, 0) * 0.15))',
-      backdropFilter: 'blur(calc(12px + var(--p, 0) * 8px))',
-      borderBottomColor: 'hsla(var(--border) / calc(var(--p, 0) * 0.5))',
-    } as any}
-    aria-label="Back"
-  >
-
-
+ <button
+ onClick={() => navigate('/')}
+ className={cn(
+  "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip transition-[background-color,box-shadow,backdrop-filter] duration-200",
+  scrolled
+  ?"bg-background/85 backdrop-blur-xl ring-border/60"
+  :"bg-background/70 backdrop-blur-md ring-border/40"
+ )}
+ aria-label="Back"
+ >
  <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
 
