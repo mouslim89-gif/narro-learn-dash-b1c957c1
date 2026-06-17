@@ -113,14 +113,15 @@ export default function BookDetail() {
  
   <button
     onClick={() => navigate('/')}
-    className="fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip bg-background/70 backdrop-blur-md ring-border/40"
+    className="fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip"
     style={{
       backgroundColor: 'hsl(var(--background) / calc(0.7 + var(--p, 0) * 0.15))',
       backdropFilter: 'blur(calc(12px + var(--p, 0) * 8px))',
-      boxShadow: 'var(--p, 0) > 0.5 ? "0 4px 12px -2px rgba(0,0,0,0.1)" : ""'
+      borderBottomColor: 'hsla(var(--border) / calc(var(--p, 0) * 0.5))',
     } as any}
     aria-label="Back"
   >
+
 
  <ArrowLeft className="h-[18px] w-[18px]"/>
  </button>
