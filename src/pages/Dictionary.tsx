@@ -102,7 +102,7 @@ export default function DictionaryPage() {
  } finally {
  setSearching(false);
  }
- }, 400);
+ }, 300);
 
  return () => clearTimeout(timeout);
  }, [query]);
