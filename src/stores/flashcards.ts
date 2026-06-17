@@ -27,23 +27,18 @@ interface FlashcardStore {
  savedWords: SavedWord[];
  isReviewing: boolean;
  syncUserId: string | null;
-  setIsReviewing: (v: boolean) => void;
-  addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
-  removeWord: (id: string) => void;
-  hasWord: (id: string) => boolean;
-  incrementMastery: (id: string) => void;
-  resetMastery: (id: string) => void;
-  adjustMastery: (id: string, quality: 'again' | 'hard' | 'good' | 'easy') => void;
-  getDueCount: () => number;
-  getDueWords: () => SavedWord[];
-  // Limits
-  dailyNewLimit: number;
-  dailyReviewLimit: number;
-  setDailyNewLimit: (n: number) => void;
-  setDailyReviewLimit: (n: number) => void;
-  // Sync helpers
-  hydrateWords: (words: SavedWord[], userId: string) => void;
-  clearWords: () => void;
+ setIsReviewing: (v: boolean) => void;
+ addWord: (entry: Omit<SavedWord,'mastery'>) => void;
+ removeWord: (id: string) => void;
+ hasWord: (id: string) => boolean;
+ incrementMastery: (id: string) => void;
+ resetMastery: (id: string) => void;
+ adjustMastery: (id: string, quality:'again'|'hard'|'good'|'easy') => void;
+ getDueCount: () => number;
+ getDueWords: () => SavedWord[];
+ // Sync helpers
+ hydrateWords: (words: SavedWord[], userId: string) => void;
+ clearWords: () => void;
 }
 
 const QUALITY_MAP: Record<'again'|'hard'|'good'|'easy', Quality> = {
@@ -69,13 +64,9 @@ export const useFlashcardStore = create<FlashcardStore>()(
  persist(
  (set, get) => ({
  savedWords: [],
-      isReviewing: false,
-      syncUserId: null,
-      dailyNewLimit: 20,
-      dailyReviewLimit: 100,
-      setIsReviewing: (v) => set({ isReviewing: v }),
-      setDailyNewLimit: (n) => set({ dailyNewLimit: n }),
-      setDailyReviewLimit: (n) => set({ dailyReviewLimit: n }),
+ isReviewing: false,
+ syncUserId: null,
+ setIsReviewing: (v) => set({ isReviewing: v }),
  addWord: (entry) => {
  if (get().savedWords.find(w => w.id === entry.id)) return;
  const newWord: SavedWord = {

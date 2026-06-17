@@ -60,20 +60,5 @@ export function getKnownLevel(
  const m = index.get(k);
  if (m !== undefined) return masteryToLevel(m);
  }
-  return null;
-}
-
-export function getMastery(
-  token: BookToken,
-  index: Map<string, number>
-): number {
-  if (!token.j) return 0;
-  const candidates = [token.b, token.t].filter(Boolean) as string[];
-  let max = 0;
-  for (const c of candidates) {
-    const k = normalizeKana(c);
-    const m = index.get(k);
-    if (m !== undefined && m > max) max = m;
-  }
-  return max;
+ return null;
 }

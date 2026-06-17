@@ -22,7 +22,7 @@ import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSi
 import { toast } from '@/hooks/use-toast';
 
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from'@/lib/audio-sync';
-import { useKnownWordsIndex, getKnownLevel, type KnownLevel, getMastery } from'@/lib/known-words';
+import { useKnownWordsIndex, getKnownLevel, type KnownLevel } from'@/lib/known-words';
 import { Switch } from'@/components/ui/switch';
 import { useIsAdmin } from'@/lib/admin';
 import { useTokenEditStore } from'@/stores/token-edit';
@@ -51,52 +51,10 @@ const japaneseFonts: { value: JapaneseFont; label: string; sample: string }[] = 
 const stripParens = (text: string): string =>
  text
  .replace(/[（(][^（）()\n\r]*[）)]/g,'')
-  .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g,'$1$2')
-  .replace(/^一$/gm,'​');
-
-const ReaderHeader = ({ 
-  scrolled, 
-  onBack, 
-  title, 
-  onShowSettings 
-}: { 
-  scrolled: boolean; 
-  onBack: () => void; 
-  title: string; 
-  onShowSettings: () => void;
-}) => (
-  <header className="fixed top-0 z-40 w-full">
-    <div className={cn(
-      "flex h-14 items-center justify-between px-4 transition-all duration-300",
-      scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border/40 shadow-sm" : "bg-transparent"
-    )}>
-      <div className="flex items-center gap-2 min-w-0">
-        <button
-          onClick={onBack}
-          className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <h1 className={cn(
-          "font-serif font-bold transition-all truncate",
-          scrolled ? "opacity-100 text-lg translate-y-0" : "opacity-0 -translate-y-2"
-        )}>
-          {title}
-        </h1>
-      </div>
-      <button
-        onClick={onShowSettings}
-        className="header-chip flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 tap-scale-sm"
-      >
-        <Settings className="h-4 w-4" />
-      </button>
-    </div>
-  </header>
-);
-
+ .replace(/([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])[ \t　]+([\u3040-\u30ff\u3400-\u9fff、。！？「」『』])/g,'$1$2')
+ .replace(/^一$/gm,'​');
 
 const cleanRubyTokens = (raw: BookToken[]): BookToken[] => {
-
  const out: BookToken[] = [];
  const isHorizontalSpace = (text: string) => /^[ \t　]+$/.test(text);
  const isOpen = (text: string) => text ==='（'|| text ==='(';
@@ -226,51 +184,44 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 }
 
 export default function Reader() {
-  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
-  const navigate = useNavigate();
-  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+ const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
+ const navigate = useNavigate();
+ const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
-  const knownIndex = useKnownWordsIndex();
-  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
-    new: highlightNew,
-    learning: highlightLearning,
-    known: highlightKnown,
-  };
-  const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
-  const saved = id ? getProgress(id, chapterId) : undefined;
+ const knownIndex = useKnownWordsIndex();
+ const knownTogglesByLevel: Record<KnownLevel, boolean> = {
+ new: highlightNew,
+ learning: highlightLearning,
+ known: highlightKnown,
+ };
+ const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
+ const saved = id ? getProgress(id, chapterId) : undefined;
 
-  const [difficulty, setDifficulty] = useState<Difficulty>(
-    (diffParam as Difficulty) || saved?.difficulty || 'simplified'
-  );
-  const [scrolled, setScrolled] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const initialSentenceIdx = useMemo(() => {
-    const key = chapterKey(id!, chapterId);
-    return useReadingProgressStore.getState().progress[key]?.sentenceIdx;
-  }, [id, chapterId]);
-  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
-  const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
-  const [levelOpen, setLevelOpen] = useState(false);
-  const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
-  const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
-    try {
-      const stored = sessionStorage.getItem('reopen-word-popup');
-      if (!stored) return null;
-      sessionStorage.removeItem('reopen-word-popup');
-      const data = JSON.parse(stored);
-      return data?.word ?? null;
-    } catch {
-      return null;
-    }
-  });
-
+ const [difficulty, setDifficulty] = useState<Difficulty>(
+ (diffParam as Difficulty) || saved?.difficulty ||'simplified');
+ const [showSettings, setShowSettings] = useState(false);
+ const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
+ const [sentenceTranslation, setSentenceTranslation] = useState<{ sentenceIdx: number; japanese: string; sentenceRect: { top: number; bottom: number; left: number; right: number } } | null>(null);
+ const [levelOpen, setLevelOpen] = useState(false);
+ const sentenceRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+ const [fullPopupWord, setFullPopupWord] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[] } | null>(() => {
+ try {
+ const stored = sessionStorage.getItem('reopen-word-popup');
+ if (!stored) return null;
+ sessionStorage.removeItem('reopen-word-popup');
+ const data = JSON.parse(stored);
+ return data?.word ?? null;
+ } catch {
+ return null;
+ }
+ });
 
  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
   
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
- const articleRef = useRef<HTMLElement>(null);
+ const articleRef = useRef<HTMLDivElement>(null);
  const restoredScroll = useRef(false);
  // Top-most visible sentence index (updated by IntersectionObserver).
  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
@@ -981,42 +932,142 @@ export default function Reader() {
  });
  }, []);
 
-  if (!book) return <div className="p-8 text-center">Book not found.</div>;
+ if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
-  const SectionLabel = ({ children }: { children: ReactNode }) => (
-    <div className="flex items-center gap-3 mb-3 px-1">
-      <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
-        {children}
-      </h2>
-      <div className="flex-1 h-px bg-border/60"/>
-    </div>
-  );
+ return (
+ <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
+  <header className="sticky top-0 z-30 glass-subtle">
 
-  const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
-  const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
-  const pillIdle ='text-muted-foreground';
-
-  const settingsBody = (
-    <div className="space-y-7">
-      {/* Reading */}
-      <section>
-        <SectionLabel>Reading</SectionLabel>
-        <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-          <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-[15px] font-medium">Reading level</span>
-            <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
-              {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+  <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+ <HeaderChip onClick={() => navigate(`/book/${id}`)} aria-label="Back to book">
+ <ArrowLeft className="h-5 w-5"/>
+ </HeaderChip>
+ <Popover
+ open={levelOpen}
+ onOpenChange={(o) => {
+ setLevelOpen(o);
+ if (o) {
+ setMiniPopup(null);
+ setSentenceTranslation(null);
+ }
+ }}
+ >
+ <PopoverTrigger asChild>
                 <button
-                  key={d}
-                  onClick={() => handleChangeDifficulty(d)}
-                  className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
+                  type="button"
+                  className={cn('flex-1 min-w-0 text-center tap-scale-sm rounded-lg px-2 py-0.5 -my-0.5 smooth-colors',
+                    levelOpen
+                      ?'bg-foreground/10 ring-1 ring-border/50':'',
+                  )}
+                  aria-label="Change reading level"
                 >
-                  {difficultyConfig[d].label}
+                  <p className="font-japanese text-sm font-bold leading-tight truncate">{book.titleJp}</p>
+                  <p className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5 mt-0.5">
+                    {difficultyConfig[difficulty].label}
+                    <ChevronDown
+                      className={cn('h-3 w-3 transition-transform', levelOpen &&'rotate-180')}
+                    />
+                  </p>
                 </button>
-              ))}
-            </div>
-          </div>
+ </PopoverTrigger>
+ <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
+ <div className="flex flex-col gap-1.5">
+ <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
+ <div className="flex gap-1 rounded-full bg-muted p-1">
+ {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+ <button
+ key={d}
+  onClick={() => handleChangeDifficulty(d)}
+ className={cn('h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
+ d === difficulty
+ ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground',
+ )}
+ >
+ {difficultyConfig[d].label}
+ </button>
+ ))}
+ </div>
+ </div>
+ </PopoverContent>
+ </Popover>
+ <div className="flex items-center gap-1">
+ <HeaderChip
 
+ onClick={() => setShowFurigana(!showFurigana)}
+ active={showFurigana}
+ title={showFurigana ?'Hide Furigana':'Show Furigana'}
+ >
+ {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
+ </HeaderChip>
+ <HeaderChip
+
+ onClick={handleToggleTranslations}
+ active={showTranslations}
+ title={showTranslations ?'Hide translations':'Show translations'}
+ >
+ <Languages className="h-5 w-5"/>
+ </HeaderChip>
+
+ <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
+ <BookType className="h-5 w-5"/>
+ </HeaderChip>
+ <HeaderChip
+
+ onClick={() => setShowSettings(!showSettings)}
+ active={showSettings}
+ title="Settings"
+ >
+ <Settings className="h-5 w-5"/>
+ </HeaderChip>
+
+ </div>
+ </div>
+ <div className="h-[2px] w-full bg-border/30">
+ <div
+ className="h-full transition-[width] duration-200"
+ style={{ width:`${scrollPercent}%`, backgroundColor: book.coverColor }}
+ />
+ </div>
+ </header>
+
+
+
+
+
+ {(() => {
+ const SectionLabel = ({ children }: { children: ReactNode }) => (
+ <div className="flex items-center gap-3 mb-3 px-1">
+ <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
+ {children}
+ </h2>
+ <div className="flex-1 h-px bg-border/60"/>
+ </div>
+ );
+
+ const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
+ const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
+ const pillIdle ='text-muted-foreground';
+
+ const settingsBody = (
+ <div className="space-y-7">
+ {/* Reading */}
+ <section>
+ <SectionLabel>Reading</SectionLabel>
+ <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+ <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+ <span className="text-[15px] font-medium">Reading level</span>
+ <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
+ {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+ <button
+ key={d}
+ onClick={() => handleChangeDifficulty(d)}
+ className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
+ >
+ {difficultyConfig[d].label}
+ </button>
+ ))}
+ </div>
+ </div>
  <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
  <span className="text-[15px] font-medium">Font size</span>
  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
@@ -1139,72 +1190,46 @@ export default function Reader() {
  </div>
  </section>
  )}
-    </div>
-  );
-
+ </div>
+ );
 
   if (isMobile) {
     return (
-      <div 
-        className={cn(
-          "min-h-screen transition-colors duration-300",
-
-          readerDarkMode ? "dark bg-background" : "bg-background"
-        )}
-      >
-        <ReaderHeader
-          scrolled={false}
-          onBack={() => navigate(`/book/${id}`)}
-          title={book.titleEn}
-          onShowSettings={() => setShowSettings(!showSettings)}
-        />
-
-
-
-
-        <div className="h-14" />
-
-        <Drawer open={showSettings} onOpenChange={setShowSettings}>
-          <DrawerContent className="rounded-t-3xl bg-background p-0 ring-1 ring-border/40 shadow-lg border-0">
-            <DrawerHeader className="sr-only">
-              <DrawerTitle>Reader Settings</DrawerTitle>
-            </DrawerHeader>
-            <div 
-              className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <div className="mb-5 flex items-center gap-3">
-                <h1 className="wordmark font-serif text-[24px] leading-none">Settings</h1>
-                <div className="flex-1 h-px bg-border/60"/>
-              </div>
-              {settingsBody}
+      <Drawer open={showSettings} onOpenChange={setShowSettings}>
+        <DrawerContent className="rounded-t-3xl bg-background p-0 ring-1 ring-border/40 shadow-lg border-0">
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>Reader Settings</DrawerTitle>
+          </DrawerHeader>
+          <div 
+            className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 flex items-center gap-3">
+              <h1 className="wordmark font-serif text-[24px] leading-none">Settings</h1>
+              <div className="flex-1 h-px bg-border/60"/>
             </div>
-          </DrawerContent>
-        </Drawer>
-      </div>
+            {settingsBody}
+          </div>
+        </DrawerContent>
+      </Drawer>
     );
   }
 
-  return (
-    <div 
-      className={cn(
-        "min-h-screen transition-colors duration-300",
-        readerDarkMode ? "dark bg-background" : "bg-background"
-      )}
-    >
-      <ReaderHeader
-        scrolled={scrolled}
-        onBack={() => navigate(`/book/${id}`)}
-        title={book.titleEn}
-        onShowSettings={() => setShowSettings(!showSettings)}
-      />
+ return showSettings ? (
+ <div className="sticky top-[3.25rem] z-20 border-b border-border/40 bg-background px-5 py-6 animate-fade-in-soft">
+ <div className="mx-auto max-w-2xl">
+ <div className="mb-5 flex items-center gap-3">
+ <h1 className="wordmark font-serif text-[24px] leading-none">Reader Settings</h1>
+ <div className="flex-1 h-px bg-border/60"/>
+ </div>
+ {settingsBody}
+ </div>
+ </div>
+ ) : null;
+ })()}
 
 
-
-      <div className="h-14" />
-
-      <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
-
+ <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
 
  {(() => {
  const isFirstChapter = book.chapters && book.chapters.length > 1
@@ -1238,9 +1263,9 @@ export default function Reader() {
  </p>
  <p className="mt-1 font-serif text-lg font-bold">{chapter.title}</p>
  <div className="mx-auto mt-3 h-px w-12 bg-border/60"/>
-  </div>
-  );
-  })()}
+ </div>
+ );
+ })()}
 
  {hasParts(book) && partIdx !== null && book.anchors && book.anchors[partIdx] && (
  <div key={`pt-head-${id}-${chapterId}`} className="px-6 pt-6 pb-2 text-center animate-fade-in-soft">
@@ -1312,14 +1337,8 @@ export default function Reader() {
 
  let knownLevel: KnownLevel | null = null;
  if (!tokenEditMode && showKnownHighlights) {
-  const lvl = getKnownLevel(token, knownIndex);
-  if (lvl && knownTogglesByLevel[lvl]) {
-    knownLevel = lvl;
-  } else if (!lvl) {
-    // If not in known index, check flashcards for mastery-based furigana hiding
-    const mastery = getMastery(token, knownIndex);
-    if (mastery >= 3) knownLevel = 'known';
-  }
+ const lvl = getKnownLevel(token, knownIndex);
+ if (lvl && knownTogglesByLevel[lvl]) knownLevel = lvl;
  }
 
  const editClass = tokenEditMode
@@ -1564,13 +1583,11 @@ export default function Reader() {
  toast({ title:'Rule pending', description: opts.global ?'Global rule — click Apply to save.':'Click Apply to save it.'});
  }
  }
-  setEditPanel(null);
-  setSelectedIdx([]);
-  }}
-  />
-  )}
-    </div>
-  );
+ setEditPanel(null);
+ setSelectedIdx([]);
+ }}
+ />
+ )}
+ </div>
+ );
 }
-
-

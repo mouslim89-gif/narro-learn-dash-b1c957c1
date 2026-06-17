@@ -3,7 +3,6 @@ import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useFlashcardStore } from '@/stores/flashcards';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,9 +29,6 @@ const fontSizeOptions: { label: string; value: FontSize }[] = [
   { label: 'L', value: 'large' },
 ];
 
-const limitOptions = [10, 20, 30, 50, 100];
-
-
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-3 px-1">
@@ -47,14 +43,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default function Settings() {
   const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
     useReadingProgressStore();
-  const { 
-    dailyNewLimit, 
-    dailyReviewLimit, 
-    setDailyNewLimit, 
-    setDailyReviewLimit 
-  } = useFlashcardStore();
   const { user, signOut } = useAuth();
-
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
@@ -177,41 +166,6 @@ export default function Settings() {
             </div>
           </div>
         </section>
-
-        {/* Flashcards */}
-        <section>
-          <SectionLabel>Flashcards</SectionLabel>
-          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-            <div className="flex items-center justify-between px-4 py-4">
-              <div className="space-y-0.5">
-                <Label className="text-[15px] font-medium">Daily New Cards</Label>
-                <p className="text-[11px] text-muted-foreground">Limit for new items added daily</p>
-              </div>
-              <select 
-                value={dailyNewLimit}
-                onChange={(e) => setDailyNewLimit(Number(e.target.value))}
-                className="bg-transparent text-sm font-semibold focus:outline-none"
-              >
-                {limitOptions.map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-
-            <div className="flex items-center justify-between px-4 py-4">
-              <div className="space-y-0.5">
-                <Label className="text-[15px] font-medium">Daily Reviews</Label>
-                <p className="text-[11px] text-muted-foreground">Target number of cards to review</p>
-              </div>
-              <select 
-                value={dailyReviewLimit}
-                onChange={(e) => setDailyReviewLimit(Number(e.target.value))}
-                className="bg-transparent text-sm font-semibold focus:outline-none"
-              >
-                {limitOptions.map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-          </div>
-        </section>
-
 
         {/* About */}
         <section>
