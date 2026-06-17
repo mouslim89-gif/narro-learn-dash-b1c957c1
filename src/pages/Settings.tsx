@@ -167,6 +167,43 @@ export default function Settings() {
             </div>
           </div>
         </section>
+169: 
+170:         {/* Study Limits */}
+171:         <section>
+172:           <SectionLabel>Study Limits</SectionLabel>
+173:           <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+174:             <div className="flex flex-col gap-1.5 px-4 py-4">
+175:               <div className="flex items-center justify-between">
+176:                 <Label className="text-[15px] font-medium">Daily New Cards</Label>
+177:                 <span className="text-sm font-semibold tabular-nums">{useFlashcardStore.getState().settings.newCardLimit}</span>
+178:               </div>
+179:               <input
+180:                 type="range"
+181:                 min="0"
+182:                 max="100"
+183:                 step="5"
+184:                 value={useFlashcardStore((s) => s.settings.newCardLimit)}
+185:                 onChange={(e) => useFlashcardStore.getState().setSettings({ newCardLimit: parseInt(e.target.value) })}
+186:                 className="w-full accent-primary"
+187:               />
+188:             </div>
+189:             <div className="flex flex-col gap-1.5 px-4 py-4">
+190:               <div className="flex items-center justify-between">
+191:                 <Label className="text-[15px] font-medium">Daily Reviews</Label>
+192:                 <span className="text-sm font-semibold tabular-nums">{useFlashcardStore.getState().settings.reviewLimit}</span>
+193:               </div>
+194:               <input
+195:                 type="range"
+196:                 min="0"
+197:                 max="500"
+198:                 step="10"
+199:                 value={useFlashcardStore((s) => s.settings.reviewLimit)}
+200:                 onChange={(e) => useFlashcardStore.getState().setSettings({ reviewLimit: parseInt(e.target.value) })}
+201:                 className="w-full accent-primary"
+202:               />
+203:             </div>
+204:           </div>
+205:         </section>
 
         {/* About */}
         <section>
