@@ -131,11 +131,11 @@ export default function MyBooks() {
  </Link>
  </div>
  ) : (
-  <div className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 pb-12">
-  {bookProgressList.map(({ book, progress: p }) => (
-  <BookShelfRow key={book.id} book={book} progress={p} />
-  ))}
-  </div>
+ <div className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+ {bookProgressList.map(({ book, progress: p }) => (
+ <BookShelfRow key={book.id} book={book} progress={p} />
+ ))}
+ </div>
  )}
  </div>
  </div>

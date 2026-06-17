@@ -111,7 +111,7 @@ export function AudioPlayer({
  style={{ bottom:`${bottomOffset + 12}px`}}
  className="fixed inset-x-0 z-40 px-3 pointer-events-none"
  >
- <div className="mx-auto max-w-md pointer-events-auto rounded-2xl bg-background/85 backdrop-blur-xl ring-1 ring-border/40 shadow-lg border border-white/10">
+ <div className="mx-auto max-w-md pointer-events-auto rounded-2xl bg-background/85 backdrop-blur-xl ring-1 ring-border/40 shadow-lg">
  <div className="flex items-center gap-3 px-3 py-2">
  <button
  onClick={togglePlay}
