@@ -268,7 +268,6 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
         <DrawerTitle className="sr-only">{displayWord}</DrawerTitle>
         <div 
           className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] space-y-5"
-          onPointerDown={(e) => e.stopPropagation()}
         >
  {loading && <LoadingSkeleton />}
 
