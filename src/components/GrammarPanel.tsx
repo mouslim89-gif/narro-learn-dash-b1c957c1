@@ -118,7 +118,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           <DrawerTitle>Grammar Notes</DrawerTitle>
         </DrawerHeader>
         
-        <div className="shrink-0 px-5 pt-7 pb-4 bg-background">
+        <div
+          className="shrink-0 px-5 pt-7 pb-4 bg-background border-b border-transparent transition-colors duration-200 data-[scrolled=true]:border-border/60"
+          data-scrolled={scrolled}
+        >
           <div className="flex items-center gap-3">
             <h1 className="wordmark font-serif text-[24px] leading-none">Grammar Notes</h1>
             {notes.length > 0 && (
@@ -130,7 +133,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
+          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 4)}
+        >
 
         <div className="">
           {loading && (
