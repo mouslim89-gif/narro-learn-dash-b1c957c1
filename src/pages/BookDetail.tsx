@@ -169,7 +169,7 @@ export default function BookDetail() {
  <div className="h-6 -mt-6 bg-gradient-to-b from-transparent to-background"/>
 
  <div className="stagger-children px-6">
-      <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis} save the audit</p>
+      <p className="text-sm leading-relaxed text-muted-foreground">{book.synopsis}&nbsp;Apply plan</p>
 
  <section className="mt-8">
  <h2 className="mb-3 font-serif text-lg font-semibold">Reading Level</h2>

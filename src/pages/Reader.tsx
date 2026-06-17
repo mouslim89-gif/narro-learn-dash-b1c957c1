@@ -1196,18 +1196,19 @@ export default function Reader() {
   if (isMobile) {
     return (
       <Drawer open={showSettings} onOpenChange={setShowSettings}>
-        <DrawerContent className="rounded-t-3xl bg-background p-0 ring-1 ring-border/40 shadow-lg border-0">
+        <DrawerContent className="rounded-t-3xl bg-background p-0 ring-1 ring-border/40 shadow-lg border-0 max-h-[85vh] flex flex-col">
           <DrawerHeader className="sr-only">
             <DrawerTitle>Reader Settings</DrawerTitle>
           </DrawerHeader>
-          <div 
-            className="max-h-[85vh] overflow-y-auto overscroll-contain px-5 pt-7 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <div className="mb-5 flex items-center gap-3">
+          
+          <div className="shrink-0 px-5 pt-7 pb-4 bg-background">
+            <div className="flex items-center gap-3">
               <h1 className="wordmark font-serif text-[24px] leading-none">Settings</h1>
               <div className="flex-1 h-px bg-border/60"/>
             </div>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
             {settingsBody}
           </div>
         </DrawerContent>
