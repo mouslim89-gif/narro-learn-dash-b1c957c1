@@ -1201,14 +1201,20 @@ export default function Reader() {
             <DrawerTitle>Reader Settings</DrawerTitle>
           </DrawerHeader>
           
-          <div className="shrink-0 px-5 pt-7 pb-4 bg-background">
+          <div
+            className="shrink-0 px-5 pt-7 pb-4 bg-background border-b border-transparent transition-colors duration-200 data-[scrolled=true]:border-border/60"
+            data-scrolled={settingsScrolled}
+          >
             <div className="flex items-center gap-3">
               <h1 className="wordmark font-serif text-[24px] leading-none">Settings</h1>
               <div className="flex-1 h-px bg-border/60"/>
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+          <div
+            className="flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
+            onScroll={(e) => setSettingsScrolled(e.currentTarget.scrollTop > 4)}
+          >
             {settingsBody}
           </div>
         </DrawerContent>
