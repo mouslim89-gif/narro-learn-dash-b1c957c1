@@ -104,9 +104,10 @@ const App = () => (
  <Sonner />
  <BrowserRouter>
  <AuthProvider>
- <DarkModeSync />
- <CloudSyncMount />
- <AnimatedRoutes />
+        <DarkModeSync />
+        <CloudSyncMount />
+        <Onboarding />
+        <AnimatedRoutes />
  </AuthProvider>
  </BrowserRouter>
  </TooltipProvider>
