@@ -126,18 +126,21 @@ export async function pushProgress(
 // ============ USER PREFERENCES ============
 
 export interface UserPreferences {
- fontSize:'small'|'medium'|'large';
- readerDarkMode: boolean;
- darkMode: boolean;
- showFurigana: boolean;
- showTranslations: boolean;
- displayMode:'normal'|'grammar';
- japaneseFont:'sans'|'serif'|'handwriting';
- hasSeenLongPressHint: boolean;
- showKnownHighlights: boolean;
- highlightNew: boolean;
- highlightLearning: boolean;
- highlightKnown: boolean;
+  fontSize: 'small' | 'medium' | 'large';
+  readerDarkMode: boolean;
+  darkMode: boolean;
+  showFurigana: boolean;
+  showTranslations: boolean;
+  displayMode: 'normal' | 'grammar';
+  japaneseFont: 'sans' | 'serif' | 'handwriting';
+  hasSeenLongPressHint: boolean;
+  showKnownHighlights: boolean;
+  highlightNew: boolean;
+  highlightLearning: boolean;
+  highlightKnown: boolean;
+  hasCompletedOnboarding: boolean;
+  targetJlpt: string;
+  dailyGoalMinutes: number;
 }
 
 export async function pullPreferences(userId: string): Promise<UserPreferences | null> {
@@ -160,8 +163,11 @@ export async function pullPreferences(userId: string): Promise<UserPreferences |
  showKnownHighlights: data.show_known_highlights,
  highlightNew: data.highlight_new,
  highlightLearning: data.highlight_learning,
- highlightKnown: data.highlight_known,
- };
+    highlightKnown: data.highlight_known,
+    hasCompletedOnboarding: data.has_completed_onboarding ?? false,
+    targetJlpt: data.target_jlpt ?? 'N4',
+    dailyGoalMinutes: data.daily_goal_minutes ?? 20,
+  };
 }
 
 export async function pushPreferences(userId: string, prefs: UserPreferences): Promise<void> {
@@ -180,9 +186,12 @@ export async function pushPreferences(userId: string, prefs: UserPreferences): P
  show_known_highlights: prefs.showKnownHighlights,
  highlight_new: prefs.highlightNew,
  highlight_learning: prefs.highlightLearning,
- highlight_known: prefs.highlightKnown,
- updated_at: new Date().toISOString(),
- });
+      highlight_known: prefs.highlightKnown,
+      has_completed_onboarding: prefs.hasCompletedOnboarding,
+      target_jlpt: prefs.targetJlpt,
+      daily_goal_minutes: prefs.dailyGoalMinutes,
+      updated_at: new Date().toISOString(),
+    });
 
  if (error) throw error;
  useSyncStatus.getState().endSync(true);

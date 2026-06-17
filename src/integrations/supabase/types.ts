@@ -332,9 +332,11 @@ export type Database = {
       user_preferences: {
         Row: {
           created_at: string
+          daily_goal_minutes: number | null
           dark_mode: boolean
           display_mode: string
           font_size: string
+          has_completed_onboarding: boolean | null
           has_seen_long_press_hint: boolean
           highlight_known: boolean
           highlight_learning: boolean
@@ -344,14 +346,17 @@ export type Database = {
           show_furigana: boolean
           show_known_highlights: boolean
           show_translations: boolean
+          target_jlpt: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          daily_goal_minutes?: number | null
           dark_mode?: boolean
           display_mode?: string
           font_size?: string
+          has_completed_onboarding?: boolean | null
           has_seen_long_press_hint?: boolean
           highlight_known?: boolean
           highlight_learning?: boolean
@@ -361,14 +366,17 @@ export type Database = {
           show_furigana?: boolean
           show_known_highlights?: boolean
           show_translations?: boolean
+          target_jlpt?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          daily_goal_minutes?: number | null
           dark_mode?: boolean
           display_mode?: string
           font_size?: string
+          has_completed_onboarding?: boolean | null
           has_seen_long_press_hint?: boolean
           highlight_known?: boolean
           highlight_learning?: boolean
@@ -378,6 +386,7 @@ export type Database = {
           show_furigana?: boolean
           show_known_highlights?: boolean
           show_translations?: boolean
+          target_jlpt?: string | null
           updated_at?: string
           user_id?: string
         }
