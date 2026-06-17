@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFlashcardStore } from '@/stores/flashcards';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { cn } from '@/lib/utils';
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
