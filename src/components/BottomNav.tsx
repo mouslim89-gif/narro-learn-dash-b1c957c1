@@ -37,14 +37,12 @@ export function BottomNav() {
  const active = path ==='/'? pathname ==='/': pathname.startsWith(path);
  const showBadge = path ==='/flashcards'&& dueCount > 0;
  return (
-          <Link
-            key={path}
-            to={path}
-            aria-current={active ? 'page' : undefined}
-            className={`bottom-nav-link relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 text-[11px] font-medium tap-scale-sm smooth-colors ${
-              active ? 'text-primary' : 'text-muted-foreground'
-            }`}
-          >
+ <Link
+ key={path}
+ to={path}
+ className={`bottom-nav-link relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 text-[11px] font-medium tap-scale-sm smooth-colors ${
+ active ?'text-primary':'text-muted-foreground'}`}
+ >
  {active && (
  <motion.span
  layoutId="bottom-nav-pill"

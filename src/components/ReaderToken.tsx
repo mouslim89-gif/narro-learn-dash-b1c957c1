@@ -45,7 +45,7 @@ export function ReaderToken({
       <FuriganaWord
         text={token.t}
         reading={token.r}
-        furiganaVisible={showFurigana && knownLevel !== 'known'}
+        furiganaVisible={showFurigana}
         colorClass={cls}
         onClick={handleClick}
         onMouseDown={stopDown}

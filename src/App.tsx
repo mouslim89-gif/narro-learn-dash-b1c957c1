@@ -5,8 +5,7 @@ import { Toaster as Sonner } from"@/components/ui/sonner";
 import { Toaster } from"@/components/ui/toaster";
 import { TooltipProvider } from"@/components/ui/tooltip";
 import { AnimatePresence, motion } from"framer-motion";
-import { BottomNav } from "@/components/BottomNav";
-import { Onboarding } from "@/components/Onboarding";
+import { BottomNav } from"@/components/BottomNav";
 import { AuthProvider, useAuth } from"@/contexts/AuthContext";
 import { ProtectedRoute } from"@/components/ProtectedRoute";
 import { useCloudSync } from"@/hooks/use-cloud-sync";
@@ -104,10 +103,9 @@ const App = () => (
  <Sonner />
  <BrowserRouter>
  <AuthProvider>
-        <DarkModeSync />
-        <CloudSyncMount />
-        <Onboarding />
-        <AnimatedRoutes />
+ <DarkModeSync />
+ <CloudSyncMount />
+ <AnimatedRoutes />
  </AuthProvider>
  </BrowserRouter>
  </TooltipProvider>

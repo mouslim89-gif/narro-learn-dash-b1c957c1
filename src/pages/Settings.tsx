@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useFlashcardStore } from '@/stores/flashcards';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { cn } from '@/lib/utils';
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
@@ -164,43 +163,6 @@ export default function Settings() {
             <div className="flex items-center justify-between px-4 py-4">
               <Label htmlFor="furigana" className="text-[15px] font-medium">Show furigana</Label>
               <Switch id="furigana" checked={showFurigana} onCheckedChange={setShowFurigana} />
-            </div>
-          </div>
-        </section>
-
-        {/* Study Limits */}
-        <section>
-          <SectionLabel>Study Limits</SectionLabel>
-          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-            <div className="flex flex-col gap-1.5 px-4 py-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-[15px] font-medium">Daily New Cards</Label>
-                <span className="text-sm font-semibold tabular-nums">{useFlashcardStore.getState().settings.newCardLimit}</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={useFlashcardStore((s) => s.settings.newCardLimit)}
-                onChange={(e) => useFlashcardStore.getState().setSettings({ newCardLimit: parseInt(e.target.value) })}
-                className="w-full accent-primary"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5 px-4 py-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-[15px] font-medium">Daily Reviews</Label>
-                <span className="text-sm font-semibold tabular-nums">{useFlashcardStore.getState().settings.reviewLimit}</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="500"
-                step="10"
-                value={useFlashcardStore((s) => s.settings.reviewLimit)}
-                onChange={(e) => useFlashcardStore.getState().setSettings({ reviewLimit: parseInt(e.target.value) })}
-                className="w-full accent-primary"
-              />
             </div>
           </div>
         </section>
