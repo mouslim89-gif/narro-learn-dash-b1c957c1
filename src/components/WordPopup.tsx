@@ -310,14 +310,14 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  <section>
  <p className={sectionLabel}>Meanings</p>
  <div className="mt-1 h-px w-8 bg-accent/60"/>
- <div className="mt-2 space-y-1">
- {result.senses.slice(0, 3).map((sense, i) => (
- <p key={i} className="font-serif text-sm leading-relaxed">
- <span className="text-muted-foreground tabular-nums mr-1">{i + 1}.</span>
- <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
- </p>
- ))}
- </div>
+  <div className="mt-2 space-y-1.5">
+  {result.senses.slice(0, 4).map((sense, i) => (
+  <p key={i} className="font-serif text-sm leading-relaxed">
+  <span className="text-muted-foreground tabular-nums mr-1.5">{i + 1}.</span>
+  <span className="font-medium text-foreground">{sense.english_definitions.join('; ')}</span>
+  </p>
+  ))}
+  </div>
  </section>
 
  {/* Examples */}
