@@ -1,12 +1,17 @@
 /**
- * SM-2 spaced repetition algorithm (Anki-style).
+ * Spaced repetition constants and logic.
  *
- * Quality scale used here:
+ * Quality scale used here (Anki-style):
  * - 0 = Again (lapse — reset)
  * - 3 = Hard
  * - 4 = Good
  * - 5 = Easy
  */
+
+export const SRS_LIMITS = {
+  DEFAULT_NEW_CARDS: 20,
+  DEFAULT_REVIEWS: 100,
+};
 
 export type Quality = 0 | 3 | 4 | 5;
 
