@@ -1,44 +1,58 @@
-import { create } from'zustand';
-import { persist } from'zustand/middleware';
-import { pushFlashcard, deleteFlashcard as cloudDeleteFlashcard } from'@/lib/sync/cloud-sync';
-import { applyReview, migrateCard, type Quality } from'@/lib/srs';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { pushFlashcard, deleteFlashcard as cloudDeleteFlashcard } from '@/lib/sync/cloud-sync';
+import { applyReview, migrateCard, SRS_LIMITS, type Quality } from '@/lib/srs';
 
 export interface SavedWord {
- id: string;
- word: string;
- reading: string;
- meanings: string[];
- jlpt?: string[];
- partsOfSpeech?: string[];
- contextSentence?: string;
- /** Tokens of the context sentence (surface + reading) for furigana rendering. */
- contextTokens?: { t: string; r?: string }[];
- mastery: number;
- lastReviewedAt?: string;
- nextReviewAt?: string;
- // SM-2 fields (local-first, backfilled on demand)
- easeFactor?: number;
- interval?: number;
- reps?: number;
- lapses?: number;
+  id: string;
+  word: string;
+  reading: string;
+  meanings: string[];
+  jlpt?: string[];
+  partsOfSpeech?: string[];
+  contextSentence?: string;
+  /** Tokens of the context sentence (surface + reading) for furigana rendering. */
+  contextTokens?: { t: string; r?: string }[];
+  mastery: number;
+  lastReviewedAt?: string;
+  nextReviewAt?: string;
+  // SM-2 fields (local-first, backfilled on demand)
+  easeFactor?: number;
+  interval?: number;
+  reps?: number;
+  lapses?: number;
+}
+
+interface FlashcardStats {
+  lastResetDate: string;
+  newCardsDoneToday: number;
+  reviewsDoneToday: number;
+}
+
+interface FlashcardSettings {
+  newCardLimit: number;
+  reviewLimit: number;
 }
 
 interface FlashcardStore {
- savedWords: SavedWord[];
- isReviewing: boolean;
- syncUserId: string | null;
- setIsReviewing: (v: boolean) => void;
- addWord: (entry: Omit<SavedWord,'mastery'>) => void;
- removeWord: (id: string) => void;
- hasWord: (id: string) => boolean;
- incrementMastery: (id: string) => void;
- resetMastery: (id: string) => void;
- adjustMastery: (id: string, quality:'again'|'hard'|'good'|'easy') => void;
- getDueCount: () => number;
- getDueWords: () => SavedWord[];
- // Sync helpers
- hydrateWords: (words: SavedWord[], userId: string) => void;
- clearWords: () => void;
+  savedWords: SavedWord[];
+  isReviewing: boolean;
+  syncUserId: string | null;
+  settings: FlashcardSettings;
+  stats: FlashcardStats;
+  setIsReviewing: (v: boolean) => void;
+  addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
+  removeWord: (id: string) => void;
+  hasWord: (id: string) => boolean;
+  incrementMastery: (id: string) => void;
+  resetMastery: (id: string) => void;
+  adjustMastery: (id: string, quality: 'again' | 'hard' | 'good' | 'easy') => void;
+  getDueCount: () => number;
+  getDueWords: () => SavedWord[];
+  setSettings: (settings: Partial<FlashcardSettings>) => void;
+  // Sync helpers
+  hydrateWords: (words: SavedWord[], userId: string) => void;
+  clearWords: () => void;
 }
 
 const QUALITY_MAP: Record<'again'|'hard'|'good'|'easy', Quality> = {
