@@ -57,7 +57,9 @@ interface ReadingProgressState {
  showKnownHighlights: boolean;
  highlightNew: boolean;
  highlightLearning: boolean;
- highlightKnown: boolean;
+  highlightKnown: boolean;
+  hasCompletedOnboarding: boolean;
+
  // Auth-synced user
  syncUserId: string | null;
  // Actions
@@ -88,7 +90,9 @@ interface ReadingProgressState {
  setShowKnownHighlights: (show: boolean) => void;
  setHighlightNew: (v: boolean) => void;
  setHighlightLearning: (v: boolean) => void;
- setHighlightKnown: (v: boolean) => void;
+  setHighlightKnown: (v: boolean) => void;
+  setHasCompletedOnboarding: (v: boolean) => void;
+
  // Sync helpers
  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
  clearProgress: () => void;
@@ -109,8 +113,10 @@ const DEFAULT_PREFS: UserPreferences = {
  showKnownHighlights: true,
  highlightNew: true,
  highlightLearning: true,
- highlightKnown: false,
+  highlightKnown: false,
+  hasCompletedOnboarding: false,
 };
+
 
 export function currentPrefs(state: ReadingProgressState): UserPreferences {
  return {
@@ -126,9 +132,11 @@ export function currentPrefs(state: ReadingProgressState): UserPreferences {
  showKnownHighlights: state.showKnownHighlights,
  highlightNew: state.highlightNew,
  highlightLearning: state.highlightLearning,
- highlightKnown: state.highlightKnown,
- };
+  highlightKnown: state.highlightKnown,
+  hasCompletedOnboarding: state.hasCompletedOnboarding,
+  };
 }
+
 
 let prefsTimer: number | null = null;
 function schedulePrefsPush(userId: string, prefs: UserPreferences) {
@@ -183,8 +191,10 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  showKnownHighlights: true,
  highlightNew: true,
  highlightLearning: true,
- highlightKnown: false,
- syncUserId: null,
+  highlightKnown: false,
+  hasCompletedOnboarding: false,
+  syncUserId: null,
+
  updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
  const cid = chapterId || DEFAULT_CHAPTER_ID;
  const key = chapterKey(bookId, cid);
@@ -259,7 +269,9 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  setShowKnownHighlights: (showKnownHighlights) => { set({ showKnownHighlights }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setHighlightNew: (highlightNew) => { set({ highlightNew }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setHighlightLearning: (highlightLearning) => { set({ highlightLearning }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
- setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+  setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+  setHasCompletedOnboarding: (hasCompletedOnboarding) => { set({ hasCompletedOnboarding }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+
  hydrateProgress: (incoming, userId) => {
  // Merge instead of replace: keep whichever side is newer per chapter so
  // a slow cloud pull can't clobber a fresh local write (or vice-versa).

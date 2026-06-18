@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, LogOut, Loader2, RefreshCw } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -69,7 +69,16 @@ export default function Settings() {
     }
   };
 
+  const handleReplayOnboarding = () => {
+    localStorage.removeItem("tsundoku-welcome-seen");
+    supabase.from("user_preferences").update({ has_completed_onboarding: false }).eq("user_id", user?.id).then(() => {
+      navigate("/welcome");
+    });
+  };
+
+
   const initial = (user?.email ?? '?').slice(0, 1).toUpperCase();
+
 
   return (
     <div className="pb-24">
@@ -166,6 +175,23 @@ export default function Settings() {
             </div>
           </div>
         </section>
+
+        {/* Support */}
+        <section>
+          <SectionLabel>Support</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden">
+            <button
+              onClick={handleReplayOnboarding}
+              className="w-full px-4 py-4 flex items-center justify-between text-[15px] font-medium smooth-colors tap-scale-sm"
+            >
+              <span className="flex items-center gap-2.5">
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                Replay onboarding
+              </span>
+            </button>
+          </div>
+        </section>
+
 
         {/* About */}
         <section>

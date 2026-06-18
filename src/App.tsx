@@ -1,6 +1,8 @@
 import { useEffect } from"react";
+import { supabase } from "@/integrations/supabase/client";
+
 import { QueryClient, QueryClientProvider } from"@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useLocation } from"react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from"react-router-dom";
 import { Toaster as Sonner } from"@/components/ui/sonner";
 import { Toaster } from"@/components/ui/toaster";
 import { TooltipProvider } from"@/components/ui/tooltip";
@@ -22,6 +24,9 @@ import NotFound from"./pages/NotFound";
 import Settings from"./pages/Settings";
 import Auth from"./pages/Auth";
 import ResetPassword from"./pages/ResetPassword";
+import Welcome from "./pages/Welcome";
+import Onboarding from "./pages/Onboarding";
+
 
 const queryClient = new QueryClient();
 
@@ -48,18 +53,45 @@ function CloudSyncMount() {
 }
 
 function AnimatedRoutes() {
- const location = useLocation();
- const { user, loading } = useAuth();
- const isReviewing = useFlashcardStore(s => s.isReviewing);
- const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
- const path = location.pathname;
- const isDetailRoute =
- path.startsWith('/reader/') ||
- path.startsWith('/book/') ||
- (path.startsWith('/dictionary/') && path !=='/dictionary') ||
- path ==='/settings';
- const hideNav = isDetailRoute || isReviewing || isAuthRoute;
- const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const isReviewing = useFlashcardStore(s => s.isReviewing);
+  const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
+  const path = location.pathname;
+
+  const isDetailRoute =
+  path.startsWith('/reader/') ||
+  path.startsWith('/book/') ||
+  path === '/welcome' ||
+  path === '/onboarding' ||
+  (path.startsWith('/dictionary/') && path !=='/dictionary') ||
+  path ==='/settings';
+
+  const hideNav = isDetailRoute || isReviewing || isAuthRoute;
+  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
+
+  useEffect(() => {
+    if (loading) return;
+
+    const welcomeSeen = localStorage.getItem("tsundoku-welcome-seen") === "true";
+    
+    // Redirect to welcome if never seen
+    if (!user && !welcomeSeen && path !== "/welcome" && path !== "/auth" && path !== "/reset-password") {
+      navigate("/welcome", { replace: true });
+      return;
+    }
+
+    // After auth, check onboarding status
+    if (user && path !== "/onboarding" && !path.startsWith("/welcome") && path !== "/auth" && path !== "/reset-password") {
+      supabase.from("user_preferences").select("has_completed_onboarding").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+        if (data && data.has_completed_onboarding === false) {
+          navigate("/onboarding", { replace: true });
+        }
+      });
+    }
+  }, [user, loading, path, navigate]);
+
 
  return (
  <>
@@ -74,20 +106,23 @@ function AnimatedRoutes() {
  transition={pageTransition}
  className="w-full bg-background min-h-screen"
  >
- <Routes location={location}>
- <Route path="/auth"element={<Auth />} />
- <Route path="/reset-password"element={<ResetPassword />} />
- <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
- <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
- <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
- <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
- <Route path="/dictionary/:word"element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
- <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
- <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
- <Route path="*"element={<NotFound />} />
- </Routes>
+  <Routes location={location}>
+  <Route path="/welcome" element={<Welcome />} />
+  <Route path="/auth"element={<Auth />} />
+  <Route path="/reset-password"element={<ResetPassword />} />
+  <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+  <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
+  <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
+  <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
+  <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+  <Route path="/dictionary/:word"element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
+  <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
+  <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+  <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+  <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+  <Route path="*"element={<NotFound />} />
+  </Routes>
+
  </motion.div>
  </AnimatePresence>
  </div>
