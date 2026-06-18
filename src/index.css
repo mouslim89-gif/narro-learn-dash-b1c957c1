@@ -215,51 +215,32 @@
    Adds a soft, tactile relief: ambient drop shadow + crisp inner highlight on top,
    subtle inner shadow on bottom so the chip feels physically raised off the page. */
 /* Standard raised relief — the app's default elevation language.
-   Soft, slightly diffuse drop shadow + inset top highlight. 
-   Adaptive to background colors using opacity. */
+   Soft, slightly diffuse drop shadow + inset top highlight. Background is left
+   to the caller (e.g. bg-card, bg-foreground/0.08). Apply to any element that
+   should feel physically raised off the page. */
 .relief-raised {
-  box-shadow:
-    0 1px 1px hsl(var(--foreground) / 0.12),
-    0 2px 4px -1px hsl(var(--foreground) / 0.1),
-    inset 0 1px 0.5px hsl(0 0% 100% / 0.4),
-    inset 0 -1px 0.5px hsl(var(--foreground) / 0.05);
+ box-shadow:
+ 0 1px 0 hsl(210 22% 15% / 0.15),
+ 0 2px 4px -1px hsl(210 22% 15% / 0.18),
+ inset 0 1px 0 hsl(0 0% 100% / 0.75),
+ inset 0 -1px 0 hsl(210 22% 15% / 0.10);
 }
-
 .dark .relief-raised {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.4),
-    0 2px 6px -1px hsl(0 0% 0% / 0.3),
-    inset 0 1px 0.5px hsl(0 0% 100% / 0.08),
-    inset 0 -1px 0.5px hsl(0 0% 0% / 0.3);
+ box-shadow:
+ 0 1px 2px hsl(0 0% 0% / 0.35),
+ 0 2px 6px -1px hsl(0 0% 0% / 0.40),
+ inset 0 1px 0 hsl(0 0% 100% / 0.08),
+ inset 0 -1px 0 hsl(0 0% 0% / 0.30);
 }
-
-/* Specific relief for primary buttons to handle high contrast better */
-.relief-primary {
-  box-shadow:
-    0 1px 1px hsl(var(--primary) / 0.2),
-    0 3px 6px -1.5px hsl(var(--primary) / 0.3),
-    inset 0 1px 0.5px hsl(0 0% 100% / 0.25),
-    inset 0 -1.5px 0 hsl(0 0% 0% / 0.15);
+.relief-raised:active {
+ box-shadow:
+ 0 1px 2px hsl(210 22% 15% / 0.10),
+ inset 0 1px 2px hsl(210 22% 15% / 0.10);
 }
-
-.dark .relief-primary {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.5),
-    0 4px 8px -2px hsl(0 0% 0% / 0.4),
-    inset 0 1px 0.5px hsl(0 0% 100% / 0.1),
-    inset 0 -1.5px 0 hsl(0 0% 0% / 0.4);
-}
-
-.relief-active {
-  box-shadow:
-    0 1px 1px hsl(var(--foreground) / 0.05),
-    inset 0 1.5px 3px hsl(var(--foreground) / 0.1);
-}
-
-.dark .relief-active {
-  box-shadow:
-    0 1px 1px hsl(0 0% 0% / 0.2),
-    inset 0 1.5px 3px hsl(0 0% 0% / 0.4);
+.dark .relief-raised:active {
+ box-shadow:
+ 0 1px 2px hsl(0 0% 0% / 0.30),
+ inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
 /* Premium relief for major CTAs - Polished Lacquer look */
@@ -345,38 +326,12 @@
  inset 0 -1px 0 hsl(0 0% 0% / 0.35);
 }
 
-/* Active nav pill — uses .relief-raised for the shadow plus a crisp top reflection. */
+/* Active nav pill — uses .relief-raised for the shadow; this class only sets the tint. */
 .nav-pill-active {
-  background-color: hsl(var(--foreground) / 0.08);
-  position: relative;
-  overflow: hidden;
+ background-color: hsl(var(--foreground) / 0.08);
 }
-
-.nav-pill-active::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(
-    to bottom,
-    hsl(0 0% 100% / 0.6),
-    transparent
-  );
-  pointer-events: none;
-}
-
 .dark .nav-pill-active {
-  background-color: hsl(var(--foreground) / 0.12);
-}
-
-.dark .nav-pill-active::before {
-  background: linear-gradient(
-    to bottom,
-    hsl(0 0% 100% / 0.08),
-    transparent
-  );
+ background-color: hsl(var(--foreground) / 0.10);
 }
 
 /* Wordmark — refined letter-spacing for the brand */

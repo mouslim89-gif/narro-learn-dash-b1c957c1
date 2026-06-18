@@ -181,10 +181,9 @@ export default function BookDetail() {
  <button
  key={d}
  onClick={() => setDifficulty(d)}
-                className={cn('rounded-full px-4 py-2 text-[12px] font-bold tracking-wide transition-all tap-scale-sm',
-                  selected
-                    ? 'bg-card text-foreground relief-raised border border-border/50' : 'text-muted-foreground opacity-70 hover:opacity-100')}
-
+ className={cn('rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm',
+ selected
+ ?'bg-card text-foreground shadow-sm ring-1 ring-border/50':'text-muted-foreground')}
  >
  {cfg.label}
  </button>
