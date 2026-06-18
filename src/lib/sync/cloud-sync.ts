@@ -137,8 +137,10 @@ export interface UserPreferences {
  showKnownHighlights: boolean;
  highlightNew: boolean;
  highlightLearning: boolean;
- highlightKnown: boolean;
+  highlightKnown: boolean;
+  hasCompletedOnboarding?: boolean;
 }
+
 
 export async function pullPreferences(userId: string): Promise<UserPreferences | null> {
  const { data, error } = await supabase
@@ -160,9 +162,11 @@ export async function pullPreferences(userId: string): Promise<UserPreferences |
  showKnownHighlights: data.show_known_highlights,
  highlightNew: data.highlight_new,
  highlightLearning: data.highlight_learning,
- highlightKnown: data.highlight_known,
- };
+    highlightKnown: data.highlight_known,
+    hasCompletedOnboarding: (data as any).has_completed_onboarding ?? false,
+  };
 }
+
 
 export async function pushPreferences(userId: string, prefs: UserPreferences): Promise<void> {
  useSyncStatus.getState().startSync();
