@@ -185,6 +185,7 @@ export default function Onboarding() {
                   <Check className="h-4 w-4" />
                 </div>
                 <div className="text-sm">First Book: <span className="font-bold">{selectedBookId ? books.find(b => b.id === selectedBookId)?.titleEn : 'Selected for you'}</span></div>
+
               </div>
             </div>
           </motion.div>
