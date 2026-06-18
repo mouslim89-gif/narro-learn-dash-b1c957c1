@@ -243,6 +243,34 @@
  inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
+/* Standard 3D Relief - "Boxy" look for chips/general buttons */
+.relief-3d {
+  position: relative;
+  transition: all 0.1s var(--ease-out-soft);
+  box-shadow: 0 4px 0 hsl(var(--border) / 0.5);
+  top: 0;
+}
+
+.relief-3d:active {
+  box-shadow: 0 0 0 hsl(var(--border) / 0.5);
+  top: 4px;
+}
+
+/* Primary color 3D relief */
+.relief-3d-primary {
+  position: relative;
+  transition: all 0.1s var(--ease-out-soft);
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  box-shadow: 0 4px 0 hsl(var(--primary) / 0.4);
+  top: 0;
+}
+
+.relief-3d-primary:active {
+  box-shadow: 0 0 0 hsl(var(--primary) / 0.4);
+  top: 4px;
+}
+
 /* Premium relief for major CTAs - Polished Lacquer look */
 .btn-tsundoku-premium {
   position: relative;
