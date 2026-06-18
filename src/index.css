@@ -256,6 +256,7 @@
     inset 0 1px 0 hsl(0 0% 100% / 0.15),
     inset 0 -1px 0 hsl(0 0% 0% / 0.2);
   transition: all 0.2s var(--ease-out-soft);
+  border: none !important;
 }
 
 .btn-tsundoku-premium::before {
@@ -280,6 +281,12 @@
     inset 0 1px 2px hsl(0 0% 0% / 0.15);
   transform: translateY(1px);
 }
+
+/* Alias for the premium relief if needed elsewhere */
+.relief-premium {
+  @apply btn-tsundoku-premium;
+}
+
 
 
 /* Header chip — circular icon buttons in page mastheads. Uses the standard raised relief. */

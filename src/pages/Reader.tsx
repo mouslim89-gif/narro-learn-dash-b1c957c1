@@ -1488,7 +1488,8 @@ export default function Reader() {
       {partIdx < book.anchors.length - 1 ? (
         <button
           onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
-          className="relief-premium tap-scale-sm group ml-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-[#c97b5c] px-6 h-11 font-serif text-[13px] font-bold tracking-wide text-primary-foreground border-none"
+          className="btn-tsundoku-premium tap-scale-sm group ml-auto inline-flex items-center gap-2 rounded-full px-6 h-11 font-serif text-[13px] font-bold tracking-wide"
+
         >
           Chapter {partIdx + 2}
           <ArrowRight className="h-4 w-4" />

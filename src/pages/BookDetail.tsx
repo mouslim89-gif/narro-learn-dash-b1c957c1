@@ -181,9 +181,10 @@ export default function BookDetail() {
  <button
  key={d}
  onClick={() => setDifficulty(d)}
- className={cn('rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm',
- selected
- ?'bg-card text-foreground shadow-sm ring-1 ring-border/50':'text-muted-foreground')}
+                className={cn('rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm transition-all duration-200',
+                  selected
+                    ? 'bg-card text-foreground relief-raised' : 'text-muted-foreground')}
+
  >
  {cfg.label}
  </button>
@@ -219,7 +220,8 @@ export default function BookDetail() {
  return (
  <li key={ch.id}>
  <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
-                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left ring-1 ring-border/40 shadow-sm">
+                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
+
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
