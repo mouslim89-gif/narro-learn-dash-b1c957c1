@@ -1068,7 +1068,7 @@ export default function Reader() {
   <button
   key={d}
   onClick={() => handleChangeDifficulty(d)}
-  className={cn(pillBase,'relative flex-1 sm:flex-none', d === difficulty ? 'text-foreground' : 'text-muted-foreground')}
+  className={cn(pillBase,'relative flex-1 sm:flex-none text-foreground')}
   >
     {d === difficulty && (
       <motion.div
