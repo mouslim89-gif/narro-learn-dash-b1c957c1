@@ -274,14 +274,23 @@
   pointer-events: none;
 }
 
+.btn-tsundoku-premium:hover {
+  filter: brightness(0.95);
+  box-shadow: 
+    0 2px 4px hsl(var(--primary) / 0.15), 
+    0 6px 12px -2px hsl(var(--primary) / 0.35);
+}
+
 .btn-tsundoku-premium:active {
-  background-color: hsl(var(--primary));
+  background-color: hsl(var(--primary)) !important;
+  filter: brightness(0.9);
   box-shadow: 
     0 1px 1px hsl(var(--primary) / 0.1), 
     0 2px 4px -1px hsl(var(--primary) / 0.2),
     inset 0 1px 2px hsl(0 0% 0% / 0.15);
   transform: translateY(1px);
 }
+
 
 
 /* Alias for the premium relief if needed elsewhere */
