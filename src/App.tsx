@@ -53,11 +53,13 @@ function CloudSyncMount() {
 }
 
 function AnimatedRoutes() {
- const location = useLocation();
- const { user, loading } = useAuth();
- const isReviewing = useFlashcardStore(s => s.isReviewing);
- const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
- const path = location.pathname;
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const isReviewing = useFlashcardStore(s => s.isReviewing);
+  const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
+  const path = location.pathname;
+
   const isDetailRoute =
   path.startsWith('/reader/') ||
   path.startsWith('/book/') ||
@@ -66,8 +68,30 @@ function AnimatedRoutes() {
   (path.startsWith('/dictionary/') && path !=='/dictionary') ||
   path ==='/settings';
 
- const hideNav = isDetailRoute || isReviewing || isAuthRoute;
- const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
+  const hideNav = isDetailRoute || isReviewing || isAuthRoute;
+  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
+
+  useEffect(() => {
+    if (loading) return;
+
+    const welcomeSeen = localStorage.getItem("tsundoku-welcome-seen") === "true";
+    
+    // Redirect to welcome if never seen
+    if (!user && !welcomeSeen && path !== "/welcome" && path !== "/auth" && path !== "/reset-password") {
+      navigate("/welcome", { replace: true });
+      return;
+    }
+
+    // After auth, check onboarding status
+    if (user && path !== "/onboarding" && !path.startsWith("/welcome") && path !== "/auth" && path !== "/reset-password") {
+      supabase.from("user_preferences").select("has_completed_onboarding").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+        if (data && data.has_completed_onboarding === false) {
+          navigate("/onboarding", { replace: true });
+        }
+      });
+    }
+  }, [user, loading, path, navigate]);
+
 
  return (
  <>
