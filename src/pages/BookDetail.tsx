@@ -198,10 +198,10 @@ export default function BookDetail() {
       <Link to={continueLink}>
         <Button 
           size="lg" 
-          className="relief-raised btn-primary-glow tap-scale mt-6 h-12 w-full rounded-full bg-primary font-serif text-[15px] font-semibold text-primary-foreground"
+          className="relief-premium tap-scale group mt-6 h-14 w-full rounded-full bg-gradient-to-r from-primary to-[#c97b5c] font-serif text-[16px] font-bold tracking-wide text-primary-foreground border-none"
         >
           {continueLabel()}
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <ArrowRight className="ml-2 h-5 w-5 transition-transform group-active:translate-x-1" />
         </Button>
       </Link>
 
