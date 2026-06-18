@@ -22,6 +22,9 @@ import NotFound from"./pages/NotFound";
 import Settings from"./pages/Settings";
 import Auth from"./pages/Auth";
 import ResetPassword from"./pages/ResetPassword";
+import Welcome from "./pages/Welcome";
+import Onboarding from "./pages/Onboarding";
+
 
 const queryClient = new QueryClient();
 
@@ -53,11 +56,14 @@ function AnimatedRoutes() {
  const isReviewing = useFlashcardStore(s => s.isReviewing);
  const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
  const path = location.pathname;
- const isDetailRoute =
- path.startsWith('/reader/') ||
- path.startsWith('/book/') ||
- (path.startsWith('/dictionary/') && path !=='/dictionary') ||
- path ==='/settings';
+  const isDetailRoute =
+  path.startsWith('/reader/') ||
+  path.startsWith('/book/') ||
+  path === '/welcome' ||
+  path === '/onboarding' ||
+  (path.startsWith('/dictionary/') && path !=='/dictionary') ||
+  path ==='/settings';
+
  const hideNav = isDetailRoute || isReviewing || isAuthRoute;
  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
@@ -74,20 +80,23 @@ function AnimatedRoutes() {
  transition={pageTransition}
  className="w-full bg-background min-h-screen"
  >
- <Routes location={location}>
- <Route path="/auth"element={<Auth />} />
- <Route path="/reset-password"element={<ResetPassword />} />
- <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
- <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
- <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
- <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
- <Route path="/dictionary/:word"element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
- <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
- <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
- <Route path="*"element={<NotFound />} />
- </Routes>
+  <Routes location={location}>
+  <Route path="/welcome" element={<Welcome />} />
+  <Route path="/auth"element={<Auth />} />
+  <Route path="/reset-password"element={<ResetPassword />} />
+  <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+  <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
+  <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
+  <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
+  <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+  <Route path="/dictionary/:word"element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
+  <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
+  <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+  <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+  <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+  <Route path="*"element={<NotFound />} />
+  </Routes>
+
  </motion.div>
  </AnimatePresence>
  </div>
