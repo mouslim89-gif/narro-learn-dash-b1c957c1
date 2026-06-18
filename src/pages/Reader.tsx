@@ -1473,29 +1473,34 @@ export default function Reader() {
  </div>
  </article>
 
- {hasParts(book) && partIdx !== null && book.anchors && (
- <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">
+  {hasParts(book) && partIdx !== null && book.anchors && (
+    <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">
+      {partIdx > 0 ? (
+        <button
+          onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
+          className="group relative h-11 rounded-lg bg-card px-4 text-[13px] font-bold uppercase tracking-[0.05em] ring-1 ring-inset ring-border/40 shadow-[0_3px_0_0_rgba(0,0,0,0.05)] transition-all duration-75 active:translate-y-[2px] active:shadow-none"
+        >
+          <span className="inline-flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform group-active:-translate-x-1" />
+            Chapter {partIdx}
+          </span>
+        </button>
+      ) : <span />}
 
- {partIdx > 0 ? (
- <button
- onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
- className="tap-scale-sm smooth-colors group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 text-[13px] font-semibold ring-1 ring-border/40 shadow-sm"
- >
- <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform"/>
- Chapter {partIdx}
- </button>
- ) : <span />}
- {partIdx < book.anchors.length - 1 ? (
- <button
- onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
- className="tap-scale-sm smooth-colors group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 text-[13px] font-semibold text-primary-foreground shadow-md"
- >
- Chapter {partIdx + 2}
- <ArrowRight className="h-4 w-4 transition-transform"/>
- </button>
- ) : <span />}
- </nav>
- )}
+      {partIdx < book.anchors.length - 1 ? (
+        <button
+          onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
+          className="group relative ml-auto h-11 rounded-lg bg-[#2d3e50] px-4 text-[13px] font-bold uppercase tracking-[0.05em] text-white shadow-[0_3px_0_0_#1e2a36] ring-1 ring-inset ring-black/20 transition-all duration-75 hover:bg-[#34495e] active:translate-y-[2px] active:shadow-none"
+        >
+          <span className="absolute inset-x-0 top-0 h-px bg-white/10" />
+          <span className="inline-flex items-center gap-2">
+            Chapter {partIdx + 2}
+            <ArrowRight className="h-4 w-4 transition-transform group-active:translate-x-1" />
+          </span>
+        </button>
+      ) : <span />}
+    </nav>
+  )}
 
  {miniPopup && (
  <WordMiniPopup
