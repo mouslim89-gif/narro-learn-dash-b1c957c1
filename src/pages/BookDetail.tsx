@@ -7,6 +7,7 @@ import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { cn } from'@/lib/utils';
+import { motion } from 'framer-motion';
 
 export default function BookDetail() {
  const { id } = useParams();
@@ -177,18 +178,25 @@ export default function BookDetail() {
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];
  const selected = difficulty === d;
- return (
- <button
- key={d}
- onClick={() => setDifficulty(d)}
-                className={cn('rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm transition-all duration-200',
-                  selected
-                    ? 'bg-card text-foreground relief-raised' : 'text-muted-foreground')}
-
- >
- {cfg.label}
- </button>
- );
+              return (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  className={cn(
+                    'relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm transition-all duration-200',
+                    selected ? 'text-foreground' : 'text-muted-foreground'
+                  )}
+                >
+                  {selected && (
+                    <motion.div
+                      layoutId="seg-difficulty-bookdetail"
+                      className="absolute inset-0 rounded-full bg-card relief-raised"
+                      transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+                    />
+                  )}
+                  <span className="relative z-10">{cfg.label}</span>
+                </button>
+              );
  })}
  </div>
  <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">

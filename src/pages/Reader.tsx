@@ -976,16 +976,22 @@ export default function Reader() {
  <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
  <div className="flex gap-1 rounded-full bg-muted p-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
- <button
- key={d}
-  onClick={() => handleChangeDifficulty(d)}
- className={cn('h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
- d === difficulty
- ?'bg-card text-foreground shadow-sm ring-1 ring-border/40':'text-muted-foreground',
- )}
- >
- {difficultyConfig[d].label}
- </button>
+  <button
+  key={d}
+   onClick={() => handleChangeDifficulty(d)}
+  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
+  d === difficulty ? 'text-foreground' : 'text-muted-foreground',
+  )}
+  >
+    {d === difficulty && (
+      <motion.div
+        layoutId="seg-difficulty-reader-mini"
+        className="absolute inset-0 rounded-full bg-card shadow-sm ring-1 ring-border/40"
+        transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+      />
+    )}
+  <span className="relative z-10">{difficultyConfig[d].label}</span>
+  </button>
  ))}
  </div>
  </div>
@@ -1059,13 +1065,20 @@ export default function Reader() {
  <span className="text-[15px] font-medium">Reading level</span>
  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
- <button
- key={d}
- onClick={() => handleChangeDifficulty(d)}
- className={cn(pillBase,'flex-1 sm:flex-none', d === difficulty ? pillActive : pillIdle)}
- >
- {difficultyConfig[d].label}
- </button>
+  <button
+  key={d}
+  onClick={() => handleChangeDifficulty(d)}
+  className={cn(pillBase,'relative flex-1 sm:flex-none', d === difficulty ? 'text-foreground' : 'text-muted-foreground')}
+  >
+    {d === difficulty && (
+      <motion.div
+        layoutId="seg-difficulty-reader-panel"
+        className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
+        transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+      />
+    )}
+  <span className="relative z-10">{difficultyConfig[d].label}</span>
+  </button>
  ))}
  </div>
  </div>
@@ -1073,13 +1086,20 @@ export default function Reader() {
  <span className="text-[15px] font-medium">Font size</span>
  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
  {fontSizes.map((s) => (
- <button
- key={s}
- onClick={() => setFontSize(s)}
- className={cn('h-7 rounded-full text-sm font-semibold smooth-colors tap-scale-sm flex-1 sm:w-9 sm:flex-none', s === fontSize ? pillActive : pillIdle)}
- >
- {fontSizeLabels[s]}
- </button>
+  <button
+  key={s}
+  onClick={() => setFontSize(s)}
+  className={cn('relative h-7 rounded-full text-sm font-semibold smooth-colors tap-scale-sm flex-1 sm:w-9 sm:flex-none', s === fontSize ? 'text-foreground' : 'text-muted-foreground')}
+  >
+    {s === fontSize && (
+      <motion.div
+        layoutId="seg-fontsize-reader"
+        className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
+        transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+      />
+    )}
+  <span className="relative z-10">{fontSizeLabels[s]}</span>
+  </button>
  ))}
  </div>
  </div>
@@ -1087,14 +1107,23 @@ export default function Reader() {
  <span className="text-[15px] font-medium">Japanese font</span>
  <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
  {japaneseFonts.map((f) => (
- <button
- key={f.value}
- onClick={() => setJapaneseFont(f.value)}
- className={cn(pillBase,'flex-1 sm:flex-none', f.value === japaneseFont ? pillActive : pillIdle)}
- >
- <span className={cn('text-base leading-none', japaneseFontClassMap[f.value])}>あ</span>
- {f.label}
- </button>
+  <button
+  key={f.value}
+  onClick={() => setJapaneseFont(f.value)}
+  className={cn(pillBase,'relative flex-1 sm:flex-none', f.value === japaneseFont ? 'text-foreground' : 'text-muted-foreground')}
+  >
+    {f.value === japaneseFont && (
+      <motion.div
+        layoutId="seg-jpfont-reader"
+        className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
+        transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+      />
+    )}
+  <span className="relative z-10 flex items-center justify-center gap-1">
+    <span className={cn('text-base leading-none', japaneseFontClassMap[f.value])}>あ</span>
+    {f.label}
+  </span>
+  </button>
  ))}
  </div>
  </div>
