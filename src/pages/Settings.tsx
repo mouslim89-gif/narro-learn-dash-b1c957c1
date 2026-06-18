@@ -152,8 +152,7 @@ export default function Settings() {
                     key={opt.value}
                     onClick={() => setFontSize(opt.value)}
                     className={cn(
-                      'relative h-7 w-9 rounded-full text-sm font-semibold smooth-colors tap-scale-sm',
-                      fontSize === opt.value ? 'text-foreground' : 'text-muted-foreground'
+                      'relative h-7 w-9 rounded-full text-sm font-semibold tap-scale-sm text-foreground'
                     )}
                   >
                     {fontSize === opt.value && (
