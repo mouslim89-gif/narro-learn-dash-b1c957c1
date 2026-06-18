@@ -39,13 +39,13 @@ export default function Onboarding() {
     setSubmitting(true);
     try {
       const { error } = await supabase
-        .from("profiles")
+        .from("user_preferences")
         .update({
-          onboarded_at: new Date().toISOString(),
-          daily_goal_min: dailyGoal,
-          first_book_id: selectedBookId
+          has_completed_onboarding: true,
+          daily_goal_minutes: dailyGoal,
+          // first_book_id doesn't exist in preferences, but we handle navigation
         })
-        .eq("id", user.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
       
@@ -61,14 +61,15 @@ export default function Onboarding() {
     if (!user) return;
     try {
       await supabase
-        .from("profiles")
-        .update({ onboarded_at: new Date().toISOString() })
-        .eq("id", user.id);
+        .from("user_preferences")
+        .update({ has_completed_onboarding: true })
+        .eq("user_id", user.id);
       navigate("/");
     } catch (e) {
       navigate("/");
     }
   };
+
 
   return (
     <div 
@@ -183,7 +184,7 @@ export default function Onboarding() {
                 <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center text-accent">
                   <Check className="h-4 w-4" />
                 </div>
-                <div className="text-sm">First Book: <span className="font-bold">{selectedBookId ? books.find(b => b.id === selectedBookId)?.title : 'Selected for you'}</span></div>
+                <div className="text-sm">First Book: <span className="font-bold">{selectedBookId ? books.find(b => b.id === selectedBookId)?.titleEn : 'Selected for you'}</span></div>
               </div>
             </div>
           </motion.div>

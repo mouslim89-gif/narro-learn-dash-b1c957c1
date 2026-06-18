@@ -71,10 +71,11 @@ export default function Settings() {
 
   const handleReplayOnboarding = () => {
     localStorage.removeItem("tsundoku-welcome-seen");
-    supabase.from("profiles").update({ onboarded_at: null }).eq("id", user?.id).then(() => {
+    supabase.from("user_preferences").update({ has_completed_onboarding: false }).eq("user_id", user?.id).then(() => {
       navigate("/welcome");
     });
   };
+
 
   const initial = (user?.email ?? '?').slice(0, 1).toUpperCase();
 
