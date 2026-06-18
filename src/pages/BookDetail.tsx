@@ -7,7 +7,6 @@ import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { cn } from'@/lib/utils';
-import { motion } from 'framer-motion';
 
 export default function BookDetail() {
  const { id } = useParams();
@@ -174,7 +173,7 @@ export default function BookDetail() {
 
  <section className="mt-8">
  <h2 className="mb-3 font-serif text-lg font-semibold">Reading Level</h2>
- <div className="relative rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
+ <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => {
  const cfg = difficultyConfig[d];
  const selected = difficulty === d;
@@ -182,17 +181,12 @@ export default function BookDetail() {
  <button
  key={d}
  onClick={() => setDifficulty(d)}
-                className={cn('relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors transition-all duration-200',
-                  selected ? 'text-foreground' : 'text-muted-foreground')}
+                className={cn('rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm transition-all duration-200',
+                  selected
+                    ? 'bg-card text-foreground relief-raised' : 'text-muted-foreground')}
+
  >
-                {selected && (
-                  <motion.div
-                    layoutId="difficulty-pill"
-                    className="absolute inset-0 rounded-full bg-card relief-raised"
-                    transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                  />
-                )}
-                <span className="relative z-10">{cfg.label}</span>
+ {cfg.label}
  </button>
  );
  })}
@@ -268,7 +262,7 @@ export default function BookDetail() {
  return (
  <li key={partId}>
  <Link to={`/reader/${book.id}/${difficulty}/${partId}`} className="block">
- <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
+ <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left ring-1 ring-border/40 shadow-sm">
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
  done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
