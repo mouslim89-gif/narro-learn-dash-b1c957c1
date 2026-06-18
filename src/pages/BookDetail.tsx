@@ -198,7 +198,7 @@ export default function BookDetail() {
       <Link to={continueLink}>
         <Button 
           size="lg" 
-          className="btn-tsundoku-premium tap-scale group mt-6 h-14 w-full rounded-full border-none font-serif text-[16px] font-bold tracking-wide"
+          className="btn-tsundoku-premium tap-scale group mt-6 h-14 w-full rounded-2xl border-none font-serif text-[16px] font-bold tracking-wide"
         >
           {continueLabel()}
           <ArrowRight className="ml-2 h-5 w-5 transition-transform group-active:translate-x-1" />
