@@ -345,12 +345,38 @@
  inset 0 -1px 0 hsl(0 0% 0% / 0.35);
 }
 
-/* Active nav pill — uses .relief-raised for the shadow; this class only sets the tint. */
+/* Active nav pill — uses .relief-raised for the shadow plus a crisp top reflection. */
 .nav-pill-active {
- background-color: hsl(var(--foreground) / 0.08);
+  background-color: hsl(var(--foreground) / 0.08);
+  position: relative;
+  overflow: hidden;
 }
+
+.nav-pill-active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    to bottom,
+    hsl(0 0% 100% / 0.6),
+    transparent
+  );
+  pointer-events: none;
+}
+
 .dark .nav-pill-active {
- background-color: hsl(var(--foreground) / 0.10);
+  background-color: hsl(var(--foreground) / 0.12);
+}
+
+.dark .nav-pill-active::before {
+  background: linear-gradient(
+    to bottom,
+    hsl(0 0% 100% / 0.08),
+    transparent
+  );
 }
 
 /* Wordmark — refined letter-spacing for the brand */
