@@ -122,15 +122,15 @@ export default function WordDetail() {
  <div className="pb-24">
  {/* Top bar */}
  <header className="sticky top-0 z-20 flex items-center gap-3 px-6 pt-3 pb-3 bg-background/80 backdrop-blur-md border-b border-border/50">
- <Button
- variant="ghost"
- size="icon"
- onClick={handleBack}
- className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
- aria-label="Back"
- >
- <ArrowLeft className="h-[18px] w-[18px]"/>
- </Button>
+          <Button
+            variant="icon-raised"
+            size="icon"
+            onClick={handleBack}
+            className="shrink-0"
+            aria-label="Back"
+          >
+            <ArrowLeft className="h-[18px] w-[18px]"/>
+          </Button>
  <div className="flex-1 min-w-0">
  <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">Dictionary</p>
  <p className="font-japanese text-base font-bold truncate mt-0.5">{display || word}</p>
@@ -138,12 +138,12 @@ export default function WordDetail() {
  {result && (
  <button
  onClick={toggleSave}
- aria-label={saved ?'Remove from flashcards':'Save word'}
-  className={`h-10 w-10 rounded-full ring-1 ring-border/40 bg-background/80 backdrop-blur-md flex items-center justify-center shrink-0 header-chip transition-colors ${
-  saved ?'text-accent':'text-muted-foreground'}`}
- >
- <Star className="h-[18px] w-[18px]"fill={saved ?'currentColor':'none'} />
- </button>
+              aria-label={saved ? 'Remove from flashcards' : 'Save word'}
+              className={`h-10 w-10 rounded-full relief-raised bg-background/80 backdrop-blur-md ring-1 ring-border/40 flex items-center justify-center shrink-0 transition-colors ${
+                saved ? 'text-accent' : 'text-muted-foreground'}`}
+            >
+              <Star className="h-[18px] w-[18px]" fill={saved ? 'currentColor' : 'none'} />
+            </button>
  )}
  </header>
 
