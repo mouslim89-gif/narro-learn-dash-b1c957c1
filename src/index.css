@@ -280,7 +280,7 @@
   box-shadow: 
     0 1px 2px hsl(var(--primary) / 0.1), 
     inset 0 1px 2px hsl(0 0% 0% / 0.15);
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.96);
 }
 
 
