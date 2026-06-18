@@ -243,21 +243,44 @@
  inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
-/* Premium relief for major CTAs */
-.relief-premium {
-  box-shadow:
-    0 1px 0 hsl(var(--primary) / 0.15),
-    0 4px 12px -2px hsl(var(--primary) / 0.35),
-    inset 0 1px 0 hsl(0 0% 100% / 0.25),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.15);
+/* Premium relief for major CTAs - Polished Lacquer look */
+.btn-tsundoku-premium {
+  position: relative;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  overflow: hidden;
+  box-shadow: 
+    0 1px 1px hsl(var(--primary) / 0.12), 
+    0 4px 8px -2px hsl(var(--primary) / 0.3),
+    0 12px 24px -4px hsl(var(--primary) / 0.25),
+    inset 0 1px 0 hsl(0 0% 100% / 0.15),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.2);
+  transition: all 0.2s var(--ease-out-soft);
 }
-.dark .relief-premium {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.45),
-    0 8px 16px -4px hsl(0 0% 0% / 0.65),
-    inset 0 1px 0 hsl(0 0% 100% / 0.12),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.40);
+
+.btn-tsundoku-premium::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    to bottom,
+    hsl(0 0% 100% / 0.08),
+    transparent
+  );
+  pointer-events: none;
 }
+
+.btn-tsundoku-premium:active {
+  box-shadow: 
+    0 1px 1px hsl(var(--primary) / 0.1), 
+    0 2px 4px -1px hsl(var(--primary) / 0.2),
+    inset 0 1px 2px hsl(0 0% 0% / 0.15);
+  transform: translateY(1px);
+}
+
 
 /* Header chip — circular icon buttons in page mastheads. Uses the standard raised relief. */
 
