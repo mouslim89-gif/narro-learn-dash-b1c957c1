@@ -1478,25 +1478,20 @@ export default function Reader() {
       {partIdx > 0 ? (
         <button
           onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
-          className="group relative h-11 rounded-lg bg-card px-4 text-[13px] font-bold uppercase tracking-[0.05em] ring-1 ring-inset ring-border/40 shadow-[0_3px_0_0_rgba(0,0,0,0.05)] transition-all duration-75 active:translate-y-[2px] active:shadow-none"
+          className="relief-raised tap-scale-sm group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 font-serif text-[13px] font-semibold"
         >
-          <span className="inline-flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4 text-muted-foreground transition-transform group-active:-translate-x-1" />
-            Chapter {partIdx}
-          </span>
+          <ArrowLeft className="h-4 w-4 text-muted-foreground" />
+          Chapter {partIdx}
         </button>
       ) : <span />}
 
       {partIdx < book.anchors.length - 1 ? (
         <button
           onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
-          className="group relative ml-auto h-11 rounded-lg bg-[#2d3e50] px-4 text-[13px] font-bold uppercase tracking-[0.05em] text-white shadow-[0_3px_0_0_#1e2a36] ring-1 ring-inset ring-black/20 transition-all duration-75 hover:bg-[#34495e] active:translate-y-[2px] active:shadow-none"
+          className="relief-raised btn-primary-glow tap-scale-sm group ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 h-11 font-serif text-[13px] font-semibold text-primary-foreground"
         >
-          <span className="absolute inset-x-0 top-0 h-px bg-white/10" />
-          <span className="inline-flex items-center gap-2">
-            Chapter {partIdx + 2}
-            <ArrowRight className="h-4 w-4 transition-transform group-active:translate-x-1" />
-          </span>
+          Chapter {partIdx + 2}
+          <ArrowRight className="h-4 w-4" />
         </button>
       ) : <span />}
     </nav>

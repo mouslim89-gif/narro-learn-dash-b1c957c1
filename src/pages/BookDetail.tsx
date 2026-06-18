@@ -198,11 +198,10 @@ export default function BookDetail() {
       <Link to={continueLink}>
         <Button 
           size="lg" 
-          className="group relative mt-6 h-14 w-full rounded-lg bg-[#2d3e50] text-[15px] font-bold uppercase tracking-[0.05em] text-white shadow-[0_4px_0_0_#1e2a36] ring-1 ring-inset ring-black/20 transition-all duration-75 hover:bg-[#34495e] active:translate-y-[2px] active:shadow-[0_2px_0_0_#1e2a36]"
+          className="relief-raised btn-primary-glow tap-scale mt-6 h-12 w-full rounded-full bg-primary font-serif text-[15px] font-semibold text-primary-foreground"
         >
-          <span className="absolute inset-x-0 top-0 h-px bg-white/10" />
           {continueLabel()}
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </Link>
 
