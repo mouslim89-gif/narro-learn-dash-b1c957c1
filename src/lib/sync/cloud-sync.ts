@@ -137,10 +137,8 @@ export interface UserPreferences {
  showKnownHighlights: boolean;
  highlightNew: boolean;
  highlightLearning: boolean;
-  highlightKnown: boolean;
-  hasCompletedOnboarding?: boolean;
+ highlightKnown: boolean;
 }
-
 
 export async function pullPreferences(userId: string): Promise<UserPreferences | null> {
  const { data, error } = await supabase
@@ -162,32 +160,28 @@ export async function pullPreferences(userId: string): Promise<UserPreferences |
  showKnownHighlights: data.show_known_highlights,
  highlightNew: data.highlight_new,
  highlightLearning: data.highlight_learning,
-    highlightKnown: data.highlight_known,
-    hasCompletedOnboarding: (data as any).has_completed_onboarding ?? false,
-  };
+ highlightKnown: data.highlight_known,
+ };
 }
-
 
 export async function pushPreferences(userId: string, prefs: UserPreferences): Promise<void> {
  useSyncStatus.getState().startSync();
  try {
  const { error } = await supabase.from('user_preferences').upsert({
  user_id: userId,
-  font_size: prefs.fontSize,
-  reader_dark_mode: prefs.readerDarkMode,
-  dark_mode: prefs.darkMode,
-  show_furigana: prefs.showFurigana,
-  show_translations: prefs.showTranslations,
-  display_mode: prefs.displayMode,
-  japanese_font: prefs.japaneseFont,
-  has_seen_long_press_hint: prefs.hasSeenLongPressHint,
-  show_known_highlights: prefs.showKnownHighlights,
-  highlight_new: prefs.highlightNew,
-  highlight_learning: prefs.highlightLearning,
-  highlight_known: prefs.highlightKnown,
-  has_completed_onboarding: prefs.hasCompletedOnboarding ?? false,
-  updated_at: new Date().toISOString(),
-
+ font_size: prefs.fontSize,
+ reader_dark_mode: prefs.readerDarkMode,
+ dark_mode: prefs.darkMode,
+ show_furigana: prefs.showFurigana,
+ show_translations: prefs.showTranslations,
+ display_mode: prefs.displayMode,
+ japanese_font: prefs.japaneseFont,
+ has_seen_long_press_hint: prefs.hasSeenLongPressHint,
+ show_known_highlights: prefs.showKnownHighlights,
+ highlight_new: prefs.highlightNew,
+ highlight_learning: prefs.highlightLearning,
+ highlight_known: prefs.highlightKnown,
+ updated_at: new Date().toISOString(),
  });
 
  if (error) throw error;
