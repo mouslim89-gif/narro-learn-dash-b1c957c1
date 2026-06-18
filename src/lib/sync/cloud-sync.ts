@@ -186,8 +186,8 @@ export async function pushPreferences(userId: string, prefs: UserPreferences): P
   highlight_learning: prefs.highlightLearning,
   highlight_known: prefs.highlightKnown,
   has_completed_onboarding: prefs.hasCompletedOnboarding ?? false,
+  updated_at: new Date().toISOString(),
 
- updated_at: new Date().toISOString(),
  });
 
  if (error) throw error;
