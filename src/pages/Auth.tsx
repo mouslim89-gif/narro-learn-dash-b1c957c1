@@ -167,7 +167,7 @@ export default function Auth() {
  </div>
  )}
 
- <Button type="submit" variant="premium" className="h-12 w-full gap-2 rounded-xl text-[15px] font-semibold" disabled={submitting}>
+ <Button type="submit"className="h-12 w-full gap-2 rounded-xl text-[15px] font-semibold tap-scale-sm"disabled={submitting}>
  {submitting ? (
  <Loader2 className="h-4 w-4 animate-spin"/>
  ) : (

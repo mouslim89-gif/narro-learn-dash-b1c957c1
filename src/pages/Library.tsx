@@ -64,11 +64,11 @@ export default function Library() {
  />
  </div>
  <div className="relative z-10 flex items-center gap-2">
- <Button variant="icon-raised" size="icon" onClick={() => setDarkMode(!darkMode)}>
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip"onClick={() => setDarkMode(!darkMode)}>
  {darkMode ? <Sun className="h-[18px] w-[18px]"/> : <Moon className="h-[18px] w-[18px]"/>}
  </Button>
  <Link to="/settings">
- <Button variant="icon-raised" size="icon">
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip">
  <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>

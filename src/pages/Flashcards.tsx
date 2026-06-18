@@ -141,7 +141,7 @@ export default function Flashcards() {
  />
  </div>
  <Link to="/settings">
- <Button variant="icon-raised" size="icon">
+ <Button variant="ghost"size="icon"className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip">
  <Settings className="h-[18px] w-[18px]"/>
  </Button>
  </Link>
@@ -165,7 +165,7 @@ export default function Flashcards() {
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
- <Button variant="premium" size="sm" className="rounded-full px-4" onClick={enterReview}>
+ <Button size="sm"className="rounded-full px-4 shadow-md"onClick={enterReview}>
  Review <ArrowRight className="ml-1 h-3.5 w-3.5"/>
  </Button>
  </div>
