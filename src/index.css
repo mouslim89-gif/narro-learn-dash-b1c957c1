@@ -243,20 +243,27 @@
  inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
-/* Premium relief for major CTAs - Polished Lacquer look */
+/* Premium relief for major CTAs — same shadow language as .relief-raised,
+   tuned for the dark primary background so it stays bombé. */
 .btn-tsundoku-premium {
   position: relative;
   background-color: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
   overflow: hidden;
-  box-shadow: 
-    0 1px 1px hsl(var(--primary) / 0.12), 
-    0 4px 8px -2px hsl(var(--primary) / 0.3),
-    0 12px 24px -4px hsl(var(--primary) / 0.25),
-    inset 0 1px 0 hsl(0 0% 100% / 0.15),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.2);
-  transition: all 0.2s var(--ease-out-soft);
+  box-shadow:
+    0 1px 0 hsl(210 22% 15% / 0.20),
+    0 2px 4px -1px hsl(210 22% 15% / 0.25),
+    inset 0 1px 0 hsl(0 0% 100% / 0.18),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.22);
+  transition: transform 0.18s var(--ease-out-soft), box-shadow 0.18s var(--ease-out-soft), filter 0.18s var(--ease-out-soft);
   border: none !important;
+}
+.dark .btn-tsundoku-premium {
+  box-shadow:
+    0 1px 2px hsl(0 0% 0% / 0.35),
+    0 2px 6px -1px hsl(0 0% 0% / 0.40),
+    inset 0 1px 0 hsl(0 0% 100% / 0.10),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.30);
 }
 
 .btn-tsundoku-premium::before {
@@ -276,11 +283,16 @@
 
 .btn-tsundoku-premium:active {
   background-color: hsl(var(--primary)) !important;
-  filter: brightness(0.9);
-  box-shadow: 
-    0 1px 2px hsl(var(--primary) / 0.1), 
-    inset 0 1px 2px hsl(0 0% 0% / 0.15);
-  transform: translateY(1px) scale(0.96);
+  filter: brightness(0.92);
+  box-shadow:
+    0 1px 2px hsl(210 22% 15% / 0.15),
+    inset 0 1px 2px hsl(0 0% 0% / 0.20);
+  transform: scale(0.96);
+}
+.dark .btn-tsundoku-premium:active {
+  box-shadow:
+    0 1px 2px hsl(0 0% 0% / 0.30),
+    inset 0 1px 2px hsl(0 0% 0% / 0.35);
 }
 
 
