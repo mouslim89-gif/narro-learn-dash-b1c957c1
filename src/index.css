@@ -275,12 +275,14 @@
 }
 
 .btn-tsundoku-premium:active {
+  background-color: hsl(var(--primary));
   box-shadow: 
     0 1px 1px hsl(var(--primary) / 0.1), 
     0 2px 4px -1px hsl(var(--primary) / 0.2),
     inset 0 1px 2px hsl(0 0% 0% / 0.15);
   transform: translateY(1px);
 }
+
 
 /* Alias for the premium relief if needed elsewhere */
 .relief-premium {
