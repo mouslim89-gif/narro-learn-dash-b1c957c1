@@ -1052,7 +1052,7 @@ export default function Reader() {
  </div>
  );
 
- const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
+ const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center gap-1';
  const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
  const pillIdle ='text-muted-foreground';
 
