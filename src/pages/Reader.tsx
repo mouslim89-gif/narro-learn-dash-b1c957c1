@@ -1109,7 +1109,7 @@ export default function Reader() {
   <button
   key={f.value}
   onClick={() => setJapaneseFont(f.value)}
-  className={cn(pillBase,'relative flex-1 sm:flex-none', f.value === japaneseFont ? 'text-foreground' : 'text-muted-foreground')}
+  className={cn(pillBase,'relative flex-1 sm:flex-none text-foreground')}
   >
     {f.value === japaneseFont && (
       <motion.div
