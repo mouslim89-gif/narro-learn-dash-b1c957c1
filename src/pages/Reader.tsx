@@ -980,8 +980,9 @@ export default function Reader() {
   <button
   key={d}
    onClick={() => handleChangeDifficulty(d)}
-   className={cn('relative h-8 px-4 rounded-full text-xs font-semibold tap-scale-sm flex items-center justify-center text-foreground',
-   )}
+  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
+  d === difficulty ? 'text-foreground' : 'text-muted-foreground',
+  )}
   >
     {d === difficulty && (
       <motion.div
@@ -1068,7 +1069,7 @@ export default function Reader() {
   <button
   key={d}
   onClick={() => handleChangeDifficulty(d)}
-  className={cn(pillBase,'relative flex-1 sm:flex-none text-foreground')}
+  className={cn(pillBase,'relative flex-1 sm:flex-none', d === difficulty ? 'text-foreground' : 'text-muted-foreground')}
   >
     {d === difficulty && (
       <motion.div
@@ -1089,7 +1090,7 @@ export default function Reader() {
   <button
   key={s}
   onClick={() => setFontSize(s)}
-  className={cn('relative h-7 rounded-full text-sm font-semibold tap-scale-sm flex-1 sm:w-9 sm:flex-none text-foreground')}
+  className={cn('relative h-7 rounded-full text-sm font-semibold smooth-colors tap-scale-sm flex-1 sm:w-9 sm:flex-none', s === fontSize ? 'text-foreground' : 'text-muted-foreground')}
   >
     {s === fontSize && (
       <motion.div
@@ -1110,7 +1111,7 @@ export default function Reader() {
   <button
   key={f.value}
   onClick={() => setJapaneseFont(f.value)}
-  className={cn(pillBase,'relative flex-1 sm:flex-none text-foreground')}
+  className={cn(pillBase,'relative flex-1 sm:flex-none', f.value === japaneseFont ? 'text-foreground' : 'text-muted-foreground')}
   >
     {f.value === japaneseFont && (
       <motion.div
