@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useDelayedNav } from "@/hooks/use-delayed-nav";
 import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -185,7 +186,8 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 
 export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
- const navigate = useNavigate();
+  const navigate = useNavigate();
+  const goTo = useDelayedNav();
  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
  const knownIndex = useKnownWordsIndex();
@@ -1505,7 +1507,7 @@ export default function Reader() {
     <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">
       {partIdx > 0 ? (
         <button
-          onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`)}
+          onClick={(e) => goTo(`/reader/${id}/${difficulty}/${partChapterId(partIdx - 1)}`, e)}
           className="relief-raised tap-scale group inline-flex items-center gap-2 rounded-full bg-card px-4 h-11 font-serif text-[13px] font-semibold transition-all duration-200"
 
         >
@@ -1516,7 +1518,7 @@ export default function Reader() {
 
       {partIdx < book.anchors.length - 1 ? (
         <button
-          onClick={() => navigate(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`)}
+          onClick={(e) => goTo(`/reader/${id}/${difficulty}/${partChapterId(partIdx + 1)}`, e)}
           className="btn-tsundoku-premium tap-scale group ml-auto inline-flex items-center gap-2 rounded-full px-6 h-11 font-serif text-[13px] font-bold tracking-wide"
 
         >
