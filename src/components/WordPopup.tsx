@@ -1,7 +1,7 @@
 import { useState, useEffect } from'react';
 import { Star, BookOpen, ChevronDown } from'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
-import { useNavigate } from'react-router-dom';
+import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { toRomaji } from'wanakana';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
