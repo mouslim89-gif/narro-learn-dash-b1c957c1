@@ -7,10 +7,10 @@ import {
  DrawerHeader,
  DrawerTitle,
 } from'@/components/ui/drawer';
-import { useFlashcardStore } from'@/stores/flashcards';
+import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { PlayWordButton } from'./PlayWordButton';
 import { Button } from'@/components/ui/button';
-import { Star, BookOpen, Volume2 } from'lucide-react';
+import { Star, BookOpen } from'lucide-react';
 import { lookupWord, pickBestResult, type JishoResult } from'@/lib/jisho';
 import { cn } from '@/lib/utils';
 
@@ -72,7 +72,17 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
           className="flex-1 h-12 rounded-xl text-[15px] font-semibold relief-raised"
           onClick={() => {
             if (isSaved) removeWord(word);
-            else addWord({ word, reading: overrideReading || result.japanese[0]?.reading || '', meanings: result.senses.flatMap(s => s.english_definitions.slice(0, 1)), jlpt: result.jlpt, partsOfSpeech: result.senses[0]?.parts_of_speech });
+            else {
+              const entry: Omit<SavedWord, 'mastery'> = { 
+                id: crypto.randomUUID(),
+                word, 
+                reading: overrideReading || result.japanese[0]?.reading || '', 
+                meanings: result.senses.flatMap(s => s.english_definitions.slice(0, 1)), 
+                jlpt: result.jlpt, 
+                partsOfSpeech: result.senses[0]?.parts_of_speech || []
+              };
+              addWord(entry);
+            }
           }}
         >
           <Star className={cn("mr-2 h-4 w-4", isSaved && "fill-current")} /> {isSaved ? "Saved" : "Save"}

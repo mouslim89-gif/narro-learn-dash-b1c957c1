@@ -10,9 +10,10 @@ import { ConjugationTable, getConjugations } from'@/components/ConjugationTable'
 import { Button } from'@/components/ui/button';
 import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
-import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
+import { fetchExamples, type ExampleSentence as ExampleData } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
 import { cn } from '@/lib/utils';
+import { ExampleSentence } from '@/components/ExampleSentence';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
@@ -22,8 +23,8 @@ export default function WordDetail() {
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
- const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
- const [kanjiList, setKanjiList] = useState<(KanjiDetails | null)[] | null>(null);
+ const [examples, setExamples] = useState<ExampleData[] | null>(null);
+ const [kanjiList, setKanjiList] = useState<KanjiDetails[] | null>(null);
  const [saved, setSaved] = useState(false);
 
  useEffect(() => {
@@ -33,12 +34,14 @@ export default function WordDetail() {
  useEffect(() => {
   setLoading(true);
   searchJisho(word).then(res => {
-   setResult(res);
-   setLoading(false);
-   if (res) {
-    fetchExamples(res.japanese[0]?.word || word).then(setExamples);
-    setKanjiList(extractKanji(res.japanese[0]?.word || word).map(fetchKanji));
+   if (res && res.length > 0) {
+    const firstResult = res[0];
+    setResult(firstResult);
+    fetchExamples(firstResult.japanese[0]?.word || word).then(setExamples);
+    const kanjiChars = extractKanji(firstResult.japanese[0]?.word || word);
+    Promise.all(kanjiChars.map(fetchKanji)).then(details => setKanjiList(details.filter((d): d is KanjiDetails => d !== null)));
    }
+   setLoading(false);
   });
  }, [word]);
 
@@ -57,11 +60,12 @@ export default function WordDetail() {
    setSaved(false);
   } else {
    const entry: Omit<SavedWord,'mastery'> = {
+    id: crypto.randomUUID(),
     word: display,
     reading: displayReading,
     meanings: result.senses.flatMap(s => s.english_definitions.slice(0, 2)),
-    jlpt: result.jlpt,
-    partsOfSpeech: result.senses[0]?.parts_of_speech,
+    jlpt: result.jlpt || [],
+    partsOfSpeech: result.senses[0]?.parts_of_speech || [],
    };
    addWord(entry);
    setSaved(true);
@@ -115,7 +119,7 @@ export default function WordDetail() {
         <h3 className="font-serif text-lg font-semibold mb-4">Examples</h3>
         <div className="space-y-3">
          {examples.slice(0, 3).map((ex, i) => (
-          <ExampleSentence key={i} sentence={ex.japanese} translation={ex.english} />
+          <ExampleSentence key={i} word={ex.japanese} />
          ))}
         </div>
        </section>
