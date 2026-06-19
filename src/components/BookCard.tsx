@@ -1,4 +1,4 @@
-import { Link } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
 import { Clock, Headphones } from'lucide-react';
 import type { Book } from'@/data/books';
 import { hasAnyAudio } from'@/data/books';
