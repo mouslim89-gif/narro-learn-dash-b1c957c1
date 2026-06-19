@@ -165,7 +165,7 @@ export default function Flashcards() {
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
-        <Button size="sm" className="rounded-full px-4 relief-raised" onClick={enterReview}>
+        <Button size="sm" className="rounded-full px-4 relief-premium" onClick={enterReview}>
           Review <ArrowRight className="ml-1 h-3.5 w-3.5"/>
         </Button>
  </div>
