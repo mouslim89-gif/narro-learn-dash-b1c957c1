@@ -2,7 +2,7 @@ import { useState, useMemo, useRef } from'react';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { books, genreLabels, type Genre } from'@/data/books';
 import { BookCard } from'@/components/BookCard';
-import { Link } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
 import { Search, Moon, Sun, Settings, X } from'lucide-react';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { Input } from'@/components/ui/input';

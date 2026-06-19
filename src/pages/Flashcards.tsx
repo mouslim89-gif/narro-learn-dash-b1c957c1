@@ -2,7 +2,7 @@ import { useState, useMemo, useRef } from'react';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
 import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check } from'lucide-react';
-import { Link } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { Button } from'@/components/ui/button';
 import { Input } from'@/components/ui/input';
