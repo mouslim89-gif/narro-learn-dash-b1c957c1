@@ -120,13 +120,11 @@ const HeaderChip = forwardRef<HTMLButtonElement, HeaderChipProps>(
  ({ active, children, className, ...props }, ref) => (
  <button
  ref={ref}
-  className={cn(
-    'flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm glass-chip-header',
-    active
-      ? 'text-primary ring-primary/25 relief-inset bg-foreground/5'
-      : 'text-foreground/70 ring-border/40 header-chip',
-    className,
-  )}
+   className={cn(
+     'flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-border/40 text-foreground/70 smooth-colors tap-scale-sm glass-chip-header',
+     active ? 'relief-inset bg-foreground/5' : 'header-chip',
+     className,
+   )}
 
  {...props}
  >
@@ -1020,14 +1018,13 @@ export default function Reader() {
  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
  <BookType className="h-5 w-5"/>
  </HeaderChip>
- <HeaderChip
+  <HeaderChip
 
- onClick={() => setShowSettings(!showSettings)}
- active={showSettings}
- title="Settings"
- >
- <Settings className="h-5 w-5"/>
- </HeaderChip>
+  onClick={() => setShowSettings(!showSettings)}
+  title="Settings"
+  >
+  <Settings className="h-5 w-5"/>
+  </HeaderChip>
 
  </div>
  </div>
