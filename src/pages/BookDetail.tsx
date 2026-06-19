@@ -183,7 +183,8 @@ export default function BookDetail() {
                   key={d}
                   onClick={() => setDifficulty(d)}
                   className={cn(
-                    'relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide tap-scale-sm text-foreground'
+                    'relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors tap-scale-sm transition-all duration-200',
+                    selected ? 'text-foreground' : 'text-muted-foreground'
                   )}
                 >
                   {selected && (
