@@ -11,7 +11,7 @@ import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { PlayWordButton } from'./PlayWordButton';
 import { Button } from'@/components/ui/button';
 import { Star, BookOpen } from'lucide-react';
-import { lookupWord, pickBestResult, type JishoResult } from'@/lib/jisho';
+import { lookupWord, pickBestResult, type JishoResult, type CacheEntry } from'@/lib/jisho';
 import { cn } from '@/lib/utils';
 
 interface WordPopupProps {
@@ -32,8 +32,8 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  const [result, setResult] = useState<JishoResult | null>(null);
 
  useEffect(() => {
-  lookupWord(kuromojiBase || word).then(res => {
-    setResult(pickBestResult(res, kuromojiPos, kuromojiBase || word));
+  lookupWord(kuromojiBase || word).then((res: CacheEntry) => {
+    setResult(pickBestResult(res.results, kuromojiPos, kuromojiBase || word));
     setLoading(false);
   });
  }, [word, kuromojiBase, kuromojiPos]);

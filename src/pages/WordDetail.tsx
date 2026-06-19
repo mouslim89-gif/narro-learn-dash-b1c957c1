@@ -45,8 +45,7 @@ export default function WordDetail() {
   });
  }, [word]);
 
- const resultWord = result?.japanese[0]?.word || word;
- const display = result ? getDisplayWord(result) : word;
+ const display = result ? getDisplayWord(result).word : word;
  const displayReading = result ? (result.japanese[0]?.reading || '') : '';
 
  const handleBack = (e: React.MouseEvent) => {
