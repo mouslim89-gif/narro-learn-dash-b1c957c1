@@ -41,7 +41,11 @@ export default function Flashcards() {
  const headerRef = useRef<HTMLElement>(null);
  useScrollProgress(headerRef, 0, 56);
 
- const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
+ const enterReview = () => {
+   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+   const run = () => { setReviewMode(true); setIsReviewing(true); };
+   if (reduce) run(); else window.setTimeout(run, 120);
+ };
  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
  const [filter, setFilter] = useState<StatusFilter>('all');
  const [sortBy, setSortBy] = useState<SortOption>('added');
