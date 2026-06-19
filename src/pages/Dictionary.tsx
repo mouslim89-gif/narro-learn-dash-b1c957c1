@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from'react';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { ConjugationTable } from'@/components/ConjugationTable';
-import { useSearchParams, useNavigate } from'react-router-dom';
+import { useSearchParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
@@ -52,7 +52,6 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
 }
 
 export default function DictionaryPage() {
- const navigate = useNavigate();
  const goTo = useDelayedNav();
  const [searchParams] = useSearchParams();
  const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ??'';
