@@ -980,9 +980,7 @@ export default function Reader() {
   <button
   key={d}
    onClick={() => handleChangeDifficulty(d)}
-  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
-  d === difficulty ? 'text-foreground' : 'text-muted-foreground',
-  )}
+   className="relative h-8 px-4 rounded-full text-xs font-semibold text-foreground tap-scale-sm flex items-center justify-center"
   >
     {d === difficulty && (
       <motion.div
