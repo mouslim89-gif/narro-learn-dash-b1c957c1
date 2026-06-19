@@ -9,7 +9,7 @@ const Switch = React.forwardRef<
 >(({ className, ...props }, ref) => (
  <SwitchPrimitives.Root
     className={cn(
-      "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-[background-color,box-shadow] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 shadow-[inset_0_1px_2px_hsl(210_22%_15%/0.18),inset_0_-1px_0_hsl(0_0%_100%/0.25)] dark:shadow-[inset_0_1px_2px_hsl(0_0%_0%/0.45),inset_0_-1px_0_hsl(0_0%_100%/0.04)]",
+      "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-[background-color,box-shadow] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 shadow-[inset_0_2px_4px_-1px_hsl(210_22%_15%/0.20),inset_0_-1px_0_hsl(0_0%_100%/0.30)] dark:shadow-[inset_0_2px_6px_-1px_hsl(0_0%_0%/0.40),inset_0_-1px_0_hsl(0_0%_100%/0.04)]",
  className,
  )}
  {...props}
