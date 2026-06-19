@@ -70,7 +70,6 @@ export default function Reader() {
 
       <main className="px-6 py-8">
         <div className={cn("reader-text", fontSize === 'small' ? 'text-lg' : fontSize === 'large' ? 'text-2xl' : 'text-xl')}>
-          {/* Reader content would go here */}
           <p className="font-japanese leading-loose text-foreground/90">
             Reader content placeholder for {book.titleJp} ({difficulty}).
           </p>
