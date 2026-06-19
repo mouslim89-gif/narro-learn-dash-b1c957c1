@@ -1018,14 +1018,13 @@ export default function Reader() {
  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
  <BookType className="h-5 w-5"/>
  </HeaderChip>
- <HeaderChip
+  <HeaderChip
 
- onClick={() => setShowSettings(!showSettings)}
- active={showSettings}
- title="Settings"
- >
- <Settings className="h-5 w-5"/>
- </HeaderChip>
+  onClick={() => setShowSettings(!showSettings)}
+  title="Settings"
+  >
+  <Settings className="h-5 w-5"/>
+  </HeaderChip>
 
  </div>
  </div>
