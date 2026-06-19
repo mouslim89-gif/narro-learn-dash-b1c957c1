@@ -10,6 +10,7 @@ import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
 import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
+import { cn } from '@/lib/utils';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
@@ -203,13 +204,14 @@ export default function WordDetail() {
  </div>
 
  {/* Add to flashcards CTA */}
- <Button
- onClick={toggleSave}
- className={`mt-4 w-full rounded-full h-11 font-semibold ${
- saved
- ?'bg-accent/15 text-accent ring-1 ring-accent/30':'bg-accent text-accent-foreground'}`}
- variant="ghost"
- >
+  <Button
+  onClick={toggleSave}
+  className={cn(
+    "mt-4 w-full rounded-full h-11 font-semibold relief-raised",
+    saved ? "bg-accent/15 text-accent" : "bg-accent text-accent-foreground"
+  )}
+  variant="ghost"
+  >
  {saved ? (
  <>
  <Star className="h-4 w-4 mr-1.5"fill="currentColor"/> Saved to flashcards

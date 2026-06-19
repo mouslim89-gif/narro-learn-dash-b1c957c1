@@ -165,15 +165,15 @@ export default function Flashcards() {
  <p className="font-serif text-2xl font-bold leading-none tabular-nums">{dueCount}</p>
  <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
  </div>
- <Button size="sm"className="rounded-full px-4 shadow-md"onClick={enterReview}>
- Review <ArrowRight className="ml-1 h-3.5 w-3.5"/>
- </Button>
+        <Button size="sm" className="rounded-full px-4 relief-raised" onClick={enterReview}>
+          Review <ArrowRight className="ml-1 h-3.5 w-3.5"/>
+        </Button>
  </div>
  </div>
  ) : (
- <Button variant="outline"className="w-full h-12 rounded-full"onClick={enterReview}>
- <RotateCcw className="mr-2 h-4 w-4"/>Review all words
- </Button>
+      <Button variant="outline" className="w-full h-12 rounded-full bg-card relief-raised" onClick={enterReview}>
+        <RotateCcw className="mr-2 h-4 w-4"/>Review all words
+      </Button>
  )}
  </section>
 
@@ -256,7 +256,7 @@ export default function Flashcards() {
  </div>
  <p className="mt-5 font-serif text-lg font-semibold">No flashcards yet</p>
  <p className="mt-1 text-sm text-muted-foreground">Tap a word while reading to save it here.</p>
- <Link to="/"className="mt-5"><Button size="sm"className="rounded-full px-5">Browse Library</Button></Link>
+ <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5 relief-raised">Browse Library</Button></Link>
  </div>
  ) : (
  <ul className="stagger-children mt-2 space-y-2 px-6">
