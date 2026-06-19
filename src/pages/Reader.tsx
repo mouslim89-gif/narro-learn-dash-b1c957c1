@@ -980,7 +980,7 @@ export default function Reader() {
   <button
   key={d}
    onClick={() => handleChangeDifficulty(d)}
-  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center',
+  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center',
   d === difficulty ? 'text-foreground' : 'text-muted-foreground',
   )}
   >
@@ -1052,7 +1052,7 @@ export default function Reader() {
  </div>
  );
 
- const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors tap-scale-sm flex items-center justify-center gap-1';
+ const pillBase ='h-7 px-3 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center gap-1';
  const pillActive ='bg-card text-foreground shadow-sm ring-1 ring-border/40';
  const pillIdle ='text-muted-foreground';
 
@@ -1090,7 +1090,7 @@ export default function Reader() {
   <button
   key={s}
   onClick={() => setFontSize(s)}
-  className={cn('relative h-7 rounded-full text-sm font-semibold smooth-colors tap-scale-sm flex-1 sm:w-9 sm:flex-none', s === fontSize ? 'text-foreground' : 'text-muted-foreground')}
+  className={cn('relative h-7 rounded-full text-sm font-semibold smooth-colors flex-1 sm:w-9 sm:flex-none', s === fontSize ? 'text-foreground' : 'text-muted-foreground')}
   >
     {s === fontSize && (
       <motion.div
