@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from'react';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { ConjugationTable } from'@/components/ConjugationTable';
-import { useSearchParams, useNavigate, Link } from'react-router-dom';
+import { useSearchParams } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
+import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { Search, Star, Loader2, X, Settings, ChevronRight } from'lucide-react';
@@ -50,7 +52,7 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
 }
 
 export default function DictionaryPage() {
- const navigate = useNavigate();
+ const goTo = useDelayedNav();
  const [searchParams] = useSearchParams();
  const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ??'';
  const [query, setQuery] = useState(initial);
@@ -230,11 +232,11 @@ export default function DictionaryPage() {
  <div
  role="link"
  tabIndex={0}
- onClick={() => navigate(`/dictionary/${encodeURIComponent(word)}`)}
+ onClick={() => goTo(`/dictionary/${encodeURIComponent(word)}`)}
  onKeyDown={(e) => {
  if (e.key ==='Enter'|| e.key ==='') {
  e.preventDefault();
- navigate(`/dictionary/${encodeURIComponent(word)}`);
+ goTo(`/dictionary/${encodeURIComponent(word)}`);
  }
  }}
  className="group cursor-pointer -m-1 p-1 pr-6 rounded-lg relative"

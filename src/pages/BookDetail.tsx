@@ -1,4 +1,6 @@
-import { useParams, useNavigate, Link } from'react-router-dom';
+import { useParams } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
+import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasParts, partChapterId, DEFAULT_CHAPTER_ID, type Difficulty } from'@/data/books';
 
 import { useEffect, useState } from'react';
@@ -11,7 +13,7 @@ import { motion } from 'framer-motion';
 
 export default function BookDetail() {
  const { id } = useParams();
- const navigate = useNavigate();
+ const goTo = useDelayedNav();
  const book = books.find((b) => b.id === id);
  const { getBookProgress, getChapterProgress } = useReadingProgressStore();
  const bookProgress = id ? getBookProgress(id) : undefined;
@@ -111,7 +113,7 @@ export default function BookDetail() {
  >
  
  <button
- onClick={() => navigate('/')}
+ onClick={() => goTo('/')}
  className={cn(
   "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip transition-[background-color,box-shadow,backdrop-filter] duration-200",
   scrolled
