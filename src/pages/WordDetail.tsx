@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
- const navigate = useNavigate();
+ const goTo = useDelayedNav();
  const word = rawWord ? decodeURIComponent(rawWord) :'';
  const { addWord, removeWord, hasWord } = useFlashcardStore();
 

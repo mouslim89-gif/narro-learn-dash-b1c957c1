@@ -46,13 +46,14 @@ export default function Settings() {
     useReadingProgressStore();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const goTo = useDelayedNav();
   const [deleting, setDeleting] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   useScrollProgress(headerRef, 0, 56);
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/auth', { replace: true });
+    goTo('/auth', undefined, { replace: true });
   };
 
   const handleDeleteAccount = async () => {
@@ -63,7 +64,7 @@ export default function Settings() {
       if (error) throw error;
       await signOut();
       toast.success('Account deleted');
-      navigate('/auth', { replace: true });
+      goTo('/auth', undefined, { replace: true });
     } catch (err: any) {
       toast.error(err?.message ?? 'Failed to delete account');
       setDeleting(false);

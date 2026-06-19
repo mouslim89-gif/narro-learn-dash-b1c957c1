@@ -160,7 +160,7 @@ function LoadingSkeleton() {
 
 export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens, onClose }: WordPopupProps) {
  const { addWord, hasWord, removeWord } = useFlashcardStore();
- const navigate = useNavigate();
+ const goTo = useDelayedNav();
 
  // Try looking up the base form first (more likely to have dictionary entries)
  const lookupKey = kuromojiBase || word;

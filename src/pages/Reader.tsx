@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useDelayedNav } from '@/hooks/use-delayed-nav';
 import { useDelayedNav } from "@/hooks/use-delayed-nav";
 import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -186,7 +187,7 @@ function SegmentedRow<T extends string>({ value, options, labels, onChange, cove
 
 export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
-  const navigate = useNavigate();
+  const goTo = useDelayedNav();
   const goTo = useDelayedNav();
  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
