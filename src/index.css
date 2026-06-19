@@ -243,6 +243,35 @@
  inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
+/* Raised relief tuned for saturated/colored backgrounds (e.g. bg-accent).
+   Same shadow language as .relief-raised but with reduced top highlight so it
+   doesn't wash out on warm/colored fills, and a slightly stronger drop shadow
+   to match the perceived volume of the standard relief on light surfaces. */
+.relief-raised-accent {
+  box-shadow:
+    0 1px 0 hsl(210 22% 15% / 0.20),
+    0 2px 5px -1px hsl(210 22% 15% / 0.25),
+    inset 0 1px 0 hsl(0 0% 100% / 0.22),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.18);
+}
+.dark .relief-raised-accent {
+  box-shadow:
+    0 1px 2px hsl(0 0% 0% / 0.40),
+    0 2px 6px -1px hsl(0 0% 0% / 0.45),
+    inset 0 1px 0 hsl(0 0% 100% / 0.12),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.30);
+}
+.relief-raised-accent:active {
+  box-shadow:
+    0 1px 2px hsl(210 22% 15% / 0.15),
+    inset 0 1px 2px hsl(0 0% 0% / 0.18);
+}
+.dark .relief-raised-accent:active {
+  box-shadow:
+    0 1px 2px hsl(0 0% 0% / 0.30),
+    inset 0 1px 2px hsl(0 0% 0% / 0.30);
+}
+
 /* Premium relief for major CTAs — same shadow language as .relief-raised,
    tuned for the dark primary background so it stays bombé. */
 .btn-tsundoku-premium {
