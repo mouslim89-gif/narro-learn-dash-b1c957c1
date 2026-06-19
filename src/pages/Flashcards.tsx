@@ -185,8 +185,8 @@ export default function Flashcards() {
  <button
  key={key}
  onClick={() => setFilter(active ?'all': key)}
-                className={cn('rounded-xl border bg-card bg-clip-padding p-3 text-left card-lift tap-scale smooth-colors',
-                active ?'border-primary/40 ring-1 ring-primary/30':'border-border/40')}
+                className={cn('rounded-xl border bg-card bg-clip-padding p-3 text-left tap-scale smooth-colors',
+                active ? 'border-border/40 relief-inset' : 'border-border/40 card-lift')}
  style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
  >
  <Icon className="h-4 w-4"style={{ color: iconColor }} />
@@ -214,7 +214,7 @@ export default function Flashcards() {
  <DropdownMenuTrigger asChild>
  <button
  aria-label={`Sort by ${sortLabels[sortBy]}`}
- className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm"
+ className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted/60 px-3.5 text-[12px] font-medium text-foreground/80 ring-1 ring-border/40 shadow-inner-sm smooth-colors tap-scale-sm"
  >
  <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground"/>
  <span className="text-muted-foreground">Sort by</span>
@@ -240,7 +240,7 @@ export default function Flashcards() {
  <button
  onClick={() => setSortDir(d => (d ==='asc'?'desc':'asc'))}
  aria-label={sortDir ==='asc'?'Ascending — tap to reverse':'Descending — tap to reverse'}
- className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 smooth-colors tap-scale-sm"
+ className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground/80 ring-1 ring-border/40 shadow-inner-sm smooth-colors tap-scale-sm"
  >
  {sortDir ==='asc'? <ArrowUp className="h-4 w-4"/>
  : <ArrowDown className="h-4 w-4"/>}

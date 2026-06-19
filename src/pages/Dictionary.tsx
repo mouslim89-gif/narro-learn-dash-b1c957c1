@@ -196,7 +196,7 @@ export default function DictionaryPage() {
 
  {searching && (
  <div className="mt-6 flex justify-center">
- <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3.5 py-1.5 ring-1 ring-border/40">
+ <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3.5 py-1.5 ring-1 ring-border/40 shadow-inner-sm">
  <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground"/>
  <span className="text-xs font-medium text-muted-foreground">Searching…</span>
  </div>
