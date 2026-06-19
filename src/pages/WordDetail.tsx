@@ -1,5 +1,6 @@
 import { useEffect, useState } from'react';
-import { useNavigate, useParams, Link } from'react-router-dom';
+import { useNavigate, useParams } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
 import { ArrowLeft, Star, Loader2 } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';

@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from'react';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { ConjugationTable } from'@/components/ConjugationTable';
-import { useSearchParams, useNavigate, Link } from'react-router-dom';
+import { useSearchParams, useNavigate } from'react-router-dom';
+import { DelayedLink as Link } from'@/components/DelayedLink';
+import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { Search, Star, Loader2, X, Settings, ChevronRight } from'lucide-react';
