@@ -1,5 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { DelayedLink as Link } from '@/components/DelayedLink';
+import { useDelayedNav } from '@/hooks/use-delayed-nav';
+import { LogOut, Loader2, User as UserIcon, ArrowLeft, Trash2 } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -24,35 +26,19 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const fontSizeOptions: { label: string; value: FontSize }[] = [
-  { label: 'S', value: 'small' },
-  { label: 'M', value: 'medium' },
-  { label: 'L', value: 'large' },
-];
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-3 mb-3 px-1">
-      <h2 className="font-serif text-[13px] tracking-[0.14em] uppercase text-muted-foreground">
-        {children}
-      </h2>
-      <div className="flex-1 h-px bg-border/60" />
-    </div>
-  );
-}
-
 export default function Settings() {
   const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
     useReadingProgressStore();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const goTo = useDelayedNav();
   const [deleting, setDeleting] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   useScrollProgress(headerRef, 0, 56);
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/auth', { replace: true });
+    goTo('/auth', undefined, { replace: true });
   };
 
   const handleDeleteAccount = async () => {
@@ -63,14 +49,12 @@ export default function Settings() {
       if (error) throw error;
       await signOut();
       toast.success('Account deleted');
-      navigate('/auth', { replace: true });
+      goTo('/auth', undefined, { replace: true });
     } catch (err: any) {
       toast.error(err?.message ?? 'Failed to delete account');
       setDeleting(false);
     }
   };
-
-  const initial = (user?.email ?? '?').slice(0, 1).toUpperCase();
 
   return (
     <div className="pb-24">
@@ -88,135 +72,115 @@ export default function Settings() {
           borderBottomWidth: 'calc(min(var(--p, 0), 1) * 1px)',
         }}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <button
-            onClick={() => window.history.back()}
-            aria-label="Back"
-            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip flex items-center justify-center smooth-colors tap-scale-sm"
-          >
-            <ArrowLeft className="h-[18px] w-[18px]" />
-          </button>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
           <AnimatedTitle
             text="Settings"
             className="font-serif font-bold leading-none tracking-tight"
-            style={{
-              '--title-scale': 'calc(1 - var(--p, 0) * 0.25)',
+            style={{ 
+              '--title-scale': 'calc(1 - var(--p, 0) * 0.25)', 
               fontSize: '32px'
             } as any}
           />
         </div>
       </header>
 
-      <div className="stagger-children px-5 pt-5 space-y-7">
-        {/* Account */}
-        <section>
-          <SectionLabel>Account</SectionLabel>
-          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-4">
-              <div className="h-11 w-11 rounded-full bg-accent/15 text-accent flex items-center justify-center font-serif text-lg font-bold ring-1 ring-accent/20">
-                {initial}
+      <div className="stagger-children mt-6 space-y-8 px-6">
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-primary" />
+            <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Appearance</h2>
+          </div>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="space-y-0.5">
+                <p className="text-[15px] font-medium">Dark Mode</p>
+                <p className="text-[12px] text-muted-foreground">Warm paper or dark navy</p>
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Signed in as</div>
-                <div className="text-sm font-medium truncate">{user?.email ?? '—'}</div>
-              </div>
+              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
             </div>
-            <div className="border-t border-border/40">
-              <button
-                onClick={handleSignOut}
-                className="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium smooth-colors tap-scale-sm"
-              >
-                <span className="flex items-center gap-2.5">
-                  <LogOut className="h-4 w-4 text-muted-foreground" />
-                  Sign out
-                </span>
-              </button>
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="space-y-0.5">
+                <p className="text-[15px] font-medium">Furigana</p>
+                <p className="text-[12px] text-muted-foreground">Show readings above kanji</p>
+              </div>
+              <Switch checked={showFurigana} onCheckedChange={setShowFurigana} />
             </div>
           </div>
         </section>
 
-        {/* Appearance */}
-        <section>
-          <SectionLabel>Appearance</SectionLabel>
-          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-            <div className="flex items-center justify-between px-4 py-4">
-              <Label htmlFor="dark-mode" className="text-[15px] font-medium">Dark mode</Label>
-              <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
-            </div>
-
-            <div className="flex items-center justify-between px-4 py-4">
-              <Label className="text-[15px] font-medium">Font size</Label>
-              <div className="flex gap-1 rounded-full bg-muted p-1">
-                {fontSizeOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFontSize(opt.value)}
-                    className={cn(
-                      'relative h-7 w-9 rounded-full text-sm font-semibold smooth-colors',
-                      fontSize === opt.value ? 'text-foreground' : 'text-muted-foreground'
-                    )}
-                  >
-                    {fontSize === opt.value && (
-                      <motion.div
-                        layoutId="seg-fontsize-settings"
-                        className="absolute inset-0 rounded-full bg-card relief-raised ring-1 ring-border/40"
-                        transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
-                      />
-                    )}
-                    <span className="relative z-10">{opt.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between px-4 py-4">
-              <Label htmlFor="furigana" className="text-[15px] font-medium">Show furigana</Label>
-              <Switch id="furigana" checked={showFurigana} onCheckedChange={setShowFurigana} />
-            </div>
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-primary" />
+            <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Typography</h2>
           </div>
-        </section>
-
-        {/* About */}
-        <section>
-          <SectionLabel>About</SectionLabel>
-          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-serif text-base">Tsundoku</div>
-                <div className="text-xs text-muted-foreground mt-0.5">Learn Japanese through reading</div>
-              </div>
-              <div className="text-xs text-muted-foreground font-mono">v1.0</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Danger zone */}
-        <section className="pt-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="w-full text-center text-sm font-medium text-destructive/80 py-2 smooth-colors">
-                Delete account
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This permanently deletes your account, flashcards, and reading progress. This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDeleteAccount}
-                  disabled={deleting}
-                  className="bg-destructive text-destructive-foreground"
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm p-4">
+            <p className="text-[15px] font-medium mb-3">Font Size</p>
+            <div className="flex gap-2">
+              {(['small', 'medium', 'large'] as FontSize[]).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setFontSize(s)}
+                  className={cn(
+                    "flex-1 rounded-xl py-3 text-sm font-semibold capitalize smooth-colors tap-scale-sm",
+                    fontSize === s ? "bg-primary text-primary-foreground relief-raised" : "bg-muted/40 text-muted-foreground ring-1 ring-border/40"
+                  )}
                 >
-                  {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-destructive" />
+            <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-destructive">Danger Zone</h2>
+          </div>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40 overflow-hidden">
+            <button
+              onClick={handleSignOut}
+              className="flex w-full items-center justify-between px-4 py-4 text-left active:bg-muted/30 smooth-colors"
+            >
+              <div className="space-y-0.5">
+                <p className="text-[15px] font-medium">Sign Out</p>
+                <p className="text-[12px] text-muted-foreground">Logout of your account</p>
+              </div>
+              <LogOut className="h-4 w-4 text-muted-foreground" />
+            </button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="flex w-full items-center justify-between px-4 py-4 text-left active:bg-muted/30 smooth-colors">
+                  <div className="space-y-0.5">
+                    <p className="text-[15px] font-medium text-destructive">Delete Account</p>
+                    <p className="text-[12px] text-muted-foreground">Permanently remove all data</p>
+                  </div>
+                  <Trash2 className="h-4 w-4 text-destructive/70" />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="rounded-3xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={deleting}
+                  >
+                    {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Account"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </section>
       </div>
     </div>

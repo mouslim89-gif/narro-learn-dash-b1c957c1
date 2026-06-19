@@ -1,6 +1,7 @@
 import { useEffect, useState } from'react';
-import { useNavigate, useParams } from'react-router-dom';
+import { useParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
+import { useDelayedNav } from '@/hooks/use-delayed-nav';
 import { ArrowLeft, Star, Loader2 } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
@@ -9,360 +10,125 @@ import { ConjugationTable, getConjugations } from'@/components/ConjugationTable'
 import { Button } from'@/components/ui/button';
 import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
-import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
+import { fetchExamples, type ExampleSentence as ExampleData } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
 import { cn } from '@/lib/utils';
+import { ExampleSentence } from '@/components/ExampleSentence';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
- const navigate = useNavigate();
+ const goTo = useDelayedNav();
  const word = rawWord ? decodeURIComponent(rawWord) :'';
  const { addWord, removeWord, hasWord } = useFlashcardStore();
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
- const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
- const [kanjiList, setKanjiList] = useState<(KanjiDetails | null)[] | null>(null);
+ const [examples, setExamples] = useState<ExampleData[] | null>(null);
+ const [kanjiList, setKanjiList] = useState<KanjiDetails[] | null>(null);
+ const [saved, setSaved] = useState(false);
 
  useEffect(() => {
- if (!word) return;
- let cancelled = false;
- setLoading(true);
- searchJisho(word).then((results) => {
- if (cancelled) return;
- // Prefer exact match on word or reading
- const match =
- results.find((r) => r.japanese.some((j) => j.word === word || j.reading === word)) ||
- results[0] ||
- null;
- setResult(match);
- setLoading(false);
- }).catch(() => { if (!cancelled) setLoading(false); });
- return () => { cancelled = true; };
+  setSaved(hasWord(word));
+ }, [word, hasWord]);
+
+ useEffect(() => {
+  setLoading(true);
+  searchJisho(word).then(res => {
+   if (res && res.length > 0) {
+    const firstResult = res[0];
+    setResult(firstResult);
+    fetchExamples(firstResult.japanese[0]?.word || word).then(setExamples);
+    const kanjiChars = extractKanji(firstResult.japanese[0]?.word || word);
+    Promise.all(kanjiChars.map(fetchKanji)).then(details => setKanjiList(details.filter((d): d is KanjiDetails => d !== null)));
+   }
+   setLoading(false);
+  });
  }, [word]);
 
- useEffect(() => {
-   if (!word) return;
-   let cancelled = false;
-   const chars = extractKanji(word);
-   if (chars.length === 0) { setKanjiList([]); }
-   else {
-     Promise.all(chars.map((c) => fetchKanji(c))).then((data) => {
-       if (!cancelled) setKanjiList(data);
-     });
-   }
-   return () => { cancelled = true; };
- }, [word]);
+ const display = result ? getDisplayWord(result).word : word;
+ const displayReading = result ? (result.japanese[0]?.reading || '') : '';
 
- useEffect(() => {
-   if (!word) return;
-   let cancelled = false;
-   // Pick a useful altWord: if display is the kana form, the kanji form is the alt, and vice-versa.
-   let altWord: string | undefined;
-   if (result) {
-     const j = result.japanese[0];
-     if (j) {
-       const primary = (disp?.word) || j.word || j.reading;
-       altWord = primary === j.word ? j.reading : j.word;
-       if (!altWord || altWord === primary) altWord = undefined;
-     }
-   }
-   fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
-   return () => { cancelled = true; };
- }, [word, result]);
-
- const disp = result ? getDisplayWord(result) : null;
- const display = disp?.word || word;
- const reading = disp?.reading ||'';
- const saved = hasWord(display);
-
- const handleBack = () => {
- try {
- const stored = sessionStorage.getItem('reopen-word-popup');
- if (stored) {
- const data = JSON.parse(stored);
- if (data?.returnPath) {
- navigate(data.returnPath);
- return;
- }
- }
- } catch {}
- if (window.history.length > 1) navigate(-1);
- else navigate('/dictionary');
+ const handleBack = (e: React.MouseEvent) => {
+  if (window.history.length > 1) goTo(-1, e);
+  else goTo('/dictionary', e);
  };
 
  const toggleSave = () => {
- if (!result) return;
- if (saved) {
- removeWord(display);
- return;
- }
- const entry: Omit<SavedWord,'mastery'> = {
- id: display,
- word: display,
- reading: reading || result.japanese[0]?.reading ||'',
- meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
- jlpt: result.jlpt,
- partsOfSpeech: result.senses[0]?.parts_of_speech,
- };
- addWord(entry);
- };
-
- const highlightWord = (text: string, target: string) => {
- const idx = text.indexOf(target);
- if (idx === -1) return text;
- return (
- <>
- {text.slice(0, idx)}
- <span className="text-accent font-bold">{target}</span>
- {text.slice(idx + target.length)}
- </>
- );
+  if (!result) return;
+  if (saved) {
+   removeWord(display);
+   setSaved(false);
+  } else {
+   const entry: Omit<SavedWord,'mastery'> = {
+    id: crypto.randomUUID(),
+    word: display,
+    reading: displayReading,
+    meanings: result.senses.flatMap(s => s.english_definitions.slice(0, 2)),
+    jlpt: result.jlpt || [],
+    partsOfSpeech: result.senses[0]?.parts_of_speech || [],
+   };
+   addWord(entry);
+   setSaved(true);
+  }
  };
 
  return (
- <div className="pb-24">
- {/* Top bar */}
- <header className="sticky top-0 z-20 flex items-center gap-3 px-6 pt-3 pb-3 bg-background/80 backdrop-blur-md border-b border-border/50">
- <Button
- variant="ghost"
- size="icon"
- onClick={handleBack}
- className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
- aria-label="Back"
- >
- <ArrowLeft className="h-[18px] w-[18px]"/>
- </Button>
- <div className="flex-1 min-w-0">
- <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">Dictionary</p>
- <p className="font-japanese text-base font-bold truncate mt-0.5">{display || word}</p>
- </div>
- {result && (
- <button
- onClick={toggleSave}
- aria-label={saved ?'Remove from flashcards':'Save word'}
-  className={`h-10 w-10 rounded-full ring-1 ring-border/40 bg-background/80 backdrop-blur-md flex items-center justify-center shrink-0 header-chip transition-colors ${
-  saved ?'text-accent':'text-muted-foreground'}`}
- >
- <Star className="h-[18px] w-[18px]"fill={saved ?'currentColor':'none'} />
- </button>
- )}
- </header>
+  <div className="min-h-screen bg-background pb-20">
+   <header className="sticky top-0 z-30 flex items-center gap-4 bg-background/80 px-6 py-4 backdrop-blur-md">
+    <button onClick={handleBack} className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 header-chip">
+     <ArrowLeft className="h-5 w-5"/>
+    </button>
+    <h1 className="font-serif text-xl font-bold">{word}</h1>
+    <div className="ml-auto">
+     <Button variant="ghost" size="icon" onClick={toggleSave} className={cn("rounded-full", saved && "text-amber-500")}>
+      <Star className={cn("h-5 w-5", saved && "fill-current")}/>
+     </Button>
+    </div>
+   </header>
 
- {loading && (
- <div className="mt-10 flex justify-center">
- <Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/>
- </div>
- )}
+   <div className="px-6 mt-6">
+    {loading ? (
+     <div className="space-y-4">
+      <Skeleton className="h-8 w-48"/>
+      <Skeleton className="h-24 w-full"/>
+     </div>
+    ) : result ? (
+     <div className="space-y-8 animate-fade-in-soft">
+      <div>
+       <h2 className="font-japanese text-5xl font-bold mb-2">{result.japanese[0]?.word}</h2>
+       <p className="text-xl text-muted-foreground">{result.japanese[0]?.reading}</p>
+      </div>
 
- {!loading && !result && (
- <div className="mt-16 text-center px-6">
- <p className="font-japanese text-3xl font-bold">{word}</p>
- <p className="mt-3 text-sm text-muted-foreground">No dictionary entry found.</p>
- <Link to="/dictionary"className="mt-6 inline-block text-sm text-primary underline">
- Back to dictionary
- </Link>
- </div>
- )}
+      <div className="space-y-6">
+       {result.senses.map((sense, i) => (
+        <div key={i} className="rounded-2xl border bg-card p-5 ring-1 ring-border/30">
+         <div className="text-sm font-semibold text-primary mb-2">
+          {sense.parts_of_speech.join(', ')}
+         </div>
+         <ul className="list-decimal list-inside space-y-1.5">
+          {sense.english_definitions.map((def, j) => (
+           <li key={j} className="text-foreground leading-relaxed">{def}</li>
+          ))}
+         </ul>
+        </div>
+       ))}
+      </div>
 
- {!loading && result && (
- <div className="stagger-children px-6 mt-2 space-y-5">
- {/* Header card */}
- <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <div className="flex items-start gap-2">
- <div className="flex-1 min-w-0">
- <p className="font-japanese text-3xl font-bold leading-tight break-words">{display}</p>
- {reading && reading !== display && (
- <p className="font-japanese text-base text-muted-foreground mt-1">{reading}</p>
- )}
- {reading && (
- <p className="text-xs text-muted-foreground/70 italic mt-0.5">{toRomaji(reading)}</p>
- )}
- </div>
- <PlayWordButton word={display} reading={reading} size={20} />
- </div>
-
- {/* Tags */}
- <div className="mt-3 flex flex-wrap items-center gap-1.5">
- {(result as any).is_common && (
- <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
- ✦ Common
- </span>
- )}
- {result.jlpt.length > 0 && (
- <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase text-accent ring-1 ring-accent/20">
- {result.jlpt[0]?.replace('jlpt-','').toUpperCase()}
- </span>
- )}
- {result.senses[0]?.parts_of_speech?.map((pos, i) => (
- <span
- key={i}
- className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground ring-1 ring-border/40"
- >
- {pos}
- </span>
- ))}
- </div>
-
- {/* Add to flashcards CTA */}
-  <Button
-  onClick={toggleSave}
-  className={cn(
-    "mt-4 w-full rounded-full h-11 font-semibold",
-    saved ? "bg-accent/15 text-accent relief-inset" : "bg-accent text-accent-foreground relief-raised-accent"
-  )}
-  variant="ghost"
-  >
- {saved ? (
- <>
- <Star className="h-4 w-4 mr-1.5"fill="currentColor"/> Saved to flashcards
- </>
- ) : (
- <>
- <Star className="h-4 w-4 mr-1.5"/> Add to Flashcards
- </>
- )}
- </Button>
- </section>
-
- {/* Kanji breakdown */}
- {kanjiList && kanjiList.length > 0 && (
- <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-semibold mb-3">Kanji</h2>
- <div className="space-y-3">
- {kanjiList.map((k, i) => {
- const ch = extractKanji(display)[i];
- if (!k) {
- return (
- <div key={i} className="flex items-center gap-4 rounded-xl bg-muted/40 p-3">
- <span className="font-japanese text-3xl font-bold">{ch}</span>
- <span className="text-xs text-muted-foreground">No data available</span>
- </div>
- );
- }
- return (
- <div key={i} className="rounded-xl bg-muted/40 p-4">
- <div className="flex items-start gap-4">
- <span className="font-japanese text-4xl font-bold leading-none">{k.character}</span>
- <div className="flex-1 min-w-0">
- <p className="text-sm font-semibold">{k.meanings.slice(0, 4).join(',')}</p>
- <div className="mt-1.5 flex flex-wrap gap-1.5">
- {k.jlpt != null && (
- <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold text-accent ring-1 ring-accent/20">
- N{k.jlpt}
- </span>
- )}
- {k.grade != null && (
- <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
- Grade {k.grade}
- </span>
- )}
- {k.stroke_count != null && (
- <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground ring-1 ring-border/40">
- {k.stroke_count} strokes
- </span>
- )}
- </div>
- </div>
- </div>
- <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
- <div>
- <p className="text-[10px] uppercase tracking-wider text-muted-foreground">On'yomi</p>
- <p className="font-japanese mt-0.5">
- {k.on_readings.length ? k.on_readings.join('、') :'—'}
- </p>
- </div>
- <div>
- <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Kun'yomi</p>
- <p className="font-japanese mt-0.5">
- {k.kun_readings.length ? k.kun_readings.join('、') :'—'}
- </p>
- </div>
- </div>
- </div>
- );
- })}
- </div>
- </section>
- )}
-
- {/* All meanings */}
- <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-semibold mb-3">Meanings</h2>
- <ol className="space-y-3">
- {result.senses.map((sense, i) => (
- <li key={i} className="text-sm">
- <div className="flex gap-2">
- <span className="text-muted-foreground font-mono shrink-0">{i + 1}.</span>
- <div className="flex-1">
-                 <p className="font-medium text-foreground leading-relaxed">
-                   {sense.english_definitions.join('; ')}
-                 </p>
- {sense.parts_of_speech.length > 0 && (
- <div className="mt-1 flex flex-wrap gap-1">
- {sense.parts_of_speech.map((pos, j) => (
- <span
- key={j}
- className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
- >
- {pos}
- </span>
- ))}
- </div>
- )}
- </div>
- </div>
- </li>
- ))}
- </ol>
- </section>
-
- {/* Examples */}
- <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-semibold mb-3">Examples</h2>
- {!examples && (
- <div className="space-y-2">
- <Skeleton className="h-4 w-3/4"/>
- <Skeleton className="h-3 w-1/2"/>
- </div>
- )}
- {examples && examples.length === 0 && (
- <p className="text-sm text-muted-foreground">No example sentences found.</p>
- )}
- {examples && examples.length > 0 && (
- <ul className="space-y-3">
- {examples.map((ex, i) => (
- <li key={i} className="rounded-md bg-muted/50 p-3">
- <div className="flex items-start gap-2">
- <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
- {highlightWord(ex.japanese, display)}
- </p>
- <PlayWordButton word={ex.japanese} size={14} className="mt-0.5 shrink-0"/>
- </div>
- {ex.english && (
- <p className="mt-1 text-xs text-muted-foreground italic">{ex.english}</p>
- )}
- </li>
- ))}
- </ul>
- )}
- </section>
-
- {/* Conjugation — wrapped card */}
- {getConjugations(display, result.senses.flatMap((s) => s.parts_of_speech)) && (
- <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
- <h2 className="font-serif text-lg font-semibold mb-3">Conjugation</h2>
- <ConjugationTable
- dictForm={display}
- partsOfSpeech={result.senses.flatMap((s) => s.parts_of_speech)}
- alwaysOpen
- hideLabel
- />
- </section>
- )}
-
- </div>
- )}
- </div>
+      {examples && examples.length > 0 && (
+       <section>
+        <h3 className="font-serif text-lg font-semibold mb-4">Examples</h3>
+        <div className="space-y-3">
+         {examples.slice(0, 3).map((ex, i) => (
+          <ExampleSentence key={i} word={ex.japanese} />
+         ))}
+        </div>
+       </section>
+      )}
+     </div>
+    ) : (
+     <div className="text-center text-muted-foreground">Word not found.</div>
+    )}
+   </div>
+  </div>
  );
 }

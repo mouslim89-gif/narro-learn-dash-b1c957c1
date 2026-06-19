@@ -18,6 +18,7 @@ import {
  DropdownMenuTrigger,
 } from'@/components/ui/dropdown-menu';
 import { useDelayed } from'@/hooks/use-delayed';
+import { useDelayedAction } from '@/hooks/use-delayed-nav';
 
 type StatusFilter ='all'|'due'|'new'|'learning'|'known';
 type SortOption ='added'|'mastery';
@@ -37,12 +38,13 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
 export default function Flashcards() {
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
  const [reviewMode, setReviewMode] = useState(false);
+ const waitThen = useDelayedAction();
  const showEmpty = useDelayed(300);
  const headerRef = useRef<HTMLElement>(null);
  useScrollProgress(headerRef, 0, 56);
 
- const enterReview = () => { setReviewMode(true); setIsReviewing(true); };
- const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
+ const enterReview = () => waitThen(() => { setReviewMode(true); setIsReviewing(true); });
+ const exitReview = () => waitThen(() => { setReviewMode(false); setIsReviewing(false); });
  const [filter, setFilter] = useState<StatusFilter>('all');
  const [sortBy, setSortBy] = useState<SortOption>('added');
  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
