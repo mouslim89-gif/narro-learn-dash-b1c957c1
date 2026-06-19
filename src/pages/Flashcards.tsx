@@ -46,6 +46,7 @@ export default function Flashcards() {
    const run = () => { setReviewMode(true); setIsReviewing(true); };
    if (reduce) run(); else window.setTimeout(run, 120);
  };
+ const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
  const [filter, setFilter] = useState<StatusFilter>('all');
  const [sortBy, setSortBy] = useState<SortOption>('added');
  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
