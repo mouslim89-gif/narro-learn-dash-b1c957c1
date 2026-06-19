@@ -10,6 +10,7 @@ import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
 import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
+import { cn } from '@/lib/utils';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
