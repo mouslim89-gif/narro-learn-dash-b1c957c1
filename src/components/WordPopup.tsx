@@ -33,7 +33,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
  useEffect(() => {
   lookupWord(kuromojiBase || word).then((res: CacheEntry) => {
-    setResult(pickBestResult(res.results, kuromojiPos, kuromojiBase || word));
+    setResult(pickBestResult(res.results, kuromojiPos?.[0], kuromojiBase || word));
     setLoading(false);
   });
  }, [word, kuromojiBase, kuromojiPos]);
