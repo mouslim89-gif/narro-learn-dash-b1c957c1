@@ -53,6 +53,7 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
 
 export default function DictionaryPage() {
  const navigate = useNavigate();
+ const goTo = useDelayedNav();
  const [searchParams] = useSearchParams();
  const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ??'';
  const [query, setQuery] = useState(initial);
