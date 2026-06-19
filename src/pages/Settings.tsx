@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { DelayedLink as Link } from '@/components/DelayedLink';
 import { useDelayedNav } from '@/hooks/use-delayed-nav';
-import { LogOut, Loader2, User as UserIcon, ArrowLeft } from 'lucide-react';
+import { LogOut, Loader2, User as UserIcon, ArrowLeft, Trash2 } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';

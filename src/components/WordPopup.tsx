@@ -78,7 +78,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
                 word, 
                 reading: overrideReading || result.japanese[0]?.reading || '', 
                 meanings: result.senses.flatMap(s => s.english_definitions.slice(0, 1)), 
-                jlpt: result.jlpt, 
+                jlpt: result.jlpt || [], 
                 partsOfSpeech: result.senses[0]?.parts_of_speech || []
               };
               addWord(entry);

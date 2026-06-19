@@ -1,5 +1,5 @@
 import { useEffect, useState } from'react';
-import { useNavigate, useParams } from'react-router-dom';
+import { useParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
 import { useDelayedNav } from '@/hooks/use-delayed-nav';
 import { ArrowLeft, Star, Loader2 } from'lucide-react';
@@ -45,6 +45,7 @@ export default function WordDetail() {
   });
  }, [word]);
 
+ const resultWord = result?.japanese[0]?.word || word;
  const display = result ? getDisplayWord(result) : word;
  const displayReading = result ? (result.japanese[0]?.reading || '') : '';
 
