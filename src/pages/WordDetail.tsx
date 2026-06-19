@@ -203,14 +203,12 @@ export default function WordDetail() {
  ))}
  </div>
 
-  {/* Add to flashcards CTA */}
+ {/* Add to flashcards CTA */}
   <Button
   onClick={toggleSave}
   className={cn(
-    "mt-4 h-11 w-full rounded-full font-semibold",
-    saved
-      ? "bg-card text-accent relief-raised"
-      : "btn-tsundoku-premium"
+    "mt-4 w-full rounded-full h-11 font-semibold relief-raised",
+    saved ? "bg-accent/15 text-accent" : "bg-accent text-accent-foreground"
   )}
   variant="ghost"
   >
