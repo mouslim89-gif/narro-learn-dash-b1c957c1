@@ -1,7 +1,7 @@
 import { useState, useEffect } from'react';
 import { Star, BookOpen, ChevronDown } from'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
-import { useNavigate } from'react-router-dom';
+import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { toRomaji } from'wanakana';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
@@ -160,7 +160,7 @@ function LoadingSkeleton() {
 
 export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens, onClose }: WordPopupProps) {
  const { addWord, hasWord, removeWord } = useFlashcardStore();
- const navigate = useNavigate();
+ const goTo = useDelayedNav();
 
  // Try looking up the base form first (more likely to have dictionary entries)
  const lookupKey = kuromojiBase || word;
@@ -371,7 +371,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  );
  } catch {}
  onClose();
- navigate(`/dictionary/${encodeURIComponent(dictForm)}`);
+ goTo(`/dictionary/${encodeURIComponent(dictForm)}`);
  }}
  className="tap-scale-sm flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-muted/40 text-foreground ring-1 ring-border/40 smooth-colors"
  >
