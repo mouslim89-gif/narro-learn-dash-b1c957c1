@@ -243,6 +243,20 @@
  inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
+/* Inset relief for "active" or "pressed" states (e.g. toggles, saved states).
+   Simulates the element being pressed into the surface with inner shadows. */
+.relief-inset {
+  box-shadow: 
+    inset 0 1px 3px hsl(210 22% 15% / 0.12),
+    inset 0 1px 1px hsl(210 22% 15% / 0.08);
+}
+.dark .relief-inset {
+  box-shadow: 
+    inset 0 2px 4px hsl(0 0% 0% / 0.45),
+    inset 0 1px 2px hsl(0 0% 0% / 0.30);
+}
+
+
 /* Raised relief tuned for saturated/colored backgrounds (e.g. bg-accent).
    Same shadow language as .relief-raised but with reduced top highlight so it
    doesn't wash out on warm/colored fills, and a slightly stronger drop shadow

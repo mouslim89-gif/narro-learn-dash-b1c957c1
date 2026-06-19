@@ -208,7 +208,7 @@ export default function WordDetail() {
   onClick={toggleSave}
   className={cn(
     "mt-4 w-full rounded-full h-11 font-semibold",
-    saved ? "bg-accent/15 text-accent relief-raised" : "bg-accent text-accent-foreground relief-raised-accent"
+    saved ? "bg-accent/15 text-accent relief-inset" : "bg-accent text-accent-foreground relief-raised-accent"
   )}
   variant="ghost"
   >
