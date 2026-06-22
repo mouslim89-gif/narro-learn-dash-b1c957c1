@@ -33,7 +33,7 @@ const readerSteps: TutorialStep[] = [
   },
   {
     selector: '[data-tutorial="grammar"]',
-    title: "Grammar Guide 文",
+    title: "Grammar Guide 📖",
     description: "Check specific grammar points for this book to help you with complex structures.",
     position: 'bottom',
   },
