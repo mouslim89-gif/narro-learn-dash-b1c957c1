@@ -44,7 +44,7 @@ export default function Flashcards() {
  const enterReview = () => {
    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
    const run = () => { setReviewMode(true); setIsReviewing(true); };
-   if (reduce) run(); else window.setTimeout(run, 120);
+   if (reduce) run(); else window.setTimeout(run, 250);
  };
  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
  const [filter, setFilter] = useState<StatusFilter>('all');
