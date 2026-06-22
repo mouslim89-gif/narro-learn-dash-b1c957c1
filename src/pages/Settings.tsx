@@ -179,7 +179,27 @@ export default function Settings() {
           </div>
         </section>
 
+        {/* Help */}
+        <section>
+          <SectionLabel>Help & Onboarding</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <button 
+              onClick={() => {
+                useOnboardingStore.getState().resetOnboarding();
+                toast.success('Onboarding has been reset. It will appear on your next navigation.');
+              }}
+              className="w-full px-4 py-4 flex items-center justify-between text-sm font-medium smooth-colors tap-scale-sm"
+            >
+              <div className="flex items-center gap-3">
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                <span>Restart Onboarding</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
         {/* About */}
+
         <section>
           <SectionLabel>About</SectionLabel>
           <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm px-4 py-4">
