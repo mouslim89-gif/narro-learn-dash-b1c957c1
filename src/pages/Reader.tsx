@@ -1016,11 +1016,11 @@ export default function Reader() {
     title={showTranslations ? 'Hide translations' : 'Show translations'}
     data-tutorial="translation"
   >
-    <Subtitles className="h-5 w-5" />
+    <Globe className="h-5 w-5" />
   </HeaderChip>
 
   <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
-    <span className="font-serif text-[17px] font-bold leading-none">文</span>
+    <BookType className="h-5 w-5" />
   </HeaderChip>
    <HeaderChip
 
@@ -1155,7 +1155,7 @@ export default function Reader() {
  </div>
  <div className="flex items-center justify-between gap-3 px-4 py-4">
  <span className="flex items-center gap-2 text-[15px] font-medium">
- <Subtitles className="h-4 w-4 text-muted-foreground"/>
+ <Globe className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
  <Switch checked={showTranslations} onCheckedChange={handleToggleTranslations} />
