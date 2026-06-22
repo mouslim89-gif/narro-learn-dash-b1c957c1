@@ -7,26 +7,26 @@ import { cn } from '@/lib/utils';
 
 const slides = [
   {
-    title: "Bienvenue sur Tsundoku ! 👋",
-    description: "Votre nouveau compagnon pour apprendre le japonais par la lecture. Plongez dans vos histoires préférées.",
+    title: "Welcome to Tsundoku! 👋",
+    description: "Your new companion for learning Japanese through reading. Dive into your favorite stories.",
     icon: <BookOpen className="w-12 h-12 text-primary" />,
     color: "bg-blue-50 dark:bg-blue-900/20",
   },
   {
-    title: "Lisez, cliquez, apprenez",
-    description: "Un mot vous échappe ? Cliquez dessus pour voir sa définition, sa grammaire et sa prononciation instantanément.",
+    title: "Read, tap, learn",
+    description: "Unsure about a word? Tap it to instantly see its definition, grammar, and pronunciation.",
     icon: <MousePointer2 className="w-12 h-12 text-primary" />,
     color: "bg-orange-50 dark:bg-orange-900/20",
   },
   {
-    title: "Mémorisez pour de bon",
-    description: "Ajoutez des mots à vos flashcards. Notre système de répétition espacée (SRS) s'occupe de les ancrer dans votre mémoire.",
+    title: "Memorize for good",
+    description: "Add words to your flashcards. Our spaced repetition system (SRS) takes care of anchoring them in your memory.",
     icon: <BrainCircuit className="w-12 h-12 text-primary" />,
     color: "bg-green-50 dark:bg-green-900/20",
   },
   {
-    title: "Prêt pour l'aventure ?",
-    description: "Choisissez un livre dans la bibliothèque et commencez votre voyage linguistique dès maintenant.",
+    title: "Ready for the adventure?",
+    description: "Pick a book from the library and start your linguistic journey right now.",
     icon: <Star className="w-12 h-12 text-primary" />,
     color: "bg-purple-50 dark:bg-purple-900/20",
   },
@@ -110,7 +110,7 @@ export function OnboardingCarousel() {
                   </Button>
                 )}
                 <Button onClick={nextSlide} className="rounded-full px-6">
-                  {currentSlide === slides.length - 1 ? "C'est parti !" : "Suivant"}
+                  {currentSlide === slides.length - 1 ? "Let's go!" : "Next"}
                   {currentSlide < slides.length - 1 && <ChevronRight className="ml-2 w-4 h-4" />}
                 </Button>
               </div>
@@ -122,7 +122,7 @@ export function OnboardingCarousel() {
             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
             onClick={completeCarousel}
           >
-            Passer
+            Skip
           </Button>
         </motion.div>
       </motion.div>

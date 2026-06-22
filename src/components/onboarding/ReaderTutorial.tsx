@@ -15,20 +15,32 @@ interface TutorialStep {
 const readerSteps: TutorialStep[] = [
   {
     selector: '[data-tutorial="token"]',
-    title: "Le cœur de Tsundoku 📖",
-    description: "Appuyez sur n'importe quel mot pour voir sa définition, sa lecture (furigana) et sa fonction grammaticale.",
+    title: "The heart of Tsundoku 📖",
+    description: "Tap any word to see its definition, reading (furigana), and grammar function.",
     position: 'bottom',
   },
   {
-    selector: '[data-tutorial="settings"]',
-    title: "À votre goût ⚙️",
-    description: "Changez la taille du texte, la police ou le mode sombre pour une lecture confortable.",
+    selector: '[data-tutorial="furigana"]',
+    title: "Reading Aids 🅰",
+    description: "Toggle furigana (readings above kanji) to help you read or challenge your memory.",
+    position: 'bottom',
+  },
+  {
+    selector: '[data-tutorial="translation"]',
+    title: "Helpful Translations 🌐",
+    description: "Need a hint? Toggle full sentence translations to better understand the story flow.",
     position: 'bottom',
   },
   {
     selector: '[data-tutorial="grammar"]',
-    title: "Guide de grammaire 📚",
-    description: "Consultez les points de grammaire spécifiques à ce livre pour mieux comprendre les structures complexes.",
+    title: "Grammar Guide 文",
+    description: "Check specific grammar points for this book to help you with complex structures.",
+    position: 'bottom',
+  },
+  {
+    selector: '[data-tutorial="settings"]',
+    title: "Your Preferences ⚙️",
+    description: "Customize text size, font, or theme for a comfortable reading experience.",
     position: 'bottom',
   },
 ];
@@ -164,7 +176,7 @@ export function ReaderTutorial() {
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider">
             <Sparkles className="w-4 h-4" />
-            Étape {stepIndex + 1}/{readerSteps.length}
+            Step {stepIndex + 1}/{readerSteps.length}
           </div>
           <button onClick={handleSkip} className="text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
@@ -178,10 +190,10 @@ export function ReaderTutorial() {
 
         <div className="flex justify-between items-center">
           <Button variant="ghost" size="sm" onClick={handleSkip} className="text-xs">
-            Passer
+            Skip
           </Button>
           <Button size="sm" onClick={handleNext} className="rounded-full px-4">
-            {stepIndex === readerSteps.length - 1 ? "Compris !" : "Continuer"}
+            {stepIndex === readerSteps.length - 1 ? "Got it!" : "Continue"}
           </Button>
         </div>
 
