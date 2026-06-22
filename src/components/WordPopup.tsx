@@ -361,18 +361,17 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
               {saved ? 'Saved' : 'Add to Flashcards'}
             </button>
  <button
- onClick={() => {
- try {
- sessionStorage.setItem('reopen-word-popup',
- JSON.stringify({
- returnPath: window.location.pathname + window.location.search,
- word: { text: word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens },
- })
- );
- } catch {}
- onClose();
- goTo(`/dictionary/${encodeURIComponent(dictForm)}`);
- }}
+  onClick={() => {
+    try {
+      sessionStorage.setItem('reopen-word-popup', 
+        JSON.stringify({
+          returnPath: window.location.pathname + window.location.search,
+          word: { text: word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens },
+        })
+      );
+    } catch {}
+    goTo(`/dictionary/${encodeURIComponent(dictForm)}`);
+  }}
  className="tap-scale-sm flex items-center justify-center gap-2 rounded-full py-3 px-4 text-sm font-semibold bg-muted/40 text-foreground ring-1 ring-border/40 smooth-colors"
  >
  <BookOpen className="h-4 w-4"/> Dictionary
