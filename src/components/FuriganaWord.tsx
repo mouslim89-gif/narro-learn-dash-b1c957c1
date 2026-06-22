@@ -1,7 +1,7 @@
 import { forwardRef, type MouseEvent, type TouchEvent } from'react';
 import { getCached, type CacheEntry } from'@/lib/jisho';
 
-interface FuriganaWordProps {
+interface FuriganaWordProps extends React.HTMLAttributes<HTMLSpanElement> {
  text: string;
  /** Pre-computed reading from Kuromoji (hiragana) */
  reading?: string;
@@ -10,15 +10,8 @@ interface FuriganaWordProps {
  /** Optional color class for grammar color mode */
  colorClass?: string;
  onClick: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseDown?: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseMove?: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseUp?: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseLeave?: (e: MouseEvent<HTMLSpanElement>) => void;
- onTouchStart?: (e: TouchEvent<HTMLSpanElement>) => void;
- onTouchMove?: (e: TouchEvent<HTMLSpanElement>) => void;
- onTouchEnd?: (e: TouchEvent<HTMLSpanElement>) => void;
- onTouchCancel?: (e: TouchEvent<HTMLSpanElement>) => void;
 }
+
 
 export interface FuriganaSegment {
  text: string;
