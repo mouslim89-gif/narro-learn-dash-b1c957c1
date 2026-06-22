@@ -1009,39 +1009,48 @@ export default function Reader() {
    if (chapterList.length <= 1) return null;
    const currentIdx = chapterList.findIndex((c) => c.id === chapterId);
    const activeIdx = currentIdx >= 0 ? currentIdx : 0;
-   return (
-     <div className="flex flex-col gap-2">
-       <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chapters</p>
-       <div className="flex items-center justify-between gap-1.5">
-         {chapterList.map((c, i) => {
-           const isActive = i === activeIdx;
-           return (
-             <button
-               key={c.id}
-               type="button"
-               onClick={() => {
-                 setLevelOpen(false);
-                 if (c.id !== chapterId) navigate(`/reader/${id}/${difficulty}/${c.id}`);
-               }}
-               className={cn(
-                 'relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums smooth-colors tap-scale-sm ring-1',
-                 isActive
-                   ? 'bg-primary text-primary-foreground ring-primary/30 shadow-sm'
-                   : 'bg-muted text-foreground/70 ring-border/40',
-               )}
-               aria-label={`Chapter ${i + 1}: ${c.title}`}
-               aria-current={isActive ? 'page' : undefined}
-             >
-               {i + 1}
-             </button>
-           );
-         })}
-       </div>
-       <p className="px-1 font-serif text-[13px] font-semibold leading-snug text-center">
-         {chapterList[activeIdx].title}
-       </p>
-     </div>
-   );
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chapters</p>
+        <div className="flex flex-col gap-1">
+          {chapterList.map((c, i) => {
+            const isActive = i === activeIdx;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setLevelOpen(false);
+                  if (c.id !== chapterId) navigate(`/reader/${id}/${difficulty}/${c.id}`);
+                }}
+                className={cn(
+                  "relative flex w-full items-center gap-3 rounded-xl p-2 text-left smooth-colors tap-scale-sm transition-all",
+                  isActive
+                    ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                    : "hover:bg-muted/50 text-foreground/80"
+                )}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span
+                  className={cn(
+                    "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold tabular-nums ring-1 transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground ring-primary/30"
+                      : "bg-muted text-foreground/50 ring-border/40"
+                  )}
+                >
+                  {i + 1}
+                </span>
+                <span className="font-serif text-[13px] font-medium leading-tight truncate">
+                  {c.title}
+                </span>
+                {isActive && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
  })()}
  </div>
  </PopoverContent>
