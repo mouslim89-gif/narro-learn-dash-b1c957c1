@@ -3,7 +3,7 @@ import { useDelayedNav } from "@/hooks/use-delayed-nav";
 import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown, BookMarked } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
@@ -1020,7 +1020,7 @@ export default function Reader() {
   </HeaderChip>
 
   <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
-    <span className="font-serif text-[17px] font-bold leading-none">文</span>
+    <BookMarked className="h-5 w-5" />
   </HeaderChip>
    <HeaderChip
 
