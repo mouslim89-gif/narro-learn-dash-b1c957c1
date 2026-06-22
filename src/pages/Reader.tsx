@@ -1020,7 +1020,7 @@ export default function Reader() {
   </HeaderChip>
 
   <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
-    <BookMarked className="h-5 w-5" />
+    <BookType className="h-5 w-5" />
   </HeaderChip>
    <HeaderChip
 
