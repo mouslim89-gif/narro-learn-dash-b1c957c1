@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown, BookMarked } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasChapters, hasParts, parsePartId, partChapterId } from '@/data/books';
+import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
@@ -876,16 +876,6 @@ export default function Reader() {
     setLevelOpen(false);
   }, [difficulty]);
 
-  const handleChapterChange = useCallback((newChapterId: string) => {
-    if (newChapterId === chapterId) {
-      setLevelOpen(false);
-      return;
-    }
-    setLevelOpen(false);
-    goTo(`/reader/${id}/${difficulty}/${newChapterId}`);
-  }, [id, difficulty, chapterId, goTo]);
-
-
   // Toggle inline translations while keeping the reader anchored on the
   // sentence closest to viewport center. A radial stagger animation reveals
   // the translations outward from that anchor when turning ON.
@@ -985,83 +975,31 @@ export default function Reader() {
                   </p>
                 </button>
  </PopoverTrigger>
-  <PopoverContent align="center" sideOffset={8} className="w-56 p-2 rounded-2xl shadow-xl border-border/50">
-    <div className="flex flex-col gap-1.5">
-      <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
-      <div className="flex gap-1 rounded-full bg-muted p-1">
-        {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
-          <button
-            key={d}
-            onClick={() => handleChangeDifficulty(d)}
-            className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center flex-1',
-              d === difficulty ? 'text-foreground' : 'text-muted-foreground',
-            )}
-          >
-            {d === difficulty && (
-              <motion.div
-                layoutId="seg-difficulty-reader-mini"
-                className="absolute inset-0 rounded-full bg-card shadow-sm ring-1 ring-border/40"
-                transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
-              />
-            )}
-            <span className="relative z-10">{difficultyConfig[d].label}</span>
-          </button>
-        ))}
-      </div>
-
-      {book && (hasChapters(book) || hasParts(book)) && (
-        <>
-          <div className="my-1.5 h-px bg-border/40" />
-          <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chapters</p>
-          <div className="flex flex-col gap-0.5 mt-1 max-h-[280px] overflow-y-auto pr-1 -mr-1 custom-scrollbar">
-            {book.chapters ? (
-              book.chapters.map((ch, idx) => (
-                <button
-                  key={ch.id}
-                  onClick={() => handleChapterChange(ch.id)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg px-2 py-2 text-left text-xs transition-colors",
-                    ch.id === chapterId ? "bg-foreground/5 font-bold text-foreground" : "text-muted-foreground hover:bg-foreground/5"
-                  )}
-                >
-                  <span className={cn(
-                    "flex h-4 w-4 shrink-0 items-center justify-center rounded-md text-[10px] font-bold",
-                    ch.id === chapterId ? "bg-foreground text-background" : "bg-muted text-muted-foreground"
-                  )}>
-                    {idx + 1}
-                  </span>
-                  <span className="truncate">{ch.title}</span>
-                </button>
-              ))
-            ) : (
-              book.anchors?.map((title, idx) => {
-                const cid = partChapterId(idx);
-                const active = cid === chapterId;
-                return (
-                  <button
-                    key={cid}
-                    onClick={() => handleChapterChange(cid)}
-                    className={cn(
-                      "flex items-center gap-2 rounded-lg px-2 py-2 text-left text-xs transition-colors",
-                      active ? "bg-foreground/5 font-bold text-foreground" : "text-muted-foreground hover:bg-foreground/5"
-                    )}
-                  >
-                    <span className={cn(
-                      "flex h-4 w-4 shrink-0 items-center justify-center rounded-md text-[10px] font-bold",
-                      active ? "bg-foreground text-background" : "bg-muted text-muted-foreground"
-                    )}>
-                      {idx + 1}
-                    </span>
-                    <span className="truncate">{title}</span>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  </PopoverContent>
+ <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
+ <div className="flex flex-col gap-1.5">
+ <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
+ <div className="flex gap-1 rounded-full bg-muted p-1">
+ {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
+  <button
+  key={d}
+   onClick={() => handleChangeDifficulty(d)}
+  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center',
+  d === difficulty ? 'text-foreground' : 'text-muted-foreground',
+  )}
+  >
+    {d === difficulty && (
+      <motion.div
+        layoutId="seg-difficulty-reader-mini"
+        className="absolute inset-0 rounded-full bg-card shadow-sm ring-1 ring-border/40"
+        transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+      />
+    )}
+  <span className="relative z-10">{difficultyConfig[d].label}</span>
+  </button>
+ ))}
+ </div>
+ </div>
+ </PopoverContent>
  </Popover>
  <div className="flex items-center gap-1">
   <HeaderChip
