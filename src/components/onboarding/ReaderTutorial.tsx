@@ -90,7 +90,7 @@ export function ReaderTutorial() {
     // window.addEventListener('scroll', updateTargetRect);
     return () => {
       window.removeEventListener('resize', updateTargetRect);
-      window.removeEventListener('scroll', updateTargetRect);
+      // window.removeEventListener('scroll', updateTargetRect);
     };
   }, [stepIndex]);
 
