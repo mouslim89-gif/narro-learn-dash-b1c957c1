@@ -19,7 +19,9 @@ import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { ReaderToken } from '@/components/ReaderToken';
 import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
+import { ReaderTutorial } from '@/components/onboarding/ReaderTutorial';
 import { Progress } from '@/components/ui/progress';
+
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
 import { toast } from '@/hooks/use-toast';
 
@@ -1017,16 +1019,18 @@ export default function Reader() {
  <Languages className="h-5 w-5"/>
  </HeaderChip>
 
- <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes">
- <BookType className="h-5 w-5"/>
- </HeaderChip>
-  <HeaderChip
-
-  onClick={() => setShowSettings(!showSettings)}
-  title="Settings"
-  >
-  <Settings className="h-5 w-5"/>
+  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
+  <BookType className="h-5 w-5"/>
   </HeaderChip>
+   <HeaderChip
+
+   onClick={() => setShowSettings(!showSettings)}
+   title="Settings"
+   data-tutorial="settings"
+   >
+   <Settings className="h-5 w-5"/>
+   </HeaderChip>
+
 
  </div>
  </div>
@@ -1383,13 +1387,15 @@ export default function Reader() {
  ?`outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ?'bg-primary/30 outline-primary':''}`:'';
 
  const tokenNode = (
- <ReaderToken
- key={i}
- token={token}
- showFurigana={showFurigana}
- colorClass={`${colorClass} ${editClass}`.trim()}
- isHighlighted={isHighlighted && !tokenEditMode}
- knownLevel={knownLevel}
+  <ReaderToken
+  key={i}
+  token={token}
+  showFurigana={showFurigana}
+  colorClass={`${colorClass} ${editClass}`.trim()}
+  isHighlighted={isHighlighted && !tokenEditMode}
+  knownLevel={knownLevel}
+  data-tutorial={i === 0 && globalIdx === 0 ? "token" : undefined}
+
  onTap={() => {
  if (tokenEditMode) {
  // Suppress tap if a drag-select just happened.
@@ -1628,6 +1634,8 @@ export default function Reader() {
  }}
  />
  )}
- </div>
+  <ReaderTutorial />
+  </div>
+
  );
 }

@@ -1,7 +1,7 @@
 import { forwardRef, type MouseEvent, type TouchEvent } from'react';
 import { getCached, type CacheEntry } from'@/lib/jisho';
 
-interface FuriganaWordProps {
+interface FuriganaWordProps extends React.HTMLAttributes<HTMLSpanElement> {
  text: string;
  /** Pre-computed reading from Kuromoji (hiragana) */
  reading?: string;
@@ -10,15 +10,8 @@ interface FuriganaWordProps {
  /** Optional color class for grammar color mode */
  colorClass?: string;
  onClick: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseDown?: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseMove?: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseUp?: (e: MouseEvent<HTMLSpanElement>) => void;
- onMouseLeave?: (e: MouseEvent<HTMLSpanElement>) => void;
- onTouchStart?: (e: TouchEvent<HTMLSpanElement>) => void;
- onTouchMove?: (e: TouchEvent<HTMLSpanElement>) => void;
- onTouchEnd?: (e: TouchEvent<HTMLSpanElement>) => void;
- onTouchCancel?: (e: TouchEvent<HTMLSpanElement>) => void;
 }
+
 
 export interface FuriganaSegment {
  text: string;
@@ -283,7 +276,7 @@ export function segmentsFromReading(text: string, reading: string): FuriganaSegm
 }
 
 export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(function FuriganaWord(
- { text, reading, furiganaVisible = true, colorClass, onClick, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onTouchStart, onTouchMove, onTouchEnd, onTouchCancel },
+ { text, reading, furiganaVisible = true, colorClass, onClick, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, ...props },
  ref
 ) {
  // Try pre-computed reading first, then fall back to Jisho cache
@@ -307,8 +300,10 @@ export const FuriganaWord = forwardRef<HTMLSpanElement, FuriganaWordProps>(funct
  onTouchMove={onTouchMove}
  onTouchEnd={onTouchEnd}
  onTouchCancel={onTouchCancel}
+ {...props}
  className={`cursor-pointer rounded px-px transition-colors ${colorClass ||''}`}
  >
+
  {segments
  ? segments.map((segment, index) =>
  segment.reading ? (
