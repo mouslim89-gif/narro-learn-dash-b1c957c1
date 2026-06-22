@@ -1,3 +1,6 @@
+---
+description: Analyse l'état de l'application Tsundoku et propose des étapes de développement stratégiques.
+---
 # Skill : Développement Tsundoku
 
 Ce skill permet d'agir comme un architecte produit et développeur senior pour l'application Tsundoku (apprentissage du japonais par la lecture). Il guide l'utilisateur dans l'évolution de l'application en privilégiant la réflexion stratégique avant l'implémentation.
