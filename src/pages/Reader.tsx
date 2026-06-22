@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown, BookMarked } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
+import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasChapters, hasParts, parsePartId, partChapterId } from '@/data/books';
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
@@ -975,15 +975,16 @@ export default function Reader() {
                   </p>
                 </button>
  </PopoverTrigger>
- <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
+ <PopoverContent align="center"sideOffset={8} className="w-[min(20rem,calc(100vw-1.5rem))] p-3 rounded-2xl">
+ <div className="flex flex-col gap-3">
  <div className="flex flex-col gap-1.5">
- <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
+ <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
  <div className="flex gap-1 rounded-full bg-muted p-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
   <button
   key={d}
    onClick={() => handleChangeDifficulty(d)}
-  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center',
+  className={cn('relative h-8 flex-1 px-3 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center',
   d === difficulty ? 'text-foreground' : 'text-muted-foreground',
   )}
   >
@@ -998,6 +999,50 @@ export default function Reader() {
   </button>
  ))}
  </div>
+ </div>
+ {(() => {
+   const chapterList: { id: string; title: string }[] = hasChapters(book)
+     ? book.chapters!.map((c) => ({ id: c.id, title: c.title }))
+     : hasParts(book)
+     ? book.anchors!.map((title, i) => ({ id: partChapterId(i), title }))
+     : [];
+   if (chapterList.length <= 1) return null;
+   const currentIdx = chapterList.findIndex((c) => c.id === chapterId);
+   const activeIdx = currentIdx >= 0 ? currentIdx : 0;
+   return (
+     <div className="flex flex-col gap-2">
+       <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chapters</p>
+       <div className="flex items-center justify-between gap-1.5">
+         {chapterList.map((c, i) => {
+           const isActive = i === activeIdx;
+           return (
+             <button
+               key={c.id}
+               type="button"
+               onClick={() => {
+                 setLevelOpen(false);
+                 if (c.id !== chapterId) navigate(`/reader/${id}/${difficulty}/${c.id}`);
+               }}
+               className={cn(
+                 'relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums smooth-colors tap-scale-sm ring-1',
+                 isActive
+                   ? 'bg-primary text-primary-foreground ring-primary/30 shadow-sm'
+                   : 'bg-muted text-foreground/70 ring-border/40',
+               )}
+               aria-label={`Chapter ${i + 1}: ${c.title}`}
+               aria-current={isActive ? 'page' : undefined}
+             >
+               {i + 1}
+             </button>
+           );
+         })}
+       </div>
+       <p className="px-1 font-serif text-[13px] font-semibold leading-snug text-center">
+         {chapterList[activeIdx].title}
+       </p>
+     </div>
+   );
+ })()}
  </div>
  </PopoverContent>
  </Popover>
