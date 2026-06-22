@@ -2,7 +2,7 @@ import { FuriganaWord } from '@/components/FuriganaWord';
 import type { BookToken } from '@/data/book-tokens';
 import type { KnownLevel } from '@/lib/known-words';
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLSpanElement> {
   token: BookToken;
   showFurigana: boolean;
   colorClass: string;
@@ -27,6 +27,7 @@ export function ReaderToken({
   isHighlighted,
   knownLevel,
   onTap,
+  ...props
 }: Props) {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -50,12 +51,14 @@ export function ReaderToken({
         onClick={handleClick}
         onMouseDown={stopDown}
         onTouchStart={stopDown}
+        {...(props as any)}
       />
     );
   }
 
   return (
     <span
+      {...props}
       onClick={handleClick}
       onMouseDown={stopDown}
       onTouchStart={stopDown}
