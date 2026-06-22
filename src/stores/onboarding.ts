@@ -4,8 +4,10 @@ import { persist } from 'zustand/middleware';
 interface OnboardingState {
   hasCompletedCarousel: boolean;
   hasSeenReaderTutorial: boolean;
+  alwaysReplayOnboarding: boolean;
   completeCarousel: () => void;
   completeReaderTutorial: () => void;
+  setAlwaysReplayOnboarding: (replay: boolean) => void;
   resetOnboarding: () => void;
 }
 
@@ -14,8 +16,14 @@ export const useOnboardingStore = create<OnboardingState>()(
     (set) => ({
       hasCompletedCarousel: false,
       hasSeenReaderTutorial: false,
-      completeCarousel: () => set({ hasCompletedCarousel: true }),
-      completeReaderTutorial: () => set({ hasSeenReaderTutorial: true }),
+      alwaysReplayOnboarding: false,
+      completeCarousel: () => set((state) => ({ 
+        hasCompletedCarousel: state.alwaysReplayOnboarding ? false : true 
+      })),
+      completeReaderTutorial: () => set((state) => ({ 
+        hasSeenReaderTutorial: state.alwaysReplayOnboarding ? false : true 
+      })),
+      setAlwaysReplayOnboarding: (alwaysReplayOnboarding) => set({ alwaysReplayOnboarding }),
       resetOnboarding: () => set({ hasCompletedCarousel: false, hasSeenReaderTutorial: false }),
     }),
     {

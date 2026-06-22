@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const slides = [
   {
-    title: "Bienvenue sur Kotoba ! 👋",
+    title: "Bienvenue sur Tsundoku ! 👋",
     description: "Votre nouveau compagnon pour apprendre le japonais par la lecture. Plongez dans vos histoires préférées.",
     icon: <BookOpen className="w-12 h-12 text-primary" />,
     color: "bg-blue-50 dark:bg-blue-900/20",
@@ -33,10 +33,10 @@ const slides = [
 ];
 
 export function OnboardingCarousel() {
-  const { hasCompletedCarousel, completeCarousel } = useOnboardingStore();
+  const { hasCompletedCarousel, completeCarousel, alwaysReplayOnboarding } = useOnboardingStore();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  if (hasCompletedCarousel) return null;
+  if (hasCompletedCarousel && !alwaysReplayOnboarding) return null;
 
   const nextSlide = () => {
     if (currentSlide === slides.length - 1) {

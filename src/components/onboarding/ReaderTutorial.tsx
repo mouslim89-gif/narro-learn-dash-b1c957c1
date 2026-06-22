@@ -15,7 +15,7 @@ interface TutorialStep {
 const readerSteps: TutorialStep[] = [
   {
     selector: '[data-tutorial="token"]',
-    title: "Le cœur de Kotoba 📖",
+    title: "Le cœur de Tsundoku 📖",
     description: "Appuyez sur n'importe quel mot pour voir sa définition, sa lecture (furigana) et sa fonction grammaticale.",
     position: 'bottom',
   },
@@ -34,17 +34,18 @@ const readerSteps: TutorialStep[] = [
 ];
 
 export function ReaderTutorial() {
-  const { hasSeenReaderTutorial, completeReaderTutorial } = useOnboardingStore();
+  const { hasSeenReaderTutorial, completeReaderTutorial, alwaysReplayOnboarding } = useOnboardingStore();
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [tooltipLeft, setTooltipLeft] = useState(16);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (hasSeenReaderTutorial) return;
+    if (hasSeenReaderTutorial && !alwaysReplayOnboarding) return;
 
     // Small delay to ensure the reader content is rendered
     const timer = setTimeout(() => {
-      updateTargetRect();
+      focusStep();
       setIsVisible(true);
     }, 1000);
 
@@ -55,10 +56,27 @@ export function ReaderTutorial() {
     const selector = readerSteps[stepIndex].selector;
     const element = document.querySelector(selector);
     if (element) {
-      setTargetRect(element.getBoundingClientRect());
+      const rect = element.getBoundingClientRect();
+      setTargetRect(rect);
+      
+      // Calculate tooltip position to keep it in bounds
+      const tooltipWidth = 320;
+      const windowWidth = window.innerWidth;
+      const desiredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
+      const clampedLeft = Math.max(16, Math.min(windowWidth - tooltipWidth - 16, desiredLeft));
+      setTooltipLeft(clampedLeft);
+    }
+  };
+
+  const focusStep = () => {
+    const selector = readerSteps[stepIndex].selector;
+    const element = document.querySelector(selector);
+    if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Re-read rect after scroll starts (approx)
+      setTimeout(updateTargetRect, 300);
+      updateTargetRect();
     } else {
-      // If element not found, move to next step or finish
       if (stepIndex < readerSteps.length - 1) {
         setStepIndex(prev => prev + 1);
       } else {
@@ -69,14 +87,14 @@ export function ReaderTutorial() {
 
   useEffect(() => {
     window.addEventListener('resize', updateTargetRect);
-    window.addEventListener('scroll', updateTargetRect);
+    // window.addEventListener('scroll', updateTargetRect);
     return () => {
       window.removeEventListener('resize', updateTargetRect);
-      window.removeEventListener('scroll', updateTargetRect);
+      // window.removeEventListener('scroll', updateTargetRect);
     };
   }, [stepIndex]);
 
-  if (hasSeenReaderTutorial || !isVisible || !targetRect) return null;
+  if ((hasSeenReaderTutorial && !alwaysReplayOnboarding) || !isVisible || !targetRect) return null;
 
   const currentStep = readerSteps[stepIndex];
 
@@ -100,17 +118,17 @@ export function ReaderTutorial() {
       case 'bottom':
         return {
           top: targetRect.bottom + gap,
-          left: Math.max(16, Math.min(window.innerWidth - 336, targetRect.left + targetRect.width / 2 - 160)),
+          left: tooltipLeft,
         };
       case 'top':
         return {
           bottom: window.innerHeight - targetRect.top + gap,
-          left: Math.max(16, Math.min(window.innerWidth - 336, targetRect.left + targetRect.width / 2 - 160)),
+          left: tooltipLeft,
         };
       default:
         return {
           top: targetRect.bottom + gap,
-          left: targetRect.left,
+          left: tooltipLeft,
         };
     }
   };
@@ -171,8 +189,11 @@ export function ReaderTutorial() {
         <div 
           className={cn(
             "absolute w-3 h-3 bg-card border-l border-t rotate-45",
-            currentStep.position === 'bottom' ? "-top-1.5 left-1/2 -translate-x-1/2" : "-bottom-1.5 left-1/2 -translate-x-1/2"
+            currentStep.position === 'bottom' ? "-top-1.5" : "-bottom-1.5"
           )}
+          style={{
+            left: Math.max(12, Math.min(320 - 24, targetRect.left + targetRect.width / 2 - tooltipLeft - 6))
+          }}
         />
       </motion.div>
     </div>

@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { useOnboardingStore } from '@/stores/onboarding';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, RefreshCw } from 'lucide-react';
+import { HelpCircle, RefreshCw, Wrench } from 'lucide-react';
+import { useIsAdmin } from '@/lib/admin';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
@@ -47,6 +48,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default function Settings() {
   const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
     useReadingProgressStore();
+  const { alwaysReplayOnboarding, setAlwaysReplayOnboarding } = useOnboardingStore();
+  const isAdmin = useIsAdmin();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
@@ -195,6 +198,22 @@ export default function Settings() {
                 <span>Restart Onboarding</span>
               </div>
             </button>
+
+            {isAdmin && user?.email === 'mouslim89@gmail.com' && (
+              <div className="flex items-center justify-between px-4 py-4">
+                <div className="flex items-center gap-3">
+                  <Wrench className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Always replay onboarding</span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Admin only</span>
+                  </div>
+                </div>
+                <Switch 
+                  checked={alwaysReplayOnboarding} 
+                  onCheckedChange={setAlwaysReplayOnboarding} 
+                />
+              </div>
+            )}
           </div>
         </section>
 

@@ -1386,52 +1386,52 @@ export default function Reader() {
  const editClass = tokenEditMode
  ?`outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ?'bg-primary/30 outline-primary':''}`:'';
 
- const tokenNode = (
-  <ReaderToken
-  key={i}
-  token={token}
-  showFurigana={showFurigana}
-  colorClass={`${colorClass} ${editClass}`.trim()}
-  isHighlighted={isHighlighted && !tokenEditMode}
-  knownLevel={knownLevel}
-  data-tutorial={i === 0 && globalIdx === 0 ? "token" : undefined}
+  const tokenNode = (
+   <ReaderToken
+   key={i}
+   token={token}
+   showFurigana={showFurigana}
+   colorClass={`${colorClass} ${editClass}`.trim()}
+   isHighlighted={isHighlighted && !tokenEditMode}
+   knownLevel={knownLevel}
+   data-tutorial={token.j && globalIdx === 0 && sentence.tokens.slice(0, i).every(t => !t.j) ? "token" : undefined}
 
- onTap={() => {
- if (tokenEditMode) {
- // Suppress tap if a drag-select just happened.
- if (dragRef.current.moved) { dragRef.current.moved = false; return; }
- if (selectedIdx.length > 0) {
- setSelectedIdx((arr) =>
- arr.includes(tokKey) ? arr.filter((k) => k !== tokKey) : [...arr, tokKey].sort((a, b) => a - b)
- );
- } else {
- setEditPanel({ matchedIdx: [tokKey] });
- }
- return;
- }
- if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
- setMiniPopup(null);
- return;
- }
- const spanEl = sentenceRefs.current.get(globalIdx);
- const rect = spanEl?.getBoundingClientRect();
- if (!rect) return;
- setSentenceTranslation(null);
- setLevelOpen(false);
- setMiniPopup({
- text: token.t,
- baseForm: token.b,
- reading: token.r,
- pos: token.p,
- contextSentence: sentenceText,
- contextTokens: sentence.tokens.map(t => ({ t: t.t, r: t.r })),
- sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
- sentenceIdx: globalIdx,
- tokenIdx: i,
- });
- }}
- />
- );
+  onTap={() => {
+  if (tokenEditMode) {
+  // Suppress tap if a drag-select just happened.
+  if (dragRef.current.moved) { dragRef.current.moved = false; return; }
+  if (selectedIdx.length > 0) {
+  setSelectedIdx((arr) =>
+  arr.includes(tokKey) ? arr.filter((k) => k !== tokKey) : [...arr, tokKey].sort((a, b) => a - b)
+  );
+  } else {
+  setEditPanel({ matchedIdx: [tokKey] });
+  }
+  return;
+  }
+  if (miniPopup && miniPopup.sentenceIdx === globalIdx && miniPopup.tokenIdx === i) {
+  setMiniPopup(null);
+  return;
+  }
+  const spanEl = sentenceRefs.current.get(globalIdx);
+  const rect = spanEl?.getBoundingClientRect();
+  if (!rect) return;
+  setSentenceTranslation(null);
+  setLevelOpen(false);
+  setMiniPopup({
+  text: token.t,
+  baseForm: token.b,
+  reading: token.r,
+  pos: token.p,
+  contextSentence: sentenceText,
+  contextTokens: sentence.tokens.map(t => ({ t: t.t, r: t.r })),
+  sentenceRect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+  sentenceIdx: globalIdx,
+  tokenIdx: i,
+  });
+  }}
+  />
+  );
 
  if (!tokenEditMode) return tokenNode;
 
