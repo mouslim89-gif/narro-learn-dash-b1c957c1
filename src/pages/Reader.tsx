@@ -1002,25 +1002,25 @@ export default function Reader() {
  </PopoverContent>
  </Popover>
  <div className="flex items-center gap-1">
- <HeaderChip
-
- onClick={() => setShowFurigana(!showFurigana)}
- active={showFurigana}
- title={showFurigana ?'Hide Furigana':'Show Furigana'}
- >
- {showFurigana ? <Eye className="h-5 w-5"/> : <EyeClosed className="h-5 w-5"/>}
- </HeaderChip>
- <HeaderChip
-
- onClick={handleToggleTranslations}
- active={showTranslations}
- title={showTranslations ?'Hide translations':'Show translations'}
- >
- <Languages className="h-5 w-5"/>
- </HeaderChip>
+  <HeaderChip
+    onClick={() => setShowFurigana(!showFurigana)}
+    active={showFurigana}
+    title={showFurigana ? 'Hide Furigana' : 'Show Furigana'}
+    data-tutorial="furigana"
+  >
+    {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
+  </HeaderChip>
+  <HeaderChip
+    onClick={handleToggleTranslations}
+    active={showTranslations}
+    title={showTranslations ? 'Hide translations' : 'Show translations'}
+    data-tutorial="translation"
+  >
+    <Languages className="h-5 w-5" />
+  </HeaderChip>
 
   <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
-  <BookType className="h-5 w-5"/>
+    <span className="font-serif text-[17px] font-bold leading-none">文</span>
   </HeaderChip>
    <HeaderChip
 
