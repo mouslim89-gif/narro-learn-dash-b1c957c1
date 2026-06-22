@@ -1634,6 +1634,8 @@ export default function Reader() {
  }}
  />
  )}
- </div>
+  <ReaderTutorial />
+  </div>
+
  );
 }
