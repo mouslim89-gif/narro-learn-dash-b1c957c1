@@ -976,19 +976,19 @@ export default function Reader() {
  <PopoverContent align="center"sideOffset={8} className="w-auto p-2 rounded-2xl">
  <div className="flex flex-col gap-1.5">
  <p className="px-2 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Reading level</p>
- <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
+ <div className="flex gap-1 rounded-full bg-muted p-1">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
   <button
   key={d}
    onClick={() => handleChangeDifficulty(d)}
-  className={cn("relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors transition-all duration-200",
+  className={cn('relative h-8 px-4 rounded-full text-xs font-semibold smooth-colors flex items-center justify-center',
   d === difficulty ? 'text-foreground' : 'text-muted-foreground',
   )}
   >
     {d === difficulty && (
       <motion.div
         layoutId="seg-difficulty-reader-mini"
-        className="absolute inset-0 rounded-full bg-card relief-raised"
+        className="absolute inset-0 rounded-full bg-card shadow-sm ring-1 ring-border/40"
         transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
       />
     )}
@@ -1064,17 +1064,17 @@ export default function Reader() {
  <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
  <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
  <span className="text-[15px] font-medium">Reading level</span>
- <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1 self-stretch sm:self-auto">
+ <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
  {(Object.keys(difficultyConfig) as Difficulty[]).map((d) => (
   <button
   key={d}
   onClick={() => handleChangeDifficulty(d)}
-  className={cn("relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors transition-all duration-200", d === difficulty ? 'text-foreground' : 'text-muted-foreground')}
+  className={cn(pillBase,'relative flex-1 sm:flex-none', d === difficulty ? 'text-foreground' : 'text-muted-foreground')}
   >
     {d === difficulty && (
       <motion.div
         layoutId="seg-difficulty-reader-panel"
-        className="absolute inset-0 rounded-full bg-card relief-raised"
+        className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
         transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
       />
     )}
@@ -1085,17 +1085,17 @@ export default function Reader() {
  </div>
  <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
  <span className="text-[15px] font-medium">Font size</span>
- <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1 self-stretch sm:self-auto">
+ <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
  {fontSizes.map((s) => (
   <button
   key={s}
   onClick={() => setFontSize(s)}
-  className={cn("relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors transition-all duration-200", s === fontSize ? 'text-foreground' : 'text-muted-foreground')}
+  className={cn('relative h-7 rounded-full text-sm font-semibold smooth-colors flex-1 sm:w-9 sm:flex-none', s === fontSize ? 'text-foreground' : 'text-muted-foreground')}
   >
     {s === fontSize && (
       <motion.div
         layoutId="seg-fontsize-reader"
-        className="absolute inset-0 rounded-full bg-card relief-raised"
+        className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
         transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
       />
     )}
@@ -1106,17 +1106,17 @@ export default function Reader() {
  </div>
  <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
  <span className="text-[15px] font-medium">Japanese font</span>
- <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1 self-stretch sm:self-auto">
+ <div className="flex gap-1 rounded-full bg-muted p-1 self-stretch sm:self-auto">
  {japaneseFonts.map((f) => (
   <button
   key={f.value}
   onClick={() => setJapaneseFont(f.value)}
-  className={cn("relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors transition-all duration-200", f.value === japaneseFont ? 'text-foreground' : 'text-muted-foreground')}
+  className={cn(pillBase,'relative flex-1 sm:flex-none', f.value === japaneseFont ? 'text-foreground' : 'text-muted-foreground')}
   >
     {f.value === japaneseFont && (
       <motion.div
         layoutId="seg-jpfont-reader"
-        className="absolute inset-0 rounded-full bg-card relief-raised"
+        className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
         transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
       />
     )}
