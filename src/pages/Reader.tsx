@@ -1387,13 +1387,15 @@ export default function Reader() {
  ?`outline outline-1 outline-border/60 rounded-sm mx-[1px] ${isSelected ?'bg-primary/30 outline-primary':''}`:'';
 
  const tokenNode = (
- <ReaderToken
- key={i}
- token={token}
- showFurigana={showFurigana}
- colorClass={`${colorClass} ${editClass}`.trim()}
- isHighlighted={isHighlighted && !tokenEditMode}
- knownLevel={knownLevel}
+  <ReaderToken
+  key={i}
+  token={token}
+  showFurigana={showFurigana}
+  colorClass={`${colorClass} ${editClass}`.trim()}
+  isHighlighted={isHighlighted && !tokenEditMode}
+  knownLevel={knownLevel}
+  data-tutorial={i === 0 && globalIdx === 0 ? "token" : undefined}
+
  onTap={() => {
  if (tokenEditMode) {
  // Suppress tap if a drag-select just happened.
