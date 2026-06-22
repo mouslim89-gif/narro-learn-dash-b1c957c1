@@ -146,20 +146,20 @@ export default function Settings() {
 
             <div className="flex items-center justify-between px-4 py-4">
               <Label className="text-[15px] font-medium">Font size</Label>
-              <div className="flex gap-1 rounded-full bg-muted p-1">
+              <div className="rounded-full bg-muted/60 p-1 ring-1 ring-border/40 grid grid-cols-3 gap-1">
                 {fontSizeOptions.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setFontSize(opt.value)}
                     className={cn(
-                      'relative h-7 w-9 rounded-full text-sm font-semibold smooth-colors',
+                      'relative rounded-full px-3 py-2 text-[12px] font-semibold tracking-wide smooth-colors transition-all duration-200',
                       fontSize === opt.value ? 'text-foreground' : 'text-muted-foreground'
                     )}
                   >
                     {fontSize === opt.value && (
                       <motion.div
                         layoutId="seg-fontsize-settings"
-                        className="absolute inset-0 rounded-full bg-card relief-raised ring-1 ring-border/40"
+                        className="absolute inset-0 rounded-full bg-card relief-raised"
                         transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
                       />
                     )}
