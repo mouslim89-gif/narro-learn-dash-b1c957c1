@@ -19,7 +19,9 @@ import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { ReaderToken } from '@/components/ReaderToken';
 import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
+import { ReaderTutorial } from '@/components/onboarding/ReaderTutorial';
 import { Progress } from '@/components/ui/progress';
+
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
 import { toast } from '@/hooks/use-toast';
 
