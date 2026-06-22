@@ -3,7 +3,7 @@ import { useDelayedNav } from "@/hooks/use-delayed-nav";
 import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Globe, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasParts, parsePartId, partChapterId } from '@/data/books';
@@ -1016,11 +1016,11 @@ export default function Reader() {
     title={showTranslations ? 'Hide translations' : 'Show translations'}
     data-tutorial="translation"
   >
-    <Globe className="h-5 w-5" />
+    <Languages className="h-5 w-5" />
   </HeaderChip>
 
   <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
-    <BookType className="h-5 w-5" />
+    <span className="font-serif text-[17px] font-bold leading-none">文</span>
   </HeaderChip>
    <HeaderChip
 
@@ -1155,7 +1155,7 @@ export default function Reader() {
  </div>
  <div className="flex items-center justify-between gap-3 px-4 py-4">
  <span className="flex items-center gap-2 text-[15px] font-medium">
- <Globe className="h-4 w-4 text-muted-foreground"/>
+ <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
  <Switch checked={showTranslations} onCheckedChange={handleToggleTranslations} />
