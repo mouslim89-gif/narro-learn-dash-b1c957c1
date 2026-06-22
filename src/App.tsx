@@ -107,7 +107,9 @@ const App = () => (
  <AuthProvider>
  <DarkModeSync />
  <CloudSyncMount />
- <AnimatedRoutes />
+  <OnboardingCarousel />
+  <AnimatedRoutes />
+
  </AuthProvider>
  </BrowserRouter>
  </TooltipProvider>
