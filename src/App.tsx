@@ -6,8 +6,10 @@ import { Toaster } from"@/components/ui/toaster";
 import { TooltipProvider } from"@/components/ui/tooltip";
 import { AnimatePresence, motion } from"framer-motion";
 import { BottomNav } from"@/components/BottomNav";
+import { OnboardingCarousel } from "@/components/onboarding/OnboardingCarousel";
 import { AuthProvider, useAuth } from"@/contexts/AuthContext";
 import { ProtectedRoute } from"@/components/ProtectedRoute";
+
 import { useCloudSync } from"@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from"@/stores/reading-progress";
 import { useFlashcardStore } from"@/stores/flashcards";
