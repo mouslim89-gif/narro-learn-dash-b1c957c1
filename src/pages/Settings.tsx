@@ -4,7 +4,10 @@ import { useState, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
+import { useOnboardingStore } from '@/stores/onboarding';
 import { Button } from '@/components/ui/button';
+import { HelpCircle, RefreshCw } from 'lucide-react';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { cn } from '@/lib/utils';
