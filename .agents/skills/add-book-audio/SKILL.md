@@ -2,7 +2,6 @@
 name: add-book-audio
 description: Automates adding synchronized audio playback and UI controls to books.
 ---
-
 # Add Book Audio Skill
 
 This skill automates the process of adding audio capabilities to books in the Tsundoku application. It handles everything from data structure updates to UI component integration for synchronized audio playback.
