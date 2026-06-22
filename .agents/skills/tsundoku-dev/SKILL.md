@@ -1,4 +1,5 @@
 ---
+name: tsundoku-dev
 description: Analyse l'état de l'application Tsundoku et propose des étapes de développement stratégiques.
 ---
 # Skill : Développement Tsundoku
