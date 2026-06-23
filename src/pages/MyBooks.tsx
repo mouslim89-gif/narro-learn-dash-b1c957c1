@@ -10,6 +10,7 @@ import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
+import { ContributionGraph } from '@/components/my-books/ContributionGraph';
 import { useDelayed } from'@/hooks/use-delayed';
 
 export default function MyBooks() {
@@ -116,10 +117,14 @@ export default function MyBooks() {
  <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
  </div>
  ))}
- </div>
- )}
+  </div>
+  )}
 
- {bookProgressList.length === 0 ? (
+  {bookProgressList.length > 0 && (
+    <ContributionGraph readDateStrings={stats.readDateStrings} />
+  )}
+
+  {bookProgressList.length === 0 ? (
  <div className={`mt-24 flex flex-col items-center text-center transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
  <BookOpen className="h-9 w-9 text-primary"/>
