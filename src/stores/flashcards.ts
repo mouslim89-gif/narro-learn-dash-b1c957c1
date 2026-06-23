@@ -73,6 +73,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
       syncUserId: null,
       dailyGoal: 10,
       reviewedToday: { date: new Date().toISOString().split('T')[0], count: 0 },
+      history: [],
       setIsReviewing: (v) => set({ isReviewing: v }),
       setDailyGoal: (v) => set({ dailyGoal: v }),
       addWord: (entry) => {
