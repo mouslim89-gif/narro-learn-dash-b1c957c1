@@ -52,15 +52,15 @@ export function SplashScreen() {
           <motion.div 
             layout 
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-4"
           >
             {/* Vertical Stack of Bars (Books) */}
-            <div className="flex flex-col items-end gap-1 overflow-hidden">
+            <div className="flex flex-col items-end gap-2 overflow-hidden">
               {[1, 2, 3].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-[7px] bg-foreground rounded-[1px] w-10"
-                  initial={{ x: 60, opacity: 0 }}
+                  className="h-[13px] bg-foreground rounded-[1px] w-7"
+                  initial={{ x: 80, opacity: 0 }}
                   animate={{ 
                     x: 0, 
                     opacity: 1,
@@ -80,8 +80,8 @@ export function SplashScreen() {
               {"Tsundoku".split("").map((letter, i) => (
                 <motion.span
                   key={i}
-                  className="wordmark text-4xl font-serif font-black text-foreground inline-block"
-                  initial={{ y: 40, opacity: 0 }}
+                  className="wordmark text-6xl font-serif font-black text-foreground inline-block"
+                  initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ 
                     delay: 0.1 + (i * 0.06),
@@ -103,7 +103,7 @@ export function SplashScreen() {
 function StaticSplashContent() {
   return (
     <div className="flex flex-col items-center max-w-xs w-full text-center">
-      <div className="wordmark text-5xl font-serif font-black text-foreground mb-2">
+      <div className="wordmark text-6xl font-serif font-black text-foreground mb-2">
         Tsundoku
       </div>
       <div className="h-0.5 bg-accent w-24 mx-auto mb-3" />
