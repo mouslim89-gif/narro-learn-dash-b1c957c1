@@ -29,6 +29,7 @@ interface FlashcardStore {
   syncUserId: string | null;
   dailyGoal: number;
   reviewedToday: { date: string; count: number };
+  history: { date: string; count: number }[];
   setIsReviewing: (v: boolean) => void;
   setDailyGoal: (v: number) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
@@ -72,6 +73,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
       syncUserId: null,
       dailyGoal: 10,
       reviewedToday: { date: new Date().toISOString().split('T')[0], count: 0 },
+      history: [],
       setIsReviewing: (v) => set({ isReviewing: v }),
       setDailyGoal: (v) => set({ dailyGoal: v }),
       addWord: (entry) => {
@@ -133,9 +135,20 @@ export const useFlashcardStore = create<FlashcardStore>()(
           return { ...migrated, ...result };
         });
 
+        // Update history
+        let newHistory = [...get().history];
+        const histIdx = newHistory.findIndex(h => h.date === today);
+        if (histIdx >= 0) {
+          newHistory[histIdx] = { date: today, count: newCount };
+        } else {
+          newHistory.push({ date: today, count: newCount });
+          if (newHistory.length > 90) newHistory.shift(); // Keep 90 days
+        }
+
         set({ 
           savedWords: updated,
-          reviewedToday: { date: today, count: newCount }
+          reviewedToday: { date: today, count: newCount },
+          history: newHistory
         });
         
         const uid = get().syncUserId;
@@ -165,9 +178,14 @@ export const useFlashcardStore = create<FlashcardStore>()(
  set({ savedWords: [], syncUserId: null });
  },
  }),
- {
- name:'yomimasu-flashcards',
- partialize: (state) => ({ savedWords: state.savedWords }),
+  {
+    name: 'yomimasu-flashcards',
+    partialize: (state) => ({ 
+      savedWords: state.savedWords,
+      dailyGoal: state.dailyGoal,
+      reviewedToday: state.reviewedToday,
+      history: state.history
+    }),
  onRehydrateStorage: () => (state) => {
  if (state) state.isReviewing = false;
  },

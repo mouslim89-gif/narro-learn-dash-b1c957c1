@@ -3,11 +3,13 @@ import { DelayedLink as Link } from'@/components/DelayedLink';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasParts, partChapterId, DEFAULT_CHAPTER_ID, type Difficulty } from'@/data/books';
 
-import { useEffect, useState } from'react';
-import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight } from'lucide-react';
+import { useEffect, useState, useMemo } from'react';
+import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
+import { useFlashcardStore } from '@/stores/flashcards';
+import { loadBookTokens, type BookTokenMap } from '@/data/book-tokens';
 import { cn } from'@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -15,20 +17,48 @@ export default function BookDetail() {
  const { id } = useParams();
  const goTo = useDelayedNav();
  const book = books.find((b) => b.id === id);
- const { getBookProgress, getChapterProgress } = useReadingProgressStore();
- const bookProgress = id ? getBookProgress(id) : undefined;
- const hasProgress = !!bookProgress && bookProgress.progressPercent > 0;
+  const { getBookProgress, getChapterProgress } = useReadingProgressStore();
+  const { savedWords } = useFlashcardStore();
+  const bookProgress = id ? getBookProgress(id) : undefined;
+  const hasProgress = !!bookProgress && bookProgress.progressPercent > 0;
 
- const [difficulty, setDifficulty] = useState<Difficulty>(
- bookProgress?.difficulty ||'simplified');
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    bookProgress?.difficulty || 'simplified'
+  );
 
- const [scrolled, setScrolled] = useState(false);
- useEffect(() => {
- const onScroll = () => setScrolled(window.scrollY > 120);
- onScroll();
- window.addEventListener('scroll', onScroll, { passive: true });
- return () => window.removeEventListener('scroll', onScroll);
- }, []);
+  const [tokens, setTokens] = useState<BookTokenMap | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 120);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (book?.id) {
+      loadBookTokens(book.id).then(setTokens);
+    }
+  }, [book?.id]);
+
+  const bookWords = useMemo(() => {
+    if (!tokens || !savedWords.length) return [];
+    
+    const uniqueBookWords = new Set<string>();
+    Object.values(tokens).forEach(chapterDict => {
+      Object.values(chapterDict).forEach(tokenList => {
+        tokenList.forEach(t => {
+          if (t.j) {
+            uniqueBookWords.add(t.t);
+            if (t.b) uniqueBookWords.add(t.b);
+          }
+        });
+      });
+    });
+
+    return savedWords.filter(sw => uniqueBookWords.has(sw.word));
+  }, [tokens, savedWords]);
 
  if (!book) {
  return (
@@ -247,8 +277,40 @@ export default function BookDetail() {
  )}
  </div>
  <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
- </div>
- </div>
+      {bookWords.length > 0 && (
+        <section className="mt-10 pb-4">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="font-serif text-lg font-semibold">Learning in this book</h2>
+            <span className="text-[11px] tabular-nums text-muted-foreground uppercase tracking-wider">{bookWords.length} words</span>
+          </div>
+          <div className="no-scrollbar -mx-6 flex gap-3 overflow-x-auto px-6">
+            {bookWords.map(w => (
+              <Link
+                key={w.id}
+                to={`/dictionary/${encodeURIComponent(w.word)}`}
+                className="flex min-w-[130px] flex-col rounded-xl border border-border/40 bg-card p-3 shadow-sm tap-scale-sm"
+              >
+                <p className="font-japanese text-[17px] font-bold leading-tight">{w.word}</p>
+                <p className="mt-0.5 font-japanese text-[11px] text-muted-foreground truncate">{w.reading}</p>
+                <div className="mt-3 flex items-center gap-1.5">
+                  <div className="h-1 flex-1 rounded-full bg-muted/60 overflow-hidden">
+                    <div 
+                      className={cn(
+                        "h-full rounded-full transition-all duration-500",
+                        w.mastery >= 3 ? "bg-[hsl(var(--state-known))]" : w.mastery > 0 ? "bg-[hsl(var(--state-learning))]" : "bg-[hsl(var(--state-new))]"
+                      )}
+                      style={{ width: `${Math.max(15, (w.mastery / 5) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-[9px] font-bold tabular-nums text-foreground/50">{Math.round((w.mastery / 5) * 100)}%</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </div>
  </Link>
  </li>
  );
