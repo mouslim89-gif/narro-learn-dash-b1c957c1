@@ -42,16 +42,83 @@ export function FlashcardReview({ deck, onExit }: Props) {
  }, 200);
  }, []);
 
- if (currentIdx >= localDeck.length) {
- return (
- <div className="fixed inset-0 z-[60] flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-6">
- <span className="text-6xl">🎉</span>
- <p className="font-serif text-3xl tracking-tight">Session complete</p>
- <p className="text-sm text-muted-foreground">{localDeck.length} cards reviewed</p>
- <Button onClick={onExit} className="mt-2 rounded-full px-8">Done</Button>
- </div>
- );
- }
+  const { dailyGoal, getReviewedTodayCount } = useFlashcardStore();
+  const reviewedToday = getReviewedTodayCount();
+  const goalReached = reviewedToday >= dailyGoal;
+  const initialGoalReached = useRef(reviewedToday >= dailyGoal);
+
+  useEffect(() => {
+    if (currentIdx >= localDeck.length && goalReached && !initialGoalReached.current) {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff']
+      });
+    }
+  }, [currentIdx, localDeck.length, goalReached]);
+
+  if (currentIdx >= localDeck.length) {
+    return (
+      <div className="fixed inset-0 z-[60] flex flex-col bg-background px-6 overflow-y-auto">
+        <div className="flex-1 flex flex-col items-center justify-center py-12">
+          <div className="relative mb-8">
+            <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+              <Trophy className="h-12 w-12 text-primary" />
+            </div>
+          </div>
+          
+          <h2 className="font-serif text-3xl font-bold tracking-tight text-center">Session Complete!</h2>
+          <p className="mt-2 text-muted-foreground text-center max-w-[280px]">
+            You've just strengthened your memory for {localDeck.length} words.
+          </p>
+
+          <div className="mt-10 w-full max-w-sm space-y-4">
+            <div className="rounded-2xl border border-border/40 bg-card p-4 flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/10 text-orange-500">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Words Reviewed</p>
+                <p className="font-serif text-xl font-bold">{localDeck.length}</p>
+              </div>
+            </div>
+
+            <div className={cn(
+              "rounded-2xl border p-4 flex items-center justify-between transition-colors",
+              goalReached ? "bg-primary/5 border-primary/20" : "bg-card border-border/40"
+            )}>
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-full transition-colors",
+                  goalReached ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                )}>
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Daily Goal</p>
+                  <p className="font-serif text-xl font-bold">
+                    {reviewedToday} <span className="text-sm font-normal text-muted-foreground">/ {dailyGoal}</span>
+                  </p>
+                </div>
+              </div>
+              {goalReached && (
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-bold uppercase text-primary">Goal Met</span>
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Button onClick={onExit} size="lg" className="mt-12 w-full max-w-sm rounded-full relief-premium">
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
  const card = localDeck[currentIdx];
  const progressPct = ((currentIdx + 1) / localDeck.length) * 100;
