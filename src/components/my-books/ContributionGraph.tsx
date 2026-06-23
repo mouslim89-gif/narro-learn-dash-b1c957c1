@@ -64,7 +64,7 @@ export function ContributionGraph({ readDateStrings }: ContributionGraphProps) {
                           className={cn(
                             "h-3 w-3 rounded-[2px] transition-colors duration-300",
                             isRead 
-                              ? "bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]" 
+                              ? "bg-primary shadow-sm shadow-primary/20" 
                               : "bg-muted/40",
                             isToday && !isRead && "ring-1 ring-primary/30"
                           )}
