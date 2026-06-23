@@ -3,11 +3,13 @@ import { DelayedLink as Link } from'@/components/DelayedLink';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasParts, partChapterId, DEFAULT_CHAPTER_ID, type Difficulty } from'@/data/books';
 
-import { useEffect, useState } from'react';
-import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight } from'lucide-react';
+import { useEffect, useState, useMemo } from'react';
+import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
+import { useFlashcardStore } from '@/stores/flashcards';
+import { loadBookTokens, type BookTokenMap } from '@/data/book-tokens';
 import { cn } from'@/lib/utils';
 import { motion } from 'framer-motion';
 
