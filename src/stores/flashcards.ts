@@ -121,26 +121,40 @@ export const useFlashcardStore = create<FlashcardStore>()(
  const w = updated.find(x => x.id === id);
  if (uid && w) schedulePush(uid, w);
  },
- adjustMastery: (id, quality) => {
- const updated = get().savedWords.map(w => {
- if (w.id !== id) return w;
- const migrated = migrateCard(w);
- const result = applyReview(migrated, QUALITY_MAP[quality]);
- return { ...migrated, ...result };
- });
- set({ savedWords: updated });
- const uid = get().syncUserId;
- const w = updated.find(x => x.id === id);
- if (uid && w) schedulePush(uid, w);
- },
- getDueCount: () => {
- const now = new Date().toISOString();
- return get().savedWords.filter(w => !w.nextReviewAt || w.nextReviewAt <= now).length;
- },
- getDueWords: () => {
- const now = new Date().toISOString();
- return get().savedWords.filter(w => !w.nextReviewAt || w.nextReviewAt <= now);
- },
+      adjustMastery: (id, quality) => {
+        const today = new Date().toISOString().split('T')[0];
+        const currentReviewed = get().reviewedToday;
+        const newCount = currentReviewed.date === today ? currentReviewed.count + 1 : 1;
+
+        const updated = get().savedWords.map(w => {
+          if (w.id !== id) return w;
+          const migrated = migrateCard(w);
+          const result = applyReview(migrated, QUALITY_MAP[quality]);
+          return { ...migrated, ...result };
+        });
+
+        set({ 
+          savedWords: updated,
+          reviewedToday: { date: today, count: newCount }
+        });
+        
+        const uid = get().syncUserId;
+        const w = updated.find(x => x.id === id);
+        if (uid && w) schedulePush(uid, w);
+      },
+      getDueCount: () => {
+        const now = new Date().toISOString();
+        return get().savedWords.filter(w => !w.nextReviewAt || w.nextReviewAt <= now).length;
+      },
+      getDueWords: () => {
+        const now = new Date().toISOString();
+        return get().savedWords.filter(w => !w.nextReviewAt || w.nextReviewAt <= now);
+      },
+      getReviewedTodayCount: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const reviewed = get().reviewedToday;
+        return reviewed.date === today ? reviewed.count : 0;
+      },
  hydrateWords: (words, userId) => set({
  savedWords: words.map(migrateCard),
  syncUserId: userId,
