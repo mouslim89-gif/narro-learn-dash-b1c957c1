@@ -48,102 +48,65 @@ export function SplashScreen() {
           transition={{ duration: 0.12 }}
           className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background p-6"
         >
-          <div className="flex flex-col items-center max-w-xs w-full text-center">
-            {/* Abstract Minimalist Book Stack */}
-            <div className="relative h-48 w-full flex items-end justify-center mb-10">
-              <motion.svg 
-                viewBox="0 0 200 180" 
-                className="w-56 h-48"
-                initial="initial"
-                animate="animate"
-              >
-                {/* Book 1 (Bottom) */}
-                <motion.rect
-                  x="40" y="150" width="120" height="4" rx="2"
-                  fill="hsl(var(--primary))"
-                  variants={{
-                    initial: { x: -200, opacity: 0 },
-                    animate: { x: 0, opacity: 1, transition: { delay: 0.1, type: 'spring', stiffness: 300, damping: 25 } }
-                  }}
-                />
+          <div className="flex flex-col items-center max-w-sm w-full text-center">
+            {/* Minimalist Centered Wordmark with Sidebar Books */}
+            <div className="relative flex items-center mb-4">
+              {/* Vertical Stack of Bars (Books) docking to the left of "T" */}
+              <div className="absolute right-full mr-4 flex flex-col items-end gap-1.5">
+                {[32, 48, 24, 40].map((width, i) => (
+                  <motion.div
+                    key={i}
+                    className="h-1 rounded-full bg-foreground"
+                    style={{ width }}
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ 
+                      x: 0, 
+                      opacity: 1,
+                      transition: { 
+                        delay: 0.2 + (i * 0.1),
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 25
+                      }
+                    }}
+                  />
+                ))}
+              </div>
 
-                {/* Book 2 */}
-                <motion.rect
-                  x="45" y="140" width="110" height="4" rx="2"
-                  fill="hsl(var(--muted-foreground))"
-                  variants={{
-                    initial: { x: -200, opacity: 0 },
-                    animate: { x: 0, opacity: 1, transition: { delay: 0.2, type: 'spring', stiffness: 300, damping: 25 } }
-                  }}
-                />
-
-                {/* Book 3 */}
-                <motion.rect
-                  x="50" y="130" width="100" height="4" rx="2"
-                  fill="hsl(var(--accent))"
-                  variants={{
-                    initial: { x: -200, opacity: 0 },
-                    animate: { x: 0, opacity: 1, transition: { delay: 0.3, type: 'spring', stiffness: 300, damping: 25 } }
-                  }}
-                />
-
-                {/* Book 4 */}
-                <motion.rect
-                  x="55" y="120" width="90" height="4" rx="2"
-                  fill="hsl(var(--primary))"
-                  variants={{
-                    initial: { x: -200, opacity: 0 },
-                    animate: { x: 0, opacity: 1, transition: { delay: 0.4, type: 'spring', stiffness: 300, damping: 25 } }
-                  }}
-                />
-
-                {/* Book 5 (Top) */}
-                <motion.rect
-                  x="60" y="110" width="80" height="4" rx="2"
-                  fill="hsl(var(--secondary-foreground))"
-                  variants={{
-                    initial: { x: -200, opacity: 0 },
-                    animate: { x: 0, opacity: 1, transition: { delay: 0.5, type: 'spring', stiffness: 300, damping: 25 } }
-                  }}
-                />
-              </motion.svg>
-            </div>
-
-            {/* Wordmark */}
-            <div className="relative mb-4">
-              <motion.div className="flex gap-0.5 overflow-hidden">
+              {/* Wordmark */}
+              <div className="flex gap-0.5 overflow-hidden">
                 {"Tsundoku".split("").map((letter, i) => (
                   <motion.span
                     key={i}
-                    className="wordmark text-5xl font-serif font-black text-foreground inline-block"
-                    initial={{ y: 50, opacity: 0 }}
+                    className="wordmark text-6xl font-serif font-black text-foreground inline-block"
+                    initial={{ y: 60, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ 
-                      delay: 0.85 + (i * 0.04),
-                      duration: 0.4,
+                      delay: 0.6 + (i * 0.04),
+                      duration: 0.5,
                       ease: [0.22, 1, 0.36, 1]
                     }}
                   >
                     {letter}
                   </motion.span>
                 ))}
-              </motion.div>
-              
-              {/* Underline */}
-              <motion.div 
-                className="h-0.5 bg-accent w-24 mx-auto mt-2"
-                initial={{ scaleX: 0, transformOrigin: 'center' }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 1.25, duration: 0.4 }}
-              />
+              </div>
             </div>
+            
+            {/* Underline */}
+            <motion.div 
+              className="h-0.5 bg-accent w-24 mx-auto mt-2"
+              initial={{ scaleX: 0, transformOrigin: 'center' }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 1.2, duration: 0.4 }}
+            />
 
             {/* Tagline */}
             <motion.p 
-              className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground"
+              className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.45, duration: 0.6 }}
+              transition={{ delay: 1.4, duration: 0.6 }}
             >
               Read. Tap. Remember.
             </motion.p>
