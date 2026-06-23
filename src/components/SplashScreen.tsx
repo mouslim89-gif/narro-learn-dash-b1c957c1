@@ -50,14 +50,13 @@ export function SplashScreen() {
         >
           <div className="flex flex-col items-center max-w-sm w-full text-center">
             {/* Minimalist Centered Wordmark with Sidebar Books */}
-            <div className="flex items-center gap-3 mb-4 translate-x-[-12px]">
+            <div className="flex items-center gap-3 translate-x-[-12px]">
               {/* Vertical Stack of Bars (Books) */}
               <div className="flex flex-col items-end gap-1.5">
-                {[40, 28, 48].map((width, i) => (
+                {[1, 2, 3].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="h-2 bg-foreground rounded-[1px]"
-                    style={{ width }}
+                    className="h-2 bg-foreground rounded-[1px] w-11"
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ 
                       x: 0, 
@@ -92,14 +91,6 @@ export function SplashScreen() {
                 ))}
               </div>
             </div>
-            
-            {/* Underline */}
-            <motion.div 
-              className="h-0.5 bg-accent w-20 mx-auto mt-2"
-              initial={{ scaleX: 0, transformOrigin: 'center' }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 1.4, duration: 0.4 }}
-            />
           </div>
         </motion.div>
       )}
