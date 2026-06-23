@@ -67,21 +67,24 @@ function schedulePush(userId: string, word: SavedWord) {
 export const useFlashcardStore = create<FlashcardStore>()(
  persist(
  (set, get) => ({
- savedWords: [],
- isReviewing: false,
- syncUserId: null,
- setIsReviewing: (v) => set({ isReviewing: v }),
- addWord: (entry) => {
- if (get().savedWords.find(w => w.id === entry.id)) return;
- const newWord: SavedWord = {
- ...entry,
- mastery: 0,
- easeFactor: 2.5,
- interval: 0,
- reps: 0,
- lapses: 0,
- nextReviewAt: new Date().toISOString(),
- };
+      savedWords: [],
+      isReviewing: false,
+      syncUserId: null,
+      dailyGoal: 10,
+      reviewedToday: { date: new Date().toISOString().split('T')[0], count: 0 },
+      setIsReviewing: (v) => set({ isReviewing: v }),
+      setDailyGoal: (v) => set({ dailyGoal: v }),
+      addWord: (entry) => {
+        if (get().savedWords.find(w => w.id === entry.id)) return;
+        const newWord: SavedWord = {
+          ...entry,
+          mastery: 0,
+          easeFactor: 2.5,
+          interval: 0,
+          reps: 0,
+          lapses: 0,
+          nextReviewAt: new Date().toISOString(),
+        };
  set({ savedWords: [...get().savedWords, newWord] });
  const uid = get().syncUserId;
  if (uid) schedulePush(uid, newWord);
