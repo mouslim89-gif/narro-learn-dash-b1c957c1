@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from'react';
+import { useState, useCallback, useRef, useEffect } from'react';
 import { SavedWord, useFlashcardStore } from'@/stores/flashcards';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
@@ -7,7 +7,8 @@ import { Button } from'@/components/ui/button';
 import { SrsButtons, type SrsQualityLabel } from'@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from'@/components/ui/alert-dialog';
 import { toRomaji } from'wanakana';
-import { Trash2, X, BookOpen, ChevronDown, Eye, EyeClosed } from'lucide-react';
+import { Trash2, X, BookOpen, ChevronDown, Eye, EyeClosed, Trophy, TrendingUp, Calendar } from'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface Props {
  deck: SavedWord[];
