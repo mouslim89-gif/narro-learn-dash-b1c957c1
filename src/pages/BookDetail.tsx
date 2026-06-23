@@ -246,38 +246,79 @@ export default function BookDetail() {
         </Button>
       </Link>
 
- {isMultiChapter && (
- <section className="mt-8">
- <div className="mb-3 flex items-baseline justify-between">
- <h2 className="font-serif text-lg font-semibold">Chapters</h2>
- <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
- </div>
- <ul className="space-y-2">
- {book.chapters!.map((ch, idx) => {
- const cp = chapterProgressMap[ch.id];
- const pct = cp?.progressPercent ?? 0;
- const done = pct >= 100;
- return (
- <li key={ch.id}>
- <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
-                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
-
- <div className="flex items-center gap-3">
- <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
- done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
- {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
- </span>
- <div className="min-w-0 flex-1">
- <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
- {pct > 0 && !done && (
- <div className="mt-1.5 flex items-center gap-2">
- <Progress value={pct} className="h-1 flex-1"/>
- <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
- </div>
- )}
- </div>
- <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
       {bookWords.length > 0 && (
+        <section className="mt-10 pb-4">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="font-serif text-lg font-semibold">Learning in this book</h2>
+            <span className="text-[11px] tabular-nums text-muted-foreground uppercase tracking-wider">{bookWords.length} words</span>
+          </div>
+          <div className="no-scrollbar -mx-6 flex gap-3 overflow-x-auto px-6">
+            {bookWords.map(w => (
+              <Link
+                key={w.id}
+                to={`/dictionary/${encodeURIComponent(w.word)}`}
+                className="flex min-w-[130px] flex-col rounded-xl border border-border/40 bg-card p-3 shadow-sm tap-scale-sm"
+              >
+                <p className="font-japanese text-[17px] font-bold leading-tight">{w.word}</p>
+                <p className="mt-0.5 font-japanese text-[11px] text-muted-foreground truncate">{w.reading}</p>
+                <div className="mt-3 flex items-center gap-1.5">
+                  <div className="h-1 flex-1 rounded-full bg-muted/60 overflow-hidden">
+                    <div 
+                      className={cn(
+                        "h-full rounded-full transition-all duration-500",
+                        w.mastery >= 3 ? "bg-[hsl(var(--state-known))]" : w.mastery > 0 ? "bg-[hsl(var(--state-learning))]" : "bg-[hsl(var(--state-new))]"
+                      )}
+                      style={{ width: `${Math.max(15, (w.mastery / 5) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-[9px] font-bold tabular-nums text-foreground/50">{Math.round((w.mastery / 5) * 100)}%</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {isMultiChapter && (
+        <section className="mt-8">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="font-serif text-lg font-semibold">Chapters</h2>
+            <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
+          </div>
+          <ul className="space-y-2">
+            {book.chapters!.map((ch, idx) => {
+              const cp = chapterProgressMap[ch.id];
+              const pct = cp?.progressPercent ?? 0;
+              const done = pct >= 100;
+              return (
+                <li key={ch.id}>
+                  <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
+                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
+                      <div className="flex items-center gap-3">
+                        <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
+                        done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
+                        {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                        <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
+                        {pct > 0 && !done && (
+                        <div className="mt-1.5 flex items-center gap-2">
+                        <Progress value={pct} className="h-1 flex-1"/>
+                        <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
+                        </div>
+                        )}
+                        </div>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
         <section className="mt-10 pb-4">
           <div className="mb-4 flex items-baseline justify-between">
             <h2 className="font-serif text-lg font-semibold">Learning in this book</h2>
