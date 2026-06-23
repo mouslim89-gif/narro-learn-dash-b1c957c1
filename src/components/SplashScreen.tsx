@@ -52,21 +52,21 @@ export function SplashScreen() {
             {/* Minimalist Centered Wordmark with Sidebar Books */}
             <div className="relative flex items-center mb-4">
               {/* Vertical Stack of Bars (Books) docking to the left of "T" */}
-              <div className="absolute right-full mr-4 flex flex-col items-end gap-1.5">
+              <div className="absolute right-full mr-4 flex flex-col items-end gap-2">
                 {[32, 48, 24, 40].map((width, i) => (
                   <motion.div
                     key={i}
-                    className="h-1 rounded-full bg-foreground"
+                    className="h-2 rounded-full bg-foreground"
                     style={{ width }}
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ 
                       x: 0, 
                       opacity: 1,
                       transition: { 
-                        delay: 0.2 + (i * 0.1),
+                        delay: 0.8 + (i * 0.1),
                         type: 'spring',
-                        stiffness: 300,
-                        damping: 25
+                        stiffness: 250,
+                        damping: 22
                       }
                     }}
                   />
@@ -82,7 +82,7 @@ export function SplashScreen() {
                     initial={{ y: 60, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ 
-                      delay: 0.6 + (i * 0.04),
+                      delay: 0.1 + (i * 0.06),
                       duration: 0.5,
                       ease: [0.22, 1, 0.36, 1]
                     }}
@@ -98,18 +98,8 @@ export function SplashScreen() {
               className="h-0.5 bg-accent w-24 mx-auto mt-2"
               initial={{ scaleX: 0, transformOrigin: 'center' }}
               animate={{ scaleX: 1 }}
-              transition={{ delay: 1.2, duration: 0.4 }}
+              transition={{ delay: 1.4, duration: 0.4 }}
             />
-
-            {/* Tagline */}
-            <motion.p 
-              className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground mt-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.4, duration: 0.6 }}
-            >
-              Read. Tap. Remember.
-            </motion.p>
           </div>
         </motion.div>
       )}
