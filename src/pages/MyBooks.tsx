@@ -11,7 +11,6 @@ import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
-import { DailyGoalCard } from '@/components/my-books/DailyGoalCard';
 import { useDelayed } from'@/hooks/use-delayed';
 
 export default function MyBooks() {
@@ -122,8 +121,7 @@ export default function MyBooks() {
   )}
 
   {bookProgressList.length > 0 && (
-    <div className="mt-6 space-y-6">
-      <DailyGoalCard />
+    <div className="mt-6">
       <ContributionGraph readDateStrings={stats.readDateStrings} />
     </div>
   )}
