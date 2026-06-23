@@ -52,20 +52,33 @@ export function SplashScreen() {
           <motion.div 
             layout 
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="flex items-center gap-4"
+            className="flex items-center"
           >
-            {/* Vertical Stack of Bars (Books) */}
-            <div className="flex flex-col items-end gap-2 overflow-hidden">
+            {/* Vertical Stack of Bars (Books) - Animates width to push title */}
+            <motion.div 
+              className="flex flex-col items-end gap-[6px] overflow-hidden"
+              initial={{ width: 0, opacity: 0, marginRight: 0 }}
+              animate={{ 
+                width: "auto", 
+                opacity: 1,
+                marginRight: 12, // Equivalent to gap-3
+                transition: { 
+                  delay: 0.8,
+                  duration: 0.5,
+                  ease: [0.22, 1, 0.36, 1]
+                }
+              }}
+            >
               {[1, 2, 3].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-[13px] bg-foreground rounded-[1px] w-7"
-                  initial={{ x: 80, opacity: 0 }}
+                  className="h-[11px] bg-foreground rounded-[1px] w-6"
+                  initial={{ x: 40, opacity: 0 }}
                   animate={{ 
                     x: 0, 
                     opacity: 1,
                     transition: { 
-                      delay: 0.8 + (i * 0.08),
+                      delay: 0.85 + (i * 0.08),
                       type: 'spring',
                       stiffness: 250,
                       damping: 25
@@ -73,14 +86,14 @@ export function SplashScreen() {
                   }}
                 />
               ))}
-            </div>
+            </motion.div>
 
             {/* Wordmark */}
             <div className="flex gap-0.5 overflow-hidden">
               {"Tsundoku".split("").map((letter, i) => (
                 <motion.span
                   key={i}
-                  className="wordmark text-6xl font-serif font-black text-foreground inline-block"
+                  className="wordmark text-[54px] font-serif font-black text-foreground inline-block"
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ 
