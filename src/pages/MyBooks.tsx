@@ -11,6 +11,7 @@ import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
+import { DailyGoalCard } from '@/components/my-books/DailyGoalCard';
 import { useDelayed } from'@/hooks/use-delayed';
 
 export default function MyBooks() {
