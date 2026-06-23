@@ -59,7 +59,7 @@ export function SplashScreen() {
               {[1, 2, 3].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-[13px] bg-foreground rounded-[1px] w-8"
+                  className="h-[13px] bg-foreground rounded-[1px] w-7"
                   initial={{ x: 80, opacity: 0 }}
                   animate={{ 
                     x: 0, 
