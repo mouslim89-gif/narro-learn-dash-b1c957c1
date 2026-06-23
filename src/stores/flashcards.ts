@@ -29,6 +29,7 @@ interface FlashcardStore {
   syncUserId: string | null;
   dailyGoal: number;
   reviewedToday: { date: string; count: number };
+  history: { date: string; count: number }[];
   setIsReviewing: (v: boolean) => void;
   setDailyGoal: (v: number) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
