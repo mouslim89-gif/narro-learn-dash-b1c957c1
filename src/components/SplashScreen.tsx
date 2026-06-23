@@ -49,83 +49,63 @@ export function SplashScreen() {
           className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background p-6"
         >
           <div className="flex flex-col items-center max-w-xs w-full text-center">
-            {/* Refined Book Stack SVG */}
+            {/* Abstract Minimalist Book Stack */}
             <div className="relative h-48 w-full flex items-end justify-center mb-10">
               <motion.svg 
                 viewBox="0 0 200 180" 
-                className="w-56 h-48 drop-shadow-[0_10px_15px_rgba(0,0,0,0.1)]"
+                className="w-56 h-48"
                 initial="initial"
                 animate="animate"
               >
-                <defs>
-                  <linearGradient id="spine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="rgba(0,0,0,0.2)" />
-                    <stop offset="15%" stopColor="rgba(255,255,255,0.1)" />
-                    <stop offset="30%" stopColor="rgba(0,0,0,0)" />
-                    <stop offset="85%" stopColor="rgba(0,0,0,0.1)" />
-                    <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
-                  </linearGradient>
-                </defs>
-
-                {/* Book 1 (Bottom - Navy) */}
-                <motion.g
+                {/* Book 1 (Bottom) */}
+                <motion.rect
+                  x="40" y="150" width="120" height="4" rx="2"
+                  fill="hsl(var(--primary))"
                   variants={{
-                    initial: { y: -40, opacity: 0, scale: 0.95 },
-                    animate: { y: 0, opacity: 1, scale: 1, transition: { delay: 0.1, type: 'spring', stiffness: 400, damping: 25 } }
+                    initial: { x: -200, opacity: 0 },
+                    animate: { x: 0, opacity: 1, transition: { delay: 0.1, type: 'spring', stiffness: 300, damping: 25 } }
                   }}
-                >
-                  <rect x="35" y="145" width="130" height="24" rx="3" fill="hsl(var(--primary))" />
-                  <rect x="35" y="145" width="130" height="24" rx="3" fill="url(#spine-grad)" />
-                  {/* Decorative bands */}
-                  <rect x="45" y="148" width="2" height="18" fill="rgba(255,255,255,0.2)" />
-                  <rect x="153" y="148" width="2" height="18" fill="rgba(255,255,255,0.2)" />
-                </motion.g>
+                />
 
-                {/* Book 2 (Beige) */}
-                <motion.g
-                  transform="rotate(-1.5 100 132)"
+                {/* Book 2 */}
+                <motion.rect
+                  x="45" y="140" width="110" height="4" rx="2"
+                  fill="hsl(var(--muted-foreground))"
                   variants={{
-                    initial: { y: -60, opacity: 0, scale: 0.95 },
-                    animate: { y: 0, opacity: 1, scale: 1, transition: { delay: 0.22, type: 'spring', stiffness: 400, damping: 25 } }
+                    initial: { x: -200, opacity: 0 },
+                    animate: { x: 0, opacity: 1, transition: { delay: 0.2, type: 'spring', stiffness: 300, damping: 25 } }
                   }}
-                >
-                  <rect x="40" y="125" width="120" height="20" rx="3" fill="hsl(var(--secondary))" />
-                  <rect x="40" y="125" width="120" height="20" rx="3" fill="url(#spine-grad)" />
-                  <rect x="52" y="128" width="1.5" height="14" fill="rgba(0,0,0,0.1)" />
-                  <rect x="146" y="128" width="1.5" height="14" fill="rgba(0,0,0,0.1)" />
-                </motion.g>
+                />
 
-                {/* Book 3 (Amber/Accent) */}
-                <motion.g
-                  transform="rotate(2 100 112)"
+                {/* Book 3 */}
+                <motion.rect
+                  x="50" y="130" width="100" height="4" rx="2"
+                  fill="hsl(var(--accent))"
                   variants={{
-                    initial: { y: -80, opacity: 0, scale: 0.95 },
-                    animate: { y: 0, opacity: 1, scale: 1, transition: { delay: 0.34, type: 'spring', stiffness: 400, damping: 25 } }
+                    initial: { x: -200, opacity: 0 },
+                    animate: { x: 0, opacity: 1, transition: { delay: 0.3, type: 'spring', stiffness: 300, damping: 25 } }
                   }}
-                >
-                  <rect x="48" y="105" width="104" height="20" rx="3" fill="hsl(var(--accent))" />
-                  <rect x="48" y="105" width="104" height="20" rx="3" fill="url(#spine-grad)" />
-                  {/* Title lines */}
-                  <rect x="75" y="112" width="50" height="1.5" rx="0.5" fill="rgba(255,255,255,0.4)" />
-                  <rect x="75" y="116" width="30" height="1.5" rx="0.5" fill="rgba(255,255,255,0.3)" />
-                </motion.g>
+                />
 
-                {/* Book 4 (Top - Navy/Primary) */}
-                <motion.g
-                  transform="rotate(-3 100 90)"
+                {/* Book 4 */}
+                <motion.rect
+                  x="55" y="120" width="90" height="4" rx="2"
+                  fill="hsl(var(--primary))"
                   variants={{
-                    initial: { y: -100, opacity: 0, scale: 0.95, rotate: -8 },
-                    animate: { 
-                      y: 0, opacity: 1, scale: 1, rotate: -3,
-                      transition: { delay: 0.46, type: 'spring', stiffness: 400, damping: 20 } 
-                    }
+                    initial: { x: -200, opacity: 0 },
+                    animate: { x: 0, opacity: 1, transition: { delay: 0.4, type: 'spring', stiffness: 300, damping: 25 } }
                   }}
-                >
-                  <rect x="55" y="85" width="90" height="20" rx="3" fill="hsl(var(--primary))" />
-                  <rect x="55" y="85" width="90" height="20" rx="3" fill="url(#spine-grad)" />
-                  <rect x="65" y="88" width="2" height="14" fill="rgba(255,255,255,0.2)" />
-                  <rect x="133" y="88" width="2" height="14" fill="rgba(255,255,255,0.2)" />
-                </motion.g>
+                />
+
+                {/* Book 5 (Top) */}
+                <motion.rect
+                  x="60" y="110" width="80" height="4" rx="2"
+                  fill="hsl(var(--secondary-foreground))"
+                  variants={{
+                    initial: { x: -200, opacity: 0 },
+                    animate: { x: 0, opacity: 1, transition: { delay: 0.5, type: 'spring', stiffness: 300, damping: 25 } }
+                  }}
+                />
               </motion.svg>
             </div>
 
