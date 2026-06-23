@@ -24,21 +24,25 @@ export interface SavedWord {
 }
 
 interface FlashcardStore {
- savedWords: SavedWord[];
- isReviewing: boolean;
- syncUserId: string | null;
- setIsReviewing: (v: boolean) => void;
- addWord: (entry: Omit<SavedWord,'mastery'>) => void;
- removeWord: (id: string) => void;
- hasWord: (id: string) => boolean;
- incrementMastery: (id: string) => void;
- resetMastery: (id: string) => void;
- adjustMastery: (id: string, quality:'again'|'hard'|'good'|'easy') => void;
- getDueCount: () => number;
- getDueWords: () => SavedWord[];
- // Sync helpers
- hydrateWords: (words: SavedWord[], userId: string) => void;
- clearWords: () => void;
+  savedWords: SavedWord[];
+  isReviewing: boolean;
+  syncUserId: string | null;
+  dailyGoal: number;
+  reviewedToday: { date: string; count: number };
+  setIsReviewing: (v: boolean) => void;
+  setDailyGoal: (v: number) => void;
+  addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
+  removeWord: (id: string) => void;
+  hasWord: (id: string) => boolean;
+  incrementMastery: (id: string) => void;
+  resetMastery: (id: string) => void;
+  adjustMastery: (id: string, quality: 'again' | 'hard' | 'good' | 'easy') => void;
+  getDueCount: () => number;
+  getDueWords: () => SavedWord[];
+  getReviewedTodayCount: () => number;
+  // Sync helpers
+  hydrateWords: (words: SavedWord[], userId: string) => void;
+  clearWords: () => void;
 }
 
 const QUALITY_MAP: Record<'again'|'hard'|'good'|'easy', Quality> = {
