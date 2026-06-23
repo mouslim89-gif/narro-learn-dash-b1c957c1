@@ -103,7 +103,7 @@ export function SplashScreen() {
 function StaticSplashContent() {
   return (
     <div className="flex flex-col items-center max-w-xs w-full text-center">
-      <div className="wordmark text-5xl font-serif font-black text-foreground mb-2">
+      <div className="wordmark text-6xl font-serif font-black text-foreground mb-2">
         Tsundoku
       </div>
       <div className="h-0.5 bg-accent w-24 mx-auto mb-3" />
