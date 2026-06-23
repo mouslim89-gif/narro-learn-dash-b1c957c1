@@ -48,50 +48,52 @@ export function SplashScreen() {
           transition={{ duration: 0.12 }}
           className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background p-6"
         >
-          <div className="flex flex-col items-center max-w-sm w-full text-center">
-            {/* Minimalist Centered Wordmark with Sidebar Books */}
-            <div className="flex items-center gap-3 translate-x-[-12px]">
-              {/* Vertical Stack of Bars (Books) */}
-              <div className="flex flex-col items-end gap-1.5">
-                {[1, 2, 3].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="h-2 bg-foreground rounded-[1px] w-11"
-                    initial={{ x: -100, opacity: 0 }}
-                    animate={{ 
-                      x: 0, 
-                      opacity: 1,
-                      transition: { 
-                        delay: 0.8 + (i * 0.1),
-                        type: 'spring',
-                        stiffness: 250,
-                        damping: 22
-                      }
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Wordmark */}
-              <div className="flex gap-0.5 overflow-hidden">
-                {"Tsundoku".split("").map((letter, i) => (
-                  <motion.span
-                    key={i}
-                    className="wordmark text-4xl font-serif font-black text-foreground inline-block"
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ 
-                      delay: 0.1 + (i * 0.06),
-                      duration: 0.5,
-                      ease: [0.22, 1, 0.36, 1]
-                    }}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
-              </div>
+          {/* Main container with layout prop to handle the centering shift automatically */}
+          <motion.div 
+            layout 
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="flex items-center gap-3"
+          >
+            {/* Vertical Stack of Bars (Books) */}
+            <div className="flex flex-col items-end gap-1 overflow-hidden">
+              {[1, 2, 3].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="h-[7px] bg-foreground rounded-[1px] w-10"
+                  initial={{ x: 60, opacity: 0 }}
+                  animate={{ 
+                    x: 0, 
+                    opacity: 1,
+                    transition: { 
+                      delay: 0.8 + (i * 0.08),
+                      type: 'spring',
+                      stiffness: 250,
+                      damping: 25
+                    }
+                  }}
+                />
+              ))}
             </div>
-          </div>
+
+            {/* Wordmark */}
+            <div className="flex gap-0.5 overflow-hidden">
+              {"Tsundoku".split("").map((letter, i) => (
+                <motion.span
+                  key={i}
+                  className="wordmark text-4xl font-serif font-black text-foreground inline-block"
+                  initial={{ y: 40, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ 
+                    delay: 0.1 + (i * 0.06),
+                    duration: 0.5,
+                    ease: [0.22, 1, 0.36, 1]
+                  }}
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
