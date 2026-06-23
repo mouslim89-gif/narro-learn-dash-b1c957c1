@@ -9,6 +9,8 @@ import { BottomNav } from"@/components/BottomNav";
 import { OnboardingCarousel } from "@/components/onboarding/OnboardingCarousel";
 import { AuthProvider, useAuth } from"@/contexts/AuthContext";
 import { ProtectedRoute } from"@/components/ProtectedRoute";
+import { SplashScreen } from "@/components/SplashScreen";
+
 
 import { useCloudSync } from"@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from"@/stores/reading-progress";
@@ -107,11 +109,13 @@ const App = () => (
  <AuthProvider>
  <DarkModeSync />
  <CloudSyncMount />
+  <SplashScreen />
   <OnboardingCarousel />
   <AnimatedRoutes />
 
  </AuthProvider>
  </BrowserRouter>
+
  </TooltipProvider>
  </QueryClientProvider>
 );
