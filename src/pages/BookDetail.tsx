@@ -246,37 +246,6 @@ export default function BookDetail() {
         </Button>
       </Link>
 
- {isMultiChapter && (
- <section className="mt-8">
- <div className="mb-3 flex items-baseline justify-between">
- <h2 className="font-serif text-lg font-semibold">Chapters</h2>
- <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
- </div>
- <ul className="space-y-2">
- {book.chapters!.map((ch, idx) => {
- const cp = chapterProgressMap[ch.id];
- const pct = cp?.progressPercent ?? 0;
- const done = pct >= 100;
- return (
- <li key={ch.id}>
- <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
-                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
-
- <div className="flex items-center gap-3">
- <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
- done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
- {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
- </span>
- <div className="min-w-0 flex-1">
- <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
- {pct > 0 && !done && (
- <div className="mt-1.5 flex items-center gap-2">
- <Progress value={pct} className="h-1 flex-1"/>
- <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
- </div>
- )}
- </div>
- <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
       {bookWords.length > 0 && (
         <section className="mt-10 pb-4">
           <div className="mb-4 flex items-baseline justify-between">
@@ -309,15 +278,47 @@ export default function BookDetail() {
           </div>
         </section>
       )}
-    </div>
-  </div>
- </Link>
- </li>
- );
- })}
- </ul>
- </section>
- )}
+
+      {isMultiChapter && (
+        <section className="mt-8">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="font-serif text-lg font-semibold">Chapters</h2>
+            <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
+          </div>
+          <ul className="space-y-2">
+            {book.chapters!.map((ch, idx) => {
+              const cp = chapterProgressMap[ch.id];
+              const pct = cp?.progressPercent ?? 0;
+              const done = pct >= 100;
+              return (
+                <li key={ch.id}>
+                  <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
+                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
+                      <div className="flex items-center gap-3">
+                        <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
+                        done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
+                        {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                        <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
+                        {pct > 0 && !done && (
+                        <div className="mt-1.5 flex items-center gap-2">
+                        <Progress value={pct} className="h-1 flex-1"/>
+                        <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
+                        </div>
+                        )}
+                        </div>
+                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
 
  {isMultiPart && (
  <section className="mt-8">
