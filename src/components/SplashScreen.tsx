@@ -50,13 +50,13 @@ export function SplashScreen() {
         >
           <div className="flex flex-col items-center max-w-sm w-full text-center">
             {/* Minimalist Centered Wordmark with Sidebar Books */}
-            <div className="relative flex items-center mb-4">
-              {/* Vertical Stack of Bars (Books) docking to the left of "T" */}
-              <div className="absolute right-full mr-4 flex flex-col items-end gap-2">
-                {[32, 48, 24, 40].map((width, i) => (
+            <div className="flex items-center gap-3 mb-4 translate-x-[-12px]">
+              {/* Vertical Stack of Bars (Books) */}
+              <div className="flex flex-col items-end gap-1.5">
+                {[40, 28, 48].map((width, i) => (
                   <motion.div
                     key={i}
-                    className="h-2 rounded-full bg-foreground"
+                    className="h-2 bg-foreground rounded-[1px]"
                     style={{ width }}
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ 
@@ -78,8 +78,8 @@ export function SplashScreen() {
                 {"Tsundoku".split("").map((letter, i) => (
                   <motion.span
                     key={i}
-                    className="wordmark text-6xl font-serif font-black text-foreground inline-block"
-                    initial={{ y: 60, opacity: 0 }}
+                    className="wordmark text-4xl font-serif font-black text-foreground inline-block"
+                    initial={{ y: 40, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ 
                       delay: 0.1 + (i * 0.06),
@@ -95,7 +95,7 @@ export function SplashScreen() {
             
             {/* Underline */}
             <motion.div 
-              className="h-0.5 bg-accent w-24 mx-auto mt-2"
+              className="h-0.5 bg-accent w-20 mx-auto mt-2"
               initial={{ scaleX: 0, transformOrigin: 'center' }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 1.4, duration: 0.4 }}
