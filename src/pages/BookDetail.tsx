@@ -277,40 +277,8 @@ export default function BookDetail() {
  )}
  </div>
  <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
-      {bookWords.length > 0 && (
-        <section className="mt-10 pb-4">
-          <div className="mb-4 flex items-baseline justify-between">
-            <h2 className="font-serif text-lg font-semibold">Learning in this book</h2>
-            <span className="text-[11px] tabular-nums text-muted-foreground uppercase tracking-wider">{bookWords.length} words</span>
-          </div>
-          <div className="no-scrollbar -mx-6 flex gap-3 overflow-x-auto px-6">
-            {bookWords.map(w => (
-              <Link
-                key={w.id}
-                to={`/dictionary/${encodeURIComponent(w.word)}`}
-                className="flex min-w-[130px] flex-col rounded-xl border border-border/40 bg-card p-3 shadow-sm tap-scale-sm"
-              >
-                <p className="font-japanese text-[17px] font-bold leading-tight">{w.word}</p>
-                <p className="mt-0.5 font-japanese text-[11px] text-muted-foreground truncate">{w.reading}</p>
-                <div className="mt-3 flex items-center gap-1.5">
-                  <div className="h-1 flex-1 rounded-full bg-muted/60 overflow-hidden">
-                    <div 
-                      className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        w.mastery >= 3 ? "bg-[hsl(var(--state-known))]" : w.mastery > 0 ? "bg-[hsl(var(--state-learning))]" : "bg-[hsl(var(--state-new))]"
-                      )}
-                      style={{ width: `${Math.max(15, (w.mastery / 5) * 100)}%` }}
-                    />
-                  </div>
-                  <span className="text-[9px] font-bold tabular-nums text-foreground/50">{Math.round((w.mastery / 5) * 100)}%</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  </div>
+ </div>
+ </div>
  </Link>
  </li>
  );
