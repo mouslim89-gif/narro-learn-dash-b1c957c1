@@ -55,11 +55,11 @@ export function SplashScreen() {
             className="flex items-center gap-4"
           >
             {/* Vertical Stack of Bars (Books) */}
-            <div className="flex flex-col items-end gap-1.5 overflow-hidden">
+            <div className="flex flex-col items-end gap-2 overflow-hidden">
               {[1, 2, 3].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-[10px] bg-foreground rounded-[1px] w-8"
+                  className="h-[13px] bg-foreground rounded-[1px] w-8"
                   initial={{ x: 80, opacity: 0 }}
                   animate={{ 
                     x: 0, 
