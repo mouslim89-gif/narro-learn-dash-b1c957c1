@@ -122,7 +122,10 @@ export default function MyBooks() {
   )}
 
   {bookProgressList.length > 0 && (
-    <ContributionGraph readDateStrings={stats.readDateStrings} />
+    <div className="mt-6 space-y-6">
+      <DailyGoalCard />
+      <ContributionGraph readDateStrings={stats.readDateStrings} />
+    </div>
   )}
 
   {bookProgressList.length === 0 ? (
