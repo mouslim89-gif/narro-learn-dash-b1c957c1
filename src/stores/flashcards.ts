@@ -135,9 +135,20 @@ export const useFlashcardStore = create<FlashcardStore>()(
           return { ...migrated, ...result };
         });
 
+        // Update history
+        let newHistory = [...get().history];
+        const histIdx = newHistory.findIndex(h => h.date === today);
+        if (histIdx >= 0) {
+          newHistory[histIdx] = { date: today, count: newCount };
+        } else {
+          newHistory.push({ date: today, count: newCount });
+          if (newHistory.length > 90) newHistory.shift(); // Keep 90 days
+        }
+
         set({ 
           savedWords: updated,
-          reviewedToday: { date: today, count: newCount }
+          reviewedToday: { date: today, count: newCount },
+          history: newHistory
         });
         
         const uid = get().syncUserId;
