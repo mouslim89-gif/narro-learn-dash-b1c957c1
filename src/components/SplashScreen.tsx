@@ -7,18 +7,22 @@ export function SplashScreen() {
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    // Lock scroll
-    document.body.style.overflow = 'hidden';
-    
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, 1850);
+    return () => clearTimeout(timer);
+  }, []);
 
+  useEffect(() => {
+    if (!isVisible) {
+      document.body.style.overflow = '';
+      return;
+    }
+    document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = '';
-      clearTimeout(timer);
     };
-  }, []);
+  }, [isVisible]);
 
   if (prefersReducedMotion) {
     // Immediate static view for accessibility
