@@ -69,16 +69,20 @@ export function SplashScreen() {
                 }
               }}
             >
-              {[1, 2, 3].map((_, i) => (
+              {[
+                { w: "w-7", d: 0.85 },
+                { w: "w-9", d: 0.93 },
+                { w: "w-8", d: 1.01 }
+              ].map((book, i) => (
                 <motion.div
                   key={i}
-                  className="h-[10px] bg-foreground rounded-[1px] w-8"
+                  className={cn("h-[10px] bg-foreground rounded-[3px]", book.w)}
                   initial={{ x: 40, opacity: 0 }}
                   animate={{ 
                     x: 0, 
                     opacity: 1,
                     transition: { 
-                      delay: 0.85 + (i * 0.08),
+                      delay: book.d,
                       type: 'spring',
                       stiffness: 250,
                       damping: 25
