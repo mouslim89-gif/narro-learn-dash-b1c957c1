@@ -56,12 +56,12 @@ export function SplashScreen() {
           >
             {/* Vertical Stack of Bars (Books) - Animates width to push title */}
             <motion.div 
-              className="flex flex-col items-end gap-[6px] overflow-hidden"
+              className="flex flex-col items-end gap-[5px] overflow-hidden"
               initial={{ width: 0, opacity: 0, marginRight: 0 }}
               animate={{ 
                 width: "auto", 
                 opacity: 1,
-                marginRight: 12, // Equivalent to gap-3
+                marginRight: 10,
                 transition: { 
                   delay: 0.8,
                   duration: 0.5,
@@ -72,7 +72,7 @@ export function SplashScreen() {
               {[1, 2, 3].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-[11px] bg-foreground rounded-[1px] w-6"
+                  className="h-[10px] bg-foreground rounded-[1px] w-8"
                   initial={{ x: 40, opacity: 0 }}
                   animate={{ 
                     x: 0, 
@@ -93,7 +93,7 @@ export function SplashScreen() {
               {"Tsundoku".split("").map((letter, i) => (
                 <motion.span
                   key={i}
-                  className="wordmark text-[54px] font-serif font-black text-foreground inline-block"
+                  className="wordmark text-[48px] font-serif font-black text-foreground inline-block"
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ 
@@ -116,10 +116,10 @@ export function SplashScreen() {
 function StaticSplashContent() {
   return (
     <div className="flex flex-col items-center max-w-xs w-full text-center">
-      <div className="wordmark text-[54px] font-serif font-black text-foreground mb-2">
+      <div className="wordmark text-[48px] font-serif font-black text-foreground mb-2">
         Tsundoku
       </div>
-      <div className="h-0.5 bg-accent w-20 mx-auto mb-3" />
+      <div className="h-0.5 bg-accent w-18 mx-auto mb-3" />
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         Read. Tap. Remember.
       </p>
