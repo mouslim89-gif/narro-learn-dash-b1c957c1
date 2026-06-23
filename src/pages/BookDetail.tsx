@@ -17,20 +17,48 @@ export default function BookDetail() {
  const { id } = useParams();
  const goTo = useDelayedNav();
  const book = books.find((b) => b.id === id);
- const { getBookProgress, getChapterProgress } = useReadingProgressStore();
- const bookProgress = id ? getBookProgress(id) : undefined;
- const hasProgress = !!bookProgress && bookProgress.progressPercent > 0;
+  const { getBookProgress, getChapterProgress } = useReadingProgressStore();
+  const { savedWords } = useFlashcardStore();
+  const bookProgress = id ? getBookProgress(id) : undefined;
+  const hasProgress = !!bookProgress && bookProgress.progressPercent > 0;
 
- const [difficulty, setDifficulty] = useState<Difficulty>(
- bookProgress?.difficulty ||'simplified');
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    bookProgress?.difficulty || 'simplified'
+  );
 
- const [scrolled, setScrolled] = useState(false);
- useEffect(() => {
- const onScroll = () => setScrolled(window.scrollY > 120);
- onScroll();
- window.addEventListener('scroll', onScroll, { passive: true });
- return () => window.removeEventListener('scroll', onScroll);
- }, []);
+  const [tokens, setTokens] = useState<BookTokenMap | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 120);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (book?.id) {
+      loadBookTokens(book.id).then(setTokens);
+    }
+  }, [book?.id]);
+
+  const bookWords = useMemo(() => {
+    if (!tokens || !savedWords.length) return [];
+    
+    const uniqueBookWords = new Set<string>();
+    Object.values(tokens).forEach(chapterDict => {
+      Object.values(chapterDict).forEach(tokenList => {
+        tokenList.forEach(t => {
+          if (t.j) {
+            uniqueBookWords.add(t.t);
+            if (t.b) uniqueBookWords.add(t.b);
+          }
+        });
+      });
+    });
+
+    return savedWords.filter(sw => uniqueBookWords.has(sw.word));
+  }, [tokens, savedWords]);
 
  if (!book) {
  return (
