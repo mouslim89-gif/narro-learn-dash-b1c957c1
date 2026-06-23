@@ -18,6 +18,7 @@ import {
  DropdownMenuTrigger,
 } from'@/components/ui/dropdown-menu';
 import { useDelayed } from'@/hooks/use-delayed';
+import { DailyGoalCard } from '@/components/my-books/DailyGoalCard';
 
 type StatusFilter ='all'|'due'|'new'|'learning'|'known';
 type SortOption ='added'|'mastery';
@@ -179,7 +180,11 @@ export default function Flashcards() {
         <RotateCcw className="mr-2 h-4 w-4"/>Review all words
       </Button>
  )}
- </section>
+  </section>
+
+  <section className="px-6 mt-4">
+    <DailyGoalCard />
+  </section>
 
  {/* Stat tiles */}
  <div className="stagger-children mt-4 px-6 grid grid-cols-4 gap-2">
