@@ -1,45 +1,56 @@
-import * as kuromoji from 'kuromoji';
+import * as kuromojiModule from 'kuromoji/build/kuromoji.js';
 
-// More robust access to the builder
-const getBuilder = () => {
-  console.log('Inspecting kuromoji module:', kuromoji);
-  if ((kuromoji as any).builder) return (kuromoji as any).builder;
-  if ((kuromoji as any).default && (kuromoji as any).default.builder) return (kuromoji as any).default.builder;
-  return null;
-};
+// The build/kuromoji.js is a UMD bundle. 
+// In some environments, it might be on .default, in others directly on the module.
+const kuromoji = (kuromojiModule as any).default || kuromojiModule;
 
 type Tokenizer = any;
 
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
 
-// unpkg is often more reliable for raw files
-const DICT_URL = 'https://unpkg.com/kuromoji@0.1.2/dict/';
+// unpkg is generally reliable for these files
+const DICT_URL = 'https://unpkg.com/kuromoji@0.1.2/dict';
 
 export async function getTokenizer(): Promise<Tokenizer> {
   if (tokenizer) return tokenizer;
   if (loadingPromise) return loadingPromise;
 
-  console.log('Initializing Kuromoji tokenizer with dict path:', DICT_URL);
+  console.log('Kuromoji: Starting initialization with dict path:', DICT_URL);
+  
   loadingPromise = new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.error('Kuromoji: Initialization timed out after 10s');
+      loadingPromise = null;
+      reject(new Error('Kuromoji timeout'));
+    }, 10000);
+
     try {
-      const builder = getBuilder();
+      const builder = kuromoji.builder ? kuromoji.builder({ dicPath: DICT_URL }) : null;
+      
       if (!builder) {
-        throw new Error('Kuromoji builder not found in module');
+        clearTimeout(timeout);
+        console.error('Kuromoji: Builder not found in module', kuromoji);
+        loadingPromise = null;
+        reject(new Error('Builder not found'));
+        return;
       }
-      builder({ dicPath: DICT_URL }).build((err: any, _tokenizer: any) => {
+
+      builder.build((err: any, _tokenizer: any) => {
+        clearTimeout(timeout);
         if (err) {
-          console.error('Kuromoji builder error details:', err);
+          console.error('Kuromoji: Builder error:', err);
           loadingPromise = null;
           reject(err);
           return;
         }
-        console.log('Kuromoji tokenizer successfully initialized');
+        console.log('Kuromoji: Successfully initialized');
         tokenizer = _tokenizer;
         resolve(_tokenizer);
       });
     } catch (e) {
-      console.error('Kuromoji initialization caught exception:', e);
+      clearTimeout(timeout);
+      console.error('Kuromoji: Initialization exception:', e);
       loadingPromise = null;
       reject(e);
     }
@@ -67,25 +78,20 @@ export async function tokenizeToFurigana(text: string): Promise<FuriganaToken[]>
     const t = await getTokenizer();
     const tokens = t.tokenize(text);
 
-    return tokens.map((token) => {
+    return tokens.map((token: any) => {
       const surface = token.surface_form;
       const reading = token.reading;
 
-      // Kuromoji provides reading in Katakana, we convert to Hiragana
-      // Only provide reading if it's different from the surface and contains kanji
       if (reading && reading !== '*' && surface !== reading) {
         const hiraganaReading = katakanaToHiragana(reading);
-        // Basic check to see if the surface has kanji (otherwise reading is redundant)
         if (/[\u4e00-\u9fff]/.test(surface)) {
           return { t: surface, r: hiraganaReading };
         }
       }
-
       return { t: surface };
     });
   } catch (err) {
-    console.error('Kuromoji tokenization failed:', err);
-    // Return a single token with the full text as fallback
+    console.error('Kuromoji: Tokenization failed, using fallback:', err);
     return [{ t: text }];
   }
 }
