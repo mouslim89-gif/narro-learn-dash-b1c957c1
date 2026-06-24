@@ -11,7 +11,7 @@ import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
 import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
-import { cn } from '@/lib/utils';
+import { cn, highlightJapaneseWord } from '@/lib/utils';
 
 export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
@@ -108,31 +108,9 @@ export default function WordDetail() {
     addWord(entry);
   };
 
-  const highlightWord = (text: string, target: string) => {
-    const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
-    const isAllKanji = /^[\u4e00-\u9fff]+$/.test(target);
-    
-    let foundIdx = -1;
-    if (isAllKanji) {
-      let idx = -1;
-      while ((idx = text.indexOf(target, idx + 1)) !== -1) {
-        const charBefore = text[idx - 1];
-        const charAfter = text[idx + target.length];
-        if (!isKanji(charBefore) && !isKanji(charAfter)) {
-          foundIdx = idx;
-          break;
-        }
-      }
-    } else {
-      foundIdx = text.indexOf(target);
-    }
-
-    if (foundIdx === -1) {
-      // Fallback to simple index if boundary check fails but word exists
-      const fallbackIdx = text.indexOf(target);
-      if (fallbackIdx === -1) return text;
-      foundIdx = fallbackIdx;
-    }
+  const renderJapanese = (text: string, target: string) => {
+    const foundIdx = highlightJapaneseWord(text, target);
+    if (foundIdx === -1) return text;
 
     return (
       <>
@@ -142,6 +120,7 @@ export default function WordDetail() {
       </>
     );
   };
+
 
  return (
  <div className="pb-24">
@@ -358,7 +337,7 @@ export default function WordDetail() {
  <li key={i} className="rounded-md bg-muted/50 p-3">
  <div className="flex items-start gap-2">
  <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
- {highlightWord(ex.japanese, display)}
+ {renderJapanese(ex.japanese, display)}
  </p>
  <PlayWordButton word={ex.japanese} size={14} className="mt-0.5 shrink-0"/>
  </div>
