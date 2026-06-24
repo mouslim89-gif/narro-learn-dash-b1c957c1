@@ -13,65 +13,73 @@ const CURATED: Record<string, ExampleSentence> = {'は': { japanese:'私は学�
 };
 
 export async function fetchExample(word: string): Promise<ExampleSentence | null> {
- if (cache.has(word)) return cache.get(word)!;
-
- if (CURATED[word]) {
- cache.set(word, CURATED[word]);
- return CURATED[word];
- }
-
- try {
- const { data, error } = await supabase.functions.invoke('tatoeba-example', {
- body: { word },
- });
-
- if (error || !data?.japanese) {
- cache.set(word, null);
- return null;
- }
-
- const result: ExampleSentence = {
- japanese: data.japanese,
- english: data.english ||'',
- };
- cache.set(word, result);
- return result;
- } catch {
- cache.set(word, null);
- return null;
- }
+  const examples = await fetchExamples(word, 1);
+  return examples.length > 0 ? examples[0] : null;
 }
 
 const multiCache = new Map<string, ExampleSentence[]>();
 
+const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
+
+function isWordStandalone(text: string, word: string): boolean {
+  const isTargetAllKanji = /^[\u4e00-\u9fff]+$/.test(word);
+  if (!isTargetAllKanji) return true; // Simple search for non-kanji or mixed for now
+
+  let idx = -1;
+  while ((idx = text.indexOf(word, idx + 1)) !== -1) {
+    const charBefore = text[idx - 1];
+    const charAfter = text[idx + word.length];
+    // If it's pure kanji, it shouldn't be adjacent to another kanji
+    if (!isKanji(charBefore) && !isKanji(charAfter)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export async function fetchExamples(word: string, limit = 3, altWord?: string): Promise<ExampleSentence[]> {
- const key =`${word}::${altWord ?? ''}::${limit}`;
- if (multiCache.has(key)) return multiCache.get(key)!;
+  const key = `${word}::${altWord ?? ''}::${limit}`;
+  if (multiCache.has(key)) return multiCache.get(key)!;
 
- if (CURATED[word]) {
- const arr = [CURATED[word]];
- multiCache.set(key, arr);
- return arr;
- }
+  if (CURATED[word]) {
+    const arr = [CURATED[word]];
+    multiCache.set(key, arr);
+    return arr;
+  }
 
- try {
- const { data, error } = await supabase.functions.invoke('tatoeba-example', {
- body: { word, limit, altWord },
- });
- if (error) {
- multiCache.set(key, []);
- return [];
- }
- const sentences: ExampleSentence[] = Array.isArray(data?.sentences) && data.sentences.length
- ? data.sentences
- : data?.japanese
- ? [{ japanese: data.japanese, english: data.english ||''}]
- : [];
- multiCache.set(key, sentences);
- return sentences;
- } catch {
- multiCache.set(key, []);
- return [];
- }
+  try {
+    // Fetch more than requested to allow for filtering of compounds
+    const fetchLimit = limit * 4;
+    const { data, error } = await supabase.functions.invoke('tatoeba-example', {
+      body: { word, limit: fetchLimit, altWord },
+    });
+
+    if (error) {
+      multiCache.set(key, []);
+      return [];
+    }
+
+    let sentences: ExampleSentence[] = Array.isArray(data?.sentences) && data.sentences.length
+      ? data.sentences
+      : data?.japanese
+      ? [{ japanese: data.japanese, english: data.english || '' }]
+      : [];
+
+    // Filter out sentences where the kanji is part of a larger compound
+    // (e.g. if searching for 林, don't show sentences where it's only found in 林檎)
+    if (word.length > 0 && isKanji(word[0])) {
+      const filtered = sentences.filter(s => isWordStandalone(s.japanese, word) || (altWord && isWordStandalone(s.japanese, altWord)));
+      if (filtered.length > 0) {
+        sentences = filtered;
+      }
+    }
+
+    const finalResults = sentences.slice(0, limit);
+    multiCache.set(key, finalResults);
+    return finalResults;
+  } catch {
+    multiCache.set(key, []);
+    return [];
+  }
 }
 
