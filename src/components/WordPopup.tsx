@@ -254,11 +254,12 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  addWord(entry);
  };
 
- const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined };
- const displayWord = disp.word || word;
- const isShowingSurface = displayWord === word;
- const displayReading = (isShowingSurface ? overrideReading : undefined) || disp.reading;
- const isCommon = (result as any)?.is_common;
+  const disp = result ? getDisplayWord(result, surfaceForMatch) : { word, reading: undefined as string | undefined, pronunciation: word };
+  const displayWord = disp.word || word;
+  const isShowingSurface = displayWord === word;
+  const displayReading = (isShowingSurface ? overrideReading : undefined) || disp.reading;
+  const pronunciation = (isShowingSurface ? overrideReading : undefined) || disp.pronunciation;
+  const isCommon = (result as any)?.is_common;
 
  const sectionLabel ="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
@@ -288,9 +289,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  {displayReading && displayReading !== displayWord && (
  <span className="font-japanese text-base text-muted-foreground">{displayReading}</span>
  )}
- {displayReading && (
- <span className="text-xs italic text-muted-foreground/70">{toRomaji(displayReading)}</span>
- )}
+                 {pronunciation && (
+                   <span className="text-xs italic text-muted-foreground/70">{toRomaji(pronunciation)}</span>
+                 )}
                 {isCommon && (
                   <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary ring-1 ring-primary/20">
                     ✦ Common

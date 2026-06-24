@@ -198,9 +198,9 @@ export default function WordDetail() {
  {reading && reading !== display && (
  <p className="font-japanese text-base text-muted-foreground mt-1">{reading}</p>
  )}
- {reading && (
- <p className="text-xs text-muted-foreground/70 italic mt-0.5">{toRomaji(reading)}</p>
- )}
+             {disp && (
+               <p className="text-xs text-muted-foreground/70 italic mt-0.5">{toRomaji(disp.pronunciation)}</p>
+             )}
  </div>
  <PlayWordButton word={display} reading={reading} size={20} />
  </div>

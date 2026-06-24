@@ -200,24 +200,38 @@ const KANA_ONLY = /^[\u3040-\u309F\u30A0-\u30FF\u30FC]+$/;
 export function getDisplayWord(
   result: JishoResult | null | undefined,
   surface?: string,
-): { word: string; reading?: string } {
-  if (!result) return { word: '' };
+): { word: string; reading?: string; pronunciation: string } {
+  if (!result) return { word: '', pronunciation: '' };
   const j = result.japanese[0];
-  if (!j) return { word: '' };
+  if (!j) return { word: '', pronunciation: '' };
 
   // If surface is provided and it's pure kana, prefer that specific form
   if (surface && KANA_ONLY.test(surface)) {
     const match = result.japanese.find((x) => x.reading === surface || x.word === surface);
-    if (match?.reading) return { word: match.reading, reading: match.word !== match.reading ? match.word : undefined };
+    if (match?.reading) {
+      return {
+        word: match.reading,
+        reading: match.word !== match.reading ? match.word : undefined,
+        pronunciation: match.reading
+      };
+    }
   }
 
   // If "usually written in kana", priority goes to reading
   if (isUsuallyKana(result) && j.reading) {
-    return { word: j.reading, reading: j.word !== j.reading ? j.word : undefined };
+    return {
+      word: j.reading,
+      reading: j.word !== j.reading ? j.word : undefined,
+      pronunciation: j.reading
+    };
   }
 
   // Default: Kanji (word) as primary, Hiragana (reading) as secondary
-  return { word: j.word || j.reading, reading: j.word ? j.reading : undefined };
+  return {
+    word: j.word || j.reading,
+    reading: j.word ? j.reading : undefined,
+    pronunciation: j.reading || j.word || ''
+  };
 }
 
 /** Pick the result whose form best matches the surface, falling back to POS matching. */
