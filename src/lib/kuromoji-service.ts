@@ -1,9 +1,8 @@
-import * as kuromoji from 'kuromoji/build/kuromoji';
+import kuromoji from 'kuromoji';
 
-// The build/kuromoji.js file usually exports to a global or has a specific export structure
 const kuromojiObj = (kuromoji as any).default || kuromoji;
 
-type Tokenizer = any; // kuromoji.Tokenizer<kuromoji.IpadicFeatures>;
+type Tokenizer = any;
 
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
