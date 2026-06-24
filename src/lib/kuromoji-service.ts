@@ -1,6 +1,9 @@
-import kuromoji from 'kuromoji';
+import * as kuromojiModule from 'kuromoji';
 
-type Tokenizer = kuromoji.Tokenizer<kuromoji.IpadicFeatures>;
+// Handle different import styles (ESM/CJS)
+const kuromoji = (kuromojiModule as any).default || kuromojiModule;
+
+type Tokenizer = any; // kuromoji.Tokenizer<kuromoji.IpadicFeatures>;
 
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
