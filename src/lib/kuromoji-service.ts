@@ -2,6 +2,7 @@ import * as kuromoji from 'kuromoji';
 
 // More robust access to the builder
 const getBuilder = () => {
+  console.log('Inspecting kuromoji module:', kuromoji);
   if ((kuromoji as any).builder) return (kuromoji as any).builder;
   if ((kuromoji as any).default && (kuromoji as any).default.builder) return (kuromoji as any).default.builder;
   return null;
@@ -12,8 +13,8 @@ type Tokenizer = any;
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
 
-// Use a reliable CDN for the dictionaries (must end with a slash)
-const DICT_URL = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+// unpkg is often more reliable for raw files
+const DICT_URL = 'https://unpkg.com/kuromoji@0.1.2/dict/';
 
 export async function getTokenizer(): Promise<Tokenizer> {
   if (tokenizer) return tokenizer;
