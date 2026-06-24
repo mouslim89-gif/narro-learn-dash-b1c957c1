@@ -10,8 +10,10 @@ interface ExampleSentenceProps {
 }
 
 export function ExampleSentence({ word, className =''}: ExampleSentenceProps) {
- const [example, setExample] = useState<ExampleData | null>(null);
- const [loading, setLoading] = useState(true);
+  const [example, setExample] = useState<ExampleData | null>(null);
+  const [tokens, setTokens] = useState<FuriganaToken[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
 
  useEffect(() => {
  let cancelled = false;
@@ -23,7 +25,20 @@ export function ExampleSentence({ word, className =''}: ExampleSentenceProps) {
  }
  });
  return () => { cancelled = true; };
- }, [word]);
+  }, [word]);
+
+  useEffect(() => {
+    if (!example) {
+      setTokens(null);
+      return;
+    }
+    let cancelled = false;
+    tokenizeToFurigana(example.japanese).then((t) => {
+      if (!cancelled) setTokens(t);
+    });
+    return () => { cancelled = true; };
+  }, [example]);
+
 
  if (loading) {
  return (
@@ -52,10 +67,15 @@ export function ExampleSentence({ word, className =''}: ExampleSentenceProps) {
 
  return (
  <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
- <div className="flex items-start gap-1">
- <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
- {renderJapanese(example.japanese)}
- </p>
+  <div className="flex items-start gap-1">
+  <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
+  {tokens ? (
+    <FuriganaSentence tokens={tokens} highlight={word} />
+  ) : (
+    example.japanese
+  )}
+  </div>
+
  <PlayWordButton word={example.japanese} size={14} className="mt-0.5 shrink-0"/>
  </div>
  {example.english && (

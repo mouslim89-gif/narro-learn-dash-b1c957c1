@@ -9,8 +9,11 @@ import { ConjugationTable, getConjugations } from'@/components/ConjugationTable'
 import { Button } from'@/components/ui/button';
 import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
-import { fetchExamples, type ExampleSentence } from'@/lib/tatoeba';
-import { extractKanji, fetchKanji, type KanjiDetails } from'@/lib/kanji';
+import { fetchExamples, type ExampleSentence } from '@/lib/tatoeba';
+import { extractKanji, fetchKanji, type KanjiDetails } from '@/lib/kanji';
+import { tokenizeToFurigana, type FuriganaToken } from '@/lib/kuromoji-service';
+import { FuriganaSentence } from '@/components/FuriganaSentence';
+
 import { cn, highlightJapaneseWord } from '@/lib/utils';
 
 export default function WordDetail() {
@@ -21,7 +24,9 @@ export default function WordDetail() {
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
- const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
+  const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
+  const [exampleTokens, setExampleTokens] = useState<FuriganaToken[][] | null>(null);
+
  const [kanjiList, setKanjiList] = useState<(KanjiDetails | null)[] | null>(null);
 
  useEffect(() => {
@@ -69,7 +74,20 @@ export default function WordDetail() {
    }
    fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
    return () => { cancelled = true; };
- }, [word, result]);
+  }, [word, result]);
+
+  useEffect(() => {
+    if (!examples) {
+      setExampleTokens(null);
+      return;
+    }
+    let cancelled = false;
+    Promise.all(examples.map(ex => tokenizeToFurigana(ex.japanese))).then(allTokens => {
+      if (!cancelled) setExampleTokens(allTokens);
+    });
+    return () => { cancelled = true; };
+  }, [examples]);
+
 
   const disp = result ? getDisplayWord(result, word) : null;
   const display = disp?.word || word;
@@ -334,11 +352,16 @@ export default function WordDetail() {
  {examples && examples.length > 0 && (
  <ul className="space-y-3">
  {examples.map((ex, i) => (
- <li key={i} className="rounded-md bg-muted/50 p-3">
- <div className="flex items-start gap-2">
- <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
- {renderJapanese(ex.japanese, display)}
- </p>
+  <li key={i} className="rounded-md bg-muted/50 p-3">
+  <div className="flex items-start gap-2">
+  <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
+  {exampleTokens && exampleTokens[i] ? (
+    <FuriganaSentence tokens={exampleTokens[i]} highlight={display} />
+  ) : (
+    ex.japanese
+  )}
+  </div>
+
  <PlayWordButton word={ex.japanese} size={14} className="mt-0.5 shrink-0"/>
  </div>
  {ex.english && (
