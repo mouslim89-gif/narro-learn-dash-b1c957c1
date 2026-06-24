@@ -1,5 +1,7 @@
 export const join = (...args: string[]) => {
-  return args.join('/').replace(/\/+/g, '/');
+  const result = args.join('/').replace(/\/+/g, '/');
+  // Preserve https:// or http://
+  return result.replace(/^(https?):\/+/, '$1://');
 };
 
 export const dirname = (path: string) => {
