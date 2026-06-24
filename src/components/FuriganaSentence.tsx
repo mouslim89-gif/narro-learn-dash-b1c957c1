@@ -57,33 +57,48 @@ export function FuriganaSentence({
  );
  }
 
- // Highlight only the first matching token.
- let highlightedOnce = false;
+  // Highlight logic: check if token matches the highlight word or its dictionary form.
+  let highlightedOnce = false;
 
- return (
- <p className={className}>
- {tokens.map((tok, i) => {
- const isHighlight =
- !highlightedOnce && !!highlight && tok.t === highlight;
- if (isHighlight) highlightedOnce = true;
+  return (
+    <p className={className}>
+      {tokens.map((tok, i) => {
+        const isHighlight =
+          !highlightedOnce && !!highlight && (tok.t === highlight || tok.t.includes(highlight));
+        if (isHighlight) highlightedOnce = true;
 
- const hasKanji = KANJI_RE.test(tok.t);
- const segs = hasKanji && tok.r ? segmentsFromReading(tok.t, tok.r) : null;
+        const hasKanji = KANJI_RE.test(tok.t);
+        const segs = hasKanji && tok.r ? segmentsFromReading(tok.t, tok.r) : null;
 
- const content: ReactNode = segs ? renderSegments(segs, i) : tok.t;
+        let content: ReactNode;
+        if (segs) {
+          content = renderSegments(segs, i);
+        } else if (hasKanji && tok.r) {
+          // Fallback: Show ruby for the whole token if splitting failed
+          content = (
+            <ruby key={i}>
+              {tok.t}
+              <rt className="font-japanese text-[0.55em] font-normal text-foreground/60 leading-none">
+                {tok.r}
+              </rt>
+            </ruby>
+          );
+        } else {
+          content = tok.t;
+        }
 
- if (isHighlight) {
- return (
- <span
- key={i}
- className="text-primary font-semibold underline decoration-dotted underline-offset-4"
- >
- {content}
- </span>
- );
- }
- return <Fragment key={i}>{content}</Fragment>;
- })}
- </p>
- );
+        if (isHighlight) {
+          return (
+            <span
+              key={i}
+              className="text-primary font-semibold underline decoration-dotted underline-offset-4"
+            >
+              {content}
+            </span>
+          );
+        }
+        return <Fragment key={i}>{content}</Fragment>;
+      })}
+    </p>
+  );
 }
