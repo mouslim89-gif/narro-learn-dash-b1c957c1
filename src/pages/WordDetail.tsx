@@ -108,17 +108,40 @@ export default function WordDetail() {
     addWord(entry);
   };
 
- const highlightWord = (text: string, target: string) => {
- const idx = text.indexOf(target);
- if (idx === -1) return text;
- return (
- <>
- {text.slice(0, idx)}
- <span className="text-accent font-bold">{target}</span>
- {text.slice(idx + target.length)}
- </>
- );
- };
+  const highlightWord = (text: string, target: string) => {
+    const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
+    const isAllKanji = /^[\u4e00-\u9fff]+$/.test(target);
+    
+    let foundIdx = -1;
+    if (isAllKanji) {
+      let idx = -1;
+      while ((idx = text.indexOf(target, idx + 1)) !== -1) {
+        const charBefore = text[idx - 1];
+        const charAfter = text[idx + target.length];
+        if (!isKanji(charBefore) && !isKanji(charAfter)) {
+          foundIdx = idx;
+          break;
+        }
+      }
+    } else {
+      foundIdx = text.indexOf(target);
+    }
+
+    if (foundIdx === -1) {
+      // Fallback to simple index if boundary check fails but word exists
+      const fallbackIdx = text.indexOf(target);
+      if (fallbackIdx === -1) return text;
+      foundIdx = fallbackIdx;
+    }
+
+    return (
+      <>
+        {text.slice(0, foundIdx)}
+        <span className="text-accent font-bold">{target}</span>
+        {text.slice(foundIdx + target.length)}
+      </>
+    );
+  };
 
  return (
  <div className="pb-24">
