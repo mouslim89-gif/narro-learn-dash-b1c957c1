@@ -37,8 +37,24 @@ Deno.serve(async (req) => {
     }
 
     const MAX_JP_LEN = 60;
-    const matchesTarget = (jp: string) =>
-      jp.includes(word) || (altWord ? jp.includes(altWord) : false);
+    const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
+    const matchesTarget = (jp: string) => {
+      const check = (target: string) => {
+        if (!target || !jp.includes(target)) return false;
+        // If the target is all kanji, we ensure it's not a substring of a larger kanji compound
+        if (/^[\u4e00-\u9fff]+$/.test(target)) {
+          let idx = -1;
+          while ((idx = jp.indexOf(target, idx + 1)) !== -1) {
+            const charBefore = jp[idx - 1];
+            const charAfter = jp[idx + target.length];
+            if (!isKanji(charBefore) && !isKanji(charAfter)) return true;
+          }
+          return false;
+        }
+        return true;
+      };
+      return check(word) || (altWord ? check(altWord) : false);
+    };
     const isShortEnough = (jp: string) => [...jp].length <= MAX_JP_LEN;
     const pickBest = (arr: Sentence[], n: number): Sentence[] => {
       const short = arr.filter((s) => isShortEnough(s.japanese));
