@@ -18,7 +18,7 @@ export async function getTokenizer(): Promise<Tokenizer> {
   console.log('Initializing Kuromoji tokenizer with dict path:', DICT_URL);
   loadingPromise = new Promise((resolve, reject) => {
     try {
-      kuromoji.builder({ dicPath: DICT_URL }).build((err, _tokenizer) => {
+      kuromojiObj.builder({ dicPath: DICT_URL }).build((err: any, _tokenizer: any) => {
         if (err) {
           console.error('Kuromoji builder error details:', err);
           loadingPromise = null;
