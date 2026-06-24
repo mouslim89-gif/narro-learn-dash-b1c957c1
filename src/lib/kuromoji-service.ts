@@ -1,6 +1,11 @@
-import kuromoji from 'kuromoji';
+import * as kuromoji from 'kuromoji';
 
-const kuromojiObj = (kuromoji as any).default || kuromoji;
+// More robust access to the builder
+const getBuilder = () => {
+  if ((kuromoji as any).builder) return (kuromoji as any).builder;
+  if ((kuromoji as any).default && (kuromoji as any).default.builder) return (kuromoji as any).default.builder;
+  return null;
+};
 
 type Tokenizer = any;
 
