@@ -1,31 +1,44 @@
-import kuromoji from 'kuromoji';
+import * as kuromoji from 'kuromoji';
 
-type Tokenizer = kuromoji.Tokenizer<kuromoji.IpadicFeatures>;
+// More robust access to the builder
+const getBuilder = () => {
+  if ((kuromoji as any).builder) return (kuromoji as any).builder;
+  if ((kuromoji as any).default && (kuromoji as any).default.builder) return (kuromoji as any).default.builder;
+  return null;
+};
+
+type Tokenizer = any;
 
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
 
-// Use a reliable CDN for the dictionaries
-const DICT_URL = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict';
+// Use a reliable CDN for the dictionaries (must end with a slash)
+const DICT_URL = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
 
 export async function getTokenizer(): Promise<Tokenizer> {
   if (tokenizer) return tokenizer;
   if (loadingPromise) return loadingPromise;
 
+  console.log('Initializing Kuromoji tokenizer with dict path:', DICT_URL);
   loadingPromise = new Promise((resolve, reject) => {
     try {
-      kuromoji.builder({ dicPath: DICT_URL }).build((err, _tokenizer) => {
+      const builder = getBuilder();
+      if (!builder) {
+        throw new Error('Kuromoji builder not found in module');
+      }
+      builder({ dicPath: DICT_URL }).build((err: any, _tokenizer: any) => {
         if (err) {
-          console.error('Kuromoji builder error:', err);
+          console.error('Kuromoji builder error details:', err);
           loadingPromise = null;
           reject(err);
           return;
         }
+        console.log('Kuromoji tokenizer successfully initialized');
         tokenizer = _tokenizer;
         resolve(_tokenizer);
       });
     } catch (e) {
-      console.error('Kuromoji initialization failed:', e);
+      console.error('Kuromoji initialization caught exception:', e);
       loadingPromise = null;
       reject(e);
     }
