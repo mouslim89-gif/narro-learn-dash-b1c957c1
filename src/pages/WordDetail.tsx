@@ -71,10 +71,10 @@ export default function WordDetail() {
    return () => { cancelled = true; };
  }, [word, result]);
 
- const disp = result ? getDisplayWord(result) : null;
- const display = disp?.word || word;
- const reading = disp?.reading ||'';
- const saved = hasWord(display);
+  const disp = result ? getDisplayWord(result) : null;
+  const display = disp?.word || word;
+  const reading = disp?.reading || '';
+  const saved = hasWord(word);
 
  const handleBack = () => {
  try {
@@ -91,22 +91,22 @@ export default function WordDetail() {
  else navigate('/dictionary');
  };
 
- const toggleSave = () => {
- if (!result) return;
- if (saved) {
- removeWord(display);
- return;
- }
- const entry: Omit<SavedWord,'mastery'> = {
- id: display,
- word: display,
- reading: reading || result.japanese[0]?.reading ||'',
- meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
- jlpt: result.jlpt,
- partsOfSpeech: result.senses[0]?.parts_of_speech,
- };
- addWord(entry);
- };
+  const toggleSave = () => {
+    if (!result) return;
+    if (saved) {
+      removeWord(word);
+      return;
+    }
+    const entry: Omit<SavedWord, 'mastery'> = {
+      id: word,
+      word: word,
+      reading: reading || result.japanese[0]?.reading || '',
+      meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
+      jlpt: result.jlpt,
+      partsOfSpeech: result.senses[0]?.parts_of_speech,
+    };
+    addWord(entry);
+  };
 
  const highlightWord = (text: string, target: string) => {
  const idx = text.indexOf(target);
