@@ -13,6 +13,14 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  optimizeDeps: {
+    include: ["kuromoji"],
+    esbuildOptions: {
+      alias: {
+        path: path.resolve(__dirname, "./src/lib/path-polyfill.ts"),
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
