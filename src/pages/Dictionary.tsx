@@ -207,7 +207,7 @@ export default function DictionaryPage() {
 
  <div className="stagger-children mt-5 flex flex-col gap-3 px-6">
  {jishoResults.map((result, idx) => {
- const disp = getDisplayWord(result);
+  const disp = getDisplayWord(result, query);
  const word = disp.word || result.slug;
  const reading = disp.reading;
  const saved = hasWord(word);

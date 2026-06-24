@@ -74,9 +74,9 @@ export function SplashScreen() {
               }}
             >
               {[
-                { w: "w-7", d: 0.85 },
+                { w: "w-7", d: 1.01 },
                 { w: "w-9", d: 0.93 },
-                { w: "w-8", d: 1.01 }
+                { w: "w-8", d: 0.85 }
               ].map((book, i) => (
                 <motion.div
                   key={i}
