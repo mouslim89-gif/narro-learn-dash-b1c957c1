@@ -71,7 +71,7 @@ export default function WordDetail() {
    return () => { cancelled = true; };
  }, [word, result]);
 
-  const disp = result ? getDisplayWord(result) : null;
+  const disp = result ? getDisplayWord(result, word) : null;
   const display = disp?.word || word;
   const reading = disp?.reading || '';
   const saved = hasWord(word);
