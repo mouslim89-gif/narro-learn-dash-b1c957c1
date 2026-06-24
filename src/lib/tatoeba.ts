@@ -19,23 +19,23 @@ export async function fetchExample(word: string): Promise<ExampleSentence | null
 
 const multiCache = new Map<string, ExampleSentence[]>();
 
-const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
+import { isKanji } from './utils';
 
 function isWordStandalone(text: string, word: string): boolean {
-  const isTargetAllKanji = /^[\u4e00-\u9fff]+$/.test(word);
-  if (!isTargetAllKanji) return true; // Simple search for non-kanji or mixed for now
+  const isTargetAllKanji = /^[\u4e00-\u9fff々]+$/.test(word);
+  if (!isTargetAllKanji) return true;
 
   let idx = -1;
   while ((idx = text.indexOf(word, idx + 1)) !== -1) {
     const charBefore = text[idx - 1];
     const charAfter = text[idx + word.length];
-    // If it's pure kanji, it shouldn't be adjacent to another kanji
     if (!isKanji(charBefore) && !isKanji(charAfter)) {
       return true;
     }
   }
   return false;
 }
+
 
 export async function fetchExamples(word: string, limit = 3, altWord?: string): Promise<ExampleSentence[]> {
   const key = `${word}::${altWord ?? ''}::${limit}`;
@@ -68,11 +68,12 @@ export async function fetchExamples(word: string, limit = 3, altWord?: string): 
     // Filter out sentences where the kanji is part of a larger compound
     // (e.g. if searching for 林, don't show sentences where it's only found in 林檎)
     if (word.length > 0 && isKanji(word[0])) {
-      const filtered = sentences.filter(s => isWordStandalone(s.japanese, word) || (altWord && isWordStandalone(s.japanese, altWord)));
-      if (filtered.length > 0) {
-        sentences = filtered;
-      }
+      sentences = sentences.filter(s => 
+        isWordStandalone(s.japanese, word) || 
+        (altWord && isWordStandalone(s.japanese, altWord))
+      );
     }
+
 
     const finalResults = sentences.slice(0, limit);
     multiCache.set(key, finalResults);
