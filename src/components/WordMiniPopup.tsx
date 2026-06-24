@@ -1,5 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from'react';
 import { Star, ChevronRight, Loader2, Languages } from'lucide-react';
+import { toRomaji } from 'wanakana';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from'@/lib/jisho';
@@ -229,11 +230,16 @@ export function WordMiniPopup({
  </div>
 
  {/* Reading */}
- {headerReading && headerReading !== headerWord && (
- <p className="font-japanese text-[11px] text-muted-foreground px-2.5 -mt-0.5">
- {headerReading}
- </p>
- )}
+  {(headerReading || (pronunciation && pronunciation !== headerWord)) && (
+    <p className="font-japanese text-[11px] text-muted-foreground px-2.5 -mt-0.5 flex items-baseline gap-2">
+      {headerReading && headerReading !== headerWord && (
+        <span>{headerReading}</span>
+      )}
+      {pronunciation && (
+        <span className="text-[10px] italic opacity-70">{toRomaji(pronunciation)}</span>
+      )}
+    </p>
+  )}
 
  {/* Content */}
  <div className="px-2.5 pt-1 pb-2">
