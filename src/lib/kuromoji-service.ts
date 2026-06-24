@@ -78,7 +78,7 @@ export async function tokenizeToFurigana(text: string): Promise<FuriganaToken[]>
     const t = await getTokenizer();
     const tokens = t.tokenize(text);
 
-    return tokens.map((token: any) => {
+    const result = tokens.map((token: any) => {
       const surface = token.surface_form;
       const reading = token.reading;
 
@@ -90,8 +90,12 @@ export async function tokenizeToFurigana(text: string): Promise<FuriganaToken[]>
       }
       return { t: surface };
     });
+
+    console.log(`Kuromoji: Tokenized text (${text.slice(0, 10)}...):`, result);
+    return result;
   } catch (err) {
     console.error('Kuromoji: Tokenization failed, using fallback:', err);
     return [{ t: text }];
   }
 }
+
