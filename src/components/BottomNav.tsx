@@ -53,7 +53,7 @@ export function BottomNav() {
  <div className="relative z-10">
  <Icon className="h-5 w-5"strokeWidth={active ? 2.2 : 1.8} />
             {showBadge && (
-              <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-destructive-foreground animate-scale-pop animate-soft-pulse shadow-[0_0_8px_hsl(var(--destructive)/0.4)]">
+              <span className="absolute -right-1.5 -top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-destructive-foreground animate-scale-pop shadow-[0_0_8px_hsl(var(--destructive)/0.4)]">
                 {dueCount > 9 ? '9+' : dueCount}
               </span>
             )}
