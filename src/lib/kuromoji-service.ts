@@ -5,27 +5,29 @@ type Tokenizer = kuromoji.Tokenizer<kuromoji.IpadicFeatures>;
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
 
-// Use a reliable CDN for the dictionaries
-const DICT_URL = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict';
+// Use a reliable CDN for the dictionaries (must end with a slash)
+const DICT_URL = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
 
 export async function getTokenizer(): Promise<Tokenizer> {
   if (tokenizer) return tokenizer;
   if (loadingPromise) return loadingPromise;
 
+  console.log('Initializing Kuromoji tokenizer with dict path:', DICT_URL);
   loadingPromise = new Promise((resolve, reject) => {
     try {
       kuromoji.builder({ dicPath: DICT_URL }).build((err, _tokenizer) => {
         if (err) {
-          console.error('Kuromoji builder error:', err);
+          console.error('Kuromoji builder error details:', err);
           loadingPromise = null;
           reject(err);
           return;
         }
+        console.log('Kuromoji tokenizer successfully initialized');
         tokenizer = _tokenizer;
         resolve(_tokenizer);
       });
     } catch (e) {
-      console.error('Kuromoji initialization failed:', e);
+      console.error('Kuromoji initialization caught exception:', e);
       loadingPromise = null;
       reject(e);
     }
