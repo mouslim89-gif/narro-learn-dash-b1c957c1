@@ -1,36 +1,17 @@
-import { Fragment, type ReactNode } from'react';
-import { segmentsFromReading, type FuriganaSegment } from'@/components/FuriganaWord';
+import { Fragment, type ReactNode } from 'react';
+import { FuriganaWord } from '@/components/FuriganaWord';
 
 interface FuriganaSentenceProps {
- /** Pre-tokenized sentence with readings (preferred for furigana). */
- tokens?: { t: string; r?: string }[];
- /** Raw sentence text — used when tokens are absent. */
- fallbackText?: string;
- /** Token surface (or substring) to highlight as the studied word. */
- highlight?: string;
- className?: string;
+  /** Pre-tokenized sentence with readings (preferred for furigana). */
+  tokens?: { t: string; r?: string }[];
+  /** Raw sentence text — used when tokens are absent. */
+  fallbackText?: string;
+  /** Token surface (or substring) to highlight as the studied word. */
+  highlight?: string;
+  className?: string;
 }
 
 const KANJI_RE = /[\u4E00-\u9FFF\u3400-\u4DBF]/;
-
-function renderSegments(segments: FuriganaSegment[], key: number): ReactNode {
- return (
- <Fragment key={key}>
- {segments.map((seg, i) =>
- seg.reading ? (
- <ruby key={i}>
- {seg.text}
- <rt className="font-japanese text-[0.55em] font-normal text-foreground/60 leading-none">
- {seg.reading}
- </rt>
- </ruby>
- ) : (
- <Fragment key={i}>{seg.text}</Fragment>
- )
- )}
- </Fragment>
- );
-}
 
 export function FuriganaSentence({
  tokens,
