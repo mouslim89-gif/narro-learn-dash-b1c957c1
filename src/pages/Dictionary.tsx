@@ -248,9 +248,9 @@ export default function DictionaryPage() {
 						{reading && reading !== word && (
 							<span className="font-japanese text-sm text-muted-foreground whitespace-nowrap">{reading}</span>
 						)}
-						{reading && (
-							<span className="text-xs text-muted-foreground/70 italic whitespace-nowrap">{toRomaji(reading)}</span>
-						)}
+ 						{disp.pronunciation && (
+ 							<span className="text-xs text-muted-foreground/70 italic whitespace-nowrap">{toRomaji(disp.pronunciation)}</span>
+ 						)}
 						<span onClick={(e) => e.stopPropagation()}>
 							<PlayWordButton word={word} reading={reading} size={16} />
 						</span>
