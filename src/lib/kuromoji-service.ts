@@ -1,7 +1,5 @@
 import * as kuromojiModule from 'kuromoji/build/kuromoji.js';
 
-// The build/kuromoji.js is a UMD bundle. 
-// In some environments, it might be on .default, in others directly on the module.
 const kuromoji = (kuromojiModule as any).default || kuromojiModule;
 
 type Tokenizer = any;
@@ -9,8 +7,8 @@ type Tokenizer = any;
 let tokenizer: Tokenizer | null = null;
 let loadingPromise: Promise<Tokenizer> | null = null;
 
-// unpkg is generally reliable for these files
-const DICT_URL = 'https://unpkg.com/kuromoji@0.1.2/dict';
+// Local dictionaries are served from the public/dict/ folder
+const DICT_URL = '/dict';
 
 export async function getTokenizer(): Promise<Tokenizer> {
   if (tokenizer) return tokenizer;
