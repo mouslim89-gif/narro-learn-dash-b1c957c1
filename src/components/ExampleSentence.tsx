@@ -35,18 +35,39 @@ export function ExampleSentence({ word, className =''}: ExampleSentenceProps) {
 
  if (!example) return null;
 
- const highlightWord = (text: string) => {
- const index = text.indexOf(word);
- if (index === -1) return text;
- 
- return (
- <>
- {text.slice(0, index)}
- <span className="text-accent font-bold">{word}</span>
- {text.slice(index + word.length)}
- </>
- );
- };
+  const highlightWord = (text: string) => {
+    const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
+    const isAllKanji = /^[\u4e00-\u9fff]+$/.test(word);
+    
+    let foundIdx = -1;
+    if (isAllKanji) {
+      let idx = -1;
+      while ((idx = text.indexOf(word, idx + 1)) !== -1) {
+        const charBefore = text[idx - 1];
+        const charAfter = text[idx + word.length];
+        if (!isKanji(charBefore) && !isKanji(charAfter)) {
+          foundIdx = idx;
+          break;
+        }
+      }
+    } else {
+      foundIdx = text.indexOf(word);
+    }
+
+    if (foundIdx === -1) {
+      const fallbackIdx = text.indexOf(word);
+      if (fallbackIdx === -1) return text;
+      foundIdx = fallbackIdx;
+    }
+    
+    return (
+      <>
+        {text.slice(0, foundIdx)}
+        <span className="text-accent font-bold">{word}</span>
+        {text.slice(foundIdx + word.length)}
+      </>
+    );
+  };
 
  return (
  <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
