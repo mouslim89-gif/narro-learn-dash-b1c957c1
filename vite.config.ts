@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  define: {
+    global: "window",
+  },
   optimizeDeps: {
     include: ["kuromoji"],
     esbuildOptions: {
