@@ -1,68 +1,72 @@
-import { useState, useEffect } from'react';
+import { useState, useEffect } from 'react';
 import { fetchExample, type ExampleSentence as ExampleData } from '@/lib/tatoeba';
-import { highlightJapaneseWord } from '@/lib/utils';
-import { PlayWordButton } from'@/components/PlayWordButton';
-import { Skeleton } from'@/components/ui/skeleton';
+import { PlayWordButton } from '@/components/PlayWordButton';
+import { Skeleton } from '@/components/ui/skeleton';
+import { tokenizeToFurigana, type FuriganaToken } from '@/lib/kuromoji-service';
+import { FuriganaSentence } from './FuriganaSentence';
 
 interface ExampleSentenceProps {
- word: string;
- className?: string;
+  word: string;
+  className?: string;
 }
 
-export function ExampleSentence({ word, className =''}: ExampleSentenceProps) {
- const [example, setExample] = useState<ExampleData | null>(null);
- const [loading, setLoading] = useState(true);
+export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) {
+  const [example, setExample] = useState<ExampleData | null>(null);
+  const [tokens, setTokens] = useState<FuriganaToken[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
- useEffect(() => {
- let cancelled = false;
- setLoading(true);
- fetchExample(word).then((result) => {
- if (!cancelled) {
- setExample(result);
- setLoading(false);
- }
- });
- return () => { cancelled = true; };
- }, [word]);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchExample(word).then((result) => {
+      if (!cancelled) {
+        setExample(result);
+        setLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [word]);
 
- if (loading) {
- return (
- <div className={`mt-2 space-y-1 ${className}`}>
- <Skeleton className="h-4 w-3/4"/>
- <Skeleton className="h-3 w-1/2"/>
- </div>
- );
- }
+  useEffect(() => {
+    if (!example) {
+      setTokens(null);
+      return;
+    }
+    let cancelled = false;
+    tokenizeToFurigana(example.japanese).then((t) => {
+      if (!cancelled) setTokens(t);
+    });
+    return () => { cancelled = true; };
+  }, [example]);
 
- if (!example) return null;
-
-  const renderJapanese = (text: string) => {
-    const foundIdx = highlightJapaneseWord(text, word);
-    if (foundIdx === -1) return text;
-    
+  if (loading) {
     return (
-      <>
-        {text.slice(0, foundIdx)}
-        <span className="text-accent font-bold">{word}</span>
-        {text.slice(foundIdx + word.length)}
-      </>
+      <div className={`mt-2 space-y-1 ${className}`}>
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
     );
-  };
+  }
 
+  if (!example) return null;
 
- return (
- <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
- <div className="flex items-start gap-1">
- <p className="font-japanese text-sm font-semibold leading-relaxed flex-1">
- {renderJapanese(example.japanese)}
- </p>
- <PlayWordButton word={example.japanese} size={14} className="mt-0.5 shrink-0"/>
- </div>
- {example.english && (
- <p className="mt-0.5 text-xs text-muted-foreground italic">
- {example.english}
- </p>
- )}
- </div>
- );
+  return (
+    <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
+      <div className="flex items-start gap-1">
+        <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
+          {tokens ? (
+            <FuriganaSentence tokens={tokens} highlight={word} />
+          ) : (
+            example.japanese
+          )}
+        </div>
+        <PlayWordButton word={example.japanese} size={14} className="mt-0.5 shrink-0" />
+      </div>
+      {example.english && (
+        <p className="mt-0.5 text-xs text-muted-foreground italic">
+          {example.english}
+        </p>
+      )}
+    </div>
+  );
 }
