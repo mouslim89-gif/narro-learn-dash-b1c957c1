@@ -25,26 +25,41 @@ interface Sentence {
   tokens?: Token[];
 }
 
-async function tokenizeWithAI(japanese: string, gateway: any): Promise<Token[]> {
-  const { text } = await generateText({
-    model: gateway("openai/gpt-4o-mini"),
-    system: "You are a Japanese linguistics expert. Tokenize the given Japanese sentence and provide readings for words containing Kanji. Format the output as a JSON array of tokens where each token is {t: 'surface', r: 'reading'}. Only include 'r' for tokens containing Kanji. Reading should be in Hiragana.",
-    prompt: `Tokenize this sentence: ${japanese}`,
-    responseFormat: {
-      type: 'json',
-      schema: z.array(z.object({
-        t: z.string(),
-        r: z.string().optional()
-      }))
-    }
+async function tokenizeWithAI(japanese: string, apiKey: string): Promise<Token[]> {
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Lovable-API-Key": apiKey,
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.0-flash-001",
+      messages: [
+        { role: "system", content: "You are a Japanese linguistics expert. Tokenize the given Japanese sentence and provide readings for words containing Kanji. Format the output as a JSON array of tokens where each token is {t: 'surface', r: 'reading'}. Only include 'r' for tokens containing Kanji. Reading should be in Hiragana. Return ONLY the JSON array." },
+        { role: "user", content: japanese }
+      ],
+      response_format: { type: "json_object" }
+    })
   });
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("AI Gateway error:", errorText);
+    return [{ t: japanese }];
+  }
+
+  const data = await response.json();
   try {
-    return JSON.parse(text);
-  } catch {
+    const content = data.choices[0].message.content;
+    const parsed = JSON.parse(content);
+    // Handle both cases: direct array or object with 'tokens' property
+    return Array.isArray(parsed) ? parsed : (parsed.tokens || [{ t: japanese }]);
+  } catch (err) {
+    console.error("AI parsing error:", err);
     return [{ t: japanese }];
   }
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
