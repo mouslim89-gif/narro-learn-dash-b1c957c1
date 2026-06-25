@@ -346,12 +346,9 @@ export default function WordDetail() {
 
   {/* Context Sentence */}
   {context && (
-    <section className="mt-4 px-1">
-      <div className="flex items-center gap-1.5 mb-2">
-        <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">From your reading</h2>
-      </div>
-      <div className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
+    <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
+      <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
+      <div className="font-japanese font-jp-serif text-[15px] leading-relaxed text-foreground/90">
         {context.tokens ? (
           <FuriganaSentence tokens={context.tokens} highlight={word} />
         ) : (
