@@ -145,18 +145,6 @@ export default function WordDetail() {
     addWord(entry);
   };
 
-  const renderJapanese = (text: string, target: string) => {
-    const foundIdx = highlightJapaneseWord(text, target);
-    if (foundIdx === -1) return text;
-
-    return (
-      <>
-        {text.slice(0, foundIdx)}
-        <span className="text-accent font-bold">{target}</span>
-        {text.slice(foundIdx + target.length)}
-      </>
-    );
-  };
 
 
  return (
