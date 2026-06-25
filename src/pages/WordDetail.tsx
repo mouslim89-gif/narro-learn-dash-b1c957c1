@@ -24,6 +24,7 @@ export default function WordDetail() {
    const { addWord, removeWord, hasWord, savedWords } = useFlashcardStore();
    const { japaneseFont } = useReadingProgressStore();
    const [context, setContext] = useState<{sentence?: string, tokens?: {t: string, r?: string}[]} | null>(null);
+   const lastWordRef = useRef(word);
 
 
  const [result, setResult] = useState<JishoResult | null>(null);
