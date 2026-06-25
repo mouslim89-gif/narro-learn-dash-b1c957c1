@@ -346,12 +346,12 @@ export default function WordDetail() {
 
   {/* Context Sentence */}
   {context && (
-    <section className="rounded-2xl bg-primary/5 p-5 ring-1 ring-primary/10">
-      <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <h2 className="font-serif text-lg font-semibold text-primary">From your reading</h2>
+    <section className="rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10">
+      <div className="flex items-center gap-2 mb-2">
+        <Sparkles className="h-3.5 w-3.5 text-primary" />
+        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">From your reading</h2>
       </div>
-      <div className="font-japanese text-lg font-semibold leading-relaxed">
+      <div className="font-japanese text-sm font-semibold leading-relaxed">
         {context.tokens ? (
           <FuriganaSentence tokens={context.tokens} highlight={word} />
         ) : (
