@@ -60,7 +60,7 @@ export function FuriganaSentence({
           return (
             <span
               key={i}
-              className="text-primary font-semibold underline decoration-dotted underline-offset-4"
+              className="text-accent font-semibold underline decoration-dotted underline-offset-4"
             >
               {content}
             </span>
