@@ -208,9 +208,9 @@ export function FlashcardReview({ deck, onExit }: Props) {
  {/* Front face */}
  <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
  {/* decorative kanji watermark */}
- <span className="pointer-events-none select-none absolute -top-10 -right-6 font-japanese text-[220px] leading-none font-bold text-foreground/[0.025]">
- {card.word.charAt(0)}
- </span>
+              <span className={cn("pointer-events-none select-none absolute -top-10 -right-6 text-[220px] leading-none font-bold text-foreground/[0.025]", japaneseFontClassMap[japaneseFont])}>
+                {card.word.charAt(0)}
+              </span>
 
  <div className="relative flex-1 flex flex-col items-center justify-center px-6">
  <p className="font-japanese text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm">
