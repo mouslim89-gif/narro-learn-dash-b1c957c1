@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
     // 3. Tokenize best sentences
     for (const s of best) {
       if (!s.tokens) {
-        s.tokens = await tokenizeWithAI(s.japanese, gateway);
+        s.tokens = await tokenizeWithAI(s.japanese, key);
       }
     }
 
