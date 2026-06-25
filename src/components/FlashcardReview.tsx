@@ -213,9 +213,9 @@ export function FlashcardReview({ deck, onExit }: Props) {
               </span>
 
  <div className="relative flex-1 flex flex-col items-center justify-center px-6">
- <p className="font-japanese text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm">
- {card.word}
- </p>
+                <p className={cn("text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm", japaneseFontClassMap[japaneseFont])}>
+                  {card.word}
+                </p>
  <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent"/>
  <p
  className={`font-japanese text-xl mt-7 font-medium transition-all duration-300 ${
