@@ -226,7 +226,26 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  tryLookup();
 
  return () => { cancelled = true; };
- }, [word, kuromojiBase, kuromojiPos, cached]);
+  }, [word, kuromojiBase, kuromojiPos, cached]);
+
+  useEffect(() => {
+    setTokens(contextTokens);
+    if (contextSentence && (!contextTokens || contextTokens.length === 0)) {
+      import('@/integrations/supabase/client').then(({ supabase }) => {
+        supabase.functions.invoke('tatoeba-example', {
+          body: { mode: 'tokenize', sentence: contextSentence }
+        }).then(({ data }) => {
+          if (data?.tokens) {
+            setTokens(data.tokens);
+            // If already saved, persist to flashcard
+            if (saved) {
+              useFlashcardStore.getState().attachContext(wordId, { tokens: data.tokens });
+            }
+          }
+        }).catch(console.error);
+      });
+    }
+  }, [contextSentence, contextTokens, wordId, saved]);
 
  const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
