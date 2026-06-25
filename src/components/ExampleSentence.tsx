@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { fetchExample, type ExampleSentence as ExampleData } from '@/lib/tatoeba';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { PlayWordButton } from '@/components/PlayWordButton';
+import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FuriganaSentence } from './FuriganaSentence';
 
