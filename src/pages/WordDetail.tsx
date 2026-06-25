@@ -351,7 +351,7 @@ export default function WordDetail() {
         <Sparkles className="h-3.5 w-3.5 text-primary" />
         <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">From your reading</h2>
       </div>
-      <div className="font-japanese text-sm font-semibold leading-relaxed">
+      <div className="font-japanese text-sm font-semibold leading-[2.2]">
         {context.tokens ? (
           <FuriganaSentence tokens={context.tokens} highlight={word} />
         ) : (
