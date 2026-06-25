@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from'react';
-import { Star, BookOpen, ChevronDown, Sparkles } from'lucide-react';
+import { Star, BookOpen, ChevronDown } from'lucide-react';
 import { FuriganaSentence } from './FuriganaSentence';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
