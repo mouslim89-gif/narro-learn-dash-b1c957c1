@@ -78,32 +78,57 @@ export default function WordDetail() {
    return () => { cancelled = true; };
    }, [word, result]);
  
-   useEffect(() => {
-     if (!word) return;
-     // 1. Check if word is in store with context
-     const sw = savedWords.find(s => s.id === word);
-     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
-       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
-       return;
-     }
- 
-     // 2. Check session storage (if we just arrived from reader)
-     try {
-       const stored = sessionStorage.getItem('reopen-word-popup');
-       if (stored) {
-         const data = JSON.parse(stored);
-         // Check if the word in storage matches the current word
-         // or if the baseForm matches (since we might have navigated to the base form)
-         if ((data?.word?.text === word || data?.word?.baseForm === word) && 
-             (data?.word?.contextSentence || data?.word?.contextTokens)) {
-           setContext({ 
-             sentence: data.word.contextSentence, 
-             tokens: data.word.contextTokens 
-           });
-         }
-       }
-     } catch {}
-   }, [word, savedWords]);
+  useEffect(() => {
+    if (!word) return;
+    // 1. Check if word is in store with context
+    const sw = savedWords.find(s => s.id === word);
+    if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
+      setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
+      
+      // Lazy re-tokenize if tokens are missing but sentence exists
+      if (sw.contextSentence && (!sw.contextTokens || sw.contextTokens.length === 0)) {
+        import('@/integrations/supabase/client').then(({ supabase }) => {
+          supabase.functions.invoke('tatoeba-example', {
+            body: { mode: 'tokenize', sentence: sw.contextSentence }
+          }).then(({ data }) => {
+            if (data?.tokens) {
+              useFlashcardStore.getState().attachContext(word, { tokens: data.tokens });
+              setContext(prev => ({ ...prev, tokens: data.tokens }));
+            }
+          }).catch(console.error);
+        });
+      }
+      return;
+    }
+
+    // 2. Check session storage (if we just arrived from reader)
+    try {
+      const stored = sessionStorage.getItem('reopen-word-popup');
+      if (stored) {
+        const data = JSON.parse(stored);
+        if ((data?.word?.text === word || data?.word?.baseForm === word) && 
+            (data?.word?.contextSentence || data?.word?.contextTokens)) {
+          setContext({ 
+            sentence: data.word.contextSentence, 
+            tokens: data.word.contextTokens 
+          });
+          
+          // Lazy re-tokenize if tokens are missing but sentence exists
+          if (data.word.contextSentence && (!data.word.contextTokens || data.word.contextTokens.length === 0)) {
+            import('@/integrations/supabase/client').then(({ supabase }) => {
+              supabase.functions.invoke('tatoeba-example', {
+                body: { mode: 'tokenize', sentence: data.word.contextSentence }
+              }).then(({ data: tokData }) => {
+                if (tokData?.tokens) {
+                  setContext(prev => ({ ...prev, tokens: tokData.tokens }));
+                }
+              }).catch(console.error);
+            });
+          }
+        }
+      }
+    } catch {}
+  }, [word, savedWords]);
 
 
 
