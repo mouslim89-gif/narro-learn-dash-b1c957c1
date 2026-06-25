@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from'react';
 import { Star, BookOpen, ChevronDown } from'lucide-react';
 import { FuriganaSentence } from './FuriganaSentence';
+import { cn } from '@/lib/utils';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
