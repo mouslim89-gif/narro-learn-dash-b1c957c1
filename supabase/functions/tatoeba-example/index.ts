@@ -49,9 +49,9 @@ async function tokenizeWithAI(japanese: string, apiKey: string): Promise<Token[]
   }
 
   const data = await response.json();
-  const content = data.choices[0].message.content;
-  console.log("AI content:", content);
   try {
+    const content = data.choices[0].message.content;
+
 
     const parsed = JSON.parse(content);
     // Handle both cases: direct array or object with 'tokens' property
