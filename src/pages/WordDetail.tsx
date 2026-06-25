@@ -76,17 +76,6 @@ export default function WordDetail() {
    return () => { cancelled = true; };
   }, [word, result]);
 
-  useEffect(() => {
-    if (!examples) {
-      setExampleTokens(null);
-      return;
-    }
-    let cancelled = false;
-    Promise.all(examples.map(ex => tokenizeToFurigana(ex.japanese))).then(allTokens => {
-      if (!cancelled) setExampleTokens(allTokens);
-    });
-    return () => { cancelled = true; };
-  }, [examples]);
 
 
   const disp = result ? getDisplayWord(result, word) : null;
