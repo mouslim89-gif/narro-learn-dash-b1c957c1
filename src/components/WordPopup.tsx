@@ -324,12 +324,12 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
   
   {/* Context sentence from the story */}
   {(contextSentence || (contextTokens && contextTokens.length > 0)) && (
-    <section className="rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10">
-      <div className="flex items-center gap-1.5 mb-2.5">
-        <Sparkles className="h-3.5 w-3.5 text-primary" />
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">From your reading</p>
+    <section className="mt-4">
+      <div className="flex items-center gap-1.5 mb-2">
+        <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">From your reading</p>
       </div>
-      <div className="font-japanese text-sm font-semibold leading-[2.2]">
+      <div className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
         {contextTokens ? (
           <FuriganaSentence tokens={contextTokens} highlight={word} />
         ) : (
