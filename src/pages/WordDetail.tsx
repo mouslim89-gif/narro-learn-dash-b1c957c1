@@ -11,8 +11,8 @@ import { Skeleton } from'@/components/ui/skeleton';
 import { toRomaji } from'wanakana';
 import { fetchExamples, type ExampleSentence } from '@/lib/tatoeba';
 import { extractKanji, fetchKanji, type KanjiDetails } from '@/lib/kanji';
-import { tokenizeToFurigana, type FuriganaToken } from '@/lib/kuromoji-service';
 import { FuriganaSentence } from '@/components/FuriganaSentence';
+
 
 import { cn, highlightJapaneseWord } from '@/lib/utils';
 
