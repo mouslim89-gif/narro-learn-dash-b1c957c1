@@ -329,7 +329,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
         <Sparkles className="h-3.5 w-3.5 text-primary" />
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">From your reading</p>
       </div>
-      <div className="font-japanese text-[15px] font-semibold leading-relaxed">
+      <div className="font-japanese text-sm font-semibold leading-[2.2]">
         {contextTokens ? (
           <FuriganaSentence tokens={contextTokens} highlight={word} />
         ) : (
