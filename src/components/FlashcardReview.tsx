@@ -217,11 +217,11 @@ export function FlashcardReview({ deck, onExit }: Props) {
                   {card.word}
                 </p>
  <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent"/>
- <p
- className={`font-japanese text-xl mt-7 font-medium transition-all duration-300 ${
- showFrontReading ?'text-muted-foreground opacity-100':'text-muted-foreground opacity-0 blur-md select-none'}`}
- aria-hidden={!showFrontReading}
- >
+                <p
+                  className={cn("text-xl mt-7 font-medium transition-all duration-300", japaneseFontClassMap[japaneseFont],
+                  showFrontReading ?'text-muted-foreground opacity-100':'text-muted-foreground opacity-0 blur-md select-none')}
+                  aria-hidden={!showFrontReading}
+                >
  {card.reading ||'—'}
  </p>
  </div>
