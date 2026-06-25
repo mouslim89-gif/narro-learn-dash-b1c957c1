@@ -171,10 +171,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  const [loading, setLoading] = useState(!cached);
  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, kuromojiPos, surfaceForMatch));
  const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? kuromojiBase ?? null);
- const [error, setError] = useState(false);
+  const [error, setError] = useState(false);
+  const [tokens, setTokens] = useState<{t: string, r?: string}[] | undefined>(contextTokens);
 
- const wordId = word;
- const saved = hasWord(wordId);
+  const wordId = word;
+  const saved = hasWord(wordId);
 
  useEffect(() => {
  if (cached) {
