@@ -10,6 +10,8 @@ import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { loadBookTokens, type BookTokenMap } from '@/data/book-tokens';
+import { fetchExamples } from '@/lib/tatoeba';
+
 import { cn } from'@/lib/utils';
 import { motion } from 'framer-motion';
 
