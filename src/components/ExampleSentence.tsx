@@ -41,12 +41,13 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
     <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
       <div className="flex items-start gap-1">
         <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
-          {tokens ? (
-            <FuriganaSentence tokens={tokens} highlight={word} />
+          {example.tokens ? (
+            <FuriganaSentence tokens={example.tokens} highlight={word} />
           ) : (
             example.japanese
           )}
         </div>
+
         <PlayWordButton word={example.japanese} size={14} className="mt-0.5 shrink-0" />
       </div>
       {example.english && (
