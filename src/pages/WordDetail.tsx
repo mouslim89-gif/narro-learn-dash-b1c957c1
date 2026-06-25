@@ -21,8 +21,9 @@ export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
  const navigate = useNavigate();
  const word = rawWord ? decodeURIComponent(rawWord) :'';
-  const { addWord, removeWord, hasWord, savedWords } = useFlashcardStore();
-  const [context, setContext] = useState<{sentence?: string, tokens?: {t: string, r?: string}[]} | null>(null);
+   const { addWord, removeWord, hasWord, savedWords } = useFlashcardStore();
+   const { japaneseFont } = useReadingProgressStore();
+   const [context, setContext] = useState<{sentence?: string, tokens?: {t: string, r?: string}[]} | null>(null);
 
 
  const [result, setResult] = useState<JishoResult | null>(null);
