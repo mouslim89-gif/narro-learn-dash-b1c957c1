@@ -1,7 +1,7 @@
 import { useEffect, useState } from'react';
 import { useNavigate, useParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
-import { ArrowLeft, Star, Loader2 } from'lucide-react';
+import { ArrowLeft, Star, Loader2, Sparkles } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { PlayWordButton } from'@/components/PlayWordButton';
@@ -20,7 +20,9 @@ export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
  const navigate = useNavigate();
  const word = rawWord ? decodeURIComponent(rawWord) :'';
- const { addWord, removeWord, hasWord } = useFlashcardStore();
+  const { addWord, removeWord, hasWord, savedWords } = useFlashcardStore();
+  const [context, setContext] = useState<{sentence?: string, tokens?: {t: string, r?: string}[]} | null>(null);
+
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
@@ -74,7 +76,35 @@ export default function WordDetail() {
    }
    fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
    return () => { cancelled = true; };
-  }, [word, result]);
+   }, [word, result]);
+ 
+   useEffect(() => {
+     if (!word) return;
+     // 1. Check if word is in store with context
+     const sw = savedWords.find(s => s.id === word);
+     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
+       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
+       return;
+     }
+ 
+     // 2. Check session storage (if we just arrived from reader)
+     try {
+       const stored = sessionStorage.getItem('reopen-word-popup');
+       if (stored) {
+         const data = JSON.parse(stored);
+         // Check if the word in storage matches the current word
+         // or if the baseForm matches (since we might have navigated to the base form)
+         if ((data?.word?.text === word || data?.word?.baseForm === word) && 
+             (data?.word?.contextSentence || data?.word?.contextTokens)) {
+           setContext({ 
+             sentence: data.word.contextSentence, 
+             tokens: data.word.contextTokens 
+           });
+         }
+       }
+     } catch {}
+   }, [word, savedWords]);
+
 
 
 
@@ -115,18 +145,6 @@ export default function WordDetail() {
     addWord(entry);
   };
 
-  const renderJapanese = (text: string, target: string) => {
-    const foundIdx = highlightJapaneseWord(text, target);
-    if (foundIdx === -1) return text;
-
-    return (
-      <>
-        {text.slice(0, foundIdx)}
-        <span className="text-accent font-bold">{target}</span>
-        {text.slice(foundIdx + target.length)}
-      </>
-    );
-  };
 
 
  return (
@@ -326,7 +344,25 @@ export default function WordDetail() {
  </ol>
  </section>
 
- {/* Examples */}
+  {/* Context Sentence */}
+  {context && (
+    <section className="rounded-2xl bg-primary/5 p-5 ring-1 ring-primary/10">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="h-4 w-4 text-primary" />
+        <h2 className="font-serif text-lg font-semibold text-primary">From your reading</h2>
+      </div>
+      <div className="font-japanese text-lg font-semibold leading-relaxed">
+        {context.tokens ? (
+          <FuriganaSentence tokens={context.tokens} highlight={word} />
+        ) : (
+          context.sentence
+        )}
+      </div>
+    </section>
+  )}
+
+  {/* Examples */}
+
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
  <h2 className="font-serif text-lg font-semibold mb-3">Examples</h2>
  {!examples && (

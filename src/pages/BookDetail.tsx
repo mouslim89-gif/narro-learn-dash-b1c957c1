@@ -10,6 +10,8 @@ import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { loadBookTokens, type BookTokenMap } from '@/data/book-tokens';
+import { fetchExamples } from '@/lib/tatoeba';
+
 import { cn } from'@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -59,6 +61,16 @@ export default function BookDetail() {
 
     return savedWords.filter(sw => uniqueBookWords.has(sw.word));
   }, [tokens, savedWords]);
+
+  useEffect(() => {
+    if (bookWords.length > 0) {
+      // Pre-fetch examples for words the user is learning in this book to warm the cache
+      bookWords.forEach(w => {
+        fetchExamples(w.word, 3);
+      });
+    }
+  }, [bookWords]);
+
 
  if (!book) {
  return (

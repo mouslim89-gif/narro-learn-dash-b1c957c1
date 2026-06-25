@@ -1,5 +1,7 @@
-import { useState, useEffect } from'react';
-import { Star, BookOpen, ChevronDown } from'lucide-react';
+import { useState, useEffect, Fragment } from'react';
+import { Star, BookOpen, ChevronDown, Sparkles } from'lucide-react';
+import { FuriganaSentence } from './FuriganaSentence';
+
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { toRomaji } from'wanakana';
@@ -318,7 +320,25 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  </p>
  ))}
  </div>
- </section>
+  </section>
+  
+  {/* Context sentence from the story */}
+  {(contextSentence || (contextTokens && contextTokens.length > 0)) && (
+    <section className="rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10">
+      <div className="flex items-center gap-1.5 mb-2.5">
+        <Sparkles className="h-3.5 w-3.5 text-primary" />
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">From your reading</p>
+      </div>
+      <div className="font-japanese text-[15px] font-semibold leading-relaxed">
+        {contextTokens ? (
+          <FuriganaSentence tokens={contextTokens} highlight={word} />
+        ) : (
+          contextSentence
+        )}
+      </div>
+    </section>
+  )}
+
 
  {/* Examples */}
  <section>
