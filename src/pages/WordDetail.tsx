@@ -4,6 +4,7 @@ import { DelayedLink as Link } from'@/components/DelayedLink';
 import { ArrowLeft, Star, Loader2, BookOpen } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ConjugationTable, getConjugations } from'@/components/ConjugationTable';
 import { Button } from'@/components/ui/button';
