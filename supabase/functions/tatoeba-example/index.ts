@@ -1,5 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
 import { requireUser } from "../_shared/auth.ts";
+import { createLovableAiGatewayProvider, getLovableAiGatewayRunId, getLovableAiGatewayResponseHeaders } from "../_shared/ai-gateway.ts";
+import { generateText } from "npm:ai";
+import { z } from "npm:zod";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +14,37 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 );
 
-interface Sentence { japanese: string; english: string }
+interface Token {
+  t: string; // text
+  r?: string; // reading (hiragana)
+}
+
+interface Sentence {
+  japanese: string;
+  english: string;
+  tokens?: Token[];
+}
+
+async function tokenizeWithAI(japanese: string, gateway: any): Promise<Token[]> {
+  const { text } = await generateText({
+    model: gateway("google/gemini-2.0-flash-exp"),
+    system: "You are a Japanese linguistics expert. Tokenize the given Japanese sentence and provide readings for words containing Kanji. Format the output as a JSON array of tokens where each token is {t: 'surface', r: 'reading'}. Only include 'r' for tokens containing Kanji. Reading should be in Hiragana.",
+    prompt: `Tokenize this sentence: ${japanese}`,
+    responseFormat: {
+      type: 'json',
+      schema: z.array(z.object({
+        t: z.string(),
+        r: z.string().optional()
+      }))
+    }
+  });
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return [{ t: japanese }];
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -20,6 +53,14 @@ Deno.serve(async (req) => {
 
   const auth = await requireUser(req, corsHeaders);
   if ("error" in auth) return auth.error;
+
+  const key = Deno.env.get("LOVABLE_API_KEY");
+  if (!key) {
+    return new Response(JSON.stringify({ error: 'Missing LOVABLE_API_KEY' }), { status: 500, headers: corsHeaders });
+  }
+
+  const initialRunId = getLovableAiGatewayRunId(req);
+  const gateway = createLovableAiGatewayProvider(key, initialRunId);
 
   try {
     const body = await req.json();
@@ -41,7 +82,6 @@ Deno.serve(async (req) => {
     const matchesTarget = (jp: string) => {
       const check = (target: string) => {
         if (!target || !jp.includes(target)) return false;
-        // If the target is all kanji, we ensure it's not a substring of a larger kanji compound
         if (/^[\u4e00-\u9fff]+$/.test(target)) {
           let idx = -1;
           while ((idx = jp.indexOf(target, idx + 1)) !== -1) {
@@ -65,61 +105,61 @@ Deno.serve(async (req) => {
     // 1. DB cache
     const { data: cached } = await supabase
       .from('example_sentences')
-      .select('japanese, english, sentences')
+      .select('japanese, english, sentences, tokens')
       .eq('word', word)
       .maybeSingle();
 
     if (cached) {
-      const cachedSentences: Sentence[] = Array.isArray(cached.sentences) && cached.sentences.length
+      let cachedSentences: Sentence[] = Array.isArray(cached.sentences) && cached.sentences.length
         ? cached.sentences as Sentence[]
         : cached.japanese
-          ? [{ japanese: cached.japanese, english: cached.english || '' }]
+          ? [{ japanese: cached.japanese, english: cached.english || '', tokens: cached.tokens as Token[] }]
           : [];
 
       const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
       const shorts = filtered.filter((s) => isShortEnough(s.japanese));
       const best = pickBest(filtered, limit);
 
-      // Only trust the cache if it contains at least one short-enough sentence;
-      // otherwise fall through to refetch fresh (shorter) examples.
-      if (shorts.length > 0 && best.length >= limit) {
+      if (shorts.length > 0 && best.length >= limit && best.every(b => !!b.tokens)) {
         return new Response(
           JSON.stringify({
             japanese: best[0]?.japanese ?? null,
             english: best[0]?.english ?? null,
+            tokens: best[0]?.tokens ?? null,
             sentences: best,
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
         );
       }
-      // else fall through to refetch
+      // If we have cached sentences but no tokens, we proceed to re-tokenize
     }
 
-    // Query Tatoeba for both forms when altWord present, merge results.
-    const queries = [word, ...(altWord ? [altWord] : [])];
-    const collected: Sentence[] = [];
-    const seen = new Set<string>();
+    // 2. Query Tatoeba or use existing cache
+    let collected: Sentence[] = [];
+    if (cached && Array.isArray(cached.sentences) && cached.sentences.length > 0) {
+      collected = cached.sentences as Sentence[];
+    } else {
+      const queries = [word, ...(altWord ? [altWord] : [])];
+      const seen = new Set<string>();
 
-    for (const q of queries) {
-      const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&sort=words&limit=20`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.error('Tatoeba API error:', res.status);
-        continue;
-      }
-      const data = await res.json();
-      const results = Array.isArray(data.results) ? data.results : [];
+      for (const q of queries) {
+        const url = `https://tatoeba.org/en/api_v0/search?from=jpn&to=eng&query=${encodeURIComponent(q)}&sort=words&limit=20`;
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const data = await res.json();
+        const results = Array.isArray(data.results) ? data.results : [];
 
-      for (const sentence of results) {
-        const jpText = sentence.text;
-        if (!jpText || seen.has(jpText)) continue;
-        if (!matchesTarget(jpText)) continue;
-        const directTranslations = sentence.translations?.[0] || [];
-        for (const t of directTranslations) {
-          if (t?.lang === 'eng' && t?.text) {
-            collected.push({ japanese: jpText, english: t.text });
-            seen.add(jpText);
-            break;
+        for (const sentence of results) {
+          const jpText = sentence.text;
+          if (!jpText || seen.has(jpText)) continue;
+          if (!matchesTarget(jpText)) continue;
+          const directTranslations = sentence.translations?.[0] || [];
+          for (const t of directTranslations) {
+            if (t?.lang === 'eng' && t?.text) {
+              collected.push({ japanese: jpText, english: t.text });
+              seen.add(jpText);
+              break;
+            }
           }
         }
       }
@@ -127,11 +167,19 @@ Deno.serve(async (req) => {
 
     const best = pickBest(collected, limit);
 
+    // 3. Tokenize best sentences
+    for (const s of best) {
+      if (!s.tokens) {
+        s.tokens = await tokenizeWithAI(s.japanese, gateway);
+      }
+    }
+
     if (best.length > 0) {
       await supabase.from('example_sentences').upsert({
         word,
         japanese: best[0].japanese,
         english: best[0].english,
+        tokens: best[0].tokens,
         sentences: best,
       });
     }
@@ -140,6 +188,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         japanese: best[0]?.japanese ?? null,
         english: best[0]?.english ?? null,
+        tokens: best[0]?.tokens ?? null,
         sentences: best,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } }
@@ -152,3 +201,4 @@ Deno.serve(async (req) => {
     );
   }
 });
+
