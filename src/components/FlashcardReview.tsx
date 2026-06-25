@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from'react';
 import { cn } from '@/lib/utils';
 import { SavedWord, useFlashcardStore } from'@/stores/flashcards';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { FuriganaSentence } from'@/components/FuriganaSentence';
