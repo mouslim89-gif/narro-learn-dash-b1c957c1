@@ -27,7 +27,7 @@ interface Sentence {
 
 async function tokenizeWithAI(japanese: string, gateway: any): Promise<Token[]> {
   const { text } = await generateText({
-    model: gateway("google/gemini-2.0-flash-001"),
+    model: gateway("google/gemini-3-flash-preview"),
     system: "You are a Japanese linguistics expert. Tokenize the given Japanese sentence and provide readings for words containing Kanji. Format the output as a JSON array of tokens where each token is {t: 'surface', r: 'reading'}. Only include 'r' for tokens containing Kanji. Reading should be in Hiragana.",
     prompt: `Tokenize this sentence: ${japanese}`,
     responseFormat: {
