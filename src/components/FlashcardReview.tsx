@@ -313,7 +313,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  tokens={card.contextTokens}
  fallbackText={card.contextSentence}
  highlight={card.word}
- className="font-japanese text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
+ className="font-japanese font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
  />
 
  </section>
