@@ -81,8 +81,9 @@ export default function WordDetail() {
    }, [word, result]);
  
   useEffect(() => {
-    if (!word) return;
-    // 1. Check if word is in store with context
+     if (!word) return;
+     setContext(null);
+     // 1. Check if word is in store with context
     const sw = savedWords.find(s => s.id === word);
     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
