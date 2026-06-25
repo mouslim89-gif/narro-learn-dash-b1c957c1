@@ -153,22 +153,24 @@ export default function WordDetail() {
  else navigate('/dictionary');
  };
 
-  const toggleSave = () => {
-    if (!result) return;
-    if (saved) {
-      removeWord(word);
-      return;
-    }
-    const entry: Omit<SavedWord, 'mastery'> = {
-      id: word,
-      word: word,
-      reading: reading || result.japanese[0]?.reading || '',
-      meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
-      jlpt: result.jlpt,
-      partsOfSpeech: result.senses[0]?.parts_of_speech,
-    };
-    addWord(entry);
-  };
+   const toggleSave = () => {
+     if (!result) return;
+     if (saved) {
+       removeWord(word);
+       return;
+     }
+     const entry: Omit<SavedWord, 'mastery'> = {
+       id: word,
+       word: word,
+       reading: reading || result.japanese[0]?.reading || '',
+       meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
+       jlpt: result.jlpt,
+       partsOfSpeech: result.senses[0]?.parts_of_speech,
+       contextSentence: context?.sentence,
+       contextTokens: context?.tokens,
+     };
+     addWord(entry);
+   };
 
 
 
