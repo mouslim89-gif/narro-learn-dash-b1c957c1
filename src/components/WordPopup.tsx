@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from'react';
 import { Star, BookOpen, ChevronDown } from'lucide-react';
 import { FuriganaSentence } from './FuriganaSentence';
+import { cn } from '@/lib/utils';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
@@ -9,6 +10,7 @@ import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from'@/lib/jisho';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { ConjugationTable, getWordType } from'@/components/ConjugationTable';
 import { Skeleton } from'@/components/ui/skeleton';
 import {
@@ -162,7 +164,8 @@ function LoadingSkeleton() {
 
 export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReading, pos: kuromojiPos, contextSentence, contextTokens, onClose }: WordPopupProps) {
  const { addWord, hasWord, removeWord } = useFlashcardStore();
- const goTo = useDelayedNav();
+  const goTo = useDelayedNav();
+  const { japaneseFont } = useReadingProgressStore();
 
  // Try looking up the base form first (more likely to have dictionary entries)
  const lookupKey = kuromojiBase || word;
@@ -349,7 +352,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
         <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">From your reading</p>
       </div>
-      <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
+      <div className={cn(japaneseFontClassMap[japaneseFont], "text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3")}>
         {tokens ? (
           <FuriganaSentence tokens={tokens} highlight={word} />
         ) : (

@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from'react';
 import { cn } from '@/lib/utils';
 import { SavedWord, useFlashcardStore } from'@/stores/flashcards';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { FuriganaSentence } from'@/components/FuriganaSentence';
@@ -19,8 +20,9 @@ interface Props {
 const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
- const { adjustMastery, removeWord } = useFlashcardStore();
- // Snapshot the deck once, then manage review-session deletions locally.
+  const { adjustMastery, removeWord } = useFlashcardStore();
+  const { japaneseFont } = useReadingProgressStore();
+  // Snapshot the deck once, then manage review-session deletions locally.
  const [localDeck, setLocalDeck] = useState<SavedWord[]>(() => deck);
  const [currentIdx, setCurrentIdx] = useState(0);
  const [flipped, setFlipped] = useState(false);
@@ -206,20 +208,20 @@ export function FlashcardReview({ deck, onExit }: Props) {
  {/* Front face */}
  <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
  {/* decorative kanji watermark */}
- <span className="pointer-events-none select-none absolute -top-10 -right-6 font-japanese text-[220px] leading-none font-bold text-foreground/[0.025]">
- {card.word.charAt(0)}
- </span>
+              <span className={cn("pointer-events-none select-none absolute -top-10 -right-6 text-[220px] leading-none font-bold text-foreground/[0.025]", japaneseFontClassMap[japaneseFont])}>
+                {card.word.charAt(0)}
+              </span>
 
  <div className="relative flex-1 flex flex-col items-center justify-center px-6">
- <p className="font-japanese text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm">
- {card.word}
- </p>
+                <p className={cn("text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm", japaneseFontClassMap[japaneseFont])}>
+                  {card.word}
+                </p>
  <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent"/>
- <p
- className={`font-japanese text-xl mt-7 font-medium transition-all duration-300 ${
- showFrontReading ?'text-muted-foreground opacity-100':'text-muted-foreground opacity-0 blur-md select-none'}`}
- aria-hidden={!showFrontReading}
- >
+                <p
+                  className={cn("text-xl mt-7 font-medium transition-all duration-300", japaneseFontClassMap[japaneseFont],
+                  showFrontReading ?'text-muted-foreground opacity-100':'text-muted-foreground opacity-0 blur-md select-none')}
+                  aria-hidden={!showFrontReading}
+                >
  {card.reading ||'—'}
  </p>
  </div>
@@ -250,8 +252,8 @@ export function FlashcardReview({ deck, onExit }: Props) {
  <div className="flex-none px-5 pt-5 pb-3">
  <div className="flex items-start justify-between gap-3">
  <div className="min-w-0 flex-1">
- <p className="font-japanese text-[34px] leading-[0.95] font-bold tracking-tight">{card.word}</p>
- <p className="font-japanese text-[15px] font-medium text-foreground/70 mt-1.5">{card.reading}</p>
+                    <p className={cn("text-[34px] leading-[0.95] font-bold tracking-tight", japaneseFontClassMap[japaneseFont])}>{card.word}</p>
+                    <p className={cn("text-[15px] font-medium text-foreground/70 mt-1.5", japaneseFontClassMap[japaneseFont])}>{card.reading}</p>
  <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">
  {toRomaji(card.reading || card.word)}
  </p>
@@ -309,12 +311,12 @@ export function FlashcardReview({ deck, onExit }: Props) {
  From your reading
  </p>
  </div>
-  <FuriganaSentence
-  tokens={card.contextTokens}
-  fallbackText={card.contextSentence}
-  highlight={card.word}
-  className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
-  />
+               <FuriganaSentence
+                 tokens={card.contextTokens}
+                 fallbackText={card.contextSentence}
+                 highlight={card.word}
+                 className={cn("text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3", japaneseFontClassMap[japaneseFont])}
+               />
 
  </section>
  )}

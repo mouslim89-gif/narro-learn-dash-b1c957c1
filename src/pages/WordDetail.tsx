@@ -1,9 +1,10 @@
-import { useEffect, useState } from'react';
+import { useEffect, useState, useRef } from'react';
 import { useNavigate, useParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
 import { ArrowLeft, Star, Loader2, BookOpen } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ConjugationTable, getConjugations } from'@/components/ConjugationTable';
 import { Button } from'@/components/ui/button';
@@ -20,8 +21,10 @@ export default function WordDetail() {
  const { word: rawWord } = useParams<{ word: string }>();
  const navigate = useNavigate();
  const word = rawWord ? decodeURIComponent(rawWord) :'';
-  const { addWord, removeWord, hasWord, savedWords } = useFlashcardStore();
-  const [context, setContext] = useState<{sentence?: string, tokens?: {t: string, r?: string}[]} | null>(null);
+   const { addWord, removeWord, hasWord, savedWords } = useFlashcardStore();
+   const { japaneseFont } = useReadingProgressStore();
+   const [context, setContext] = useState<{sentence?: string, tokens?: {t: string, r?: string}[]} | null>(null);
+   const lastWordRef = useRef(word);
 
 
  const [result, setResult] = useState<JishoResult | null>(null);
@@ -79,8 +82,12 @@ export default function WordDetail() {
    }, [word, result]);
  
   useEffect(() => {
-    if (!word) return;
-    // 1. Check if word is in store with context
+     if (!word) return;
+     if (lastWordRef.current !== word) {
+       setContext(null);
+       lastWordRef.current = word;
+     }
+     // 1. Check if word is in store with context
     const sw = savedWords.find(s => s.id === word);
     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
@@ -375,7 +382,7 @@ export default function WordDetail() {
   {context && (
     <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
       <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
-      <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90">
+      <div className={cn(japaneseFontClassMap[japaneseFont], "text-[15px] leading-relaxed text-foreground/90")}>
         {context.tokens ? (
           <FuriganaSentence tokens={context.tokens} highlight={word} />
         ) : (
@@ -403,7 +410,7 @@ export default function WordDetail() {
  {examples.map((ex, i) => (
   <li key={i} className="rounded-md bg-muted/50 p-3">
   <div className="flex items-start gap-2">
-  <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
+  <div className={cn(japaneseFontClassMap[japaneseFont], "text-sm font-semibold leading-[2.2] flex-1")}>
    {ex.tokens ? (
      <FuriganaSentence tokens={ex.tokens} highlight={display} />
    ) : (
