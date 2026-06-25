@@ -28,7 +28,7 @@ export function FuriganaSentence({
     return (
       <p className={className}>
         {text.slice(0, idx)}
-        <span className="text-primary font-semibold underline decoration-dotted underline-offset-4">
+        <span className="text-accent font-semibold underline decoration-dotted underline-offset-4">
           {highlight}
         </span>
         {text.slice(idx + highlight.length)}
