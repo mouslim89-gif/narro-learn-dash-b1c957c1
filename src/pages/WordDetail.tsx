@@ -25,7 +25,7 @@ export default function WordDetail() {
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
   const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
-  const [exampleTokens, setExampleTokens] = useState<FuriganaToken[][] | null>(null);
+  
 
  const [kanjiList, setKanjiList] = useState<(KanjiDetails | null)[] | null>(null);
 
