@@ -311,12 +311,12 @@ export function FlashcardReview({ deck, onExit }: Props) {
  From your reading
  </p>
  </div>
-  <FuriganaSentence
-  tokens={card.contextTokens}
-  fallbackText={card.contextSentence}
-  highlight={card.word}
-  className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
-  />
+               <FuriganaSentence
+                 tokens={card.contextTokens}
+                 fallbackText={card.contextSentence}
+                 highlight={card.word}
+                 className={cn("text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3", japaneseFontClassMap[japaneseFont])}
+               />
 
  </section>
  )}
