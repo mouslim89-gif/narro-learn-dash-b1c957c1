@@ -356,7 +356,25 @@ export default function WordDetail() {
  </ol>
  </section>
 
- {/* Examples */}
+  {/* Context Sentence */}
+  {context && (
+    <section className="rounded-2xl bg-primary/5 p-5 ring-1 ring-primary/10">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="h-4 w-4 text-primary" />
+        <h2 className="font-serif text-lg font-semibold text-primary">From your reading</h2>
+      </div>
+      <div className="font-japanese text-lg font-semibold leading-relaxed">
+        {context.tokens ? (
+          <FuriganaSentence tokens={context.tokens} highlight={word} />
+        ) : (
+          context.sentence
+        )}
+      </div>
+    </section>
+  )}
+
+  {/* Examples */}
+
  <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
  <h2 className="font-serif text-lg font-semibold mb-3">Examples</h2>
  {!examples && (
