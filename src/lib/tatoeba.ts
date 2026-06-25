@@ -1,9 +1,11 @@
 import { supabase } from'@/integrations/supabase/client';
 
 export interface ExampleSentence {
- japanese: string;
- english: string;
+  japanese: string;
+  english: string;
+  tokens?: { t: string; r?: string }[];
 }
+
 
 const cache = new Map<string, ExampleSentence | null>();
 

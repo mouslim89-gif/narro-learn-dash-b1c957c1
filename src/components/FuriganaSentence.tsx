@@ -43,7 +43,7 @@ export function FuriganaSentence({
     <p className={className}>
       {tokens.map((tok, i) => {
         const isHighlight =
-          !highlightedOnce && !!highlight && (tok.t === highlight || tok.t.includes(highlight));
+          !highlightedOnce && !!highlight && tok.t === highlight;
         if (isHighlight) highlightedOnce = true;
 
         const content = (

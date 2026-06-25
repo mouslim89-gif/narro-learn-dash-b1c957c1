@@ -13,22 +13,11 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  define: {
-    global: "window",
-  },
-  optimizeDeps: {
-    include: ["kuromoji"],
-    esbuildOptions: {
-      alias: {
-        path: path.resolve(__dirname, "./src/lib/path-polyfill.ts"),
-      },
-    },
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "path": path.resolve(__dirname, "./src/lib/path-polyfill.ts"),
     },
+
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
 }));

@@ -113,6 +113,7 @@ export type Database = {
           english: string
           japanese: string
           sentences: Json | null
+          tokens: Json | null
           word: string
         }
         Insert: {
@@ -120,6 +121,7 @@ export type Database = {
           english?: string
           japanese: string
           sentences?: Json | null
+          tokens?: Json | null
           word: string
         }
         Update: {
@@ -127,6 +129,7 @@ export type Database = {
           english?: string
           japanese?: string
           sentences?: Json | null
+          tokens?: Json | null
           word?: string
         }
         Relationships: []
