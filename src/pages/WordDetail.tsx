@@ -344,11 +344,12 @@ export default function WordDetail() {
   <li key={i} className="rounded-md bg-muted/50 p-3">
   <div className="flex items-start gap-2">
   <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
-  {exampleTokens && exampleTokens[i] ? (
-    <FuriganaSentence tokens={exampleTokens[i]} highlight={display} />
-  ) : (
-    ex.japanese
-  )}
+   {ex.tokens ? (
+     <FuriganaSentence tokens={ex.tokens} highlight={display} />
+   ) : (
+     ex.japanese
+   )}
+
   </div>
 
  <PlayWordButton word={ex.japanese} size={14} className="mt-0.5 shrink-0"/>
