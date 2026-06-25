@@ -14,6 +14,7 @@ interface ExampleSentenceProps {
 export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) {
   const [example, setExample] = useState<ExampleData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { japaneseFont } = useReadingProgressStore();
 
   useEffect(() => {
     let cancelled = false;
