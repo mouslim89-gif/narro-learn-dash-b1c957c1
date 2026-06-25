@@ -329,7 +329,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
         <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">From your reading</p>
       </div>
-      <div className="font-japanese font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
+      <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
         {contextTokens ? (
           <FuriganaSentence tokens={contextTokens} highlight={word} />
         ) : (
