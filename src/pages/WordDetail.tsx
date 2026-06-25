@@ -76,7 +76,35 @@ export default function WordDetail() {
    }
    fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
    return () => { cancelled = true; };
-  }, [word, result]);
+   }, [word, result]);
+ 
+   useEffect(() => {
+     if (!word) return;
+     // 1. Check if word is in store with context
+     const sw = savedWords.find(s => s.id === word);
+     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
+       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
+       return;
+     }
+ 
+     // 2. Check session storage (if we just arrived from reader)
+     try {
+       const stored = sessionStorage.getItem('reopen-word-popup');
+       if (stored) {
+         const data = JSON.parse(stored);
+         // Check if the word in storage matches the current word
+         // or if the baseForm matches (since we might have navigated to the base form)
+         if ((data?.word?.text === word || data?.word?.baseForm === word) && 
+             (data?.word?.contextSentence || data?.word?.contextTokens)) {
+           setContext({ 
+             sentence: data.word.contextSentence, 
+             tokens: data.word.contextTokens 
+           });
+         }
+       }
+     } catch {}
+   }, [word, savedWords]);
+
 
 
 
