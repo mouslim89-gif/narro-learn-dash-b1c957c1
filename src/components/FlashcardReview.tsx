@@ -20,8 +20,9 @@ interface Props {
 const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
- const { adjustMastery, removeWord } = useFlashcardStore();
- // Snapshot the deck once, then manage review-session deletions locally.
+  const { adjustMastery, removeWord } = useFlashcardStore();
+  const { japaneseFont } = useReadingProgressStore();
+  // Snapshot the deck once, then manage review-session deletions locally.
  const [localDeck, setLocalDeck] = useState<SavedWord[]>(() => deck);
  const [currentIdx, setCurrentIdx] = useState(0);
  const [flipped, setFlipped] = useState(false);
