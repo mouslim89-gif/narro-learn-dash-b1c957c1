@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchExample, type ExampleSentence as ExampleData } from '@/lib/tatoeba';
-import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { PlayWordButton } from '@/components/PlayWordButton';
-import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FuriganaSentence } from './FuriganaSentence';
 
@@ -14,7 +12,6 @@ interface ExampleSentenceProps {
 export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) {
   const [example, setExample] = useState<ExampleData | null>(null);
   const [loading, setLoading] = useState(true);
-  const { japaneseFont } = useReadingProgressStore();
 
   useEffect(() => {
     let cancelled = false;
@@ -43,7 +40,7 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
   return (
     <div className={`mt-2 rounded-md bg-muted/50 p-2.5 ${className}`}>
       <div className="flex items-start gap-1">
-        <div className={cn("text-sm font-semibold leading-[2.2] flex-1", japaneseFontClassMap[japaneseFont])}>
+        <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
           {example.tokens ? (
             <FuriganaSentence tokens={example.tokens} highlight={word} />
           ) : (
