@@ -9,6 +9,7 @@ import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { getCached, lookupWord, pickBestResult, getDisplayWord, type JishoResult, type CacheEntry } from'@/lib/jisho';
+import { useReadingProgressStore, japaneseFontClassMap } from '@/stores/reading-progress';
 import { ConjugationTable, getWordType } from'@/components/ConjugationTable';
 import { Skeleton } from'@/components/ui/skeleton';
 import {
