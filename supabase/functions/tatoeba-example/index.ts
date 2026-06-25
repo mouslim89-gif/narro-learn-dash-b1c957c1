@@ -81,6 +81,32 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+    const mode = body.mode || 'examples';
+
+    if (mode === 'tokenize') {
+      const sentence = body.sentence;
+      if (!sentence || typeof sentence !== 'string' || sentence.length > 500) {
+        return new Response(JSON.stringify({ error: 'sentence is required (max 500 chars)' }), { status: 400, headers: corsHeaders });
+      }
+
+      // 1. Check if we already have these tokens cached anywhere (check example_sentences)
+      const { data: cached } = await supabase
+        .from('example_sentences')
+        .select('tokens')
+        .eq('japanese', sentence)
+        .not('tokens', 'is', null)
+        .limit(1)
+        .maybeSingle();
+
+      if (cached?.tokens) {
+        return new Response(JSON.stringify({ tokens: cached.tokens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+
+      // 2. Tokenize with AI
+      const tokens = await tokenizeWithAI(sentence, key);
+      return new Response(JSON.stringify({ tokens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const word: unknown = body.word;
     const altWordRaw: unknown = body.altWord;
     const altWord = typeof altWordRaw === 'string' && altWordRaw.length > 0 && altWordRaw.length <= 50 ? altWordRaw : null;

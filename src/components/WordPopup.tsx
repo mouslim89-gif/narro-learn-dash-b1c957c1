@@ -171,10 +171,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  const [loading, setLoading] = useState(!cached);
  const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, kuromojiPos, surfaceForMatch));
  const [deinflected, setDeinflected] = useState<string | null>(cached?.deinflected ?? kuromojiBase ?? null);
- const [error, setError] = useState(false);
+  const [error, setError] = useState(false);
+  const [tokens, setTokens] = useState<{t: string, r?: string}[] | undefined>(contextTokens);
 
- const wordId = word;
- const saved = hasWord(wordId);
+  const wordId = word;
+  const saved = hasWord(wordId);
 
  useEffect(() => {
  if (cached) {
@@ -225,7 +226,26 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  tryLookup();
 
  return () => { cancelled = true; };
- }, [word, kuromojiBase, kuromojiPos, cached]);
+  }, [word, kuromojiBase, kuromojiPos, cached]);
+
+  useEffect(() => {
+    setTokens(contextTokens);
+    if (contextSentence && (!contextTokens || contextTokens.length === 0)) {
+      import('@/integrations/supabase/client').then(({ supabase }) => {
+        supabase.functions.invoke('tatoeba-example', {
+          body: { mode: 'tokenize', sentence: contextSentence }
+        }).then(({ data }) => {
+          if (data?.tokens) {
+            setTokens(data.tokens);
+            // If already saved, persist to flashcard
+            if (saved) {
+              useFlashcardStore.getState().attachContext(wordId, { tokens: data.tokens });
+            }
+          }
+        }).catch(console.error);
+      });
+    }
+  }, [contextSentence, contextTokens, wordId, saved]);
 
  const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
@@ -250,7 +270,7 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  jlpt: result.jlpt,
  partsOfSpeech: result.senses[0]?.parts_of_speech,
  contextSentence,
- contextTokens,
+      contextTokens: tokens,
  mastery: 0,
  };
  addWord(entry);
@@ -329,9 +349,9 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
         <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">From your reading</p>
       </div>
-      <div className="font-japanese font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
-        {contextTokens ? (
-          <FuriganaSentence tokens={contextTokens} highlight={word} />
+      <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
+        {tokens ? (
+          <FuriganaSentence tokens={tokens} highlight={word} />
         ) : (
           contextSentence
         )}

@@ -34,6 +34,7 @@ interface FlashcardStore {
   setDailyGoal: (v: number) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
   removeWord: (id: string) => void;
+  attachContext: (id: string, context: { sentence?: string; tokens?: { t: string; r?: string }[] }) => void;
   hasWord: (id: string) => boolean;
   incrementMastery: (id: string) => void;
   resetMastery: (id: string) => void;
@@ -99,8 +100,22 @@ export const useFlashcardStore = create<FlashcardStore>()(
  if (t) { clearTimeout(t); pushTimers.delete(id); }
  cloudDeleteFlashcard(uid, id).catch(() => {});
  }
- },
- hasWord: (id) => !!get().savedWords.find(w => w.id === id),
+  },
+  attachContext: (id, context) => {
+    const word = get().savedWords.find(w => w.id === id);
+    if (!word) return;
+    const updatedWord = { 
+      ...word, 
+      contextSentence: context.sentence ?? word.contextSentence,
+      contextTokens: context.tokens ?? word.contextTokens 
+    };
+    set({
+      savedWords: get().savedWords.map(w => w.id === id ? updatedWord : w)
+    });
+    const uid = get().syncUserId;
+    if (uid) schedulePush(uid, updatedWord);
+  },
+  hasWord: (id) => !!get().savedWords.find(w => w.id === id),
  incrementMastery: (id) => {
  // Treat as a"Good"review (back-compat helper)
  get().adjustMastery(id,'good');
