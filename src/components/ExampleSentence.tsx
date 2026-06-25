@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { fetchExample, type ExampleSentence as ExampleData } from '@/lib/tatoeba';
 import { PlayWordButton } from '@/components/PlayWordButton';
 import { Skeleton } from '@/components/ui/skeleton';
-import { tokenizeToFurigana, type FuriganaToken } from '@/lib/kuromoji-service';
 import { FuriganaSentence } from './FuriganaSentence';
 
 interface ExampleSentenceProps {
@@ -12,7 +11,6 @@ interface ExampleSentenceProps {
 
 export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) {
   const [example, setExample] = useState<ExampleData | null>(null);
-  const [tokens, setTokens] = useState<FuriganaToken[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,17 +25,6 @@ export function ExampleSentence({ word, className = '' }: ExampleSentenceProps) 
     return () => { cancelled = true; };
   }, [word]);
 
-  useEffect(() => {
-    if (!example) {
-      setTokens(null);
-      return;
-    }
-    let cancelled = false;
-    tokenizeToFurigana(example.japanese).then((t) => {
-      if (!cancelled) setTokens(t);
-    });
-    return () => { cancelled = true; };
-  }, [example]);
 
   if (loading) {
     return (
