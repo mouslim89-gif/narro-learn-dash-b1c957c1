@@ -26,7 +26,9 @@ export default function WordDetail() {
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
-  const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
+   const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
+   const [loadingMore, setLoadingMore] = useState(false);
+   const [hasMoreExamples, setHasMoreExamples] = useState(true);
   
 
  const [kanjiList, setKanjiList] = useState<(KanjiDetails | null)[] | null>(null);
@@ -74,7 +76,12 @@ export default function WordDetail() {
        if (!altWord || altWord === primary) altWord = undefined;
      }
    }
-   fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
+    fetchExamples(word, 3, altWord).then((s) => { 
+      if (!cancelled) {
+        setExamples(s);
+        if (s.length < 3) setHasMoreExamples(false);
+      }
+    });
    return () => { cancelled = true; };
    }, [word, result]);
  
@@ -187,6 +194,39 @@ export default function WordDetail() {
 
 
 
+
+    const loadMore = async () => {
+      if (!word || loadingMore || !hasMoreExamples) return;
+      
+      setLoadingMore(true);
+      try {
+        let altWord: string | undefined;
+        if (result) {
+          const j = result.japanese[0];
+          if (j) {
+            const primary = (disp?.word) || j.word || j.reading;
+            altWord = primary === j.word ? j.reading : j.word;
+            if (!altWord || altWord === primary) altWord = undefined;
+          }
+        }
+        
+        const currentCount = examples?.length || 0;
+        const nextBatch = await fetchExamples(word, currentCount + 5, altWord);
+        
+        if (nextBatch.length <= currentCount) {
+          setHasMoreExamples(false);
+        } else {
+          setExamples(nextBatch);
+          if (nextBatch.length < currentCount + 5) {
+            setHasMoreExamples(false);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load more examples:", err);
+      } finally {
+        setLoadingMore(false);
+      }
+    };
 
  return (
  <div className="pb-24">
@@ -433,8 +473,32 @@ export default function WordDetail() {
  )}
  </li>
  ))}
- </ul>
- )}
+   </ul>
+  )}
+
+  {examples && examples.length > 0 && hasMoreExamples && (
+    <Button
+      variant="ghost"
+      onClick={loadMore}
+      disabled={loadingMore}
+      className="mt-4 w-full rounded-full h-11 text-muted-foreground hover:text-foreground ring-1 ring-border/30 tap-scale-sm"
+    >
+      {loadingMore ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Loading...
+        </>
+      ) : (
+        "Show more examples"
+      )}
+    </Button>
+  )}
+
+  {examples && examples.length > 0 && !hasMoreExamples && (
+    <p className="mt-4 text-center text-[10px] uppercase tracking-wider text-muted-foreground/60">
+      No more examples
+    </p>
+  )}
  </section>
 
  {/* Conjugation — wrapped card */}
