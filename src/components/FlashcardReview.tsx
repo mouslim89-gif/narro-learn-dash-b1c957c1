@@ -8,7 +8,7 @@ import { Button } from'@/components/ui/button';
 import { SrsButtons, type SrsQualityLabel } from'@/components/SrsButtons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from'@/components/ui/alert-dialog';
 import { toRomaji } from'wanakana';
-import { Trash2, X, BookOpen, ChevronDown, Eye, EyeClosed, Trophy, TrendingUp, Calendar } from'lucide-react';
+import { Trash2, X, BookOpen, ChevronDown, Eye, EyeClosed, Trophy, TrendingUp, Calendar, Quote } from'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -309,12 +309,16 @@ export function FlashcardReview({ deck, onExit }: Props) {
  From your reading
  </p>
  </div>
-  <FuriganaSentence
-  tokens={card.contextTokens}
-  fallbackText={card.contextSentence}
-  highlight={card.word}
-  className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
-  />
+  <div className="relative py-1">
+    <Quote className="absolute -left-1 -top-2 h-6 w-6 text-primary/10 fill-primary/5 -scale-x-100" />
+    <FuriganaSentence
+      tokens={card.contextTokens}
+      fallbackText={card.contextSentence}
+      highlight={card.word}
+      className="font-jp-serif text-[15px] leading-[1.8] text-foreground/90 border-l-[3px] border-primary/40 pl-4 relative z-10"
+    />
+    <Quote className="absolute -right-1 -bottom-2 h-6 w-6 text-primary/10 fill-primary/5 rotate-180" />
+  </div>
 
  </section>
  )}
