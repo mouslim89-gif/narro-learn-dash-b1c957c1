@@ -28,7 +28,7 @@ async function tokenizeWithAI(japanese: string): Promise<Token[]> {
       "Lovable-API-Key": LOVABLE_API_KEY!,
     },
     body: JSON.stringify({
-      model: "google/gemini-2.0-flash-001",
+      model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: "You are a Japanese linguistics expert. Tokenize the given Japanese sentence and provide readings for words containing Kanji. Format the output as a JSON array of tokens where each token is {t: 'surface', r: 'reading'}. Only include 'r' for tokens containing Kanji. Reading should be in Hiragana. Return ONLY the JSON array." },
         { role: "user", content: japanese }
