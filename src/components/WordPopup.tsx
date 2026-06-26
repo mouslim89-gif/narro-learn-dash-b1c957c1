@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from'react';
-import { Star, BookOpen, ChevronDown, Quote } from'lucide-react';
+import { Star, BookOpen, ChevronDown } from'lucide-react';
 import { FuriganaSentence } from './FuriganaSentence';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from'@/components/ui/collapsible';
@@ -361,16 +361,12 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
         <BookOpen className="h-3 w-3 text-foreground/55 shrink-0" />
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">From your reading</p>
       </div>
-      <div className="relative font-jp-serif text-[15px] leading-[1.8] text-foreground/90 border-l-[3px] border-primary/40 pl-4 py-1">
-        <Quote className="absolute -left-1 -top-2 h-6 w-6 text-primary/10 fill-primary/5 -scale-x-100" />
-        <div className="relative z-10">
-          {tokens ? (
-            <FuriganaSentence tokens={tokens} highlight={word} />
-          ) : (
-            contextSentence
-          )}
-        </div>
-        <Quote className="absolute -right-1 -bottom-2 h-6 w-6 text-primary/10 fill-primary/5 rotate-180" />
+      <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3">
+        {tokens ? (
+          <FuriganaSentence tokens={tokens} highlight={word} />
+        ) : (
+          contextSentence
+        )}
       </div>
     </section>
   )}
