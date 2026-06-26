@@ -225,7 +225,7 @@ export default function DictionaryPage() {
           const disp = getDisplayWord(result, query);
           const word = disp.word || result.slug;
           const reading = disp.reading;
-          const { savedWords } = useFlashcardStore();
+          const savedWords = useFlashcardStore.getState().savedWords;
           const savedCard = savedWords.find(s => 
             s.id === word || 
             s.word === word || 
