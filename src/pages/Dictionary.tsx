@@ -91,24 +91,30 @@ export default function DictionaryPage() {
 
  if (query === lastFetchedRef.current) return;
 
- const timeout = setTimeout(async () => {
- setSearching(true);
- try {
- const results = await searchJisho(romajiToKana(query) ?? query);
- const ranked = rankByRelevance(results, query);
- setJishoResults(ranked);
- lastFetchedRef.current = query;
- try {
- sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
- } catch {/* quota — ignore */}
- } catch {
- setJishoResults([]);
- } finally {
- setSearching(false);
- }
- }, 400);
+  const timeout = setTimeout(async () => {
+  setSearching(true);
+  try {
+  const q = romajiToKana(query) ?? query;
+  const results = await searchJisho(q);
+  const ranked = rankByRelevance(results, query);
+  setJishoResults(ranked);
+  lastFetchedRef.current = query;
+  
+  if (ranked.length > 0) {
+    pushHistory(q);
+  }
 
- return () => clearTimeout(timeout);
+  try {
+  sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
+  } catch {/* quota — ignore */}
+  } catch {
+  setJishoResults([]);
+  } finally {
+  setSearching(false);
+  }
+  }, 400);
+
+  return () => clearTimeout(timeout);
  }, [query]);
 
   const handleToggleSave = (result: JishoResult) => {
