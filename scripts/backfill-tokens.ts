@@ -20,7 +20,6 @@ interface Sentence {
 }
 
 async function tokenizeWithAI(japanese: string): Promise<Token[]> {
-  console.log(`Tokenizing: ${japanese}`);
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -38,8 +37,6 @@ async function tokenizeWithAI(japanese: string): Promise<Token[]> {
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`AI Gateway error for "${japanese}":`, errorText);
     return [{ t: japanese }];
   }
 
@@ -47,51 +44,39 @@ async function tokenizeWithAI(japanese: string): Promise<Token[]> {
   try {
     const content = data.choices[0].message.content;
     const parsed = JSON.parse(content);
-    const tokens = Array.isArray(parsed) ? parsed : (parsed.tokens || [{ t: japanese }]);
-    console.log(`Successfully tokenized "${japanese}"`);
-    return tokens;
+    return Array.isArray(parsed) ? parsed : (parsed.tokens || [{ t: japanese }]);
   } catch (err) {
-    console.error("AI parsing error:", err);
     return [{ t: japanese }];
   }
 }
 
 async function runBackfill() {
-  console.log("Starting backfill process...");
   const { data: rows, error: fetchError } = await supabase
     .from('example_sentences')
     .select('word, japanese, sentences')
     .is('tokens', null)
-    .limit(30); // Smaller batch to be safe
+    .limit(40);
 
-  if (fetchError) {
-    console.error("Fetch error:", fetchError);
-    return;
-  }
-
-  if (!rows || rows.length === 0) {
-    console.log("No rows to process.");
-    return;
-  }
+  if (fetchError || !rows) return;
 
   console.log(`Processing ${rows.length} rows...`);
 
-  for (const row of rows) {
-    console.log(`--- Word: ${row.word} ---`);
-    
+  await Promise.all(rows.map(async (row) => {
     // 1. Tokenize main sentence
-    const mainTokens = await tokenizeWithAI(row.japanese);
+    const mainTokensPromise = tokenizeWithAI(row.japanese);
     
     // 2. Tokenize nested sentences
     const sentences = (row.sentences || []) as Sentence[];
-    for (const s of sentences) {
+    const sentencePromises = sentences.map(async (s) => {
       if (!s.tokens && s.japanese) {
         s.tokens = await tokenizeWithAI(s.japanese);
       }
-    }
+    });
+
+    const [mainTokens] = await Promise.all([mainTokensPromise, ...sentencePromises]);
 
     // 3. Update DB
-    const { error: updateError } = await supabase
+    await supabase
       .from('example_sentences')
       .update({
         tokens: mainTokens,
@@ -99,12 +84,8 @@ async function runBackfill() {
       })
       .eq('word', row.word);
     
-    if (updateError) {
-      console.error(`Failed to update ${row.word}:`, updateError);
-    } else {
-      console.log(`Successfully updated ${row.word}`);
-    }
-  }
+    console.log(`Updated ${row.word}`);
+  }));
 }
 
 runBackfill();
