@@ -82,8 +82,7 @@ function AnimatedRoutes() {
  <Routes location={location}>
  <Route path="/auth"element={<Auth />} />
  <Route path="/reset-password"element={<ResetPassword />} />
-  <Route path="/"element={<ProtectedRoute><Home /></ProtectedRoute>} />
-  <Route path="/library"element={<ProtectedRoute><Library /></ProtectedRoute>} />
+  <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
  <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
  <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
  <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
