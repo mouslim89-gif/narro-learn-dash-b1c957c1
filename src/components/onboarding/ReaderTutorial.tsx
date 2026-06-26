@@ -59,9 +59,15 @@ export function ReaderTutorial() {
     const timer = setTimeout(() => {
       focusStep();
       setIsVisible(true);
-    }, 1000);
+    }, 1200);
 
-    return () => clearTimeout(timer);
+    // Re-check position frequently while visible to ensure arrow points correctly
+    const interval = setInterval(updateTargetRect, 500);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, [hasSeenReaderTutorial, stepIndex]);
 
   const updateTargetRect = () => {
@@ -69,9 +75,14 @@ export function ReaderTutorial() {
     const element = document.querySelector(selector);
     if (element) {
       const rect = element.getBoundingClientRect();
-      setTargetRect(rect);
+      // Only update if it actually changed to avoid unnecessary renders
+      setTargetRect(prev => {
+        if (!prev || prev.top !== rect.top || prev.left !== rect.left || prev.width !== rect.width) {
+          return rect;
+        }
+        return prev;
+      });
       
-      // Calculate tooltip position to keep it in bounds
       const tooltipWidth = 320;
       const windowWidth = window.innerWidth;
       const desiredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
@@ -85,8 +96,9 @@ export function ReaderTutorial() {
     const element = document.querySelector(selector);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Re-read rect after scroll starts (approx)
-      setTimeout(updateTargetRect, 300);
+      // Re-read rect after scroll starts and ends
+      setTimeout(updateTargetRect, 100);
+      setTimeout(updateTargetRect, 500);
       updateTargetRect();
     } else {
       if (stepIndex < readerSteps.length - 1) {

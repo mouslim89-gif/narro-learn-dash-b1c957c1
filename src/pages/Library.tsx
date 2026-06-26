@@ -9,6 +9,7 @@ import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { romajiToKana } from'@/lib/romaji';
+import { DailyGoalProgress } from '@/components/DailyGoalProgress';
 
 const genres = Object.keys(genreLabels) as Genre[];
 
@@ -111,8 +112,9 @@ export default function Library() {
  )}
  </section>
  ) : (
- <>
- {/* Continue Reading */}
+  <>
+  <DailyGoalProgress />
+  {/* Continue Reading */}
  {continueBooks.length > 0 && (
  <section className="py-5">
  <div className="px-6 flex items-baseline justify-between">
