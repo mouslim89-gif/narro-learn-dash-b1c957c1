@@ -200,19 +200,45 @@ export default function Settings() {
             </button>
 
             {isAdmin && user?.email === 'mouslim89@gmail.com' && (
-              <div className="flex items-center justify-between px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <Wrench className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">Always replay onboarding</span>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Admin only</span>
+              <>
+                <div className="flex items-center justify-between px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <Wrench className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">Always replay onboarding</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Admin only</span>
+                    </div>
                   </div>
+                  <Switch 
+                    checked={alwaysReplayOnboarding} 
+                    onCheckedChange={setAlwaysReplayOnboarding} 
+                  />
                 </div>
-                <Switch 
-                  checked={alwaysReplayOnboarding} 
-                  onCheckedChange={setAlwaysReplayOnboarding} 
-                />
-              </div>
+
+                <button 
+                  onClick={async () => {
+                    const t = toast.loading('Backfilling tokens (batch 50)...');
+                    try {
+                      const { data, error } = await supabase.functions.invoke('backfill-example-tokens', {
+                        body: { batchSize: 50 }
+                      });
+                      if (error) throw error;
+                      toast.success(`Processed ${data.processed} rows. ${data.message}`, { id: t });
+                    } catch (err: any) {
+                      toast.error(err.message || 'Backfill failed', { id: t });
+                    }
+                  }}
+                  className="w-full px-4 py-4 flex items-center justify-between text-sm font-medium smooth-colors tap-scale-sm border-t border-border/40"
+                >
+                  <div className="flex items-center gap-3 text-accent">
+                    <RefreshCw className="h-4 w-4" />
+                    <div className="flex flex-col items-start text-left">
+                      <span>Backfill Example Tokens</span>
+                      <span className="text-[10px] uppercase tracking-tight opacity-80">Admin only (Warm up DB cache)</span>
+                    </div>
+                  </div>
+                </button>
+              </>
             )}
           </div>
         </section>
