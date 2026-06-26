@@ -193,37 +193,62 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  highlightNew: true,
  highlightLearning: true,
  highlightKnown: false,
- syncUserId: null,
- updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
- const cid = chapterId || DEFAULT_CHAPTER_ID;
- const key = chapterKey(bookId, cid);
- const prev = get().progress[key];
- const roundedPct = Math.max(0, Math.min(100, Math.round(percent)));
- // Once a chapter is marked complete, drop the sentence anchor so the next
- // visit starts at the top.
- const nextSentence = roundedPct >= 100 ? null : (sentenceIdx ?? prev?.sentenceIdx ?? null);
- // Skip no-op writes (same pct AND same sentence anchor) to avoid spamming cloud.
- if (
- prev &&
- prev.progressPercent === roundedPct &&
- (prev.sentenceIdx ?? null) === nextSentence &&
- prev.difficulty === difficulty
- ) {
- return;
- }
- const next: ReadingProgress = {
- difficulty,
- progressPercent: roundedPct,
- lastReadAt: new Date().toISOString(),
- chapterId: cid,
- sentenceIdx: nextSentence,
- };
- set((state) => ({
- progress: { ...state.progress, [key]: next },
- }));
- const userId = get().syncUserId;
- if (userId) schedulePush(userId, bookId, next);
- },
+    syncUserId: null,
+    readingGoal: 500,
+    readToday: { date: new Date().toISOString().split('T')[0], count: 0 },
+    readingHistory: [],
+    updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx, wordsRead) => {
+      const cid = chapterId || DEFAULT_CHAPTER_ID;
+      const key = chapterKey(bookId, cid);
+      const prev = get().progress[key];
+      const roundedPct = Math.max(0, Math.min(100, Math.round(percent)));
+      // Once a chapter is marked complete, drop the sentence anchor so the next
+      // visit starts at the top.
+      const nextSentence = roundedPct >= 100 ? null : (sentenceIdx ?? prev?.sentenceIdx ?? null);
+
+      const today = new Date().toISOString().split('T')[0];
+      const currentRead = get().readToday;
+      let newReadToday = { ...currentRead };
+      let newHistory = [...get().readingHistory];
+
+      if (wordsRead && wordsRead > 0) {
+        const newCount = currentRead.date === today ? currentRead.count + wordsRead : wordsRead;
+        newReadToday = { date: today, count: newCount };
+
+        const histIdx = newHistory.findIndex(h => h.date === today);
+        if (histIdx >= 0) {
+          newHistory[histIdx] = { date: today, count: newCount };
+        } else {
+          newHistory.push({ date: today, count: newCount });
+          if (newHistory.length > 90) newHistory.shift();
+        }
+      }
+
+      // Skip no-op writes (same pct AND same sentence anchor) to avoid spamming cloud.
+      if (
+        prev &&
+        prev.progressPercent === roundedPct &&
+        (prev.sentenceIdx ?? null) === nextSentence &&
+        prev.difficulty === difficulty &&
+        (!wordsRead || wordsRead <= 0)
+      ) {
+        return;
+      }
+      const next: ReadingProgress = {
+        difficulty,
+        progressPercent: roundedPct,
+        lastReadAt: new Date().toISOString(),
+        chapterId: cid,
+        sentenceIdx: nextSentence,
+      };
+      set((state) => ({
+        progress: { ...state.progress, [key]: next },
+        readToday: newReadToday,
+        readingHistory: newHistory,
+      }));
+      const userId = get().syncUserId;
+      if (userId) schedulePush(userId, bookId, next);
+    },
  flushPendingProgressPushes: () => {
  flushAllProgressPushes();
  },
