@@ -49,7 +49,6 @@ async function tokenizeWithAI(japanese: string, apiKey: string): Promise<Token[]
   try {
     const content = data.choices[0].message.content;
     const parsed = JSON.parse(content);
-    // Handle both cases: direct array or object with 'tokens' property
     return Array.isArray(parsed) ? parsed : (parsed.tokens || [{ t: japanese }]);
   } catch (err) {
     console.error("AI parsing error:", err);
@@ -76,13 +75,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    let body = {};
+    let batchSize = 20;
     try {
-      body = await req.json();
+      const body = await req.json();
+      if (body && typeof body.batchSize === 'number') {
+        batchSize = Math.max(1, Math.min(50, body.batchSize));
+      }
     } catch {
       // Body might be empty
     }
-    const batchSize = Math.max(1, Math.min(50, Number((body as any).batchSize ?? 20)));
 
     // Find rows that need backfilling
     const { data: rows, error: fetchError } = await supabase
@@ -133,7 +134,6 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ 
       message: `Successfully processed ${processedCount} rows`,
       processed: processedCount,
-      remaining_estimate: 'Run again to check' 
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (err) {
