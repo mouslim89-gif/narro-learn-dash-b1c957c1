@@ -62,7 +62,7 @@ async function runBackfill() {
     .from('example_sentences')
     .select('word, japanese, sentences')
     .is('tokens', null)
-    .limit(50); // Smaller batch to be safe
+    .limit(30); // Smaller batch to be safe
 
   if (fetchError) {
     console.error("Fetch error:", fetchError);
