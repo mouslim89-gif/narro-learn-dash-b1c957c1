@@ -281,7 +281,13 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  }
  return out;
  },
- setFontSize: (fontSize) => { set({ fontSize }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+  setReadingGoal: (readingGoal) => set({ readingGoal }),
+  getReadTodayCount: () => {
+    const today = new Date().toISOString().split('T')[0];
+    const read = get().readToday;
+    return read.date === today ? read.count : 0;
+  },
+  setFontSize: (fontSize) => { set({ fontSize }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setReaderDarkMode: (readerDarkMode) => { set({ readerDarkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setDarkMode: (darkMode) => { set({ darkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setShowFurigana: (showFurigana) => { set({ showFurigana }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
