@@ -26,7 +26,9 @@ export default function WordDetail() {
 
  const [result, setResult] = useState<JishoResult | null>(null);
  const [loading, setLoading] = useState(true);
-  const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
+   const [examples, setExamples] = useState<ExampleSentence[] | null>(null);
+   const [loadingMore, setLoadingMore] = useState(false);
+   const [hasMoreExamples, setHasMoreExamples] = useState(true);
   
 
  const [kanjiList, setKanjiList] = useState<(KanjiDetails | null)[] | null>(null);
@@ -74,7 +76,12 @@ export default function WordDetail() {
        if (!altWord || altWord === primary) altWord = undefined;
      }
    }
-   fetchExamples(word, 3, altWord).then((s) => { if (!cancelled) setExamples(s); });
+    fetchExamples(word, 3, altWord).then((s) => { 
+      if (!cancelled) {
+        setExamples(s);
+        if (s.length < 3) setHasMoreExamples(false);
+      }
+    });
    return () => { cancelled = true; };
    }, [word, result]);
  
