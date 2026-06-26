@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { useOnboardingStore } from '@/stores/onboarding';
+import { useFlashcardStore } from '@/stores/flashcards';
 import { Button } from '@/components/ui/button';
 import { HelpCircle, RefreshCw, Wrench } from 'lucide-react';
 import { useIsAdmin } from '@/lib/admin';
@@ -46,8 +47,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function Settings() {
-  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
+  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana, readingGoal, setReadingGoal } =
     useReadingProgressStore();
+  const { dailyGoal, setDailyGoal } = useFlashcardStore();
   const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
   const { user, signOut } = useAuth();
@@ -181,60 +183,60 @@ export default function Settings() {
             </div>
           </div>
         </section>
-184: 
-185:         {/* Goals */}
-186:         <section>
-187:           <SectionLabel>Goals</SectionLabel>
-188:           <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-189:             <div className="flex items-center justify-between px-4 py-4">
-190:               <div className="flex flex-col">
-191:                 <Label className="text-[15px] font-medium">Daily Flashcards</Label>
-201:                 <span className="text-xs text-muted-foreground mt-0.5">Cards to review each day</span>
-202:               </div>
-203:               <div className="flex items-center gap-3">
-204:                 <button 
-205:                   onClick={() => useFlashcardStore.getState().setDailyGoal(Math.max(5, useFlashcardStore.getState().dailyGoal - 5))}
-206:                   className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg"
-207:                 >
-208:                   -
-209:                 </button>
-210:                 <span className="w-8 text-center font-bold tabular-nums">
-211:                   {useFlashcardStore((s) => s.dailyGoal)}
-212:                 </span>
-213:                 <button 
-214:                   onClick={() => useFlashcardStore.getState().setDailyGoal(useFlashcardStore.getState().dailyGoal + 5)}
-215:                   className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg"
-216:                 >
-217:                   +
-218:                 </button>
-219:               </div>
-220:             </div>
-221: 
-222:             <div className="flex items-center justify-between px-4 py-4">
-223:               <div className="flex flex-col">
-224:                 <Label className="text-[15px] font-medium">Daily Reading</Label>
-225:                 <span className="text-xs text-muted-foreground mt-0.5">Words to read each day</span>
-226:               </div>
-227:               <div className="flex items-center gap-3">
-228:                 <button 
-229:                   onClick={() => useReadingProgressStore.getState().setReadingGoal(Math.max(100, useReadingProgressStore.getState().readingGoal - 100))}
-230:                   className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg"
-231:                 >
-232:                   -
-233:                 </button>
-234:                 <span className="w-12 text-center font-bold tabular-nums text-sm">
-235:                   {useReadingProgressStore((s) => s.readingGoal)}
-236:                 </span>
-237:                 <button 
-238:                   onClick={() => useReadingProgressStore.getState().setReadingGoal(useReadingProgressStore.getState().readingGoal + 100)}
-239:                   className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg"
-240:                 >
-241:                   +
-242:                 </button>
-243:               </div>
-244:             </div>
-245:           </div>
-246:         </section>
+
+        {/* Goals */}
+        <section>
+          <SectionLabel>Goals</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <Label className="text-[15px] font-medium">Daily Flashcards</Label>
+                <span className="text-xs text-muted-foreground mt-0.5">Cards to review each day</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setDailyGoal(Math.max(5, dailyGoal - 5))}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  -
+                </button>
+                <span className="w-8 text-center font-bold tabular-nums">
+                  {dailyGoal}
+                </span>
+                <button 
+                  onClick={() => setDailyGoal(dailyGoal + 5)}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <Label className="text-[15px] font-medium">Daily Reading</Label>
+                <span className="text-xs text-muted-foreground mt-0.5">Words to read each day</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setReadingGoal(Math.max(100, readingGoal - 100))}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  -
+                </button>
+                <span className="w-12 text-center font-bold tabular-nums text-sm">
+                  {readingGoal}
+                </span>
+                <button 
+                  onClick={() => setReadingGoal(readingGoal + 100)}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Help */}
         <section>
@@ -284,7 +286,6 @@ export default function Settings() {
                 </div>
 
                 <button 
-
                   onClick={async () => {
                     const t = toast.loading('Backfilling tokens (batch 50)...');
                     try {
@@ -313,7 +314,6 @@ export default function Settings() {
         </section>
 
         {/* About */}
-
         <section>
           <SectionLabel>About</SectionLabel>
           <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm px-4 py-4">
