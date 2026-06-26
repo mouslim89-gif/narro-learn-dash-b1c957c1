@@ -76,7 +76,7 @@ export default function BookDetail() {
  return (
  <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 px-6 text-center">
  <p className="font-serif text-2xl font-semibold">Book not found</p>
- <Link to="/"className="text-sm text-muted-foreground underline-offset-4">
+ <Link to="/library"className="text-sm text-muted-foreground underline-offset-4">
  Back to Library
  </Link>
  </div>
@@ -155,7 +155,7 @@ export default function BookDetail() {
  >
  
  <button
- onClick={() => goTo('/')}
+ onClick={() => goTo('/library')}
  className={cn(
   "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip transition-[background-color,box-shadow,backdrop-filter] duration-200",
   scrolled
