@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useOnboardingStore } from '@/stores/onboarding';
 
 export function SplashScreen() {
+  const disableAnimation = useOnboardingStore((s) => s.disableAnimation);
   const [isVisible, setIsVisible] = useState(true);
   const prefersReducedMotion = useReducedMotion();
 
@@ -23,6 +25,10 @@ export function SplashScreen() {
       document.body.style.overflow = '';
     };
   }, [isVisible]);
+
+  if (disableAnimation) {
+    return null;
+  }
 
   if (prefersReducedMotion) {
     // Immediate static view for accessibility
