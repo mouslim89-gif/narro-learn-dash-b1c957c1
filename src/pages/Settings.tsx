@@ -48,7 +48,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default function Settings() {
   const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
     useReadingProgressStore();
-  const { alwaysReplayOnboarding, setAlwaysReplayOnboarding } = useOnboardingStore();
+  const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -215,7 +215,22 @@ export default function Settings() {
                   />
                 </div>
 
+                <div className="flex items-center justify-between px-4 py-4 border-t border-border/40">
+                  <div className="flex items-center gap-3">
+                    <Wrench className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">Disable App Animation</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Admin only</span>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={disableAnimation} 
+                    onCheckedChange={setDisableAnimation} 
+                  />
+                </div>
+
                 <button 
+
                   onClick={async () => {
                     const t = toast.loading('Backfilling tokens (batch 50)...');
                     try {
