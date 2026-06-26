@@ -228,10 +228,11 @@ export default function Reader() {
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
  const restoredScroll = useRef(false);
- // Top-most visible sentence index (updated by IntersectionObserver).
- const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
- // While restoring scroll, briefly ignore handleScroll writes so we don't
- // overwrite the saved progress with 0%.
+  // Top-most visible sentence index (updated by IntersectionObserver).
+  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
+  const maxSentenceReadRef = useRef<number>(saved?.sentenceIdx ?? 0);
+  // While restoring scroll, briefly ignore handleScroll writes so we don't
+  // overwrite the saved progress with 0%.
   const suppressSaveUntilRef = useRef<number>(0);
   // When the user switches difficulty, we want to land at the same % of the
   // text instead of trying to map sentence indices (which don't survive a
