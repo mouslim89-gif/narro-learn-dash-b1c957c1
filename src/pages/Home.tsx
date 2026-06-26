@@ -1,19 +1,23 @@
-import { useMemo, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useReadingProgressStore } from '@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { books } from '@/data/books';
+import { books, genreLabels, type Genre } from '@/data/books';
 import { BookCard } from '@/components/BookCard';
 import { DelayedLink as Link } from '@/components/DelayedLink';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Layers, Flame, Trophy, ChevronRight, Settings, Sun, Moon } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { BookOpen, Layers, Flame, Trophy, ChevronRight, Settings, Sun, Moon, Search, X, Sparkles } from 'lucide-react';
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
-import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { romajiToKana } from '@/lib/romaji';
+
+const genres = Object.keys(genreLabels) as Genre[];
 
 export default function Home() {
+  const [search, setSearch] = useState('');
   const { progress, darkMode, setDarkMode } = useReadingProgressStore();
   const { savedWords, getDueCount, getReviewedTodayCount, dailyGoal, history } = useFlashcardStore();
   const headerRef = useRef<HTMLElement>(null);
@@ -27,8 +31,7 @@ export default function Home() {
     return dates;
   }, [progress]);
 
-
-  // Find most recently read book
+  // Find most recently read book for Hero
   const lastReadBook = useMemo(() => {
     const sorted = Object.entries(progress)
       .filter(([, p]) => p.progressPercent > 0 && p.progressPercent < 100)
@@ -49,6 +52,18 @@ export default function Home() {
     };
   }, [progress]);
 
+  const filteredBooks = useMemo(() => {
+    if (!search.trim()) return null;
+    const q = search.toLowerCase();
+    const kana = romajiToKana(q);
+    return books.filter(
+      b => b.titleEn.toLowerCase().includes(q) || 
+           b.titleJp.includes(q) || 
+           b.author.toLowerCase().includes(q) || 
+           (kana ? b.titleJp.includes(kana) : false)
+    );
+  }, [search]);
+
   const dueCount = getDueCount();
   const reviewedToday = getReviewedTodayCount();
   
@@ -61,7 +76,6 @@ export default function Home() {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
     
-    // Check if user has reviewed today or yesterday to maintain streak
     const hasActivityToday = sortedHistory[0]?.date === today;
     const hasActivityYesterday = sortedHistory.some(h => h.date === yesterday);
     
@@ -125,146 +139,212 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="px-6 pt-4 stagger-children">
-        {/* Hero: Continue Reading */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-serif font-bold">Continue Reading</h2>
-            <Link to="/my-books" className="text-xs text-primary font-medium flex items-center gap-0.5">
-              All books <ChevronRight className="h-3 w-3" />
-            </Link>
-          </div>
-          
-          {lastReadBook ? (
-            <Link 
-              to={`/reader/${lastReadBook.id}/${lastReadBook.difficulty}${lastReadBook.chapterId && lastReadBook.chapterId !== 'main' ? `/${lastReadBook.chapterId}` : ''}`}
-              className="group block relative overflow-hidden rounded-3xl border border-border/40 bg-card p-5 transition-all hover:border-primary/20 active:scale-[0.98]"
+      {/* Search Bar */}
+      <div className="px-6 pt-2 pb-4">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
+          <Input
+            placeholder="Search books, authors..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10 text-sm shadow-inner-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background transition-all"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground smooth-colors tap-scale-sm"
+              aria-label="Clear search"
             >
-              <div className="flex gap-5">
-                <div 
-                  className="relative h-32 w-24 shrink-0 overflow-hidden rounded-xl shadow-lg ring-1 ring-black/5"
-                  style={{ backgroundColor: lastReadBook.coverColor }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  <div className="absolute inset-x-2 bottom-3">
-                    <p className="font-jp-serif text-[10px] leading-tight text-white/90 line-clamp-3">
-                      {lastReadBook.titleJp}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col justify-center min-w-0 flex-1">
-                  <h3 className="text-lg font-bold leading-tight truncate">{lastReadBook.titleEn}</h3>
-                  <p className="text-sm text-muted-foreground truncate mb-4">{lastReadBook.author}</p>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground">
-                      <span>Progress</span>
-                      <span className="text-primary">{lastReadBook.percent}%</span>
-                    </div>
-                    <Progress value={lastReadBook.percent} className="h-1.5" />
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-center pl-2">
-                  <div className="rounded-full bg-primary/10 p-2 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ) : (
-            <div className="rounded-3xl border border-dashed border-border/60 bg-muted/30 p-8 text-center">
-              <BookOpen className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground mb-4">You haven't started any books yet.</p>
-              <Link to="/">
-                <Button variant="outline" size="sm" className="rounded-full px-6">
-                  Browse Library
-                </Button>
-              </Link>
-            </div>
+              <X className="h-3.5 w-3.5"/>
+            </button>
           )}
-        </section>
+        </div>
+      </div>
 
-        {/* Stats Grid */}
-        <section className="mb-8">
-          <h2 className="text-xl font-serif font-bold mb-4">Today's Focus</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <Link 
-              to="/flashcards"
-              className="flex flex-col gap-3 rounded-3xl border border-border/40 bg-card p-5 transition-all hover:border-primary/20 active:scale-[0.98]"
-            >
-              <div className="h-10 w-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
-                <Layers className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-[22px] font-bold leading-none">{dueCount}</p>
-                <p className="text-xs text-muted-foreground mt-1 font-medium uppercase tracking-wider">Due Today</p>
-              </div>
-            </Link>
-            
-            <Link 
-              to="/flashcards"
-              className="flex flex-col gap-3 rounded-3xl border border-border/40 bg-card p-5 transition-all hover:border-primary/20 active:scale-[0.98]"
-            >
-              <div className="h-10 w-10 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500">
-                <Flame className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-[22px] font-bold leading-none">{streak}d</p>
-                <p className="text-xs text-muted-foreground mt-1 font-medium uppercase tracking-wider">Streak</p>
-              </div>
-            </Link>
-
-            <div className="col-span-2 flex items-center justify-between rounded-3xl border border-border/40 bg-card p-5">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
-                  <Trophy className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold">Daily Goal</p>
-                  <p className="text-xs text-muted-foreground">{reviewedToday} / {dailyGoal} cards</p>
-                </div>
-              </div>
-              <div className="relative h-12 w-12 flex items-center justify-center">
-                <svg className="h-12 w-12 -rotate-90 transform">
-                  <circle
-                    cx="24"
-                    cy="24"
-                    r="20"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="transparent"
-                    className="text-muted/30"
-                  />
-                  <circle
-                    cx="24"
-                    cy="24"
-                    r="20"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="transparent"
-                    strokeDasharray={125.6}
-                    strokeDashoffset={125.6 * (1 - Math.min(reviewedToday / dailyGoal, 1))}
-                    strokeLinecap="round"
-                    className="text-amber-500 transition-all duration-500"
-                  />
-                </svg>
-                <span className="absolute text-[10px] font-bold">{Math.round((reviewedToday / dailyGoal) * 100)}%</span>
-              </div>
+      <main className="stagger-children">
+        {filteredBooks ? (
+          <section className="px-6 py-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Search Results</h2>
+              <span className="text-xs text-muted-foreground">{filteredBooks.length} found</span>
             </div>
-          </div>
-        </section>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {filteredBooks.map(book => (
+                <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
+              ))}
+            </div>
+            {filteredBooks.length === 0 && (
+              <div className="py-20 text-center">
+                <Search className="h-10 w-10 mx-auto mb-3 text-muted-foreground/20" />
+                <p className="text-sm text-muted-foreground">No books found for "{search}"</p>
+              </div>
+            )}
+          </section>
+        ) : (
+          <>
+            {/* Stats Grid */}
+            <section className="px-6 mb-8">
+              <div className="grid grid-cols-2 gap-4">
+                <Link 
+                  to="/flashcards"
+                  className="flex flex-col gap-3 rounded-3xl border border-border/40 bg-card p-5 transition-all hover:border-primary/20 active:scale-[0.98] relief-raised"
+                >
+                  <div className="h-10 w-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                    <Layers className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[22px] font-bold leading-none">{dueCount}</p>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium uppercase tracking-wider">Due Today</p>
+                  </div>
+                </Link>
+                
+                <Link 
+                  to="/flashcards"
+                  className="flex flex-col gap-3 rounded-3xl border border-border/40 bg-card p-5 transition-all hover:border-primary/20 active:scale-[0.98] relief-raised"
+                >
+                  <div className="h-10 w-10 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+                    <Flame className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[22px] font-bold leading-none">{streak}d</p>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium uppercase tracking-wider">Streak</p>
+                  </div>
+                </Link>
 
-        {/* Activity Graph */}
-        <section className="mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-serif font-bold">Activity</h2>
-          </div>
-          <div className="rounded-3xl border border-border/40 bg-card p-5">
-            <ContributionGraph readDateStrings={readDateStrings} />
-          </div>
-        </section>
+                <div className="col-span-2 flex items-center justify-between rounded-3xl border border-border/40 bg-card p-5 relief-raised">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                      <Trophy className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold">Daily Goal</p>
+                      <p className="text-xs text-muted-foreground">{reviewedToday} / {dailyGoal} cards</p>
+                    </div>
+                  </div>
+                  <div className="relative h-12 w-12 flex items-center justify-center">
+                    <svg className="h-12 w-12 -rotate-90 transform">
+                      <circle
+                        cx="24"
+                        cy="24"
+                        r="20"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="transparent"
+                        className="text-muted/30"
+                      />
+                      <circle
+                        cx="24"
+                        cy="24"
+                        r="20"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="transparent"
+                        strokeDasharray={125.6}
+                        strokeDashoffset={125.6 * (1 - Math.min(reviewedToday / dailyGoal, 1))}
+                        strokeLinecap="round"
+                        className="text-amber-500 transition-all duration-500"
+                      />
+                    </svg>
+                    <span className="absolute text-[10px] font-bold">{Math.round((reviewedToday / dailyGoal) * 100)}%</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Hero: Continue Reading */}
+            {lastReadBook && (
+              <section className="px-6 mb-10">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-serif font-bold">Continue Reading</h2>
+                  <Link to="/my-books" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    My Collection <ChevronRight className="h-3 w-3" />
+                  </Link>
+                </div>
+                
+                <Link 
+                  to={`/reader/${lastReadBook.id}/${lastReadBook.difficulty}${lastReadBook.chapterId && lastReadBook.chapterId !== 'main' ? `/${lastReadBook.chapterId}` : ''}`}
+                  className="group block relative overflow-hidden rounded-3xl border border-border/40 bg-card p-5 transition-all hover:border-primary/20 active:scale-[0.98] relief-raised"
+                >
+                  <div className="flex gap-5">
+                    <div 
+                      className="relative h-32 w-24 shrink-0 overflow-hidden rounded-xl shadow-lg ring-1 ring-black/5"
+                      style={{ backgroundColor: lastReadBook.coverColor }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <div className="absolute inset-x-2 bottom-3">
+                        <p className="font-jp-serif text-[10px] leading-tight text-white/90 line-clamp-3">
+                          {lastReadBook.titleJp}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col justify-center min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 mb-1">
+                         <Sparkles className="h-3 w-3 text-amber-500 fill-amber-500" />
+                         <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Current</span>
+                      </div>
+                      <h3 className="text-lg font-bold leading-tight truncate">{lastReadBook.titleEn}</h3>
+                      <p className="text-sm text-muted-foreground truncate mb-4">{lastReadBook.author}</p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground">
+                          <span>Progress</span>
+                          <span className="text-primary">{lastReadBook.percent}%</span>
+                        </div>
+                        <Progress value={lastReadBook.percent} className="h-1.5" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-center pl-2">
+                      <div className="rounded-full bg-primary/10 p-2 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <BookOpen className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </section>
+            )}
+
+            {/* Explore Library (Genre Horizontal Scrolls) */}
+            <div className="mb-8">
+              <div className="px-6 mb-4">
+                <h2 className="text-xl font-serif font-bold">Explore Library</h2>
+              </div>
+              
+              {genres.map((genre) => {
+                const genreBooks = books.filter((b) => b.genre === genre);
+                if (genreBooks.length === 0) return null;
+                return (
+                  <section key={genre} className="mb-8">
+                    <div className="px-6 flex items-baseline justify-between mb-3">
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                        {genreLabels[genre]}
+                      </h3>
+                      <span className="text-[10px] text-muted-foreground font-medium">{genreBooks.length} books</span>
+                    </div>
+                    <div className="flex gap-4 overflow-x-auto px-6 pb-2 no-scrollbar">
+                      {genreBooks.map((book) => (
+                        <div key={book.id} className="min-w-[140px]">
+                          <BookCard book={book} progress={progress[book.id]?.progressPercent} />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+
+            {/* Activity Graph */}
+            <section className="px-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-serif font-bold">Activity</h2>
+              </div>
+              <div className="rounded-3xl border border-border/40 bg-card p-5 relief-raised">
+                <ContributionGraph readDateStrings={readDateStrings} />
+              </div>
+            </section>
+          </>
+        )}
       </main>
     </div>
   );
