@@ -112,7 +112,6 @@ export default function WordDetail() {
         });
       }
     }
-  }, [word, result, savedWords, disp, reading]);
     // 2. Check session storage (if we just arrived from reader)
     try {
       const stored = sessionStorage.getItem('reopen-word-popup');
