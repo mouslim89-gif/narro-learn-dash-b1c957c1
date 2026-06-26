@@ -1,14 +1,15 @@
 import { Link, useLocation } from'react-router-dom';
-import { Library, BookOpen, Layers, Search } from'lucide-react';
+import { Home as HomeIcon, Library, BookOpen, Layers, Search } from'lucide-react';
 import { motion } from'framer-motion';
 import { useFlashcardStore } from'@/stores/flashcards';
 import { useSyncStatus } from'@/lib/sync/sync-status';
 
 const tabs = [
- { path:'/', label:'Library', icon: Library },
- { path:'/my-books', label:'My Books', icon: BookOpen },
- { path:'/flashcards', label:'Cards', icon: Layers },
- { path:'/dictionary', label:'Dictionary', icon: Search },
+  { path:'/', label:'Home', icon: HomeIcon },
+  { path:'/library', label:'Library', icon: Library },
+  { path:'/my-books', label:'Books', icon: BookOpen },
+  { path:'/flashcards', label:'Cards', icon: Layers },
+  { path:'/dictionary', label:'Search', icon: Search },
 ];
 
 function SyncIndicator() {

@@ -11,12 +11,22 @@ import { BookOpen, Layers, Flame, Trophy, ChevronRight, Settings, Sun, Moon } fr
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 
 export default function Home() {
   const { progress, darkMode, setDarkMode } = useReadingProgressStore();
   const { savedWords, getDueCount, getReviewedTodayCount, dailyGoal, history } = useFlashcardStore();
   const headerRef = useRef<HTMLElement>(null);
   useScrollProgress(headerRef, 0, 64);
+
+  const readDateStrings = useMemo(() => {
+    const dates = new Set<string>();
+    Object.values(progress).forEach(p => {
+      dates.add(format(new Date(p.lastReadAt), 'yyyy-MM-dd'));
+    });
+    return dates;
+  }, [progress]);
+
 
   // Find most recently read book
   const lastReadBook = useMemo(() => {
@@ -252,7 +262,7 @@ export default function Home() {
             <h2 className="text-xl font-serif font-bold">Activity</h2>
           </div>
           <div className="rounded-3xl border border-border/40 bg-card p-5">
-            <ContributionGraph />
+            <ContributionGraph readDateStrings={readDateStrings} />
           </div>
         </section>
       </main>
