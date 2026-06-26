@@ -5,8 +5,9 @@ import { useSearchParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
+import { useDictionaryHistoryStore } from '@/stores/dictionary-history';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
-import { Search, Star, Loader2, X, Settings, ChevronRight } from'lucide-react';
+import { Search, Star, Loader2, X, Settings, ChevronRight, History, Trash2 } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { toRomaji } from'wanakana';
@@ -56,6 +57,7 @@ export default function DictionaryPage() {
  const [searchParams] = useSearchParams();
  const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ??'';
  const [query, setQuery] = useState(initial);
+ const { recent, push: pushHistory, remove: removeHistory, clear: clearHistory } = useDictionaryHistoryStore();
  const { addWord, removeWord, hasWord } = useFlashcardStore();
  const [jishoResults, setJishoResults] = useState<JishoResult[]>(() => {
  try {
@@ -89,24 +91,30 @@ export default function DictionaryPage() {
 
  if (query === lastFetchedRef.current) return;
 
- const timeout = setTimeout(async () => {
- setSearching(true);
- try {
- const results = await searchJisho(romajiToKana(query) ?? query);
- const ranked = rankByRelevance(results, query);
- setJishoResults(ranked);
- lastFetchedRef.current = query;
- try {
- sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
- } catch {/* quota — ignore */}
- } catch {
- setJishoResults([]);
- } finally {
- setSearching(false);
- }
- }, 400);
+  const timeout = setTimeout(async () => {
+  setSearching(true);
+  try {
+  const q = romajiToKana(query) ?? query;
+  const results = await searchJisho(q);
+  const ranked = rankByRelevance(results, query);
+  setJishoResults(ranked);
+  lastFetchedRef.current = query;
+  
+  if (ranked.length > 0) {
+    pushHistory(q);
+  }
 
- return () => clearTimeout(timeout);
+  try {
+  sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
+  } catch {/* quota — ignore */}
+  } catch {
+  setJishoResults([]);
+  } finally {
+  setSearching(false);
+  }
+  }, 400);
+
+  return () => clearTimeout(timeout);
  }, [query]);
 
   const handleToggleSave = (result: JishoResult) => {
@@ -319,17 +327,60 @@ export default function DictionaryPage() {
  {!searching && query.trim() && jishoResults.length === 0 && (
  <p className="mt-8 text-center text-sm text-muted-foreground">No results found.</p>
  )}
- {!query.trim() && (
- <div className="mt-16 flex flex-col items-center text-center">
- <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
- <Search className="h-9 w-9 text-primary"/>
- </div>
- <p className="mt-5 font-serif text-lg font-semibold">Search the dictionary</p>
- <p className="mt-1 text-sm text-muted-foreground">
- Type a word in Japanese or English to get started.
- </p>
- </div>
- )}
+  {!query.trim() && (
+    <div className="mt-12 flex flex-col items-center">
+      <div className="flex flex-col items-center text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+          <Search className="h-9 w-9 text-primary"/>
+        </div>
+        <p className="mt-5 font-serif text-lg font-semibold">Search the dictionary</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Type a word in Japanese or English to get started.
+        </p>
+      </div>
+
+      {recent.length > 0 && (
+        <div className="mt-12 w-full max-w-sm px-4">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="section-bullet" />Recent searches
+            </p>
+            <button 
+              onClick={clearHistory}
+              className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 hover:text-destructive flex items-center gap-1 transition-colors"
+            >
+              <Trash2 className="h-2.5 w-2.5" />
+              Clear all
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {recent.map((item) => (
+              <div
+                key={item.query}
+                className="group relative flex items-center gap-1 rounded-full bg-muted/60 pl-3 pr-1.5 py-1.5 ring-1 ring-border/40 tap-scale-sm transition-all active:bg-muted/80"
+              >
+                <button
+                  onClick={() => setQuery(item.query)}
+                  className={`text-sm font-medium ${/[　-ヿ]/.test(item.query) ? 'font-japanese' : ''}`}
+                >
+                  {item.query}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeHistory(item.query);
+                  }}
+                  className="h-5 w-5 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-muted-foreground hover:bg-background/50 transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
  </div>
  </div>
  );
