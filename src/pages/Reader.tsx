@@ -627,12 +627,21 @@ export default function Reader() {
  rafRef.current = 0;
  const scrollH = document.documentElement.scrollHeight - window.innerHeight;
  if (scrollH <= 0) return;
- const pct = Math.min(100, (window.scrollY / scrollH) * 100);
- setScrollPercent(Math.round(pct));
- if (performance.now() < suppressSaveUntilRef.current) return;
- if (id) updateProgress(id, chapterId, difficulty, pct, currentSentenceRef.current ?? null);
- });
- }, [id, chapterId, difficulty, updateProgress]);
+      const pct = Math.min(100, (window.scrollY / scrollH) * 100);
+      setScrollPercent(Math.round(pct));
+      if (performance.now() < suppressSaveUntilRef.current) return;
+      
+      let wordsReadCount = 0;
+      const curIdx = currentSentenceRef.current ?? 0;
+      const prevMax = maxSentenceReadRef.current;
+      if (curIdx > prevMax) {
+        wordsReadCount = (cumulativeTokenCounts[curIdx] || 0) - (cumulativeTokenCounts[prevMax] || 0);
+        maxSentenceReadRef.current = curIdx;
+      }
+
+      if (id) updateProgress(id, chapterId, difficulty, pct, curIdx, wordsReadCount);
+    });
+  }, [id, chapterId, difficulty, updateProgress, cumulativeTokenCounts]);
 
  // Flush pending cloud pushes when the user leaves / hides the tab / changes
  // chapter. This is the difference between"sometimes saves"and"always saves".
