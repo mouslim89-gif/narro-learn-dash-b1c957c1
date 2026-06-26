@@ -58,42 +58,51 @@ interface ReadingProgressState {
  highlightNew: boolean;
  highlightLearning: boolean;
  highlightKnown: boolean;
- // Auth-synced user
- syncUserId: string | null;
- // Actions
- updateProgress: (
- bookId: string,
- chapterId: string | undefined,
- difficulty: Difficulty,
- percent: number,
- sentenceIdx?: number | null,
- ) => void;
- /** Force-flush any debounced cloud pushes immediately (best-effort, fire-and-forget). */
- flushPendingProgressPushes: () => void;
- /** Get progress for a specific chapter (defaults to'main'). */
- getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
- /** Get the most recently read progress entry for a book (across chapters). */
- getBookProgress: (bookId: string) => ReadingProgress | undefined;
- /** Get all per-chapter progress for a book. Returns map keyed by chapterId. */
- getChapterProgress: (bookId: string) => Record<string, ReadingProgress>;
- setFontSize: (size: FontSize) => void;
- setReaderDarkMode: (dark: boolean) => void;
- setDarkMode: (dark: boolean) => void;
- setShowFurigana: (show: boolean) => void;
- setShowTranslations: (show: boolean) => void;
- setDisplayMode: (mode: DisplayMode) => void;
+  // Auth-synced user
+  syncUserId: string | null;
+  // Goals & Activity
+  readingGoal: number;
+  readToday: { date: string; count: number };
+  readingHistory: { date: string; count: number }[];
+  // Actions
+  updateProgress: (
+    bookId: string,
+    chapterId: string | undefined,
+    difficulty: Difficulty,
+    percent: number,
+    sentenceIdx?: number | null,
+    wordsRead?: number
+  ) => void;
+  /** Force-flush any debounced cloud pushes immediately (best-effort, fire-and-forget). */
+  flushPendingProgressPushes: () => void;
+  /** Get progress for a specific chapter (defaults to 'main'). */
+  getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
+  /** Get the most recently read progress entry for a book (across chapters). */
+  getBookProgress: (bookId: string) => ReadingProgress | undefined;
+  /** Get all per-chapter progress for a book. Returns map keyed by chapterId. */
+  getChapterProgress: (bookId: string) => Record<string, ReadingProgress>;
+  
+  setReadingGoal: (v: number) => void;
+  getReadTodayCount: () => number;
 
- setJapaneseFont: (font: JapaneseFont) => void;
- setHasSeenLongPressHint: (seen: boolean) => void;
- setShowKnownHighlights: (show: boolean) => void;
- setHighlightNew: (v: boolean) => void;
- setHighlightLearning: (v: boolean) => void;
- setHighlightKnown: (v: boolean) => void;
- // Sync helpers
- hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
- clearProgress: () => void;
- hydratePreferences: (prefs: UserPreferences, userId: string) => void;
- clearPreferences: () => void;
+  setFontSize: (size: FontSize) => void;
+  setReaderDarkMode: (dark: boolean) => void;
+  setDarkMode: (dark: boolean) => void;
+  setShowFurigana: (show: boolean) => void;
+  setShowTranslations: (show: boolean) => void;
+  setDisplayMode: (mode: DisplayMode) => void;
+
+  setJapaneseFont: (font: JapaneseFont) => void;
+  setHasSeenLongPressHint: (seen: boolean) => void;
+  setShowKnownHighlights: (show: boolean) => void;
+  setHighlightNew: (v: boolean) => void;
+  setHighlightLearning: (v: boolean) => void;
+  setHighlightKnown: (v: boolean) => void;
+  // Sync helpers
+  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
+  clearProgress: () => void;
+  hydratePreferences: (prefs: UserPreferences, userId: string) => void;
+  clearPreferences: () => void;
 }
 
 const DEFAULT_PREFS: UserPreferences = {
