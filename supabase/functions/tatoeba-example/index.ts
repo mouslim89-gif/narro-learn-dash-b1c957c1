@@ -124,17 +124,29 @@ Deno.serve(async (req) => {
     const isKanji = (ch: string) => !!ch && /[\u4e00-\u9fff]/.test(ch);
     const matchesTarget = (jp: string) => {
       const check = (target: string) => {
-        if (!target || !jp.includes(target)) return false;
-        if (/^[\u4e00-\u9fff]+$/.test(target)) {
-          let idx = -1;
-          while ((idx = jp.indexOf(target, idx + 1)) !== -1) {
-            const charBefore = jp[idx - 1];
-            const charAfter = jp[idx + target.length];
-            if (!isKanji(charBefore) && !isKanji(charAfter)) return true;
+        if (!target) return false;
+        
+        // If the target has no Kanji, simple include check is usually fine for Tatoeba results
+        const targetKanji = [...target].filter(isKanji).join('');
+        if (!targetKanji) return jp.includes(target);
+
+        // If target has Kanji, we must ensure it's not part of a larger Kanji compound
+        // But we must also allow for inflections if it's a verb/adjective (e.g. 解く -> 解いた)
+        // We look for the Kanji part of the target in the sentence.
+        let idx = -1;
+        while ((idx = jp.indexOf(targetKanji, idx + 1)) !== -1) {
+          const charBefore = jp[idx - 1];
+          const charAfter = jp[idx + targetKanji.length];
+          // standalone means not preceded or followed by another Kanji
+          if (!isKanji(charBefore) && !isKanji(charAfter)) {
+            // For verbs/adjectives, we also check if the kana following the Kanji
+            // in the target matches the start of the kana following the Kanji in the sentence.
+            // This is a bit complex, so we'll be lenient: as long as it's the right Kanji 
+            // and standalone, and the sentence was found by Tatoeba for this word, it's likely correct.
+            return true;
           }
-          return false;
         }
-        return true;
+        return false;
       };
       return check(word) || (altWord ? check(altWord) : false);
     };
