@@ -1,7 +1,7 @@
 import { useEffect, useState } from'react';
 import { useNavigate, useParams } from'react-router-dom';
 import { DelayedLink as Link } from'@/components/DelayedLink';
-import { ArrowLeft, Star, Loader2, BookOpen } from'lucide-react';
+import { ArrowLeft, Star, Loader2, BookOpen, Quote } from'lucide-react';
 import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
 import { PlayWordButton } from'@/components/PlayWordButton';
@@ -429,12 +429,16 @@ export default function WordDetail() {
   {context && (
     <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40">
       <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
-      <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90">
-        {context.tokens ? (
-          <FuriganaSentence tokens={context.tokens} highlight={display} />
-        ) : (
-          context.sentence
-        )}
+      <div className="relative px-2 py-1">
+        <Quote className="absolute -left-2 -top-2 h-7 w-7 text-primary/10 fill-primary/5 -scale-x-100" />
+        <div className="font-jp-serif text-[15px] leading-[1.8] text-foreground/90 pl-6 relative z-10">
+          {context.tokens ? (
+            <FuriganaSentence tokens={context.tokens} highlight={display} />
+          ) : (
+            context.sentence
+          )}
+        </div>
+        <Quote className="absolute -right-2 -bottom-2 h-7 w-7 text-primary/10 fill-primary/5 rotate-180" />
       </div>
     </section>
   )}
