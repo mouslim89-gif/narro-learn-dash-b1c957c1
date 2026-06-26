@@ -337,8 +337,26 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  },
  }),
  {
- name:'reading-progress',
- // Persist everything (preferences AND progress) — progress acts as offline cache
- }
+    name:'reading-progress',
+    partialize: (state) => ({
+      progress: state.progress,
+      fontSize: state.fontSize,
+      readerDarkMode: state.readerDarkMode,
+      darkMode: state.darkMode,
+      showFurigana: state.showFurigana,
+      showTranslations: state.showTranslations,
+      displayMode: state.displayMode,
+      japaneseFont: state.japaneseFont,
+      hasSeenLongPressHint: state.hasSeenLongPressHint,
+      showKnownHighlights: state.showKnownHighlights,
+      highlightNew: state.highlightNew,
+      highlightLearning: state.highlightLearning,
+      highlightKnown: state.highlightKnown,
+      readingGoal: state.readingGoal,
+      readToday: state.readToday,
+      readingHistory: state.readingHistory,
+    }),
+    // Persist everything (preferences AND progress) — progress acts as offline cache
+  }
  )
 );
