@@ -133,7 +133,7 @@ export default function MyBooks() {
  </div>
  <p className="mt-5 font-serif text-lg font-semibold">Your bookshelf is empty</p>
  <p className="mt-1 text-sm text-muted-foreground">Pick up a story from the Library to get started.</p>
- <Link to="/"className="mt-5">
+ <Link to="/library"className="mt-5">
  <Button size="sm"className="rounded-full px-5">Browse Library</Button>
  </Link>
  </div>
