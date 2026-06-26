@@ -265,7 +265,7 @@ export default function Flashcards() {
  </div>
  <p className="mt-5 font-serif text-lg font-semibold">No flashcards yet</p>
  <p className="mt-1 text-sm text-muted-foreground">Tap a word while reading to save it here.</p>
- <Link to="/library" className="mt-5"><Button size="sm" className="rounded-full px-5 relief-raised">Browse Library</Button></Link>
+ <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5 relief-raised">Browse Library</Button></Link>
  </div>
  ) : (
  <ul className="stagger-children mt-2 space-y-2 px-6">
