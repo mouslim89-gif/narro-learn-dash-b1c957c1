@@ -4,9 +4,10 @@ import { CheckCircle2, Flame, Target } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function DailyGoalProgress() {
-  const { reviewsThisSession, dailyGoal } = useFlashcardStore();
-  const progress = Math.min(100, (reviewsThisSession / dailyGoal) * 100);
-  const isComplete = reviewsThisSession >= dailyGoal;
+  const { dailyGoal, getReviewedTodayCount } = useFlashcardStore();
+  const reviewsToday = getReviewedTodayCount();
+  const progress = Math.min(100, (reviewsToday / dailyGoal) * 100);
+  const isComplete = reviewsToday >= dailyGoal;
 
   return (
     <div className="mx-6 mb-6 p-4 rounded-3xl bg-card border ring-1 ring-border/40 shadow-sm overflow-hidden relative">
@@ -29,7 +30,7 @@ export function DailyGoalProgress() {
       <div className="space-y-2 relative z-10">
         <div className="flex justify-between items-end">
           <span className="text-2xl font-bold font-serif tabular-nums">
-            {reviewsThisSession}
+            {reviewsToday}
             <span className="text-sm text-muted-foreground font-sans font-medium"> / {dailyGoal} cards</span>
           </span>
           {isComplete && (
