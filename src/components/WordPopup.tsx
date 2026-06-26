@@ -174,7 +174,8 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
   const [error, setError] = useState(false);
   const [tokens, setTokens] = useState<{t: string, r?: string}[] | undefined>(contextTokens);
 
-  const wordId = word;
+  const dictForm = result?.japanese[0]?.word || deinflected || word;
+  const wordId = dictForm;
   const saved = hasWord(wordId);
 
  useEffect(() => {
@@ -247,9 +248,10 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
     }
   }, [contextSentence, contextTokens, wordId, saved]);
 
- const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
+  const conjugationLabel = getConjugationLabel(word, deinflected, result?.japanese[0]?.word);
 
- const dictForm = result?.japanese[0]?.word || deinflected || word;
+  // Use dictForm computed at top level
+
  // Use Kuromoji POS if available, otherwise fall back to Jisho POS
  const allPartsOfSpeech = result?.senses?.flatMap(s => s.parts_of_speech) || 
  (kuromojiPos ? kuromojiPosToJisho(kuromojiPos) : []);
@@ -261,11 +263,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  return;
  }
  if (!result) return;
- const disp = getDisplayWord(result, surfaceForMatch);
- const entry: SavedWord = {
- id: wordId,
- word: disp.word || word,
- reading: disp.reading || result.japanese[0]?.reading ||'',
+    const disp = getDisplayWord(result, surfaceForMatch);
+    const entry: SavedWord = {
+      id: wordId,
+      word: wordId,
+      reading: disp.reading || result.japanese[0]?.reading || '',
  meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
  jlpt: result.jlpt,
  partsOfSpeech: result.senses[0]?.parts_of_speech,
