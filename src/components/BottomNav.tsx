@@ -5,11 +5,10 @@ import { useFlashcardStore } from'@/stores/flashcards';
 import { useSyncStatus } from'@/lib/sync/sync-status';
 
 const tabs = [
-  { path:'/', label:'Home', icon: HomeIcon },
-  { path:'/library', label:'Library', icon: Library },
-  { path:'/my-books', label:'Books', icon: BookOpen },
-  { path:'/flashcards', label:'Cards', icon: Layers },
-  { path:'/dictionary', label:'Search', icon: Search },
+  { path: '/', label: 'Home', icon: HomeIcon },
+  { path: '/my-books', label: 'Books', icon: BookOpen },
+  { path: '/flashcards', label: 'Cards', icon: Layers },
+  { path: '/dictionary', label: 'Search', icon: Search },
 ];
 
 function SyncIndicator() {
