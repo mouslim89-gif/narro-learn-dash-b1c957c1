@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { useOnboardingStore } from '@/stores/onboarding';
+import { useFlashcardStore } from '@/stores/flashcards';
 import { Button } from '@/components/ui/button';
 import { HelpCircle, RefreshCw, Wrench } from 'lucide-react';
 import { useIsAdmin } from '@/lib/admin';
@@ -46,8 +47,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function Settings() {
-  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
+  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana, readingGoal, setReadingGoal } =
     useReadingProgressStore();
+  const { dailyGoal, setDailyGoal } = useFlashcardStore();
   const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
   const { user, signOut } = useAuth();
@@ -182,6 +184,60 @@ export default function Settings() {
           </div>
         </section>
 
+        {/* Goals */}
+        <section>
+          <SectionLabel>Goals</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <Label className="text-[15px] font-medium">Daily Flashcards</Label>
+                <span className="text-xs text-muted-foreground mt-0.5">Cards to review each day</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setDailyGoal(Math.max(5, dailyGoal - 5))}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  -
+                </button>
+                <span className="w-8 text-center font-bold tabular-nums">
+                  {dailyGoal}
+                </span>
+                <button 
+                  onClick={() => setDailyGoal(dailyGoal + 5)}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <Label className="text-[15px] font-medium">Daily Reading</Label>
+                <span className="text-xs text-muted-foreground mt-0.5">Words to read each day</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setReadingGoal(Math.max(100, readingGoal - 100))}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  -
+                </button>
+                <span className="w-12 text-center font-bold tabular-nums text-sm">
+                  {readingGoal}
+                </span>
+                <button 
+                  onClick={() => setReadingGoal(readingGoal + 100)}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-lg tap-scale-sm"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Help */}
         <section>
           <SectionLabel>Help & Onboarding</SectionLabel>
@@ -230,7 +286,6 @@ export default function Settings() {
                 </div>
 
                 <button 
-
                   onClick={async () => {
                     const t = toast.loading('Backfilling tokens (batch 50)...');
                     try {
@@ -259,7 +314,6 @@ export default function Settings() {
         </section>
 
         {/* About */}
-
         <section>
           <SectionLabel>About</SectionLabel>
           <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm px-4 py-4">

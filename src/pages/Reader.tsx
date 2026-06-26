@@ -228,10 +228,11 @@ export default function Reader() {
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
  const articleRef = useRef<HTMLDivElement>(null);
  const restoredScroll = useRef(false);
- // Top-most visible sentence index (updated by IntersectionObserver).
- const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
- // While restoring scroll, briefly ignore handleScroll writes so we don't
- // overwrite the saved progress with 0%.
+  // Top-most visible sentence index (updated by IntersectionObserver).
+  const currentSentenceRef = useRef<number | null>(saved?.sentenceIdx ?? null);
+  const maxSentenceReadRef = useRef<number>(saved?.sentenceIdx ?? 0);
+  // While restoring scroll, briefly ignore handleScroll writes so we don't
+  // overwrite the saved progress with 0%.
   const suppressSaveUntilRef = useRef<number>(0);
   // When the user switches difficulty, we want to land at the same % of the
   // text instead of trying to map sentence indices (which don't survive a
@@ -436,9 +437,18 @@ export default function Reader() {
  });
  flush(false);
  return result;
- }, [tokens]);
+  }, [tokens]);
 
- // Group sentences into visual paragraphs.
+  const cumulativeTokenCounts = useMemo(() => {
+    let sum = 0;
+    return sentences.map((s) => {
+      const count = s.tokens.filter(t => t.j).length;
+      sum += count;
+      return sum;
+    });
+  }, [sentences]);
+
+  // Group sentences into visual paragraphs.
  // Rules:
  // - A sentence with`breakAfter`(newline in source) closes the paragraph.
  // - But: never close while a Japanese quote 「…」 / 『…』 is still open —
@@ -617,12 +627,21 @@ export default function Reader() {
  rafRef.current = 0;
  const scrollH = document.documentElement.scrollHeight - window.innerHeight;
  if (scrollH <= 0) return;
- const pct = Math.min(100, (window.scrollY / scrollH) * 100);
- setScrollPercent(Math.round(pct));
- if (performance.now() < suppressSaveUntilRef.current) return;
- if (id) updateProgress(id, chapterId, difficulty, pct, currentSentenceRef.current ?? null);
- });
- }, [id, chapterId, difficulty, updateProgress]);
+      const pct = Math.min(100, (window.scrollY / scrollH) * 100);
+      setScrollPercent(Math.round(pct));
+      if (performance.now() < suppressSaveUntilRef.current) return;
+      
+      let wordsReadCount = 0;
+      const curIdx = currentSentenceRef.current ?? 0;
+      const prevMax = maxSentenceReadRef.current;
+      if (curIdx > prevMax) {
+        wordsReadCount = (cumulativeTokenCounts[curIdx] || 0) - (cumulativeTokenCounts[prevMax] || 0);
+        maxSentenceReadRef.current = curIdx;
+      }
+
+      if (id) updateProgress(id, chapterId, difficulty, pct, curIdx, wordsReadCount);
+    });
+  }, [id, chapterId, difficulty, updateProgress, cumulativeTokenCounts]);
 
  // Flush pending cloud pushes when the user leaves / hides the tab / changes
  // chapter. This is the difference between"sometimes saves"and"always saves".
