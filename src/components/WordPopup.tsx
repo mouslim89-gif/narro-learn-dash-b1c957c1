@@ -267,11 +267,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  (kuromojiPos ? kuromojiPosToJisho(kuromojiPos) : []);
  const wordType = getWordType(allPartsOfSpeech);
 
- const handleSave = () => {
- if (saved) {
- removeWord(wordId);
- return;
- }
+  const handleSave = () => {
+    if (saved && savedCard) {
+      removeWord(savedCard.id);
+      return;
+    }
  if (!result) return;
     const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {
