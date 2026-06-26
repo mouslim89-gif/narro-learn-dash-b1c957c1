@@ -53,8 +53,9 @@ export function getKnownLevel(
  token: BookToken,
  index: Map<string, number>
 ): KnownLevel | null {
- if (!token.j) return null;
- const candidates = [token.b, token.t].filter(Boolean) as string[];
+  if (!token.j) return null;
+  const candidates = [token.b, token.t, token.r].filter(Boolean) as string[];
+
  for (const c of candidates) {
  const k = normalizeKana(c);
  const m = index.get(k);

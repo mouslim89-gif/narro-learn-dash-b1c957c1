@@ -80,19 +80,32 @@ export default function WordDetail() {
  
   useEffect(() => {
     if (!word) return;
-    // 1. Check if word is in store with context
-    const sw = savedWords.find(s => s.id === word);
+    
+    // Use the result's display word or dictForm if available to find the saved card
+    const dictForm = result?.japanese[0]?.word;
+    const dispWord = disp?.word;
+    
+    // 1. Check if word is in store (by URL param, display word, or dict form)
+    const sw = savedWords.find(s => 
+      s.id === word || 
+      (dictForm && s.id === dictForm) || 
+      (dispWord && s.id === dispWord) ||
+      s.word === word ||
+      (dictForm && s.word === dictForm)
+    );
+
     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
       
       // Lazy re-tokenize if tokens are missing but sentence exists
+      const savedId = sw.id;
       if (sw.contextSentence && (!sw.contextTokens || sw.contextTokens.length === 0)) {
         import('@/integrations/supabase/client').then(({ supabase }) => {
           supabase.functions.invoke('tatoeba-example', {
             body: { mode: 'tokenize', sentence: sw.contextSentence }
           }).then(({ data }) => {
             if (data?.tokens) {
-              useFlashcardStore.getState().attachContext(word, { tokens: data.tokens });
+              useFlashcardStore.getState().attachContext(savedId, { tokens: data.tokens });
               setContext(prev => ({ ...prev, tokens: data.tokens }));
             }
           }).catch(console.error);
@@ -100,6 +113,7 @@ export default function WordDetail() {
       }
       return;
     }
+
 
     // 2. Check session storage (if we just arrived from reader)
     try {
@@ -136,7 +150,15 @@ export default function WordDetail() {
   const disp = result ? getDisplayWord(result, word) : null;
   const display = disp?.word || word;
   const reading = disp?.reading || '';
-  const saved = hasWord(word);
+
+  const dictForm = result?.japanese[0]?.word;
+  const savedCard = savedWords.find(s => 
+    s.id === word || 
+    (dictForm && s.id === dictForm) || 
+    (display && s.id === display)
+  );
+  const saved = !!savedCard;
+
 
  const handleBack = () => {
  try {
@@ -153,24 +175,29 @@ export default function WordDetail() {
  else navigate('/dictionary');
  };
 
-   const toggleSave = () => {
-     if (!result) return;
-     if (saved) {
-       removeWord(word);
-       return;
-     }
-     const entry: Omit<SavedWord, 'mastery'> = {
-       id: word,
-       word: word,
-       reading: reading || result.japanese[0]?.reading || '',
-       meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
-       jlpt: result.jlpt,
-       partsOfSpeech: result.senses[0]?.parts_of_speech,
-       contextSentence: context?.sentence,
-       contextTokens: context?.tokens,
-     };
-     addWord(entry);
-   };
+    const toggleSave = () => {
+      if (!result) return;
+      if (saved && savedCard) {
+        removeWord(savedCard.id);
+        return;
+      }
+      
+      // Use dictForm as the preferred ID for consistency
+      const canonicalId = dictForm || display || word;
+      
+      const entry: Omit<SavedWord, 'mastery'> = {
+        id: canonicalId,
+        word: canonicalId,
+        reading: reading || result.japanese[0]?.reading || '',
+        meanings: result.senses.flatMap((s) => s.english_definitions).slice(0, 5),
+        jlpt: result.jlpt,
+        partsOfSpeech: result.senses[0]?.parts_of_speech,
+        contextSentence: context?.sentence,
+        contextTokens: context?.tokens,
+      };
+      addWord(entry);
+    };
+
 
 
 
@@ -377,7 +404,7 @@ export default function WordDetail() {
       <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
       <div className="font-jp-serif text-[15px] leading-relaxed text-foreground/90">
         {context.tokens ? (
-          <FuriganaSentence tokens={context.tokens} highlight={word} />
+          <FuriganaSentence tokens={context.tokens} highlight={display} />
         ) : (
           context.sentence
         )}
