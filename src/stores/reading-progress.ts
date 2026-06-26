@@ -58,51 +58,42 @@ interface ReadingProgressState {
  highlightNew: boolean;
  highlightLearning: boolean;
  highlightKnown: boolean;
-  // Auth-synced user
-  syncUserId: string | null;
-  // Goals & Activity
-  readingGoal: number;
-  readToday: { date: string; count: number };
-  readingHistory: { date: string; count: number }[];
-  // Actions
-  updateProgress: (
-    bookId: string,
-    chapterId: string | undefined,
-    difficulty: Difficulty,
-    percent: number,
-    sentenceIdx?: number | null,
-    wordsRead?: number
-  ) => void;
-  /** Force-flush any debounced cloud pushes immediately (best-effort, fire-and-forget). */
-  flushPendingProgressPushes: () => void;
-  /** Get progress for a specific chapter (defaults to 'main'). */
-  getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
-  /** Get the most recently read progress entry for a book (across chapters). */
-  getBookProgress: (bookId: string) => ReadingProgress | undefined;
-  /** Get all per-chapter progress for a book. Returns map keyed by chapterId. */
-  getChapterProgress: (bookId: string) => Record<string, ReadingProgress>;
-  
-  setReadingGoal: (v: number) => void;
-  getReadTodayCount: () => number;
+ // Auth-synced user
+ syncUserId: string | null;
+ // Actions
+ updateProgress: (
+ bookId: string,
+ chapterId: string | undefined,
+ difficulty: Difficulty,
+ percent: number,
+ sentenceIdx?: number | null,
+ ) => void;
+ /** Force-flush any debounced cloud pushes immediately (best-effort, fire-and-forget). */
+ flushPendingProgressPushes: () => void;
+ /** Get progress for a specific chapter (defaults to'main'). */
+ getProgress: (bookId: string, chapterId?: string) => ReadingProgress | undefined;
+ /** Get the most recently read progress entry for a book (across chapters). */
+ getBookProgress: (bookId: string) => ReadingProgress | undefined;
+ /** Get all per-chapter progress for a book. Returns map keyed by chapterId. */
+ getChapterProgress: (bookId: string) => Record<string, ReadingProgress>;
+ setFontSize: (size: FontSize) => void;
+ setReaderDarkMode: (dark: boolean) => void;
+ setDarkMode: (dark: boolean) => void;
+ setShowFurigana: (show: boolean) => void;
+ setShowTranslations: (show: boolean) => void;
+ setDisplayMode: (mode: DisplayMode) => void;
 
-  setFontSize: (size: FontSize) => void;
-  setReaderDarkMode: (dark: boolean) => void;
-  setDarkMode: (dark: boolean) => void;
-  setShowFurigana: (show: boolean) => void;
-  setShowTranslations: (show: boolean) => void;
-  setDisplayMode: (mode: DisplayMode) => void;
-
-  setJapaneseFont: (font: JapaneseFont) => void;
-  setHasSeenLongPressHint: (seen: boolean) => void;
-  setShowKnownHighlights: (show: boolean) => void;
-  setHighlightNew: (v: boolean) => void;
-  setHighlightLearning: (v: boolean) => void;
-  setHighlightKnown: (v: boolean) => void;
-  // Sync helpers
-  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
-  clearProgress: () => void;
-  hydratePreferences: (prefs: UserPreferences, userId: string) => void;
-  clearPreferences: () => void;
+ setJapaneseFont: (font: JapaneseFont) => void;
+ setHasSeenLongPressHint: (seen: boolean) => void;
+ setShowKnownHighlights: (show: boolean) => void;
+ setHighlightNew: (v: boolean) => void;
+ setHighlightLearning: (v: boolean) => void;
+ setHighlightKnown: (v: boolean) => void;
+ // Sync helpers
+ hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
+ clearProgress: () => void;
+ hydratePreferences: (prefs: UserPreferences, userId: string) => void;
+ clearPreferences: () => void;
 }
 
 const DEFAULT_PREFS: UserPreferences = {
@@ -193,62 +184,37 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  highlightNew: true,
  highlightLearning: true,
  highlightKnown: false,
-    syncUserId: null,
-    readingGoal: 500,
-    readToday: { date: new Date().toISOString().split('T')[0], count: 0 },
-    readingHistory: [],
-    updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx, wordsRead) => {
-      const cid = chapterId || DEFAULT_CHAPTER_ID;
-      const key = chapterKey(bookId, cid);
-      const prev = get().progress[key];
-      const roundedPct = Math.max(0, Math.min(100, Math.round(percent)));
-      // Once a chapter is marked complete, drop the sentence anchor so the next
-      // visit starts at the top.
-      const nextSentence = roundedPct >= 100 ? null : (sentenceIdx ?? prev?.sentenceIdx ?? null);
-
-      const today = new Date().toISOString().split('T')[0];
-      const currentRead = get().readToday;
-      let newReadToday = { ...currentRead };
-      let newHistory = [...get().readingHistory];
-
-      if (wordsRead && wordsRead > 0) {
-        const newCount = currentRead.date === today ? currentRead.count + wordsRead : wordsRead;
-        newReadToday = { date: today, count: newCount };
-
-        const histIdx = newHistory.findIndex(h => h.date === today);
-        if (histIdx >= 0) {
-          newHistory[histIdx] = { date: today, count: newCount };
-        } else {
-          newHistory.push({ date: today, count: newCount });
-          if (newHistory.length > 90) newHistory.shift();
-        }
-      }
-
-      // Skip no-op writes (same pct AND same sentence anchor) to avoid spamming cloud.
-      if (
-        prev &&
-        prev.progressPercent === roundedPct &&
-        (prev.sentenceIdx ?? null) === nextSentence &&
-        prev.difficulty === difficulty &&
-        (!wordsRead || wordsRead <= 0)
-      ) {
-        return;
-      }
-      const next: ReadingProgress = {
-        difficulty,
-        progressPercent: roundedPct,
-        lastReadAt: new Date().toISOString(),
-        chapterId: cid,
-        sentenceIdx: nextSentence,
-      };
-      set((state) => ({
-        progress: { ...state.progress, [key]: next },
-        readToday: newReadToday,
-        readingHistory: newHistory,
-      }));
-      const userId = get().syncUserId;
-      if (userId) schedulePush(userId, bookId, next);
-    },
+ syncUserId: null,
+ updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
+ const cid = chapterId || DEFAULT_CHAPTER_ID;
+ const key = chapterKey(bookId, cid);
+ const prev = get().progress[key];
+ const roundedPct = Math.max(0, Math.min(100, Math.round(percent)));
+ // Once a chapter is marked complete, drop the sentence anchor so the next
+ // visit starts at the top.
+ const nextSentence = roundedPct >= 100 ? null : (sentenceIdx ?? prev?.sentenceIdx ?? null);
+ // Skip no-op writes (same pct AND same sentence anchor) to avoid spamming cloud.
+ if (
+ prev &&
+ prev.progressPercent === roundedPct &&
+ (prev.sentenceIdx ?? null) === nextSentence &&
+ prev.difficulty === difficulty
+ ) {
+ return;
+ }
+ const next: ReadingProgress = {
+ difficulty,
+ progressPercent: roundedPct,
+ lastReadAt: new Date().toISOString(),
+ chapterId: cid,
+ sentenceIdx: nextSentence,
+ };
+ set((state) => ({
+ progress: { ...state.progress, [key]: next },
+ }));
+ const userId = get().syncUserId;
+ if (userId) schedulePush(userId, bookId, next);
+ },
  flushPendingProgressPushes: () => {
  flushAllProgressPushes();
  },
@@ -281,13 +247,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  }
  return out;
  },
-  setReadingGoal: (readingGoal) => set({ readingGoal }),
-  getReadTodayCount: () => {
-    const today = new Date().toISOString().split('T')[0];
-    const read = get().readToday;
-    return read.date === today ? read.count : 0;
-  },
-  setFontSize: (fontSize) => { set({ fontSize }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+ setFontSize: (fontSize) => { set({ fontSize }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setReaderDarkMode: (readerDarkMode) => { set({ readerDarkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setDarkMode: (darkMode) => { set({ darkMode }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setShowFurigana: (showFurigana) => { set({ showFurigana }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
@@ -337,26 +297,8 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  },
  }),
  {
-    name:'reading-progress',
-    partialize: (state) => ({
-      progress: state.progress,
-      fontSize: state.fontSize,
-      readerDarkMode: state.readerDarkMode,
-      darkMode: state.darkMode,
-      showFurigana: state.showFurigana,
-      showTranslations: state.showTranslations,
-      displayMode: state.displayMode,
-      japaneseFont: state.japaneseFont,
-      hasSeenLongPressHint: state.hasSeenLongPressHint,
-      showKnownHighlights: state.showKnownHighlights,
-      highlightNew: state.highlightNew,
-      highlightLearning: state.highlightLearning,
-      highlightKnown: state.highlightKnown,
-      readingGoal: state.readingGoal,
-      readToday: state.readToday,
-      readingHistory: state.readingHistory,
-    }),
-    // Persist everything (preferences AND progress) — progress acts as offline cache
-  }
+ name:'reading-progress',
+ // Persist everything (preferences AND progress) — progress acts as offline cache
+ }
  )
 );
