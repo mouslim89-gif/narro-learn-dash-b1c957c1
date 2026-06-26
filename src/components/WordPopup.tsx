@@ -176,7 +176,17 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
 
   const dictForm = result?.japanese[0]?.word || deinflected || word;
   const wordId = dictForm;
-  const saved = hasWord(wordId);
+  const { savedWords } = useFlashcardStore();
+  
+  const savedCard = savedWords.find(s => 
+    s.id === wordId || 
+    s.word === wordId ||
+    s.id === word ||
+    s.word === word ||
+    (kuromojiBase && (s.id === kuromojiBase || s.word === kuromojiBase)) ||
+    (result?.japanese.some(j => j.word === s.word || j.reading === s.word))
+  );
+  const saved = !!savedCard;
 
  useEffect(() => {
  if (cached) {
@@ -257,11 +267,11 @@ export function WordPopup({ word, baseForm: kuromojiBase, reading: overrideReadi
  (kuromojiPos ? kuromojiPosToJisho(kuromojiPos) : []);
  const wordType = getWordType(allPartsOfSpeech);
 
- const handleSave = () => {
- if (saved) {
- removeWord(wordId);
- return;
- }
+  const handleSave = () => {
+    if (saved && savedCard) {
+      removeWord(savedCard.id);
+      return;
+    }
  if (!result) return;
     const disp = getDisplayWord(result, surfaceForMatch);
     const entry: SavedWord = {

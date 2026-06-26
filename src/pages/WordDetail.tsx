@@ -78,26 +78,31 @@ export default function WordDetail() {
    return () => { cancelled = true; };
    }, [word, result]);
  
+  const disp = result ? getDisplayWord(result, word) : null;
+  const display = disp?.word || word;
+  const reading = disp?.reading || '';
+
+  const dictForm = result?.japanese[0]?.word;
+  const savedCard = savedWords.find(s => 
+    s.id === word || 
+    (dictForm && s.id === dictForm) || 
+    (display && s.id === display) ||
+    s.word === word ||
+    (dictForm && s.word === dictForm) ||
+    (reading && s.reading === reading) ||
+    (result?.japanese?.some(j => j.word === s.word || j.reading === s.word))
+  );
+  const saved = !!savedCard;
+
   useEffect(() => {
     if (!word) return;
     
-    // Use the result's display word or dictForm if available to find the saved card
-    const dictForm = result?.japanese[0]?.word;
-    const dispWord = disp?.word;
-    
-    // 1. Check if word is in store (by URL param, display word, or dict form)
-    const sw = savedWords.find(s => 
-      s.id === word || 
-      (dictForm && s.id === dictForm) || 
-      (dispWord && s.id === dispWord) ||
-      s.word === word ||
-      (dictForm && s.word === dictForm)
-    );
+    // Pick the best match from saved words
+    const sw = savedCard;
 
     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
       
-      // Lazy re-tokenize if tokens are missing but sentence exists
       const savedId = sw.id;
       if (sw.contextSentence && (!sw.contextTokens || sw.contextTokens.length === 0)) {
         import('@/integrations/supabase/client').then(({ supabase }) => {
@@ -111,9 +116,7 @@ export default function WordDetail() {
           }).catch(console.error);
         });
       }
-      return;
     }
-
 
     // 2. Check session storage (if we just arrived from reader)
     try {
@@ -127,7 +130,6 @@ export default function WordDetail() {
             tokens: data.word.contextTokens 
           });
           
-          // Lazy re-tokenize if tokens are missing but sentence exists
           if (data.word.contextSentence && (!data.word.contextTokens || data.word.contextTokens.length === 0)) {
             import('@/integrations/supabase/client').then(({ supabase }) => {
               supabase.functions.invoke('tatoeba-example', {
@@ -142,22 +144,7 @@ export default function WordDetail() {
         }
       }
     } catch {}
-  }, [word, savedWords]);
-
-
-
-
-  const disp = result ? getDisplayWord(result, word) : null;
-  const display = disp?.word || word;
-  const reading = disp?.reading || '';
-
-  const dictForm = result?.japanese[0]?.word;
-  const savedCard = savedWords.find(s => 
-    s.id === word || 
-    (dictForm && s.id === dictForm) || 
-    (display && s.id === display)
-  );
-  const saved = !!savedCard;
+  }, [word, result, savedWords, savedCard]);
 
 
  const handleBack = () => {
