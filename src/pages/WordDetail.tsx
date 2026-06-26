@@ -78,22 +78,27 @@ export default function WordDetail() {
    return () => { cancelled = true; };
    }, [word, result]);
  
+  const disp = result ? getDisplayWord(result, word) : null;
+  const display = disp?.word || word;
+  const reading = disp?.reading || '';
+
+  const dictForm = result?.japanese[0]?.word;
+  const savedCard = savedWords.find(s => 
+    s.id === word || 
+    (dictForm && s.id === dictForm) || 
+    (display && s.id === display) ||
+    s.word === word ||
+    (dictForm && s.word === dictForm) ||
+    (reading && s.reading === reading) ||
+    (result?.japanese?.some(j => j.word === s.word || j.reading === s.word))
+  );
+  const saved = !!savedCard;
+
   useEffect(() => {
     if (!word) return;
     
     // Pick the best match from saved words
-    const dictForm = result?.japanese[0]?.word;
-    const dispWord = disp?.word;
-    
-    const sw = savedWords.find(s => 
-      s.id === word || 
-      (dictForm && s.id === dictForm) || 
-      (dispWord && s.id === dispWord) ||
-      s.word === word ||
-      (dictForm && s.word === dictForm) ||
-      (reading && s.reading === reading) ||
-      (result?.japanese.some(j => j.word === s.word || j.reading === s.word))
-    );
+    const sw = savedCard;
 
     if (sw?.contextSentence || (sw?.contextTokens && sw.contextTokens.length > 0)) {
       setContext({ sentence: sw.contextSentence, tokens: sw.contextTokens });
@@ -112,6 +117,7 @@ export default function WordDetail() {
         });
       }
     }
+
     // 2. Check session storage (if we just arrived from reader)
     try {
       const stored = sessionStorage.getItem('reopen-word-popup');
@@ -138,26 +144,7 @@ export default function WordDetail() {
         }
       }
     } catch {}
-  }, [word, result, savedWords, disp, reading]);
-
-
-
-
-  const disp = result ? getDisplayWord(result, word) : null;
-  const display = disp?.word || word;
-  const reading = disp?.reading || '';
-
-  const dictForm = result?.japanese[0]?.word;
-  const savedCard = savedWords.find(s => 
-    s.id === word || 
-    (dictForm && s.id === dictForm) || 
-    (display && s.id === display) ||
-    s.word === word ||
-    (dictForm && s.word === dictForm) ||
-    (reading && s.reading === reading) ||
-    (result?.japanese.some(j => j.word === s.word || j.reading === s.word))
-  );
-  const saved = !!savedCard;
+  }, [word, result, savedWords, savedCard]);
 
 
  const handleBack = () => {
