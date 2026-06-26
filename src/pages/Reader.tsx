@@ -437,9 +437,18 @@ export default function Reader() {
  });
  flush(false);
  return result;
- }, [tokens]);
+  }, [tokens]);
 
- // Group sentences into visual paragraphs.
+  const cumulativeTokenCounts = useMemo(() => {
+    let sum = 0;
+    return sentences.map((s) => {
+      const count = s.tokens.filter(t => t.j).length;
+      sum += count;
+      return sum;
+    });
+  }, [sentences]);
+
+  // Group sentences into visual paragraphs.
  // Rules:
  // - A sentence with`breakAfter`(newline in source) closes the paragraph.
  // - But: never close while a Japanese quote 「…」 / 『…』 is still open —
