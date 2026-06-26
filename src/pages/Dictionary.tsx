@@ -109,23 +109,30 @@ export default function DictionaryPage() {
  return () => clearTimeout(timeout);
  }, [query]);
 
- const handleToggleSave = (result: JishoResult) => {
- const disp = getDisplayWord(result);
- const id = disp.word || result.slug;
- if (hasWord(id)) {
- removeWord(id);
- return;
- }
- const entry: Omit<SavedWord,'mastery'> = {
- id,
- word: id,
- reading: disp.reading || result.japanese[0]?.reading ||'',
- meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
- jlpt: result.jlpt,
- partsOfSpeech: result.senses[0]?.parts_of_speech,
- };
- addWord(entry);
- };
+  const handleToggleSave = (result: JishoResult) => {
+    const disp = getDisplayWord(result);
+    const id = disp.word || result.slug;
+    const { savedWords } = useFlashcardStore.getState();
+    const savedCard = savedWords.find(s => 
+      s.id === id || 
+      s.word === id || 
+      (result.japanese.some(j => j.word === s.word || j.reading === s.word))
+    );
+
+    if (savedCard) {
+      removeWord(savedCard.id);
+      return;
+    }
+    const entry: Omit<SavedWord, 'mastery'> = {
+      id,
+      word: id,
+      reading: disp.reading || result.japanese[0]?.reading || '',
+      meanings: result.senses.flatMap(s => s.english_definitions).slice(0, 5),
+      jlpt: result.jlpt,
+      partsOfSpeech: result.senses[0]?.parts_of_speech,
+    };
+    addWord(entry);
+  };
 
  const clearQuery = () => {
  setQuery('');
