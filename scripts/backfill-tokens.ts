@@ -39,7 +39,7 @@ async function tokenizeWithAI(japanese: string): Promise<Token[]> {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("AI Gateway error:", errorText);
+    console.error(`AI Gateway error for "${japanese}":`, errorText);
     return [{ t: japanese }];
   }
 
@@ -47,7 +47,9 @@ async function tokenizeWithAI(japanese: string): Promise<Token[]> {
   try {
     const content = data.choices[0].message.content;
     const parsed = JSON.parse(content);
-    return Array.isArray(parsed) ? parsed : (parsed.tokens || [{ t: japanese }]);
+    const tokens = Array.isArray(parsed) ? parsed : (parsed.tokens || [{ t: japanese }]);
+    console.log(`Successfully tokenized "${japanese}"`);
+    return tokens;
   } catch (err) {
     console.error("AI parsing error:", err);
     return [{ t: japanese }];
@@ -55,11 +57,12 @@ async function tokenizeWithAI(japanese: string): Promise<Token[]> {
 }
 
 async function runBackfill() {
+  console.log("Starting backfill process...");
   const { data: rows, error: fetchError } = await supabase
     .from('example_sentences')
     .select('word, japanese, sentences')
     .is('tokens', null)
-    .limit(100); // Process in batches of 100 to avoid long runs
+    .limit(50); // Smaller batch to be safe
 
   if (fetchError) {
     console.error("Fetch error:", fetchError);
@@ -74,7 +77,7 @@ async function runBackfill() {
   console.log(`Processing ${rows.length} rows...`);
 
   for (const row of rows) {
-    console.log(`Processing word: ${row.word}`);
+    console.log(`--- Word: ${row.word} ---`);
     
     // 1. Tokenize main sentence
     const mainTokens = await tokenizeWithAI(row.japanese);
