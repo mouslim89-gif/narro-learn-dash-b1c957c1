@@ -113,8 +113,6 @@ export default function WordDetail() {
       }
     }
   }, [word, result, savedWords, disp, reading]);
-
-
     // 2. Check session storage (if we just arrived from reader)
     try {
       const stored = sessionStorage.getItem('reopen-word-popup');
@@ -127,7 +125,6 @@ export default function WordDetail() {
             tokens: data.word.contextTokens 
           });
           
-          // Lazy re-tokenize if tokens are missing but sentence exists
           if (data.word.contextSentence && (!data.word.contextTokens || data.word.contextTokens.length === 0)) {
             import('@/integrations/supabase/client').then(({ supabase }) => {
               supabase.functions.invoke('tatoeba-example', {
@@ -142,7 +139,7 @@ export default function WordDetail() {
         }
       }
     } catch {}
-  }, [word, savedWords]);
+  }, [word, result, savedWords, disp, reading]);
 
 
 
