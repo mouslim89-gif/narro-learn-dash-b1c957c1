@@ -55,7 +55,7 @@ export function WordMiniPopup({
   // Tiny delay before showing "Looking up" to hide the flicker if data is arriving
   useEffect(() => {
     if (loading) {
-      const timer = setTimeout(() => setShowLoader(true), 150);
+      const timer = setTimeout(() => setShowLoader(true), 100);
       return () => clearTimeout(timer);
     } else {
       setShowLoader(false);
