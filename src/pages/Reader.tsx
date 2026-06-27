@@ -581,12 +581,18 @@ export default function Reader() {
  if (id) hydrateDictionaryForBook(id, chapterId);
  }, [id, chapterId, difficulty]);
 
-  // Pre-hydrate dictionary entries for the current tokens (including merged forms).
-  useEffect(() => {
-    if (tokens.length > 0) {
-      hydrateDictionaryFromTokens(tokens);
-    }
-  }, [tokens]);
+   // Pre-hydrate dictionary entries for the current tokens (including merged forms).
+   // We delay this slightly so the shard hydration (which is much more efficient)
+   // has a head start and we don't hammer IndexedDB/Network unnecessarily.
+   useEffect(() => {
+     if (tokens.length > 0) {
+       const timer = setTimeout(() => {
+         hydrateDictionaryFromTokens(tokens);
+       }, 800);
+       return () => clearTimeout(timer);
+     }
+   }, [tokens]);
+
 
   // Track the top-most visible sentence so we can persist an accurate anchor.
 
