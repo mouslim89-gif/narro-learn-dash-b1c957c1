@@ -1,13 +1,13 @@
 {
   "v": 2,
   "shards": {
-    "rashomon": {
-      "file": "rashomon.json",
-      "size": 1633603,
-      "hash": "5d937383bebf",
-      "words": 1383,
-      "covered": 1360,
-      "filled": 73
+    "sakura": {
+      "file": "sakura.json",
+      "size": 811815,
+      "hash": "44ffd9a4b61d",
+      "words": 677,
+      "covered": 668,
+      "filled": 28
     }
   }
 }
