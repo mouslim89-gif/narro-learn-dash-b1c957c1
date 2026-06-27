@@ -185,22 +185,22 @@ export default function GrammarDetail() {
               </div>
             ) : (
               <>
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4">
                   {formations.length > 0 ? (
                     formations.map((f, i) => (
                       <div key={i} className="relative">
                         {i > 0 && (
-                          <div className="flex items-center gap-2 mb-4">
+                          <div className="flex items-center gap-2 mb-2">
                             <div className="h-px flex-1 bg-border/40" />
                             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 bg-background px-2">OR</span>
                             <div className="h-px flex-1 bg-border/40" />
                           </div>
                         )}
-                        <div className="flex flex-wrap items-center gap-y-3">
+                        <div className="flex flex-wrap items-center gap-y-2">
                           {f.parts.map((part, pi) => (
                             <div key={pi} className="flex items-center">
                               <span className={cn(
-                                "inline-block rounded-xl border px-3.5 py-2 text-base font-bold transition-colors shadow-sm",
+                                "inline-block rounded-lg border px-2 py-0.5 text-xs font-bold transition-colors shadow-sm",
                                 /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
                                   ? "font-japanese bg-accent/15 text-accent border-accent/30" 
                                   : "bg-muted/60 text-foreground border-border/80"
@@ -208,7 +208,7 @@ export default function GrammarDetail() {
                                 {part}
                               </span>
                               {pi < f.parts.length - 1 && (
-                                <span className="text-accent/70 font-black text-xl px-3 drop-shadow-sm">+</span>
+                                <span className="text-foreground font-black text-sm px-1.5 drop-shadow-sm">+</span>
                               )}
                             </div>
                           ))}
