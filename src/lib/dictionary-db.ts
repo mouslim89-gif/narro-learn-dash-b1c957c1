@@ -122,8 +122,9 @@ async function getManifest() {
 
 /**
  * Try to hydrate from a pre-built static shard at /dict/<key>.json.
-
+ */
 async function hydrateDictionaryFromShard(key: string): Promise<boolean> {
+
  await ensureCacheVersion();
  try {
  const url =`/dict/${encodeURIComponent(key)}.json`;
