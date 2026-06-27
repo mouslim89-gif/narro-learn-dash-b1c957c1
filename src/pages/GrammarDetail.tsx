@@ -108,6 +108,8 @@ export default function GrammarDetail() {
     );
   }
 
+  const highlightPattern = note.pattern.replace(/^〜|〜$/g, '').trim();
+
   return (
     <div className="pb-24">
       {/* Top bar - matched with WordDetail.tsx */}
@@ -233,7 +235,7 @@ export default function GrammarDetail() {
               <div key={i} className="rounded-2xl bg-card p-4 ring-1 ring-border/30 shadow-sm animate-fade-in-soft">
                 <div className="text-base leading-relaxed text-foreground">
                   {ex.tokens ? (
-                    <FuriganaSentence tokens={ex.tokens} highlight={note.pattern} />
+                    <FuriganaSentence tokens={ex.tokens} highlight={highlightPattern} />
                   ) : (
                     ex.japanese
                   )}
