@@ -575,11 +575,17 @@ export default function Reader() {
  }, [saved, sentences.length]);
 
  // Reset restore flag when the chapter changes.
- useEffect(() => {
- restoredScroll.current = false;
- currentSentenceRef.current = null;
- if (id) hydrateDictionaryForBook(id, chapterId);
- }, [id, chapterId, difficulty]);
+  useEffect(() => {
+    restoredScroll.current = false;
+    currentSentenceRef.current = null;
+    
+    if (id) {
+      // Always hydrate using the ROOT book ID to ensure we hit the correct shard
+      // and avoid chapter/part mismatch logic.
+      const rootId = id.includes('__') ? id.split('__')[0] : id;
+      hydrateDictionaryForBook(rootId);
+    }
+  }, [id, chapterId, difficulty]);
 
    // Pre-hydrate dictionary entries for the current tokens (including merged forms).
    // We delay this slightly so the shard hydration (which is much more efficient)
