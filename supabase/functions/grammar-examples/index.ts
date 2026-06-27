@@ -35,32 +35,46 @@ Deno.serve(async (req) => {
     }
 
     // Generate with AI
-    const gateway = createLovableAiGatewayProvider(key);
-    const { output } = await generateText({
-      model: gateway("google/gemini-3-flash-preview"),
-      output: Output.object({
-        schema: z.object({
-          examples: z.array(z.object({
-            japanese: z.string(),
-            english: z.string(),
-            tokens: z.array(z.object({
-              t: z.string(),
-              r: z.string().optional()
-            }))
-          }))
-        })
-      }),
-      system: `You are a Japanese grammar expert. Generate ${count} natural example sentences for the grammar pattern: "${pattern}" (${meaning}). 
-      Target JLPT level: ${jlpt}.
-      Each example must include Japanese text, English translation, and furigana tokens.
-      The tokens should split the sentence into parts, with 'r' property for kanji reading (furigana) in hiragana.`,
-      prompt: `Pattern: ${pattern}\nMeaning: ${meaning}`,
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Lovable-API-Key": key,
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.0-flash-001",
+        messages: [
+          { 
+            role: "system", 
+            content: `You are a Japanese grammar expert. Generate ${count} natural example sentences for the grammar pattern: "${pattern}" (${meaning}). 
+            Target JLPT level: ${jlpt}.
+            Provide the response as a JSON object with a field "examples" containing an array of objects.
+            Each object should have:
+            - japanese: string (the sentence)
+            - english: string (translation)
+            - tokens: array of {t: string, r?: string} where 't' is the word/part and 'r' is hiragana furigana for kanji.
+            - structure: string (optional, a concise visual representation of how this grammar is used, e.g. "Dictionary form + のだ")`
+          },
+          { role: "user", content: `Pattern: ${pattern}\nMeaning: ${meaning}` }
+        ],
+        response_format: { type: "json_object" }
+      })
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`AI Gateway error: ${errorText}`);
+    }
+
+    const aiData = await response.json();
+    const content = aiData.choices[0].message.content;
+    const output = JSON.parse(content);
 
     // Save to cache
     await supabase.from('grammar_examples').insert({
       pattern_slug: slug,
-      examples: output.examples
+      examples: output.examples,
+      structure: output.structure
     });
 
     return new Response(JSON.stringify(output), {
