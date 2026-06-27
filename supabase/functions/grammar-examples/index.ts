@@ -31,9 +31,11 @@ Deno.serve(async (req) => {
     if (cached) {
       // Handle legacy cache (array) vs new cache (object)
       const examples = Array.isArray(cached.examples) ? cached.examples : cached.examples.items;
-      const structure = Array.isArray(cached.examples) ? null : cached.examples.structure;
+      const formations = Array.isArray(cached.examples) 
+        ? null 
+        : (cached.examples.formations || (cached.examples.structure ? [{ parts: [cached.examples.structure] }] : null));
       
-      return new Response(JSON.stringify({ examples, structure }), {
+      return new Response(JSON.stringify({ examples, formations }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -50,14 +52,16 @@ Deno.serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: `You are a Japanese grammar expert. Generate ${count} natural example sentences for the grammar pattern: "${pattern}" (${meaning}). 
+            content: `You are a Japanese grammar expert. Generate ${count} natural, simple example sentences for the grammar pattern: "${pattern}" (${meaning}). 
             Target JLPT level: ${jlpt}.
-            Provide the response as a JSON object with a field "examples" containing an array of objects.
-            Each object should have:
-            - japanese: string (the sentence)
-            - english: string (translation)
-            - tokens: array of {t: string, r?: string} where 't' is the word/part and 'r' is hiragana furigana for kanji.
-            - structure: string (optional, a concise visual representation of how this grammar is used, e.g. "Dictionary form + のだ")`
+            Ensure the pattern "${pattern}" is used clearly in each sentence.
+            Provide the response as a JSON object with fields:
+            - examples: array of objects. Each object has:
+              - japanese: string (the sentence)
+              - english: string (translation)
+              - tokens: array of {t: string, r?: string} where 't' is the word/part and 'r' is hiragana furigana for kanji. Keep tokens relatively granular so the pattern can be matched.
+            - formations: array of objects. Each object has:
+              - parts: array of strings representing the formation components (e.g., ["Verb masu stem", "ながら"], ["Noun", "ながら"]). Use clear labels for parts.`
           },
           { role: "user", content: `Pattern: ${pattern}\nMeaning: ${meaning}` }
         ],
@@ -79,7 +83,7 @@ Deno.serve(async (req) => {
       pattern_slug: slug,
       examples: {
         items: output.examples,
-        structure: output.structure
+        formations: output.formations
       }
     });
 

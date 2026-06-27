@@ -36,15 +36,13 @@ export function FuriganaSentence({
     );
   }
 
-  // Highlight logic: check if token matches the highlight word or its dictionary form.
-  let highlightedOnce = false;
-
+  // Highlight logic: check if token surface or dictionary form contains the highlight substring.
+  // Using .includes() because grammar patterns like "〜のだ" might be part of a longer token.
   return (
     <p className={className}>
       {tokens.map((tok, i) => {
         const isHighlight =
-          !highlightedOnce && !!highlight && tok.t === highlight;
-        if (isHighlight) highlightedOnce = true;
+          !!highlight && (tok.t.includes(highlight) || (tok.r && tok.r.includes(highlight)));
 
         const content = (
           <FuriganaWord
@@ -60,7 +58,7 @@ export function FuriganaSentence({
           return (
             <span
               key={i}
-              className="text-accent font-semibold"
+              className="text-accent font-bold"
             >
               {content}
             </span>
