@@ -28,7 +28,10 @@ export function DictionaryPreloader() {
         
         // Preload grammar structures for current books (staggered)
         setTimeout(() => {
-          preloadGrammarForBook(book.id, 'simplified').catch(() => {});
+          const difficulties: ('simplified' | 'intermediate' | 'original')[] = ['simplified', 'intermediate', 'original'];
+          difficulties.forEach(diff => {
+            preloadGrammarForBook(book.id, diff).catch(() => {});
+          });
         }, 3000);
       }
 
