@@ -50,6 +50,17 @@ export function WordMiniPopup({
   const [result, setResult] = useState<JishoResult | null>(
     initialCached ? pickBestResult(initialCached.results, pos, surfaceForMatch) : null
   );
+  const [showLoader, setShowLoader] = useState(false);
+
+  // Tiny delay before showing "Looking up" to hide the flicker if data is arriving
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => setShowLoader(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setShowLoader(false);
+    }
+  }, [loading]);
  const [error, setError] = useState(false);
 
  const wordId = word;
@@ -257,7 +268,7 @@ export function WordMiniPopup({
 
  {/* Content */}
  <div className="px-2.5 pt-1 pb-2">
- {loading && (
+ {loading && showLoader && (
  <div className="flex items-center gap-2 py-2 text-muted-foreground">
  <Loader2 className="h-3.5 w-3.5 animate-spin"/>
  <span className="text-[11px]">Looking up…</span>
