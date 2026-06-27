@@ -21,9 +21,6 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   throw new Error('Missing Supabase env vars in .env');
 }
 
-// User JWT is usually needed for invoke if auth is enabled, 
-// but grammar-examples uses LOVABLE_API_KEY internally.
-// We just need a valid anon key to hit the endpoint.
 const AUTH_HEADER = `Bearer ${SUPABASE_KEY}`;
 
 interface GrammarNote {
@@ -36,19 +33,16 @@ async function main() {
   const grammarPath = path.resolve(__dirname, '../src/data/book-grammar.ts');
   const grammarSrc = fs.readFileSync(grammarPath, 'utf-8');
   
-  // Extract the JSON object from the file
   const startIdx = grammarSrc.indexOf('= {') + 2;
   const endIdx = grammarSrc.lastIndexOf('};') + 1;
   const jsonStr = grammarSrc.slice(startIdx, endIdx);
   const bookGrammar = JSON.parse(jsonStr);
 
-  // Collect all unique notes
   const notesMap = new Map<string, GrammarNote>();
   
   for (const bookId in bookGrammar) {
     for (const diff in bookGrammar[bookId]) {
       const parts = bookGrammar[bookId][diff];
-      // Some are flat GrammarNote[], some are GrammarNote[][]
       const flatNotes = Array.isArray(parts[0]) ? parts.flat() : parts;
       
       for (const note of flatNotes) {
@@ -61,42 +55,43 @@ async function main() {
   }
 
   const allNotes = Array.from(notesMap.values());
-  console.log(`Found ${allNotes.length} unique grammar patterns to preload.`);
+  console.log(`Found ${allNotes.length} unique grammar patterns. Processing first 50...`);
 
-  for (let i = 0; i < allNotes.length; i++) {
-    const note = allNotes[i];
-    console.log(`[${i + 1}/${allNotes.length}] Preloading: ${note.pattern} (${note.meaning})...`);
+  const BATCH_SIZE = 5;
+  const LIMIT = 50; 
+  const subset = allNotes.slice(0, LIMIT);
 
-    try {
-      const resp = await fetch(`${SUPABASE_URL}/functions/v1/grammar-examples`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': AUTH_HEADER,
-          'apikey': SUPABASE_KEY,
-        },
-        body: JSON.stringify({
-          pattern: note.pattern,
-          meaning: note.meaning,
-          jlpt: note.jlpt
-        }),
-      });
+  for (let i = 0; i < subset.length; i += BATCH_SIZE) {
+    const batch = subset.slice(i, i + BATCH_SIZE);
+    console.log(`Batch ${i/BATCH_SIZE + 1}/${subset.length/BATCH_SIZE}...`);
 
-      if (!resp.ok) {
-        const err = await resp.text();
-        console.error(`  → Error: ${resp.status} ${err}`);
-      } else {
-        console.log(`  → Success (Cached)`);
+    await Promise.all(batch.map(async (note) => {
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/functions/v1/grammar-examples`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': AUTH_HEADER,
+            'apikey': SUPABASE_KEY,
+          },
+          body: JSON.stringify({
+            pattern: note.pattern,
+            meaning: note.meaning,
+            jlpt: note.jlpt
+          }),
+        });
+
+        if (!resp.ok) {
+          console.error(`  → Error [${note.pattern}]: ${resp.status}`);
+        }
+      } catch (e) {
+        console.error(`  → Failed [${note.pattern}]: ${e.message}`);
       }
-    } catch (e) {
-      console.error(`  → Failed: ${e.message}`);
-    }
-
-    // Rate limiting
+    }));
     await new Promise(r => setTimeout(r, 1000));
   }
 
-  console.log('\nPreload complete!');
+  console.log('\nSubset preload complete!');
 }
 
 main().catch(console.error);

@@ -140,8 +140,8 @@ export default function GrammarDetail() {
 
       <div className="stagger-children px-6 mt-4 space-y-5">
         {/* Hero Card - Formation as the star */}
-        <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-4">
+        <section className="rounded-2xl bg-card p-4 ring-1 ring-border/40 shadow-sm relative overflow-hidden">
+          <div className="flex items-center gap-2 mb-3">
             <span
               className="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white"
               style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
@@ -156,37 +156,37 @@ export default function GrammarDetail() {
           <div className="space-y-4">
             {loadingMore && formations.length === 0 ? (
               <div className="space-y-3">
-                <Skeleton className="h-12 w-3/4 rounded-xl bg-accent/5" />
-                <Skeleton className="h-6 w-1/2 rounded-lg bg-muted/20" />
+                <Skeleton className="h-10 w-3/4 rounded-xl bg-accent/5" />
+                <Skeleton className="h-5 w-1/2 rounded-lg bg-muted/20" />
               </div>
             ) : (
               <>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5">
                   {formations.length > 0 ? (
                     formations.map((f, i) => (
-                      <div key={i} className="flex flex-wrap items-center gap-2">
+                      <div key={i} className="flex flex-wrap items-center gap-1.5">
                         {f.parts.map((part, pi) => (
-                          <div key={pi} className="flex items-center gap-2">
+                          <div key={pi} className="flex items-center gap-1.5">
                             <span className={cn(
-                              "inline-block rounded-xl border border-border/60 px-4 py-2 text-xl font-bold transition-colors shadow-sm",
+                              "inline-block rounded-lg border px-3 py-1.5 text-base font-bold transition-colors shadow-sm",
                               /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
-                                ? "font-japanese bg-accent text-accent-foreground border-accent/20" 
-                                : "bg-background/80 text-foreground"
+                                ? "font-japanese bg-accent/15 text-accent border-accent/20" 
+                                : "bg-muted/40 text-foreground border-border/60"
                             )}>
                               {part}
                             </span>
                             {pi < f.parts.length - 1 && (
-                              <span className="text-muted-foreground/40 font-bold text-lg">+</span>
+                              <span className="text-muted-foreground/30 font-bold text-sm">+</span>
                             )}
                           </div>
                         ))}
                       </div>
                     ))
                   ) : (
-                    <h1 className="font-japanese text-3xl font-bold leading-tight break-words">{note.pattern}</h1>
+                    <h1 className="font-japanese text-2xl font-bold leading-tight break-words">{note.pattern}</h1>
                   )}
                 </div>
-                <p className="font-serif text-lg text-muted-foreground leading-snug">{note.meaning}</p>
+                <p className="font-serif text-base text-muted-foreground leading-snug">{note.meaning}</p>
               </>
             )}
           </div>

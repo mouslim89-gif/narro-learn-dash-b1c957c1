@@ -157,7 +157,7 @@ export default function MyBooks() {
   )}
 
   {savedGrammar.length > 0 && (
-    <div className="px-6 mt-10">
+    <div className="mt-10">
       <div className="flex items-center gap-2 mb-4">
         <Bookmark className="h-5 w-5 text-accent" />
         <h2 className="font-serif text-xl font-bold">Saved Grammar</h2>
