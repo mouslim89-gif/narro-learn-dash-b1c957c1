@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ArrowLeft, Star, Loader2, BookOpen } from 'lucide-react';
+import { ArrowLeft, Star, Loader2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -8,9 +8,8 @@ import { jlptColors } from '@/data/books';
 import type { GrammarNote } from '@/data/book-grammar';
 import { FuriganaSentence } from '@/components/FuriganaSentence';
 import { useSavedGrammarStore } from '@/stores/saved-grammar';
-import { slugifyPattern } from '@/lib/grammar';
 import { supabase } from '@/integrations/supabase/client';
-import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
+import { preloadTranslations, type TranslationMap } from '@/lib/sentence-translations';
 
 export default function GrammarDetail() {
   const { id } = useParams<{ id: string }>();
@@ -21,19 +20,18 @@ export default function GrammarDetail() {
   const [note, setNote] = useState<GrammarNote | null>(location.state?.note || null);
   const [loading, setLoading] = useState(!note);
   const [examples, setExamples] = useState<{ japanese: string; english: string; tokens?: any[] }[]>([]);
+  const [structure, setStructure] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [translations, setTranslations] = useState<TranslationMap>(new Map());
 
   useEffect(() => {
     if (!note && id) {
-      // In a real app, we might fetch from a central grammar DB if not in state
-      // For now, we rely on the state being passed or finding it in saved items
       const saved = useSavedGrammarStore.getState().savedItems.find(i => i.id === id);
       if (saved) {
         setNote(saved);
         setLoading(false);
       } else {
-        // Fallback: search in book grammar? Hard without knowing bookId
+        // We could search in all book data here if needed
         setLoading(false);
       }
     }
@@ -52,14 +50,20 @@ export default function GrammarDetail() {
             jlpt: note.jlpt
           }
         });
-        if (data?.examples) {
-          setExamples(data.examples);
-          
-          // Preload translations for the new examples
-          const texts = data.examples.map((ex: any) => ex.japanese);
-          preloadTranslations(texts, {
-            onProgress: (map) => setTranslations(prev => new Map([...prev, ...map]))
-          });
+        
+        if (data) {
+          if (data.examples) {
+            setExamples(data.examples);
+            
+            // Preload translations
+            const texts = data.examples.map((ex: any) => ex.japanese);
+            preloadTranslations(texts, {
+              onProgress: (map) => setTranslations(prev => new Map([...prev, ...map]))
+            });
+          }
+          if (data.structure) {
+            setStructure(data.structure);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch grammar examples:", err);
@@ -106,7 +110,8 @@ export default function GrammarDetail() {
 
   return (
     <div className="pb-24">
-      <header className="sticky top-0 z-20 flex items-center gap-3 px-6 pt-3 pb-3 bg-background/80 backdrop-blur-md border-b border-border/50">
+      {/* Top bar - matched with WordDetail.tsx */}
+      <header className="sticky top-0 z-30 flex items-center gap-3 px-6 pt-3 pb-3 bg-background/80 backdrop-blur-md border-b border-border/50">
         <Button
           variant="ghost"
           size="icon"
@@ -132,18 +137,36 @@ export default function GrammarDetail() {
       </header>
 
       <div className="stagger-children px-6 mt-4 space-y-5">
-        {/* Header Card */}
+        {/* Main Header Card - matched style with WordDetail */}
         <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              className="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white"
-              style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
-            >
-              {note.jlpt}
-            </span>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white"
+                  style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
+                >
+                  {note.jlpt}
+                </span>
+              </div>
+              <h1 className="font-japanese text-3xl font-bold leading-tight break-words">{note.pattern}</h1>
+              <p className="font-serif text-lg text-muted-foreground mt-1 leading-snug">{note.meaning}</p>
+            </div>
           </div>
-          <h1 className="font-japanese text-3xl font-bold leading-tight break-words">{note.pattern}</h1>
-          <p className="font-serif text-lg text-muted-foreground mt-1 leading-snug">{note.meaning}</p>
+
+          {/* Visual Structure Element */}
+          {(structure || (loadingMore && !structure)) && (
+            <div className="mt-5 p-4 rounded-xl bg-accent/5 ring-1 ring-accent/20 border-l-4 border-accent">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2">Structure</p>
+              {loadingMore && !structure ? (
+                <Skeleton className="h-6 w-3/4 bg-accent/10" />
+              ) : (
+                <div className="font-japanese text-lg font-medium text-foreground tracking-wide">
+                  {structure}
+                </div>
+              )}
+            </div>
+          )}
           
           <Button
             onClick={toggleSave}
@@ -154,40 +177,40 @@ export default function GrammarDetail() {
             variant="ghost"
           >
             {saved ? (
-              <><Star className="h-4 w-4 mr-1.5" fill="currentColor" /> Saved</>
+              <><Star className="h-4 w-4 mr-1.5" fill="currentColor" /> Saved to bookmarks</>
             ) : (
               <><Star className="h-4 w-4 mr-1.5" /> Save to bookmarks</>
             )}
           </Button>
         </section>
 
-        {/* Tip */}
-        <section className="rounded-2xl bg-accent/5 ring-1 ring-accent/20 p-5">
-          <div className="flex items-center gap-1.5 mb-3">
-            <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-accent">Grammar Tip</p>
+        {/* Tip - Style matched with WordDetail sections */}
+        <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Info className="h-4 w-4 text-accent" />
+            <h2 className="font-serif text-lg font-semibold">Usage Notes</h2>
           </div>
-          <p className="font-serif text-[15px] text-foreground leading-relaxed">{note.tip}</p>
+          <p className="font-serif text-[15px] text-foreground/90 leading-relaxed italic">
+            {note.tip}
+          </p>
         </section>
 
-        {/* Primary Example */}
+        {/* Primary Example - Matched style */}
         <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Example from book</p>
-          </div>
-          <div className="font-jp-serif text-lg leading-relaxed text-foreground/90 py-1">
+          <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
+          <div className="font-jp-serif text-lg leading-relaxed text-foreground/90 border-l-4 border-primary/20 pl-4 py-1">
             {note.example}
           </div>
         </section>
 
-        {/* AI Examples */}
+        {/* Additional Examples - Renamed from AI-generated */}
         <section className="space-y-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground ml-1">AI-generated examples</p>
+          <h2 className="font-serif text-lg font-semibold ml-1">Examples</h2>
           
           {loadingMore && examples.length === 0 && (
             <div className="space-y-3">
               {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+                <Skeleton key={i} className="h-28 w-full rounded-2xl" />
               ))}
             </div>
           )}
@@ -195,7 +218,7 @@ export default function GrammarDetail() {
           <div className="space-y-3">
             {examples.map((ex, i) => (
               <div key={i} className="rounded-2xl bg-card p-4 ring-1 ring-border/30 shadow-sm animate-fade-in-soft">
-                <div className="font-japanese text-base leading-relaxed">
+                <div className="font-jp-serif text-base leading-relaxed text-foreground">
                   {ex.tokens ? (
                     <FuriganaSentence tokens={ex.tokens} highlight={note.pattern} />
                   ) : (
@@ -211,7 +234,7 @@ export default function GrammarDetail() {
 
           {!loadingMore && examples.length === 0 && (
             <div className="py-8 text-center bg-muted/30 rounded-2xl border border-dashed border-border/60">
-              <p className="text-xs text-muted-foreground">Loading additional examples...</p>
+              <p className="text-xs text-muted-foreground">Generating examples...</p>
             </div>
           )}
         </section>
