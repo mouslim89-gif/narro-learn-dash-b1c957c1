@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { hydrateDictionaryForBook, getManifest } from '@/lib/dictionary-db';
 import { books } from '@/data/books';
 import { loadBookTokens } from '@/data/book-tokens';
+import { preloadGrammarForBook } from '@/lib/grammar-preload';
 
 /**
  * Background preloader that warms up the dictionary cache and book tokens.
@@ -24,6 +25,14 @@ export function DictionaryPreloader() {
         hydrateDictionaryForBook(book.id).catch(() => {});
         // Preload token chunks (src/data/book-tokens/*.ts)
         loadBookTokens(book.id).catch(() => {});
+        
+        // Preload grammar structures for current books (staggered)
+        setTimeout(() => {
+          const difficulties: ('simplified' | 'intermediate' | 'original')[] = ['simplified', 'intermediate', 'original'];
+          difficulties.forEach(diff => {
+            preloadGrammarForBook(book.id, diff).catch(() => {});
+          });
+        }, 3000);
       }
 
       // 3. Optional: Background fetch for everything else in the manifest

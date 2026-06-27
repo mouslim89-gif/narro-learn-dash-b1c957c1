@@ -41,6 +41,23 @@ export default function GrammarDetail() {
     if (!note) return;
 
     const fetchAiExamples = async () => {
+      // Check local cache first
+      const cacheKey = `grammar_cache_${note.pattern}_${note.jlpt}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setExamples(parsed.examples || []);
+          setFormations(parsed.formations || []);
+          setLoadingMore(false);
+          
+          // Still fetch in background to refresh if needed, or just return
+          // return; 
+        } catch (e) {
+          console.error("Failed to parse grammar cache", e);
+        }
+      }
+
       setLoadingMore(true);
       try {
         const { data, error } = await supabase.functions.invoke('grammar-examples', {
@@ -64,6 +81,13 @@ export default function GrammarDetail() {
           if (data.formations) {
             setFormations(data.formations);
           }
+
+          // Save to local cache
+          localStorage.setItem(cacheKey, JSON.stringify({
+            examples: data.examples,
+            formations: data.formations,
+            timestamp: Date.now()
+          }));
         }
       } catch (err) {
         console.error("Failed to fetch grammar examples:", err);
@@ -161,25 +185,34 @@ export default function GrammarDetail() {
               </div>
             ) : (
               <>
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-6">
                   {formations.length > 0 ? (
                     formations.map((f, i) => (
-                      <div key={i} className="flex flex-wrap items-center gap-1.5">
-                        {f.parts.map((part, pi) => (
-                          <div key={pi} className="flex items-center gap-1.5">
-                            <span className={cn(
-                              "inline-block rounded-lg border px-3 py-1.5 text-base font-bold transition-colors shadow-sm",
-                              /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
-                                ? "font-japanese bg-accent/15 text-accent border-accent/20" 
-                                : "bg-muted/40 text-foreground border-border/60"
-                            )}>
-                              {part}
-                            </span>
-                            {pi < f.parts.length - 1 && (
-                              <span className="text-muted-foreground/30 font-bold text-sm">+</span>
-                            )}
+                      <div key={i} className="relative">
+                        {i > 0 && (
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="h-px flex-1 bg-border/40" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 bg-background px-2">OR</span>
+                            <div className="h-px flex-1 bg-border/40" />
                           </div>
-                        ))}
+                        )}
+                        <div className="flex flex-wrap items-center gap-y-3">
+                          {f.parts.map((part, pi) => (
+                            <div key={pi} className="flex items-center">
+                              <span className={cn(
+                                "inline-block rounded-xl border px-3.5 py-2 text-base font-bold transition-colors shadow-sm",
+                                /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
+                                  ? "font-japanese bg-accent/15 text-accent border-accent/30" 
+                                  : "bg-muted/60 text-foreground border-border/80"
+                              )}>
+                                {part}
+                              </span>
+                              {pi < f.parts.length - 1 && (
+                                <span className="text-accent/70 font-black text-xl px-3 drop-shadow-sm">+</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))
                   ) : (
