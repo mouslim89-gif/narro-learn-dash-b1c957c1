@@ -118,7 +118,7 @@ const App = () => (
   <SplashScreen />
   <OnboardingCarousel />
   <AnimatedRoutes />
-  <GrammarPreloader />
+
 
 
  </AuthProvider>
