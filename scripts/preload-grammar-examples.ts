@@ -33,13 +33,11 @@ async function main() {
   const grammarPath = path.resolve(__dirname, '../src/data/book-grammar.ts');
   const grammarSrc = fs.readFileSync(grammarPath, 'utf-8');
   
-  // Extract the JSON object from the file
   const startIdx = grammarSrc.indexOf('= {') + 2;
   const endIdx = grammarSrc.lastIndexOf('};') + 1;
   const jsonStr = grammarSrc.slice(startIdx, endIdx);
   const bookGrammar = JSON.parse(jsonStr);
 
-  // Collect all unique notes
   const notesMap = new Map<string, GrammarNote>();
   
   for (const bookId in bookGrammar) {
@@ -57,12 +55,15 @@ async function main() {
   }
 
   const allNotes = Array.from(notesMap.values());
-  console.log(`Found ${allNotes.length} unique grammar patterns to preload.`);
+  console.log(`Found ${allNotes.length} unique grammar patterns. Processing first 50...`);
 
-  const BATCH_SIZE = 10;
-  for (let i = 0; i < allNotes.length; i += BATCH_SIZE) {
-    const batch = allNotes.slice(i, i + BATCH_SIZE);
-    console.log(`Processing batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(allNotes.length/BATCH_SIZE)} (${i + 1}-${Math.min(i + BATCH_SIZE, allNotes.length)})...`);
+  const BATCH_SIZE = 5;
+  const LIMIT = 50; 
+  const subset = allNotes.slice(0, LIMIT);
+
+  for (let i = 0; i < subset.length; i += BATCH_SIZE) {
+    const batch = subset.slice(i, i + BATCH_SIZE);
+    console.log(`Batch ${i/BATCH_SIZE + 1}/${subset.length/BATCH_SIZE}...`);
 
     await Promise.all(batch.map(async (note) => {
       try {
@@ -81,21 +82,16 @@ async function main() {
         });
 
         if (!resp.ok) {
-          const err = await resp.text();
-          console.error(`  → Error [${note.pattern}]: ${resp.status} ${err}`);
-        } else {
-          // Success
+          console.error(`  → Error [${note.pattern}]: ${resp.status}`);
         }
       } catch (e) {
         console.error(`  → Failed [${note.pattern}]: ${e.message}`);
       }
     }));
-    
-    // Minimal delay between batches to be nice to the gateway
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 1000));
   }
 
-  console.log('\nPreload complete!');
+  console.log('\nSubset preload complete!');
 }
 
 main().catch(console.error);
