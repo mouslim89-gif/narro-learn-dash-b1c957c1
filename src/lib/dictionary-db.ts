@@ -124,35 +124,42 @@ async function getManifest() {
  * Try to hydrate from a pre-built static shard at /dict/<key>.json.
  */
 async function hydrateDictionaryFromShard(key: string): Promise<boolean> {
+  const manifest = await getManifest();
+  if (!manifest[key]) return false;
 
- await ensureCacheVersion();
- try {
- const url =`/dict/${encodeURIComponent(key)}.json`;
- const res = await fetch(url, { cache:'force-cache'});
- if (!res.ok) return false;
- const payload = (await res.json()) as {
- v?: number;
- entries?: Record<string, CacheEntry>;
- };
- if (!payload || payload.v !== DICT_CACHE_VERSION || !payload.entries) return false;
+  await ensureCacheVersion();
+  try {
+    const url = `/dict/${encodeURIComponent(key)}.json`;
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) return false;
+    const payload = (await res.json()) as {
+      v?: number;
+      entries?: Record<string, CacheEntry>;
+    };
+    if (!payload || payload.v !== DICT_CACHE_VERSION || !payload.entries) return false;
 
- const entries = payload.entries;
- const seed: Record<string, CacheEntry> = {};
- const idbPairs: [string, CacheEntry][] = [];
- for (const [word, entry] of Object.entries(entries)) {
- if (!entry?.results?.length) continue;
- seed[word] = entry;
- idbPairs.push([word, entry]);
- }
- if (Object.keys(seed).length === 0) return false;
- seedCache(seed);
- // Persist for offline; fire-and-forget — memory cache is already warm.
- setMany(idbPairs, wordStore).catch(() => {});
- return true;
- } catch {
- return false;
- }
+    const entries = payload.entries;
+    const seed: Record<string, CacheEntry> = {};
+    const idbPairs: [string, CacheEntry][] = [];
+    for (const [word, entry] of Object.entries(entries)) {
+      if (!entry?.results?.length) continue;
+      seed[word] = entry;
+      idbPairs.push([word, entry]);
+    }
+    if (Object.keys(seed).length === 0) return false;
+
+    // Seeding memory is synchronous and fast — do it IMMEDIATELY so any
+    // clicks on the next tick are instant.
+    seedCache(seed);
+
+    // Persist for offline; fire-and-forget.
+    setMany(idbPairs, wordStore).catch(() => {});
+    return true;
+  } catch {
+    return false;
+  }
 }
+
 
 /**
  * Helper to hydrate a specific list of words.
