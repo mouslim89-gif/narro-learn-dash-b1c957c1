@@ -21,9 +21,6 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   throw new Error('Missing Supabase env vars in .env');
 }
 
-// User JWT is usually needed for invoke if auth is enabled, 
-// but grammar-examples uses LOVABLE_API_KEY internally.
-// We just need a valid anon key to hit the endpoint.
 const AUTH_HEADER = `Bearer ${SUPABASE_KEY}`;
 
 interface GrammarNote {
@@ -48,7 +45,6 @@ async function main() {
   for (const bookId in bookGrammar) {
     for (const diff in bookGrammar[bookId]) {
       const parts = bookGrammar[bookId][diff];
-      // Some are flat GrammarNote[], some are GrammarNote[][]
       const flatNotes = Array.isArray(parts[0]) ? parts.flat() : parts;
       
       for (const note of flatNotes) {
@@ -63,37 +59,40 @@ async function main() {
   const allNotes = Array.from(notesMap.values());
   console.log(`Found ${allNotes.length} unique grammar patterns to preload.`);
 
-  for (let i = 0; i < allNotes.length; i++) {
-    const note = allNotes[i];
-    console.log(`[${i + 1}/${allNotes.length}] Preloading: ${note.pattern} (${note.meaning})...`);
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < allNotes.length; i += BATCH_SIZE) {
+    const batch = allNotes.slice(i, i + BATCH_SIZE);
+    console.log(`Processing batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(allNotes.length/BATCH_SIZE)} (${i + 1}-${Math.min(i + BATCH_SIZE, allNotes.length)})...`);
 
-    try {
-      const resp = await fetch(`${SUPABASE_URL}/functions/v1/grammar-examples`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': AUTH_HEADER,
-          'apikey': SUPABASE_KEY,
-        },
-        body: JSON.stringify({
-          pattern: note.pattern,
-          meaning: note.meaning,
-          jlpt: note.jlpt
-        }),
-      });
+    await Promise.all(batch.map(async (note) => {
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/functions/v1/grammar-examples`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': AUTH_HEADER,
+            'apikey': SUPABASE_KEY,
+          },
+          body: JSON.stringify({
+            pattern: note.pattern,
+            meaning: note.meaning,
+            jlpt: note.jlpt
+          }),
+        });
 
-      if (!resp.ok) {
-        const err = await resp.text();
-        console.error(`  → Error: ${resp.status} ${err}`);
-      } else {
-        console.log(`  → Success (Cached)`);
+        if (!resp.ok) {
+          const err = await resp.text();
+          console.error(`  → Error [${note.pattern}]: ${resp.status} ${err}`);
+        } else {
+          // Success
+        }
+      } catch (e) {
+        console.error(`  → Failed [${note.pattern}]: ${e.message}`);
       }
-    } catch (e) {
-      console.error(`  → Failed: ${e.message}`);
-    }
-
-    // Rate limiting
-    await new Promise(r => setTimeout(r, 1000));
+    }));
+    
+    // Minimal delay between batches to be nice to the gateway
+    await new Promise(r => setTimeout(r, 500));
   }
 
   console.log('\nPreload complete!');
