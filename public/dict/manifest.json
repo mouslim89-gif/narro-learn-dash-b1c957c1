@@ -56,6 +56,30 @@
       "words": 1508,
       "covered": 1478,
       "filled": 0
+    },
+    "matsu": {
+      "file": "matsu.json",
+      "size": 750725,
+      "hash": "58b78ecbe80c",
+      "words": 606,
+      "covered": 599,
+      "filled": 0
+    },
+    "rashomon": {
+      "file": "rashomon.json",
+      "size": 1635088,
+      "hash": "a2b4b78e65f0",
+      "words": 1383,
+      "covered": 1360,
+      "filled": 0
+    },
+    "sakura": {
+      "file": "sakura.json",
+      "size": 811874,
+      "hash": "946a1370399a",
+      "words": 677,
+      "covered": 668,
+      "filled": 0
     }
   }
 }
