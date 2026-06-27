@@ -457,7 +457,7 @@ export default function WordDetail() {
  {examples.map((ex, i) => (
   <li key={i} className="rounded-md bg-muted/50 p-3">
   <div className="flex items-start gap-2">
-  <div className="font-japanese text-sm font-semibold leading-[2.2] flex-1">
+  <div className="font-jp-serif text-sm font-semibold leading-[2.2] flex-1">
    {ex.tokens ? (
      <FuriganaSentence tokens={ex.tokens} highlight={display} />
    ) : (
