@@ -3,7 +3,8 @@ import { DelayedLink as Link } from'@/components/DelayedLink';
 import { useDelayedNav } from'@/hooks/use-delayed-nav';
 import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasParts, partChapterId, DEFAULT_CHAPTER_ID, type Difficulty } from'@/data/books';
 
-import { useEffect, useState, useMemo } from'react';
+import { useEffect, useState, useMemo } from 'react';
+import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
