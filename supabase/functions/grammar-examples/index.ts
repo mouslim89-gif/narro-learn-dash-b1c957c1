@@ -77,8 +77,10 @@ Deno.serve(async (req) => {
     // Save to cache
     await supabase.from('grammar_examples').insert({
       pattern_slug: slug,
-      examples: output.examples,
-      structure: output.structure
+      examples: {
+        items: output.examples,
+        structure: output.structure
+      }
     });
 
     return new Response(JSON.stringify(output), {
