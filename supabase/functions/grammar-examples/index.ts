@@ -52,15 +52,16 @@ Deno.serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: `You are a Japanese grammar expert. Generate ${count} natural example sentences for the grammar pattern: "${pattern}" (${meaning}). 
+            content: `You are a Japanese grammar expert. Generate ${count} natural, simple example sentences for the grammar pattern: "${pattern}" (${meaning}). 
             Target JLPT level: ${jlpt}.
+            Ensure the pattern "${pattern}" is used clearly in each sentence.
             Provide the response as a JSON object with fields:
             - examples: array of objects. Each object has:
               - japanese: string (the sentence)
               - english: string (translation)
-              - tokens: array of {t: string, r?: string} where 't' is the word/part and 'r' is hiragana furigana for kanji.
+              - tokens: array of {t: string, r?: string} where 't' is the word/part and 'r' is hiragana furigana for kanji. Keep tokens relatively granular so the pattern can be matched.
             - formations: array of objects. Each object has:
-              - parts: array of strings representing the formation components (e.g., ["Verb masu stem", "ながら"], ["Noun", "ながら"]).`
+              - parts: array of strings representing the formation components (e.g., ["Verb masu stem", "ながら"], ["Noun", "ながら"]). Use clear labels for parts.`
           },
           { role: "user", content: `Pattern: ${pattern}\nMeaning: ${meaning}` }
         ],
