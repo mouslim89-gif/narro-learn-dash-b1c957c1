@@ -1,12 +1,12 @@
 {
   "v": 2,
   "shards": {
-    "hashire-merosu": {
-      "file": "hashire-merosu.json",
-      "size": 2713530,
-      "hash": "38327e71b346",
-      "words": 2483,
-      "covered": 2461,
+    "kumo-no-ito": {
+      "file": "kumo-no-ito.json",
+      "size": 979859,
+      "hash": "d5edb6b5ce44",
+      "words": 807,
+      "covered": 798,
       "filled": 0
     }
   }
