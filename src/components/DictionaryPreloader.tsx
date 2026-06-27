@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { hydrateDictionaryForBook, getManifest } from '@/lib/dictionary-db';
 import { books } from '@/data/books';
 import { loadBookTokens } from '@/data/book-tokens';
+import { preloadGrammarForBook } from '@/lib/grammar-preload';
 
 /**
  * Background preloader that warms up the dictionary cache and book tokens.
