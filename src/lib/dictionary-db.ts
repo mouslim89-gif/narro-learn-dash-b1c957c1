@@ -230,11 +230,18 @@ export async function hydrateDictionaryFromTokens(tokens: { t: string; b?: strin
 }
 
 /** Public: hydrate the jisho in-memory cache for a given book/chapter. */
+const hydratedBooks = new Set<string>();
+
 export async function hydrateDictionaryForBook(
   bookId: string,
   chapterId?: string
 ): Promise<void> {
+  const cacheKey = `${bookId}:${chapterId || 'main'}`;
+  if (hydratedBooks.has(cacheKey)) return;
+  hydratedBooks.add(cacheKey);
+
   await ensureCacheVersion();
+
 
   // 1. Prefer the static shard — single fetch, instant warm cache.
   const key =
