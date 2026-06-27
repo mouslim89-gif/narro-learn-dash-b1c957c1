@@ -139,57 +139,62 @@ export default function GrammarDetail() {
       </header>
 
       <div className="stagger-children px-6 mt-4 space-y-5">
-        {/* Main Header Card - matched style with WordDetail */}
-        <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white"
-                  style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
-                >
-                  {note.jlpt}
-                </span>
-              </div>
-              <h1 className="font-japanese text-3xl font-bold leading-tight break-words">{note.pattern}</h1>
-              <p className="font-serif text-lg text-muted-foreground mt-1 leading-snug">{note.meaning}</p>
-            </div>
+        {/* Hero Card - Formation as the star */}
+        <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm relative overflow-hidden">
+          <div className="flex items-center gap-2 mb-4">
+            <span
+              className="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white"
+              style={{ backgroundColor: jlptColors[note.jlpt] || '#888' }}
+            >
+              {note.jlpt}
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground ml-auto">
+              {note.pattern}
+            </span>
           </div>
 
-          {/* Formation Card */}
-          {(formations.length > 0 || (loadingMore && formations.length === 0)) && (
-            <div className="mt-5 space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-accent ml-1">Formation</p>
-              <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 border-l-4 border-accent p-4 space-y-3">
-                {loadingMore && formations.length === 0 ? (
-                  <Skeleton className="h-20 w-full bg-accent/10" />
-                ) : (
-                  formations.map((f, i) => (
-                    <div key={i} className="flex flex-wrap items-center gap-1.5 py-1">
-                      {f.parts.map((part, pi) => (
-                        <div key={pi} className="flex items-center gap-1.5">
-                          <span className={cn(
-                            "inline-block rounded-lg border border-border/60 px-3 py-1.5 text-sm font-medium",
-                            /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) ? "font-japanese bg-accent/10 border-accent/20" : "bg-background/50"
-                          )}>
-                            {part}
-                          </span>
-                          {pi < f.parts.length - 1 && (
-                            <span className="text-muted-foreground/60 font-bold px-0.5">+</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ))
-                )}
+          <div className="space-y-4">
+            {loadingMore && formations.length === 0 ? (
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-3/4 rounded-xl bg-accent/5" />
+                <Skeleton className="h-6 w-1/2 rounded-lg bg-muted/20" />
               </div>
-            </div>
-          )}
-          
+            ) : (
+              <>
+                <div className="flex flex-col gap-3">
+                  {formations.length > 0 ? (
+                    formations.map((f, i) => (
+                      <div key={i} className="flex flex-wrap items-center gap-2">
+                        {f.parts.map((part, pi) => (
+                          <div key={pi} className="flex items-center gap-2">
+                            <span className={cn(
+                              "inline-block rounded-xl border border-border/60 px-4 py-2 text-xl font-bold transition-colors shadow-sm",
+                              /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
+                                ? "font-japanese bg-accent text-accent-foreground border-accent/20" 
+                                : "bg-background/80 text-foreground"
+                            )}>
+                              {part}
+                            </span>
+                            {pi < f.parts.length - 1 && (
+                              <span className="text-muted-foreground/40 font-bold text-lg">+</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ))
+                  ) : (
+                    <h1 className="font-japanese text-3xl font-bold leading-tight break-words">{note.pattern}</h1>
+                  )}
+                </div>
+                <p className="font-serif text-lg text-muted-foreground leading-snug">{note.meaning}</p>
+              </>
+            )}
+          </div>
+
           <Button
             onClick={toggleSave}
             className={cn(
-              "mt-5 w-full rounded-full h-11 font-semibold transition-all",
+              "mt-6 w-full rounded-full h-11 font-semibold transition-all",
               saved ? "bg-accent/15 text-accent relief-inset" : "bg-accent text-accent-foreground relief-raised-accent"
             )}
             variant="ghost"
