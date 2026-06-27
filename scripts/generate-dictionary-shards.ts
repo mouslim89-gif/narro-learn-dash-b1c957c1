@@ -235,7 +235,12 @@ for (const file of fs.readdirSync(booksDir)) {
   Object.assign(bookTokens, JSON.parse(src.slice(s, e)));
 }
 
-const keys = Object.keys(bookTokens);
+let keys = Object.keys(bookTokens);
+const filterKey = process.argv[2];
+if (filterKey) {
+  keys = keys.filter(k => k === filterKey);
+  console.log(`Filtering for key: ${filterKey}`);
+}
 console.log(`Generating shards for ${keys.length} book/chapter keys…\n`);
 
 // Cache edge lookups across keys (same merged surface may appear in multiple chapters).

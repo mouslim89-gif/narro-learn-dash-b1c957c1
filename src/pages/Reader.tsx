@@ -10,7 +10,7 @@ import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey
 import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
 import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
-import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
+import { hydrateDictionaryForBook, hydrateDictionaryFromTokens } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { FuriganaWord } from '@/components/FuriganaWord';
@@ -581,7 +581,15 @@ export default function Reader() {
  if (id) hydrateDictionaryForBook(id, chapterId);
  }, [id, chapterId, difficulty]);
 
- // Track the top-most visible sentence so we can persist an accurate anchor.
+  // Pre-hydrate dictionary entries for the current tokens (including merged forms).
+  useEffect(() => {
+    if (tokens.length > 0) {
+      hydrateDictionaryFromTokens(tokens);
+    }
+  }, [tokens]);
+
+  // Track the top-most visible sentence so we can persist an accurate anchor.
+
  useEffect(() => {
  if (sentences.length === 0) return;
  const visible = new Set<number>();

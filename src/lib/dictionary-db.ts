@@ -63,20 +63,24 @@ async function ensureCacheVersion(): Promise<void> {
 
 /** Collect every unique surface + base form a book actually uses across difficulties. */
 async function collectBookWords(bookId: string): Promise<string[]> {
- const set = new Set<string>();
- const rootId = bookId.includes('__') ? bookId.split('__')[0] : bookId;
- const map = await loadBookTokens(rootId);
- const byDiff = map[bookId];
- if (!byDiff) return [];
- for (const diff of Object.keys(byDiff)) {
- for (const tok of byDiff[diff]) {
- if (!tok.j) continue;
- if (tok.t) set.add(tok.t);
- if (tok.b) set.add(tok.b);
- }
- }
- return [...set];
+  const set = new Set<string>();
+  const rootId = bookId.includes('__') ? bookId.split('__')[0] : bookId;
+  const map = await loadBookTokens(rootId);
+  // Fallback: If map[bookId] doesn't exist (e.g. part-based book), use the root book entry
+  // which contains the full tokens (Reader will slice them, but we hydrate all).
+  const byDiff = map[bookId] || map[rootId];
+  if (!byDiff) return [];
+
+  for (const diff of Object.keys(byDiff)) {
+    for (const tok of byDiff[diff]) {
+      if (!tok.j) continue;
+      if (tok.t) set.add(tok.t);
+      if (tok.b) set.add(tok.b);
+    }
+  }
+  return [...set];
 }
+
 
 /** Fetch entries from Supabase in chunks (PostgREST .in() limit safety). */
 async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
@@ -135,56 +139,92 @@ async function hydrateDictionaryFromShard(key: string): Promise<boolean> {
  }
 }
 
+/**
+ * Helper to hydrate a specific list of words.
+ * Checks memory cache -> IndexedDB -> Supabase.
+ */
+export async function hydrateWords(words: string[]): Promise<void> {
+  if (words.length === 0) return;
+  await ensureCacheVersion();
+
+  // 1. Filter out what's already in the memory cache.
+  const { getCached } = await import('@/lib/jisho');
+  const missingFromMemory = words.filter(w => !getCached(w));
+  if (missingFromMemory.length === 0) return;
+
+  // 2. Read whatever is already cached in IndexedDB.
+  const cached = await getMany<CacheEntry | undefined>(missingFromMemory, wordStore);
+  const seed: Record<string, CacheEntry> = {};
+  const missingFromIdb: string[] = [];
+
+  missingFromMemory.forEach((w, i) => {
+    const entry = cached[i];
+    if (entry && entry.results && entry.results.length > 0) seed[w] = entry;
+    else missingFromIdb.push(w);
+  });
+
+  // 3. Already-cached entries -> seed memory.
+  if (Object.keys(seed).length > 0) {
+    seedCache(seed);
+  }
+
+  // 4. Skip the DB fetch if everything is present locally.
+  if (missingFromIdb.length === 0) return;
+
+  // 5. Fetch the missing words from DB.
+  const fetched = await fetchFromDb(missingFromIdb);
+  if (fetched.size > 0) {
+    const fetchedObj: Record<string, CacheEntry> = {};
+    const idbPairs: [string, CacheEntry][] = [];
+    fetched.forEach((entry, word) => {
+      if (!entry?.results?.length) return;
+      fetchedObj[word] = entry;
+      idbPairs.push([word, entry]);
+    });
+    seedCache(fetchedObj);
+    await setMany(idbPairs, wordStore);
+  }
+
+  // 6. If words are still missing (not in DB), use preloadWords to hit the Jisho edge function.
+  const stillMissing = missingFromIdb.filter(w => !fetched.has(w));
+  if (stillMissing.length > 0) {
+    const { preloadWords } = await import('@/lib/jisho');
+    // Preload in background, don't necessarily await the whole thing if it's huge,
+    // but for 20-30 words it's fine to await.
+    await preloadWords(stillMissing);
+  }
+}
+
+
+/** Hydrate dictionary from a list of tokens (e.g. after merges/rules). */
+export async function hydrateDictionaryFromTokens(tokens: { t: string; b?: string; j?: boolean }[]): Promise<void> {
+  const set = new Set<string>();
+  for (const tok of tokens) {
+    if (!tok.j) continue;
+    if (tok.t) set.add(tok.t);
+    if (tok.b) set.add(tok.b);
+  }
+  await hydrateWords([...set]);
+}
+
 /** Public: hydrate the jisho in-memory cache for a given book/chapter. */
 export async function hydrateDictionaryForBook(
- bookId: string,
- chapterId?: string
+  bookId: string,
+  chapterId?: string
 ): Promise<void> {
- await ensureCacheVersion();
+  await ensureCacheVersion();
 
- // 1. Prefer the static shard — single fetch, instant warm cache.
- const key =
- chapterId && chapterId !=='main'?`${bookId}__${chapterId}`: bookId;
- const shardOk =
- (await hydrateDictionaryFromShard(key)) ||
- // Fallback to the bookId-only shard for content that hasn't been split per chapter.
- (key !== bookId && (await hydrateDictionaryFromShard(bookId)));
- if (shardOk) return;
+  // 1. Prefer the static shard — single fetch, instant warm cache.
+  const key =
+    chapterId && chapterId !== 'main' ? `${bookId}__${chapterId}` : bookId;
+  const shardOk =
+    (await hydrateDictionaryFromShard(key)) ||
+    // Fallback to the bookId-only shard for content that hasn't been split per chapter.
+    (key !== bookId && (await hydrateDictionaryFromShard(bookId)));
+  if (shardOk) return;
 
- // 2. No shard available → legacy IndexedDB + PostgREST path.
- const allWords = await collectBookWords(key);
- if (allWords.length === 0) return;
-
- // 1. Read whatever is already cached in IndexedDB.
- const cached = await getMany<CacheEntry | undefined>(allWords, wordStore);
- const seed: Record<string, CacheEntry> = {};
- const missing: string[] = [];
- allWords.forEach((w, i) => {
- const entry = cached[i];
- if (entry && entry.results && entry.results.length > 0) seed[w] = entry;
- else missing.push(w);
- });
-
- // 2. Already-cached entries → seed memory (seedCache filters out stale entries).
- if (Object.keys(seed).length > 0) seedCache(seed);
-
- // 3. Skip the DB fetch only if everything we need is present locally.
- // (We no longer rely on a"hydrated"flag — a missing word always triggers a refetch
- // so corrected DB entries propagate to clients without manual cache clears.)
- if (missing.length === 0) return;
-
- // 4. Fetch the missing words from DB and persist.
- const fetched = await fetchFromDb(missing);
- if (fetched.size > 0) {
- const fetchedObj: Record<string, CacheEntry> = {};
- const idbPairs: [string, CacheEntry][] = [];
- fetched.forEach((entry, word) => {
- if (!entry?.results?.length) return;
- fetchedObj[word] = entry;
- idbPairs.push([word, entry]);
- });
- seedCache(fetchedObj);
- await setMany(idbPairs, wordStore);
- }
-
+  // 2. No shard available → legacy IndexedDB + PostgREST path.
+  const allWords = await collectBookWords(key);
+  await hydrateWords(allWords);
 }
+
