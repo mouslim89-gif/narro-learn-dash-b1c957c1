@@ -20,7 +20,7 @@ export default function GrammarDetail() {
   const [note, setNote] = useState<GrammarNote | null>(location.state?.note || null);
   const [loading, setLoading] = useState(!note);
   const [examples, setExamples] = useState<{ japanese: string; english: string; tokens?: any[] }[]>([]);
-  const [structure, setStructure] = useState<string | null>(null);
+  const [formations, setFormations] = useState<{ parts: string[] }[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [translations, setTranslations] = useState<TranslationMap>(new Map());
 
@@ -61,8 +61,8 @@ export default function GrammarDetail() {
               onProgress: (map) => setTranslations(prev => new Map([...prev, ...map]))
             });
           }
-          if (data.structure) {
-            setStructure(data.structure);
+          if (data.formations) {
+            setFormations(data.formations);
           }
         }
       } catch (err) {
@@ -154,17 +154,30 @@ export default function GrammarDetail() {
             </div>
           </div>
 
-          {/* Visual Structure Element */}
-          {(structure || (loadingMore && !structure)) && (
-            <div className="mt-5 p-4 rounded-xl bg-accent/5 ring-1 ring-accent/20 border-l-4 border-accent">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2">Structure</p>
-              {loadingMore && !structure ? (
-                <Skeleton className="h-6 w-3/4 bg-accent/10" />
-              ) : (
-                <div className="font-japanese text-lg font-medium text-foreground tracking-wide">
-                  {structure}
-                </div>
-              )}
+          {/* Formation Card */}
+          {(formations.length > 0 || (loadingMore && formations.length === 0)) && (
+            <div className="mt-5 space-y-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-accent ml-1">Formation</p>
+              <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 border-l-4 border-accent p-4 space-y-3">
+                {loadingMore && formations.length === 0 ? (
+                  <Skeleton className="h-20 w-full bg-accent/10" />
+                ) : (
+                  formations.map((f, i) => (
+                    <div key={i} className="flex flex-wrap items-center gap-1.5">
+                      {f.parts.map((part, pi) => (
+                        <div key={pi} className="flex items-center gap-1.5">
+                          <span className="inline-block rounded-lg border border-border/60 bg-background/50 px-3 py-1.5 text-sm font-medium font-japanese">
+                            {part}
+                          </span>
+                          {pi < f.parts.length - 1 && (
+                            <span className="text-muted-foreground font-bold">+</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
           
@@ -218,7 +231,7 @@ export default function GrammarDetail() {
           <div className="space-y-3">
             {examples.map((ex, i) => (
               <div key={i} className="rounded-2xl bg-card p-4 ring-1 ring-border/30 shadow-sm animate-fade-in-soft">
-                <div className="font-jp-serif text-base leading-relaxed text-foreground">
+                <div className="text-base leading-relaxed text-foreground">
                   {ex.tokens ? (
                     <FuriganaSentence tokens={ex.tokens} highlight={note.pattern} />
                   ) : (
