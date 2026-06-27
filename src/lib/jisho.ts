@@ -67,11 +67,21 @@ export function getCached(keyword: string): CacheEntry | undefined {
 }
 
 export function seedCache(entries: Record<string, CacheEntry>): void {
- for (const [word, entry] of Object.entries(entries)) {
- if (isKnownStaleEntry(word, entry)) continue;
- if (!entry?.results || entry.results.length === 0) continue;
- cache.set(word, entry);
- }
+  for (const [word, entry] of Object.entries(entries)) {
+    if (isKnownStaleEntry(word, entry)) continue;
+    if (!entry?.results || entry.results.length === 0) continue;
+    
+    // Seed primary key
+    cache.set(word, entry);
+    
+    // Also seed under alternative forms found in the entry
+    entry.results.forEach(res => {
+      res.japanese.forEach(jp => {
+        if (jp.word && !cache.has(jp.word)) cache.set(jp.word, entry);
+        if (jp.reading && !cache.has(jp.reading)) cache.set(jp.reading, entry);
+      });
+    });
+  }
 }
 
 export async function lookupWord(keyword: string, forceLive = false): Promise<CacheEntry> {

@@ -34,10 +34,22 @@ export function WordMiniPopup({
  const { addWord, hasWord, removeWord } = useFlashcardStore();
  const popupRef = useRef<HTMLDivElement>(null);
 
- const surfaceForMatch = baseForm || word;
- const cached = (baseForm && baseForm !== word ? getCached(baseForm) : undefined) ?? getCached(word);
- const [loading, setLoading] = useState(!cached);
- const [result, setResult] = useState<JishoResult | null>(pickBestResult(cached?.results, pos, surfaceForMatch));
+  const surfaceForMatch = baseForm || word;
+  
+  // Try all possible keys against cache synchronously to avoid flicker
+  const getInitialCached = () => {
+    if (baseForm) {
+      const c = getCached(baseForm);
+      if (c) return c;
+    }
+    return getCached(word);
+  };
+  
+  const initialCached = getInitialCached();
+  const [loading, setLoading] = useState(!initialCached);
+  const [result, setResult] = useState<JishoResult | null>(
+    initialCached ? pickBestResult(initialCached.results, pos, surfaceForMatch) : null
+  );
  const [error, setError] = useState(false);
 
  const wordId = word;
@@ -45,14 +57,15 @@ export function WordMiniPopup({
 
  const [position, setPosition] = useState<{ top: number; left: number; placement:'above'|'below'} | null>(null);
 
- useEffect(() => {
- if (cached) {
- const best = pickBestResult(cached.results, pos, surfaceForMatch);
- if (best) setResult(best);
- else setError(true);
- setLoading(false);
- return;
- }
+  useEffect(() => {
+    const currentCached = getInitialCached();
+    if (currentCached) {
+      const best = pickBestResult(currentCached.results, pos, surfaceForMatch);
+      if (best) setResult(best);
+      else setError(true);
+      setLoading(false);
+      return;
+    }
 
  let cancelled = false;
  setLoading(true);
@@ -81,7 +94,7 @@ export function WordMiniPopup({
  };
  tryLookup();
  return () => { cancelled = true; };
- }, [word, baseForm, pos, cached]);
+ }, [word, baseForm, pos]);
 
  // Position based on sentence rect
  useBodyScrollLock();
