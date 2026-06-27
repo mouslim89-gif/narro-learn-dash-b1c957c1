@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     // Generate with AI
     const gateway = createLovableAiGatewayProvider(key);
     const { output } = await generateText({
-      model: gateway("google/gemini-2.0-flash-001"),
+      model: gateway("google/gemini-3-flash-preview"),
       output: Output.object({
         schema: z.object({
           examples: z.array(z.object({
