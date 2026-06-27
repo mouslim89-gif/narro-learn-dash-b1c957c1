@@ -24,7 +24,9 @@ import BookDetail from"./pages/BookDetail";
 import Reader from"./pages/Reader";
 import NotFound from"./pages/NotFound";
 import Settings from"./pages/Settings";
+import GrammarDetail from"./pages/GrammarDetail";
 import Auth from"./pages/Auth";
+
 import ResetPassword from"./pages/ResetPassword";
 
 const queryClient = new QueryClient();
@@ -61,7 +63,9 @@ function AnimatedRoutes() {
  path.startsWith('/reader/') ||
  path.startsWith('/book/') ||
  (path.startsWith('/dictionary/') && path !=='/dictionary') ||
+ path.startsWith('/grammar/') ||
  path ==='/settings';
+
  const hideNav = isDetailRoute || isReviewing || isAuthRoute;
  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
@@ -89,7 +93,9 @@ function AnimatedRoutes() {
  <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
  <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
  <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+ <Route path="/grammar/:id"element={<ProtectedRoute><GrammarDetail /></ProtectedRoute>} />
  <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+
  <Route path="*"element={<NotFound />} />
  </Routes>
  </motion.div>

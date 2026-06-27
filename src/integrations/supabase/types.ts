@@ -185,6 +185,27 @@ export type Database = {
         }
         Relationships: []
       }
+      grammar_examples: {
+        Row: {
+          created_at: string | null
+          examples: Json
+          id: string
+          pattern_slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          examples: Json
+          id?: string
+          pattern_slug: string
+        }
+        Update: {
+          created_at?: string | null
+          examples?: Json
+          id?: string
+          pattern_slug?: string
+        }
+        Relationships: []
+      }
       kanji_details: {
         Row: {
           character: string

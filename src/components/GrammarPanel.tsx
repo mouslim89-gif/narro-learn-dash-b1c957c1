@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { slugifyPattern } from '@/lib/grammar';
+
 import { supabase } from '@/integrations/supabase/client';
 import { jlptColors } from '@/data/books';
 import { cn } from '@/lib/utils';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
 
@@ -20,6 +25,8 @@ interface GrammarPanelProps {
 }
 
 export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
+  const navigate = useNavigate();
+
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -233,12 +240,29 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                             )}
                           </button>
 
-                          <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-accent">Tip</p>
+                          <div className="rounded-xl bg-accent/5 ring-1 ring-accent/20 p-3 space-y-3">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-accent">Tip</p>
+                              </div>
+                              <p className="mt-2 font-serif text-sm text-foreground">{note.tip}</p>
                             </div>
-                            <p className="mt-2 font-serif text-sm text-foreground">{note.tip}</p>
+
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="w-full h-9 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 text-xs font-semibold gap-2 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const id = slugifyPattern(note.pattern);
+                                navigate(`/grammar/${id}`, { state: { note } });
+                              }}
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              View details
+                            </Button>
                           </div>
+
                         </div>
                       )}
                     </div>
