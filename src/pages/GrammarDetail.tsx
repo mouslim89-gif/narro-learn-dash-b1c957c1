@@ -165,14 +165,17 @@ export default function GrammarDetail() {
                   <Skeleton className="h-20 w-full bg-accent/10" />
                 ) : (
                   formations.map((f, i) => (
-                    <div key={i} className="flex flex-wrap items-center gap-1.5">
+                    <div key={i} className="flex flex-wrap items-center gap-1.5 py-1">
                       {f.parts.map((part, pi) => (
                         <div key={pi} className="flex items-center gap-1.5">
-                          <span className="inline-block rounded-lg border border-border/60 bg-background/50 px-3 py-1.5 text-sm font-medium font-japanese">
+                          <span className={cn(
+                            "inline-block rounded-lg border border-border/60 px-3 py-1.5 text-sm font-medium",
+                            /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) ? "font-japanese bg-accent/10 border-accent/20" : "bg-background/50"
+                          )}>
                             {part}
                           </span>
                           {pi < f.parts.length - 1 && (
-                            <span className="text-muted-foreground font-bold">+</span>
+                            <span className="text-muted-foreground/60 font-bold px-0.5">+</span>
                           )}
                         </div>
                       ))}
