@@ -32,6 +32,30 @@
       "words": 1450,
       "covered": 1437,
       "filled": 0
+    },
+    "hashire-merosu": {
+      "file": "hashire-merosu.json",
+      "size": 2714562,
+      "hash": "a7686aecaa65",
+      "words": 2483,
+      "covered": 2461,
+      "filled": 0
+    },
+    "kumo-no-ito": {
+      "file": "kumo-no-ito.json",
+      "size": 979859,
+      "hash": "24b97bb3b847",
+      "words": 807,
+      "covered": 798,
+      "filled": 0
+    },
+    "lemon": {
+      "file": "lemon.json",
+      "size": 1769988,
+      "hash": "967d4899f0ea",
+      "words": 1508,
+      "covered": 1478,
+      "filled": 0
     }
   }
 }
