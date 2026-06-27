@@ -76,7 +76,7 @@ export default function BookDetail() {
  return (
  <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 px-6 text-center">
  <p className="font-serif text-2xl font-semibold">Book not found</p>
- <Link to="/" className="text-sm text-muted-foreground underline-offset-4">
+ <Link to="/"className="text-sm text-muted-foreground underline-offset-4">
  Back to Library
  </Link>
  </div>

@@ -15,8 +15,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { useCloudSync } from"@/hooks/use-cloud-sync";
 import { useReadingProgressStore } from"@/stores/reading-progress";
 import { useFlashcardStore } from"@/stores/flashcards";
-import Home from "./pages/Home";
-
+import Library from"./pages/Library";
 import MyBooks from"./pages/MyBooks";
 import Flashcards from"./pages/Flashcards";
 import DictionaryPage from"./pages/Dictionary";
@@ -82,7 +81,7 @@ function AnimatedRoutes() {
  <Routes location={location}>
  <Route path="/auth"element={<Auth />} />
  <Route path="/reset-password"element={<ResetPassword />} />
-  <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+ <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
  <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
  <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
  <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
