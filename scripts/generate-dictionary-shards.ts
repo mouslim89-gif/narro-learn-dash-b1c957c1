@@ -219,10 +219,17 @@ const sharedRules = await loadSharedRules();
 const sharedCount = Object.values(sharedRules).reduce((n, arr) => n + arr.length, 0);
 console.log(`  → ${sharedCount} shared rules across ${Object.keys(sharedRules).length} scopes\n`);
 
-const manifest: Record<
-  string,
-  { file: string; size: number; hash: string; words: number; covered: number; filled: number }
-> = {};
+const manifestPath = path.join(outDir, 'manifest.json');
+let manifest: Record<string, any> = {};
+if (fs.existsSync(manifestPath)) {
+  try {
+    const existing = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    if (existing.v === SHARD_VERSION) {
+      manifest = existing.shards || {};
+    }
+  } catch {}
+}
+
 
 // Load all per-book token files at build time.
 const booksDir = path.join(base, 'src/data/book-tokens/books');
