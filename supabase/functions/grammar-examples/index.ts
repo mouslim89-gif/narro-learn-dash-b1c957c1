@@ -29,7 +29,11 @@ Deno.serve(async (req) => {
       .single();
 
     if (cached) {
-      return new Response(JSON.stringify({ examples: cached.examples }), {
+      // Handle legacy cache (array) vs new cache (object)
+      const examples = Array.isArray(cached.examples) ? cached.examples : cached.examples.items;
+      const structure = Array.isArray(cached.examples) ? null : cached.examples.structure;
+      
+      return new Response(JSON.stringify({ examples, structure }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
