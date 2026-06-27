@@ -104,40 +104,62 @@ async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
  return out;
 }
 
+let manifestPromise: Promise<Record<string, any>> | null = null;
+async function getManifest() {
+  if (manifestPromise) return manifestPromise;
+  manifestPromise = (async () => {
+    try {
+      const res = await fetch('/dict/manifest.json', { cache: 'no-cache' });
+      if (!res.ok) return {};
+      const data = await res.json();
+      return data.shards || {};
+    } catch {
+      return {};
+    }
+  })();
+  return manifestPromise;
+}
+
 /**
  * Try to hydrate from a pre-built static shard at /dict/<key>.json.
- * Returns true if the shard was successfully loaded (cache hit or fresh fetch),
- * false on 404 / network error so the caller can fall back to the DB path.
  */
 async function hydrateDictionaryFromShard(key: string): Promise<boolean> {
- await ensureCacheVersion();
- try {
- const url =`/dict/${encodeURIComponent(key)}.json`;
- const res = await fetch(url, { cache:'force-cache'});
- if (!res.ok) return false;
- const payload = (await res.json()) as {
- v?: number;
- entries?: Record<string, CacheEntry>;
- };
- if (!payload || payload.v !== DICT_CACHE_VERSION || !payload.entries) return false;
+  const manifest = await getManifest();
+  if (!manifest[key]) return false;
 
- const entries = payload.entries;
- const seed: Record<string, CacheEntry> = {};
- const idbPairs: [string, CacheEntry][] = [];
- for (const [word, entry] of Object.entries(entries)) {
- if (!entry?.results?.length) continue;
- seed[word] = entry;
- idbPairs.push([word, entry]);
- }
- if (Object.keys(seed).length === 0) return false;
- seedCache(seed);
- // Persist for offline; fire-and-forget — memory cache is already warm.
- setMany(idbPairs, wordStore).catch(() => {});
- return true;
- } catch {
- return false;
- }
+  await ensureCacheVersion();
+  try {
+    const url = `/dict/${encodeURIComponent(key)}.json`;
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) return false;
+    const payload = (await res.json()) as {
+      v?: number;
+      entries?: Record<string, CacheEntry>;
+    };
+    if (!payload || payload.v !== DICT_CACHE_VERSION || !payload.entries) return false;
+
+    const entries = payload.entries;
+    const seed: Record<string, CacheEntry> = {};
+    const idbPairs: [string, CacheEntry][] = [];
+    for (const [word, entry] of Object.entries(entries)) {
+      if (!entry?.results?.length) continue;
+      seed[word] = entry;
+      idbPairs.push([word, entry]);
+    }
+    if (Object.keys(seed).length === 0) return false;
+
+    // Seeding memory is synchronous and fast — do it IMMEDIATELY so any
+    // clicks on the next tick are instant.
+    seedCache(seed);
+
+    // Persist for offline; fire-and-forget.
+    setMany(idbPairs, wordStore).catch(() => {});
+    return true;
+  } catch {
+    return false;
+  }
 }
+
 
 /**
  * Helper to hydrate a specific list of words.
@@ -208,11 +230,18 @@ export async function hydrateDictionaryFromTokens(tokens: { t: string; b?: strin
 }
 
 /** Public: hydrate the jisho in-memory cache for a given book/chapter. */
+const hydratedBooks = new Set<string>();
+
 export async function hydrateDictionaryForBook(
   bookId: string,
   chapterId?: string
 ): Promise<void> {
+  const cacheKey = `${bookId}:${chapterId || 'main'}`;
+  if (hydratedBooks.has(cacheKey)) return;
+  hydratedBooks.add(cacheKey);
+
   await ensureCacheVersion();
+
 
   // 1. Prefer the static shard — single fetch, instant warm cache.
   const key =
