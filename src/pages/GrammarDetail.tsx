@@ -161,22 +161,22 @@ export default function GrammarDetail() {
               </div>
             ) : (
               <>
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-5">
                   {formations.length > 0 ? (
                     formations.map((f, i) => (
-                      <div key={i} className="flex flex-wrap items-center gap-1.5">
+                      <div key={i} className="flex flex-wrap items-center gap-y-3">
                         {f.parts.map((part, pi) => (
-                          <div key={pi} className="flex items-center gap-1.5">
+                          <div key={pi} className="flex items-center">
                             <span className={cn(
-                              "inline-block rounded-lg border px-3 py-1.5 text-base font-bold transition-colors shadow-sm",
+                              "inline-block rounded-xl border px-3.5 py-2 text-base font-bold transition-colors shadow-sm",
                               /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
-                                ? "font-japanese bg-accent/15 text-accent border-accent/20" 
-                                : "bg-muted/40 text-foreground border-border/60"
+                                ? "font-japanese bg-accent/15 text-accent border-accent/30" 
+                                : "bg-muted/60 text-foreground border-border/80"
                             )}>
                               {part}
                             </span>
                             {pi < f.parts.length - 1 && (
-                              <span className="text-muted-foreground/30 font-bold text-sm">+</span>
+                              <span className="text-accent/60 font-black text-lg px-2 drop-shadow-sm">+</span>
                             )}
                           </div>
                         ))}
