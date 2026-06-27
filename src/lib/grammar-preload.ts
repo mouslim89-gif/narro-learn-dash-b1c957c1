@@ -7,15 +7,25 @@ import type { GrammarNote } from '@/data/book-grammar';
  */
 export async function preloadGrammar(note: GrammarNote): Promise<void> {
   try {
-    // The edge function itself handles caching (likely via Supabase or internal cache)
-    // By calling it now, we ensure the data is ready when the user visits the page.
-    await supabase.functions.invoke('grammar-examples', {
+    // Check if already in local cache to save bandwidth
+    const cacheKey = `grammar_cache_${note.pattern}_${note.jlpt}`;
+    if (localStorage.getItem(cacheKey)) return;
+
+    const { data } = await supabase.functions.invoke('grammar-examples', {
       body: {
         pattern: note.pattern,
         meaning: note.meaning,
         jlpt: note.jlpt
       }
     });
+
+    if (data) {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        examples: data.examples,
+        formations: data.formations,
+        timestamp: Date.now()
+      }));
+    }
   } catch (err) {
     console.warn(`[grammar-preload] Failed for ${note.pattern}`, err);
   }
