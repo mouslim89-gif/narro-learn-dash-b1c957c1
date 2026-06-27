@@ -4,9 +4,33 @@
     "a-aki": {
       "file": "a-aki.json",
       "size": 675763,
-      "hash": "9fc2e05541ac",
+      "hash": "640096b5027c",
       "words": 558,
       "covered": 542,
+      "filled": 0
+    },
+    "asa": {
+      "file": "asa.json",
+      "size": 1304804,
+      "hash": "5ef7ee781056",
+      "words": 1023,
+      "covered": 1017,
+      "filled": 0
+    },
+    "gyofukuki": {
+      "file": "gyofukuki.json",
+      "size": 1836578,
+      "hash": "57e2bb0456c5",
+      "words": 1584,
+      "covered": 1554,
+      "filled": 0
+    },
+    "hana": {
+      "file": "hana.json",
+      "size": 1722142,
+      "hash": "e7d59e1b0374",
+      "words": 1450,
+      "covered": 1437,
       "filled": 0
     }
   }
