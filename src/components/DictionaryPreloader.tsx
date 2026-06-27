@@ -25,6 +25,11 @@ export function DictionaryPreloader() {
         hydrateDictionaryForBook(book.id).catch(() => {});
         // Preload token chunks (src/data/book-tokens/*.ts)
         loadBookTokens(book.id).catch(() => {});
+        
+        // Preload grammar structures for current books (staggered)
+        setTimeout(() => {
+          preloadGrammarForBook(book.id, 'simplified').catch(() => {});
+        }, 3000);
       }
 
       // 3. Optional: Background fetch for everything else in the manifest
