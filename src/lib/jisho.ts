@@ -75,24 +75,35 @@ export function seedCache(entries: Record<string, CacheEntry>): void {
 }
 
 export async function lookupWord(keyword: string, forceLive = false): Promise<CacheEntry> {
- if (!forceLive) {
- const existing = cache.get(keyword);
- // Use cache only if the entry actually has results, OR if we've already
- // attempted a live lookup for this keyword (to avoid hammering the API).
- if (isUsableForKeyword(keyword, existing) || (existing && !isKnownStaleEntry(keyword, existing) && liveAttempted.has(keyword))) {
- return existing;
- }
+  if (!forceLive) {
+    const existing = cache.get(keyword);
+    // Use cache only if the entry actually has results, OR if we've already
+    // attempted a live lookup for this keyword (to avoid hammering the API).
+    if (isUsableForKeyword(keyword, existing) || (existing && !isKnownStaleEntry(keyword, existing) && liveAttempted.has(keyword))) {
+      return existing;
+    }
 
- // Try IndexedDB (persisted from a previous session) before hitting the network.
- try {
-   const { readWordEntry } = await import('@/lib/dictionary-db');
-   const persisted = await readWordEntry(keyword);
-   if (persisted && !isKnownStaleEntry(keyword, persisted)) {
-     cache.set(keyword, persisted);
-     return persisted;
-   }
- } catch { /* ignore */ }
- }
+    // Try IndexedDB (persisted from a previous session) before hitting the network.
+    try {
+      const { readWordEntry } = await import('@/lib/dictionary-db');
+      
+      // Check memory cache AGAIN after the dynamic import, in case a shard loaded while we were waiting.
+      const memo2 = cache.get(keyword);
+      if (isUsableForKeyword(keyword, memo2)) return memo2;
+
+      const persisted = await readWordEntry(keyword);
+      
+      // Check memory cache AGAIN after IndexedDB, same reason.
+      const memo3 = cache.get(keyword);
+      if (isUsableForKeyword(keyword, memo3)) return memo3;
+
+      if (persisted && !isKnownStaleEntry(keyword, persisted)) {
+        cache.set(keyword, persisted);
+        return persisted;
+      }
+    } catch { /* ignore */ }
+  }
+
 
  const url =`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jisho-lookup?keyword=${encodeURIComponent(keyword)}`;
  const response = await fetch(url, {
