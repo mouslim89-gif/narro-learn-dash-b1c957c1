@@ -104,11 +104,25 @@ async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
  return out;
 }
 
+let manifestPromise: Promise<Record<string, any>> | null = null;
+async function getManifest() {
+  if (manifestPromise) return manifestPromise;
+  manifestPromise = (async () => {
+    try {
+      const res = await fetch('/dict/manifest.json', { cache: 'no-cache' });
+      if (!res.ok) return {};
+      const data = await res.json();
+      return data.shards || {};
+    } catch {
+      return {};
+    }
+  })();
+  return manifestPromise;
+}
+
 /**
  * Try to hydrate from a pre-built static shard at /dict/<key>.json.
- * Returns true if the shard was successfully loaded (cache hit or fresh fetch),
- * false on 404 / network error so the caller can fall back to the DB path.
- */
+
 async function hydrateDictionaryFromShard(key: string): Promise<boolean> {
  await ensureCacheVersion();
  try {
