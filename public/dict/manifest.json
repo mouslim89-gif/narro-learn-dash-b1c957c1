@@ -80,6 +80,14 @@
       "words": 677,
       "covered": 668,
       "filled": 0
+    },
+    "urashima": {
+      "file": "urashima.json",
+      "size": 1998362,
+      "hash": "d92b7118cb19",
+      "words": 1607,
+      "covered": 1597,
+      "filled": 0
     }
   }
 }
