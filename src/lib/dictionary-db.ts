@@ -105,7 +105,7 @@ async function fetchFromDb(words: string[]): Promise<Map<string, CacheEntry>> {
 }
 
 let manifestPromise: Promise<Record<string, any>> | null = null;
-async function getManifest() {
+export async function getManifest() {
   if (manifestPromise) return manifestPromise;
   manifestPromise = (async () => {
     try {

@@ -10,6 +10,7 @@ import { OnboardingCarousel } from "@/components/onboarding/OnboardingCarousel";
 import { AuthProvider, useAuth } from"@/contexts/AuthContext";
 import { ProtectedRoute } from"@/components/ProtectedRoute";
 import { SplashScreen } from "@/components/SplashScreen";
+import { DictionaryPreloader } from "@/components/DictionaryPreloader";
 
 
 import { useCloudSync } from"@/hooks/use-cloud-sync";
@@ -117,6 +118,7 @@ const App = () => (
   <CloudSyncMount />
   <SplashScreen />
   <OnboardingCarousel />
+  <DictionaryPreloader />
   <AnimatedRoutes />
 
 

@@ -41,6 +41,7 @@ export default function BookDetail() {
   useEffect(() => {
     if (book?.id) {
       loadBookTokens(book.id).then(setTokens);
+      hydrateDictionaryForBook(book.id).catch(() => {});
     }
   }, [book?.id]);
 
