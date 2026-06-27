@@ -1,0 +1,13 @@
+{
+  "v": 2,
+  "shards": {
+    "hashire-merosu": {
+      "file": "hashire-merosu.json",
+      "size": 2713530,
+      "hash": "02455013e83a",
+      "words": 2483,
+      "covered": 2461,
+      "filled": 58
+    }
+  }
+}
