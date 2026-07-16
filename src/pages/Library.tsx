@@ -3,7 +3,7 @@ import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { books, genreLabels, type Genre } from'@/data/books';
 import { BookCard } from'@/components/BookCard';
 import { DelayedLink as Link } from'@/components/DelayedLink';
-import { Search, Moon, Sun, Settings, X } from'lucide-react';
+import { Search, Moon, Sun, Settings, X, Sparkles } from'lucide-react';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
