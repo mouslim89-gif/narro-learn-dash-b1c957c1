@@ -172,12 +172,9 @@ export default function Library() {
     return (
       <section key={genre} className="py-5 border-t border-border/40 last:border-0">
         <div className="px-6 flex items-baseline justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="section-bullet" />
-            <h3 className="font-serif text-lg font-semibold text-foreground">
-              {genreLabels[genre]}
-            </h3>
-          </div>
+          <h3 className="font-serif text-lg font-semibold text-foreground">
+            {genreLabels[genre]}
+          </h3>
           <span className="text-[11px] text-muted-foreground tabular-nums font-medium uppercase tracking-wider">
             {genreBooks.length} books
           </span>

@@ -497,16 +497,8 @@
  );
 }
 
-/* Section header bullet (left accent bar) */
-.section-bullet {
- display: inline-block;
- width: 2px;
- height: 0.7em;
- background: hsl(var(--accent));
- border-radius: 1px;
- margin-right: 0.5em;
- vertical-align: -1px;
-}
+
+
 
 /* Refined card with inner gradient + ring */
 .card-refined {
