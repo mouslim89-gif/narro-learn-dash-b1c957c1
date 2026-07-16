@@ -167,20 +167,7 @@ export function chapterKey(bookId: string, chapterId?: string): string {
  return`${bookId}__${chapterId}`;
 }
 
-export const genreLabels: Record<Genre, string> = {
-  'folk-tales': 'Folk Tales',
-  'fiction': 'Fiction',
-  'sci-fi': 'Sci-Fi',
-  'slice-of-life': 'Slice of Life',
-  'horror': 'Horror',
-};
-
-export const genreKanjis: Record<Genre, string> = {
-  'folk-tales': '民',
-  'fiction': '文',
-  'sci-fi': '星',
-  'slice-of-life': '日',
-  'horror': '怪',
+export const genreLabels: Record<Genre, string> = {'folk-tales':'Folk Tales','fiction':'Fiction','sci-fi':'Sci-Fi','slice-of-life':'Slice of Life','horror':'Horror',
 };
 
 export const difficultyConfig: Record<Difficulty, { label: string; description: string; color: string }> = {
@@ -404,7 +391,7 @@ export const books: Book[] = [
  jlptLevel:'N4',
  coverColor:'#4A90B8',
  readingTimeMin: 9,
- synopsis: "(traite ceci comme un message dans le chat, pas une édition de texte)\u00a0\nTâche : apply plan",
+ synopsis: "A kind young fisherman saves a turtle from cruel children and is rewarded with a journey to the Dragon Palace beneath the waves, where Princess Otohime hosts him in a paradise of eternal seasons. Three carefree years later he returns home, only to discover that three hundred years have passed on land, and the small lacquered box the princess gave him holds a final and devastating gift.",
  content: { simplified: urashimaSimplified, intermediate: urashimaIntermediate, original: urashimaOriginal },
  parts: { simplified: urashimaSimplifiedParts, intermediate: urashimaIntermediateParts, original: urashimaOriginalParts },
  anchors: urashimaAnchors,
