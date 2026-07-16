@@ -48,12 +48,9 @@ export function ContinueHero({ book, progressPercent, difficulty, chapterId }: C
 
           {/* Book Info */}
           <div className="flex flex-1 flex-col justify-center min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="section-bullet" />
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                Continue Reading
-              </p>
-            </div>
+            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              Continue Reading
+            </p>
             
             <h3 className="font-japanese text-lg font-bold leading-tight text-foreground truncate">
               {book.titleJp}
