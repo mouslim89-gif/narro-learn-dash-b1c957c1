@@ -9,7 +9,7 @@ import { Input } from'@/components/ui/input';
 import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { romajiToKana } from'@/lib/romaji';
-import { DailyGoalProgress } from '@/components/DailyGoalProgress';
+import { ContinueHero } from '@/components/library/ContinueHero';
 
 const genres = Object.keys(genreLabels) as Genre[];
 
@@ -19,15 +19,21 @@ export default function Library() {
  const headerRef = useRef<HTMLElement>(null);
  useScrollProgress(headerRef, 0, 64);
 
- // Find most recently read book
  // Find books in progress, most recently read first
  const continueBooks = useMemo(() => {
- return Object.entries(progress)
- .filter(([, p]) => p.progressPercent > 0 && p.progressPercent < 100)
- .sort(([, a], [, b]) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime())
- .map(([bookId]) => books.find(b => b.id === bookId))
- .filter((b): b is typeof books[number] => Boolean(b));
+   const inProgress = Object.entries(progress)
+     .filter(([, p]) => p.progressPercent > 0 && p.progressPercent < 100)
+     .sort(([, a], [, b]) => new Date(b.lastReadAt).getTime() - new Date(a.lastReadAt).getTime());
+   
+   return inProgress.map(([id, p]) => {
+     const bookId = id.includes('__') ? id.split('__')[0] : id;
+     const book = books.find(b => b.id === bookId);
+     return book ? { book, progress: p, id } : null;
+   }).filter((item): item is NonNullable<typeof item> => Boolean(item));
  }, [progress]);
+
+ const heroBook = continueBooks[0];
+ const alsoReading = continueBooks.slice(1);
 
     const filteredBooks = useMemo(() => {
         if (!search.trim()) return null;
@@ -113,47 +119,78 @@ export default function Library() {
  </section>
  ) : (
   <>
-  <DailyGoalProgress />
-  {/* Continue Reading */}
- {continueBooks.length > 0 && (
- <section className="py-5">
- <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- Continue Reading
- </h3>
- <span className="text-[11px] text-muted-foreground tabular-nums">
- {continueBooks.length} book{continueBooks.length !== 1 ?'s':''}
- </span>
- </div>
- <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
- {continueBooks.map((book) => (
- <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
- ))}
- </div>
- </section>
- )}
+  {/* Hero Section */}
+  {heroBook ? (
+    <ContinueHero 
+      book={heroBook.book} 
+      progressPercent={heroBook.progress.progressPercent}
+      difficulty={heroBook.progress.difficulty}
+      chapterId={heroBook.id.includes('__') ? heroBook.id.split('__')[1] : undefined}
+    />
+  ) : (
+    <section className="px-6 mb-8">
+      <Link
+        to={`/book/${books[0].id}`}
+        className="block group relative overflow-hidden rounded-3xl border border-border/30 bg-card p-5 shadow-sm card-lift"
+        style={{ 
+          backgroundImage: `linear-gradient(135deg, ${books[0].coverColor}18 0%, hsl(var(--card)) 60%)` 
+        }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="font-serif text-lg font-bold">Start your first story</h3>
+            <p className="text-sm text-muted-foreground">Pick a book from the collection below</p>
+          </div>
+        </div>
+      </Link>
+    </section>
+  )}
 
- {/* Genre sections */}
- {genres.map((genre) => {
- const genreBooks = books.filter((b) => b.genre === genre);
- if (genreBooks.length === 0) return null;
- return (
- <section key={genre} className="py-5">
- <div className="px-6 flex items-baseline justify-between">
- <h3 className="font-serif text-lg font-semibold text-foreground">
- {genreLabels[genre]}
- </h3>
- <span className="text-[11px] text-muted-foreground tabular-nums">{genreBooks.length} books</span>
- </div>
- <div className="stagger-children mt-4 flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
- {genreBooks.map((book) => (
- <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
- ))}
- </div>
- </section>
- );
- })}
- </>
+  {/* Also Reading Rail */}
+  {alsoReading.length > 0 && (
+    <section className="py-2 mb-4">
+      <div className="px-6 flex items-baseline justify-between">
+        <h3 className="font-serif text-[15px] font-semibold text-muted-foreground">
+          Also Reading
+        </h3>
+      </div>
+      <div className="stagger-children mt-3 flex gap-5 overflow-x-auto px-6 pb-2 scrollbar-none">
+        {alsoReading.map(({ book, progress: p }) => (
+          <BookCard key={book.id} book={book} progress={p.progressPercent} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* Genre sections */}
+  {genres.map((genre) => {
+    const genreBooks = books.filter((b) => b.genre === genre);
+    if (genreBooks.length === 0) return null;
+    return (
+      <section key={genre} className="py-5 border-t border-border/40 last:border-0">
+        <div className="px-6 flex items-baseline justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="section-bullet" />
+            <h3 className="font-serif text-lg font-semibold text-foreground">
+              {genreLabels[genre]}
+            </h3>
+          </div>
+          <span className="text-[11px] text-muted-foreground tabular-nums font-medium uppercase tracking-wider">
+            {genreBooks.length} books
+          </span>
+        </div>
+        <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+          {genreBooks.map((book) => (
+            <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
+          ))}
+        </div>
+      </section>
+    );
+  })}
+  </>
  )}
  </div>
  );
