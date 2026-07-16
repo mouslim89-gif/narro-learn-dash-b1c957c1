@@ -1,17 +1,18 @@
-I will propose several icon options for the "Grammar Notes" header chip in the reader, replacing the current "文" character.
+## Remove the orange `section-bullet` bars
 
-### Proposed Icon Options (from Lucide React)
+Ces petites barres verticales amber viennent de la classe `.section-bullet` (définie dans `src/index.css`). On la supprime partout et on interdit sa réutilisation.
 
-1. **BookMarked** (&nbsp;): Represents a reference book or a specific study point, perfect for grammar rules.
-2. **GraduationCap** (&nbsp;): Emphasizes the learning aspect of grammar notes.
-3. **ScrollText** (&nbsp;): Suggests a list of rules or a detailed guide, fitting for grammar explanations.
-4. **SpellCheck** (&nbsp;): Directly relates to language structure and correctness.
-5. **PencilLine** (&nbsp;): Suggests annotations and study notes.
+### Changes
 
-### Technical Details
+1. **`src/pages/Library.tsx`** — enlever le `<span className="section-bullet" />` devant chaque titre de rail (section Fiction, Folk Tales, etc.). Le layout du titre redevient un simple `<h3>` + count, plus propre.
+2. **`src/components/library/ContinueHero.tsx`** — enlever le `<span className="section-bullet" />` devant le label "Continue Reading". Le petit label uppercase reste seul, ce qui est déjà suffisant visuellement.
+3. **`src/index.css`** — supprimer la définition de `.section-bullet` (lignes ~501+) pour qu'elle ne puisse plus être réutilisée par erreur.
+4. **`CLAUDE.md`** — retirer les mentions de `.section-bullet` de la doc (ligne 190 et l'exemple ligne 270) pour qu'aucune future itération ne la ressuscite.
 
-- Import the chosen icon from `lucide-react` in `src/pages/Reader.tsx`.
-- Update the `HeaderChip` component for grammar notes to use the selected icon component with the class `h-5 w-5`.
-- Remove the temporary `<span>文</span>` element.
+### Memory
 
-Which of these icons would you prefer for the Grammar Notes ? answer : 1
+Ajouter une **constraint** dans `mem://constraints/no-section-bullet` + une ligne Core dans `mem://index.md` :
+> Never use amber vertical accent bars (ex-`.section-bullet`) before section titles or labels. Rejected by user as visually poor. Section labels stand alone.
+
+### Hors scope
+Aucun autre changement visuel, aucune modif du header, des cards, ou de la logique.
