@@ -171,7 +171,7 @@ export default function BookDetail() {
 
  <div className="relative z-10 mt-8 flex flex-col items-center text-center">
  <div
- className="book-paper relative flex h-64 w-44 items-end overflow-hidden rounded-xl p-4 shadow-xl ring-1 ring-black/5 rotate-[-3deg]"
+ className="book-paper relative flex h-64 w-44 items-end overflow-hidden rounded-2xl p-4 shadow-xl ring-1 ring-black/5 rotate-[-3deg]"
  style={{ backgroundColor: book.coverColor }}
  >
  <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/40"/>
