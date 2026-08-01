@@ -59,7 +59,7 @@ import {
 } from'./books/urashima';
 
 export type Difficulty ='simplified'|'intermediate'|'original';
-export type Genre ='folk-tales'|'fiction'|'sci-fi'|'slice-of-life'|'horror';
+export type Genre = 'folk-tales' | 'psychological' | 'surreal' | 'gothic' | 'slice-of-life' | 'historical' | 'sci-fi';
 
 export interface Chapter {
  id: string;
@@ -167,7 +167,14 @@ export function chapterKey(bookId: string, chapterId?: string): string {
  return`${bookId}__${chapterId}`;
 }
 
-export const genreLabels: Record<Genre, string> = {'folk-tales':'Folk Tales','fiction':'Fiction','sci-fi':'Sci-Fi','slice-of-life':'Slice of Life','horror':'Horror',
+export const genreLabels: Record<Genre, string> = {
+  'folk-tales': 'Folk Tales',
+  'psychological': 'Psychological',
+  'surreal': 'Surreal',
+  'gothic': 'Gothic & Uncanny',
+  'slice-of-life': 'Slice of Life',
+  'historical': 'Historical',
+  'sci-fi': 'Sci-Fi'
 };
 
 export const difficultyConfig: Record<Difficulty, { label: string; description: string; color: string }> = {
@@ -245,7 +252,7 @@ export const books: Book[] = [
  titleJp:'ア、秋',
  titleEn:'A, Autumn',
  author:'Dazai Osamu',
- genre:'fiction',
+ genre: 'psychological',
  jlptLevel:'N1',
  coverColor:'#B85C2A',
  readingTimeMin: 12,
@@ -261,7 +268,7 @@ export const books: Book[] = [
  titleJp:'蜘蛛の糸',
  titleEn:'The Spider\u2019s Thread',
  author:'Akutagawa Ryūnosuke',
- genre:'fiction',
+ genre: 'folk-tales',
  jlptLevel:'N2',
  coverColor:'#6B4F8F',
  readingTimeMin: 10,
@@ -275,7 +282,7 @@ export const books: Book[] = [
  titleJp:'羅生門',
  titleEn:'Rashōmon',
  author:'Akutagawa Ryūnosuke',
- genre:'fiction',
+ genre: 'historical',
  jlptLevel:'N1',
  coverColor:'#8B2E2E',
  readingTimeMin: 12,
@@ -289,7 +296,7 @@ export const books: Book[] = [
  titleJp:'走れメロス',
  titleEn:'Run, Melos!',
  author:'Dazai Osamu',
- genre:'fiction',
+ genre: 'historical',
  jlptLevel:'N2',
  coverColor:'#C8956D',
  readingTimeMin: 25,
@@ -303,7 +310,7 @@ export const books: Book[] = [
  titleJp:'檸檬',
  titleEn:'Lemon',
  author:'Kajii Motojirō',
- genre:'fiction',
+ genre: 'surreal',
  jlptLevel:'N2',
  coverColor:'#E8C547',
  readingTimeMin: 12,
@@ -317,7 +324,7 @@ export const books: Book[] = [
  titleJp:'鼻',
  titleEn:'The Nose',
  author:'Akutagawa Ryūnosuke',
- genre:'fiction',
+ genre: 'psychological',
  jlptLevel:'N3',
  coverColor:'#C97B5C',
  readingTimeMin: 10,
@@ -331,7 +338,7 @@ export const books: Book[] = [
  titleJp:'待つ',
  titleEn:'Waiting',
  author:'Dazai Osamu',
- genre:'fiction',
+ genre: 'slice-of-life',
  jlptLevel:'N4',
  coverColor:'#7A9BB8',
  readingTimeMin: 6,
@@ -345,7 +352,7 @@ export const books: Book[] = [
  titleJp:'朝',
  titleEn:'Morning',
  author:'Dazai Osamu',
- genre:'fiction',
+ genre: 'slice-of-life',
  jlptLevel:'N3',
  coverColor:'#E8A87C',
  readingTimeMin: 11,
@@ -359,7 +366,7 @@ export const books: Book[] = [
  titleJp:'魚服記',
  titleEn:'The Fish Tale',
  author:'Dazai Osamu',
- genre:'fiction',
+ genre: 'folk-tales',
  jlptLevel:'N3',
  coverColor:'#5B7B8C',
  readingTimeMin: 10,
@@ -373,7 +380,7 @@ export const books: Book[] = [
  titleJp:'桜の樹の下には',
  titleEn:'Under the Cherry Tree',
  author:'Kajii Motojirō',
- genre:'fiction',
+ genre: 'gothic',
  jlptLevel:'N2',
  coverColor:'#E8B4C8',
  readingTimeMin: 7,
@@ -387,7 +394,7 @@ export const books: Book[] = [
  titleJp:'浦島太郎',
  titleEn:'Urashima Tarō',
  author:'Kusuyama Masao',
- genre:'fiction',
+ genre: 'folk-tales',
  jlptLevel:'N4',
  coverColor:'#4A90B8',
  readingTimeMin: 9,
