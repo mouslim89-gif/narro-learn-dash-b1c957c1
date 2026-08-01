@@ -187,21 +187,6 @@ export default function Library() {
     </section>
   )}
 
-  {/* Also Reading Rail */}
-  {alsoReading.length > 0 && (
-    <section className="py-2 mb-4">
-      <div className="px-6 flex items-baseline justify-between">
-        <h3 className="font-serif text-[15px] font-semibold text-muted-foreground">
-          Also Reading
-        </h3>
-      </div>
-      <div className="stagger-children mt-3 flex gap-5 overflow-x-auto px-6 pb-2 scrollbar-none">
-        {alsoReading.map(({ book, progress: p }) => (
-          <BookCard key={book.id} book={book} progress={p.progressPercent} />
-        ))}
-      </div>
-    </section>
-  )}
 
   {/* Layout structure: Mixed Genre and Collections */}
   <BookRail 
