@@ -10,7 +10,7 @@ export function BookCard({ book, progress }: { book: Book; progress?: number }) 
  className="group flex w-36 flex-shrink-0 flex-col gap-2 md:w-44 tap-scale"
  >
  <div
- className="book-cover book-paper relative flex h-56 items-end overflow-hidden rounded-lg p-3 shadow-md ring-1 ring-black/5 card-lift md:h-64"
+ className="book-cover book-paper relative flex h-56 items-end overflow-hidden rounded-xl p-3 shadow-md ring-1 ring-black/5 card-lift md:h-64"
  style={{ backgroundColor: book.coverColor }}
  >
  {/* Soft top highlight + bottom shade for depth */}
