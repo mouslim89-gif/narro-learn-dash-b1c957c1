@@ -1,11 +1,10 @@
 import { motion } from 'framer-motion';
-import { Play, Clock, BookOpen } from 'lucide-react';
+import { Play, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { DelayedLink as Link } from '@/components/DelayedLink';
+import { useDelayedNav } from '@/hooks/use-delayed-nav';
 import type { Book } from '@/data/books';
-import { genreLabels } from '@/data/books';
-import { cn } from '@/lib/utils';
 
 interface ContinueHeroProps {
   book: Book;
@@ -15,9 +14,18 @@ interface ContinueHeroProps {
 }
 
 export function ContinueHero({ book, progressPercent, difficulty, chapterId }: ContinueHeroProps) {
+  const goTo = useDelayedNav();
   const continueLink = chapterId 
     ? `/reader/${book.id}/${difficulty}/${chapterId}`
     : `/reader/${book.id}/${difficulty}`;
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // If we clicked the button or a link inside, don't trigger the card nav
+    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('a')) {
+      return;
+    }
+    goTo(`/book/${book.id}`);
+  };
 
   return (
     <motion.div
@@ -26,9 +34,12 @@ export function ContinueHero({ book, progressPercent, difficulty, chapterId }: C
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="mx-6 mb-8"
     >
-      <Link
-        to={`/book/${book.id}`}
-        className="block group relative overflow-hidden rounded-3xl border border-border/30 bg-card p-5 shadow-sm card-lift transition-all duration-300"
+      <div
+        onClick={handleCardClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && goTo(`/book/${book.id}`)}
+        className="block group relative overflow-hidden rounded-3xl border border-border/30 bg-card p-5 shadow-sm card-lift transition-all duration-300 cursor-pointer"
         style={{ 
           backgroundImage: `linear-gradient(135deg, ${book.coverColor}18 0%, hsl(var(--card)) 60%)` 
         }}
@@ -76,13 +87,13 @@ export function ContinueHero({ book, progressPercent, difficulty, chapterId }: C
           </div>
         </div>
 
-        <Link to={continueLink} className="mt-6 block">
-          <Button className="btn-primary-glow w-full h-11 rounded-full font-serif font-bold text-[15px] shadow-md transition-all active:scale-[0.98]">
+        <Link to={continueLink} className="mt-6 block" onClick={(e) => e.stopPropagation()}>
+          <Button className="btn-tsundoku-premium tap-scale group h-14 w-full rounded-full border-none font-serif text-[16px] font-bold tracking-wide">
             <Play className="mr-2 h-4 w-4 fill-current" />
             Resume Reading
           </Button>
         </Link>
-      </Link>
+      </div>
     </motion.div>
   );
 }
