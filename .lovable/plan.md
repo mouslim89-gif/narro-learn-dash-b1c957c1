@@ -1,18 +1,15 @@
-## Remove the orange `section-bullet` bars
+## Hero card — more color, cleaner header
 
-Ces petites barres verticales amber viennent de la classe `.section-bullet` (définie dans `src/index.css`). On la supprime partout et on interdit sa réutilisation.
+Single file: `src/components/library/ContinueHero.tsx`.
 
-### Changes
+### 1. Remove the label
+Delete the small uppercase "Continue Reading" line above the title, so the Japanese title becomes the first element of the info block.
 
-1. **`src/pages/Library.tsx`** — enlever le `<span className="section-bullet" />` devant chaque titre de rail (section Fiction, Folk Tales, etc.). Le layout du titre redevient un simple `<h3>` + count, plus propre.
-2. **`src/components/library/ContinueHero.tsx`** — enlever le `<span className="section-bullet" />` devant le label "Continue Reading". Le petit label uppercase reste seul, ce qui est déjà suffisant visuellement.
-3. **`src/index.css`** — supprimer la définition de `.section-bullet` (lignes ~501+) pour qu'elle ne puisse plus être réutilisée par erreur.
-4. **`CLAUDE.md`** — retirer les mentions de `.section-bullet` de la doc (ligne 190 et l'exemple ligne 270) pour qu'aucune future itération ne la ressuscite.
+### 2. Subtle tint boost (color from `book.coverColor`)
+- Background gradient goes from `${coverColor}18 → card` to a richer two-stop wash: `${coverColor}3D 0%, ${coverColor}14 45%, hsl(var(--card)) 100%` (135°), still readable in light and dark mode.
+- Add a soft colored halo behind the cover: an absolutely positioned blurred radial blob using the cover color at low opacity, `pointer-events-none`, clipped by the card's `overflow-hidden`.
+- Border/ring picks up the color: `border-border/30` → colored ring via inline `boxShadow: 0 0 0 1px ${coverColor}33` plus the existing soft shadow.
+- Progress bar fill tinted with the cover color (inline style on the indicator wrapper) instead of plain primary.
 
-### Memory
-
-Ajouter une **constraint** dans `mem://constraints/no-section-bullet` + une ligne Core dans `mem://index.md` :
-> Never use amber vertical accent bars (ex-`.section-bullet`) before section titles or labels. Rejected by user as visually poor. Section labels stand alone.
-
-### Hors scope
-Aucun autre changement visuel, aucune modif du header, des cards, ou de la logique.
+### 3. Untouched
+Layout, cover size, CTA (`btn-tsundoku-premium`), navigation behaviour, and typography stay exactly as they are.
