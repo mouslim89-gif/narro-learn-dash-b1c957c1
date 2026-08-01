@@ -18,7 +18,10 @@ Deno.serve(async (req) => {
 
     // Supabase client for caching
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    // Service role: the cache table is RLS-protected and this function runs
+    // without a user JWT. With the anon key every read/write was silently
+    // denied, so nothing was ever cached and each call re-generated with AI.
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Check cache
@@ -26,7 +29,7 @@ Deno.serve(async (req) => {
       .from('grammar_examples')
       .select('examples')
       .eq('pattern_slug', slug)
-      .single();
+      .maybeSingle();
 
     if (cached) {
       // Handle legacy cache (array) vs new cache (object)
@@ -79,13 +82,13 @@ Deno.serve(async (req) => {
     const output = JSON.parse(content);
 
     // Save to cache
-    await supabase.from('grammar_examples').insert({
+    await supabase.from('grammar_examples').upsert({
       pattern_slug: slug,
       examples: {
         items: output.examples,
         formations: output.formations
       }
-    });
+    }, { onConflict: 'pattern_slug' });
 
     return new Response(JSON.stringify(output), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
