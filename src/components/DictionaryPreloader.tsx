@@ -48,7 +48,10 @@ export function DictionaryPreloader() {
       const bookId = match[1].split('__')[0];
       hydrateDictionaryForBook(bookId).catch(() => {});
       loadBookTokens(bookId).catch(() => {});
+      // Grammar is only warmed for the book actually being opened.
+      preloadGrammarForBook(bookId).catch(() => {});
     }
+
   }, [location.pathname]);
 
   return null;
