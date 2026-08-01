@@ -47,7 +47,7 @@ export function ContinueHero({ book, progressPercent, difficulty, chapterId }: C
         <div className="flex gap-5">
           {/* Large Cover */}
           <div
-            className="book-paper relative flex h-[132px] w-[96px] flex-shrink-0 items-end overflow-hidden rounded-xl p-3 shadow-lg ring-1 ring-black/5"
+            className="book-paper relative flex h-[132px] w-[96px] flex-shrink-0 items-end overflow-hidden rounded-2xl p-3 shadow-lg ring-1 ring-black/5"
             style={{ backgroundColor: book.coverColor }}
           >
             <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/35" />
