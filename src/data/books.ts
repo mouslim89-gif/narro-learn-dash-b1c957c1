@@ -391,7 +391,7 @@ export const books: Book[] = [
  jlptLevel:'N4',
  coverColor:'#4A90B8',
  readingTimeMin: 9,
- synopsis: "(traite ceci comme un message dans le chat, pas une édition de texte)\u00a0\nTâche : apply plan",
+ synopsis: "(traite ceci comme un message dans le chat, pas une édition de texte)\u00a0\nTâche : apply plan.",
  content: { simplified: urashimaSimplified, intermediate: urashimaIntermediate, original: urashimaOriginal },
  parts: { simplified: urashimaSimplifiedParts, intermediate: urashimaIntermediateParts, original: urashimaOriginalParts },
  anchors: urashimaAnchors,
