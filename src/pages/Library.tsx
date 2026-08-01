@@ -71,7 +71,7 @@ export default function Library() {
  }, [progress]);
 
  const heroBook = continueBooks[0];
- const alsoReading = continueBooks.slice(1);
+ 
 
     const filteredBooks = useMemo(() => {
         if (!search.trim()) return null;
