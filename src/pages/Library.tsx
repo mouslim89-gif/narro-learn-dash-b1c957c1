@@ -1,17 +1,55 @@
-import { useState, useMemo, useRef } from'react';
-import { useScrollProgress } from'@/hooks/use-scroll-progress';
-import { books, genreLabels, type Genre } from'@/data/books';
-import { BookCard } from'@/components/BookCard';
-import { DelayedLink as Link } from'@/components/DelayedLink';
-import { Search, Moon, Sun, Settings, X, Sparkles } from'lucide-react';
-import { useReadingProgressStore } from'@/stores/reading-progress';
-import { Input } from'@/components/ui/input';
-import { Button } from'@/components/ui/button';
-import { AnimatedTitle } from'@/components/AnimatedTitle';
-import { romajiToKana } from'@/lib/romaji';
+import { useState, useMemo, useRef } from 'react';
+import { useScrollProgress } from '@/hooks/use-scroll-progress';
+import { books, genreLabels, type Genre, type Book } from '@/data/books';
+import { collections, type Collection } from '@/data/collections';
+import { BookCard } from '@/components/BookCard';
+import { DelayedLink as Link } from '@/components/DelayedLink';
+import { Search, Moon, Sun, Settings, X, Sparkles } from 'lucide-react';
+import { useReadingProgressStore } from '@/stores/reading-progress';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
+import { romajiToKana } from '@/lib/romaji';
 import { ContinueHero } from '@/components/library/ContinueHero';
+import { cn } from '@/lib/utils';
 
-const genres = Object.keys(genreLabels) as Genre[];
+interface BookRailProps {
+  title: string;
+  subtitle?: string;
+  books: Book[];
+  progress: Record<string, any>;
+  className?: string;
+}
+
+function BookRail({ title, subtitle, books: railBooks, progress, className }: BookRailProps) {
+  if (railBooks.length === 0) return null;
+
+  return (
+    <section className={cn("py-5 border-t border-border/40 last:border-0", className)}>
+      <div className="px-6 mb-4">
+        <div className="flex items-baseline justify-between">
+          <h3 className="font-serif text-lg font-semibold text-foreground">
+            {title}
+          </h3>
+          <span className="text-[11px] text-muted-foreground tabular-nums font-medium uppercase tracking-wider">
+            {railBooks.length} books
+          </span>
+        </div>
+        {subtitle && (
+          <p className="text-[11px] text-muted-foreground mt-0.5 leading-none">
+            {subtitle}
+          </p>
+        )}
+      </div>
+      <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
+        {railBooks.map((book) => (
+          <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 
 export default function Library() {
  const [search, setSearch] = useState('');
@@ -165,28 +203,64 @@ export default function Library() {
     </section>
   )}
 
-  {/* Genre sections */}
-  {genres.map((genre) => {
-    const genreBooks = books.filter((b) => b.genre === genre);
-    if (genreBooks.length === 0) return null;
-    return (
-      <section key={genre} className="py-5 border-t border-border/40 last:border-0">
-        <div className="px-6 flex items-baseline justify-between mb-4">
-          <h3 className="font-serif text-lg font-semibold text-foreground">
-            {genreLabels[genre]}
-          </h3>
-          <span className="text-[11px] text-muted-foreground tabular-nums font-medium uppercase tracking-wider">
-            {genreBooks.length} books
-          </span>
-        </div>
-        <div className="stagger-children flex gap-5 overflow-x-auto px-6 pb-3 scrollbar-none">
-          {genreBooks.map((book) => (
-            <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
-          ))}
-        </div>
-      </section>
-    );
-  })}
+  {/* Layout structure: Mixed Genre and Collections */}
+  <BookRail 
+    title={collections[0].title} 
+    subtitle={collections[0].subtitle} 
+    books={books.filter(collections[0].match)} 
+    progress={progress} 
+  />
+  
+  <BookRail 
+    title={genreLabels['folk-tales']} 
+    books={books.filter(b => b.genre === 'folk-tales')} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={genreLabels['historical']} 
+    books={books.filter(b => b.genre === 'historical')} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={collections[1].title} 
+    subtitle={collections[1].subtitle} 
+    books={books.filter(collections[1].match)} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={genreLabels['psychological']} 
+    books={books.filter(b => b.genre === 'psychological')} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={genreLabels['surreal']} 
+    books={books.filter(b => b.genre === 'surreal')} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={genreLabels['gothic']} 
+    books={books.filter(b => b.genre === 'gothic')} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={genreLabels['slice-of-life']} 
+    books={books.filter(b => b.genre === 'slice-of-life')} 
+    progress={progress} 
+  />
+
+  <BookRail 
+    title={collections[2].title} 
+    subtitle={collections[2].subtitle} 
+    books={books.filter(collections[2].match)} 
+    progress={progress} 
+  />
+
   </>
  )}
  </div>
