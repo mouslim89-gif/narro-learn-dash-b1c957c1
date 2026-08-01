@@ -25,15 +25,8 @@ export function DictionaryPreloader() {
         hydrateDictionaryForBook(book.id).catch(() => {});
         // Preload token chunks (src/data/book-tokens/*.ts)
         loadBookTokens(book.id).catch(() => {});
-        
-        // Preload grammar structures for current books (staggered)
-        setTimeout(() => {
-          const difficulties: ('simplified' | 'intermediate' | 'original')[] = ['simplified', 'intermediate', 'original'];
-          difficulties.forEach(diff => {
-            preloadGrammarForBook(book.id, diff).catch(() => {});
-          });
-        }, 3000);
       }
+
 
       // 3. Optional: Background fetch for everything else in the manifest
       // (in case there are shards for books not in the main 'books' array)
@@ -55,7 +48,10 @@ export function DictionaryPreloader() {
       const bookId = match[1].split('__')[0];
       hydrateDictionaryForBook(bookId).catch(() => {});
       loadBookTokens(bookId).catch(() => {});
+      // Grammar is only warmed for the book actually being opened.
+      preloadGrammarForBook(bookId).catch(() => {});
     }
+
   }, [location.pathname]);
 
   return null;
