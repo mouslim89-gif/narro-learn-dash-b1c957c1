@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Play, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+
 import { DelayedLink as Link } from '@/components/DelayedLink';
 import { useDelayedNav } from '@/hooks/use-delayed-nav';
 import type { Book } from '@/data/books';
