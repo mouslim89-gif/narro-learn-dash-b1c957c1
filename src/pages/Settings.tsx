@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
 import { useOnboardingStore } from '@/stores/onboarding';
 import { Button } from '@/components/ui/button';
+import { useFlashcardStore } from '@/stores/flashcards';
 import { HelpCircle, RefreshCw, Wrench } from 'lucide-react';
 import { useIsAdmin } from '@/lib/admin';
 
@@ -51,6 +52,7 @@ export default function Settings() {
   const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
   const { user, signOut } = useAuth();
+  const { dailyGoal, setDailyGoal, dailyNewGoal, setDailyNewGoal } = useFlashcardStore();
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
@@ -178,6 +180,50 @@ export default function Settings() {
             <div className="flex items-center justify-between px-4 py-4">
               <Label htmlFor="furigana" className="text-[15px] font-medium">Show furigana</Label>
               <Switch id="furigana" checked={showFurigana} onCheckedChange={setShowFurigana} />
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <Label className="text-[15px] font-medium">Reviews / day</Label>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Main daily goal</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setDailyGoal(Math.max(5, dailyGoal - 5))}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-lg font-bold tap-scale-sm"
+                >
+                  -
+                </button>
+                <span className="w-8 text-center font-serif font-bold">{dailyGoal}</span>
+                <button 
+                  onClick={() => setDailyGoal(dailyGoal + 5)}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-lg font-bold tap-scale-sm"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <Label className="text-[15px] font-medium">New cards / day</Label>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Daily intake goal</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setDailyNewGoal(Math.max(1, dailyNewGoal - 1))}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-lg font-bold tap-scale-sm"
+                >
+                  -
+                </button>
+                <span className="w-8 text-center font-serif font-bold">{dailyNewGoal}</span>
+                <button 
+                  onClick={() => setDailyNewGoal(dailyNewGoal + 1)}
+                  className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-lg font-bold tap-scale-sm"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
         </section>
