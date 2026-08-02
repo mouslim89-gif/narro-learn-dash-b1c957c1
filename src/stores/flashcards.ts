@@ -28,10 +28,13 @@ interface FlashcardStore {
   isReviewing: boolean;
   syncUserId: string | null;
   dailyGoal: number;
+  dailyNewGoal: number;
   reviewedToday: { date: string; count: number };
+  newToday: { date: string; count: number };
   history: { date: string; count: number }[];
   setIsReviewing: (v: boolean) => void;
   setDailyGoal: (v: number) => void;
+  setDailyNewGoal: (v: number) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
   removeWord: (id: string) => void;
   attachContext: (id: string, context: { sentence?: string; tokens?: { t: string; r?: string }[] }) => void;
@@ -42,6 +45,7 @@ interface FlashcardStore {
   getDueCount: () => number;
   getDueWords: () => SavedWord[];
   getReviewedTodayCount: () => number;
+  getNewTodayCount: () => number;
   // Sync helpers
   hydrateWords: (words: SavedWord[], userId: string) => void;
   clearWords: () => void;
@@ -73,10 +77,13 @@ export const useFlashcardStore = create<FlashcardStore>()(
       isReviewing: false,
       syncUserId: null,
       dailyGoal: 10,
+      dailyNewGoal: 5,
       reviewedToday: { date: new Date().toISOString().split('T')[0], count: 0 },
+      newToday: { date: new Date().toISOString().split('T')[0], count: 0 },
       history: [],
       setIsReviewing: (v) => set({ isReviewing: v }),
       setDailyGoal: (v) => set({ dailyGoal: v }),
+      setDailyNewGoal: (v) => set({ dailyNewGoal: v }),
       addWord: (entry) => {
         if (get().savedWords.find(w => w.id === entry.id)) return;
         const newWord: SavedWord = {
@@ -143,12 +150,22 @@ export const useFlashcardStore = create<FlashcardStore>()(
         const currentReviewed = get().reviewedToday;
         const newCount = currentReviewed.date === today ? currentReviewed.count + 1 : 1;
 
+        const currentNew = get().newToday;
+        let isFirstReview = false;
+
         const updated = get().savedWords.map(w => {
           if (w.id !== id) return w;
           const migrated = migrateCard(w);
+          if (migrated.reps === 0 && quality !== 'again') {
+            isFirstReview = true;
+          }
           const result = applyReview(migrated, QUALITY_MAP[quality]);
           return { ...migrated, ...result };
         });
+
+        const newTodayCount = isFirstReview 
+          ? (currentNew.date === today ? currentNew.count + 1 : 1)
+          : (currentNew.date === today ? currentNew.count : 0);
 
         // Update history
         let newHistory = [...get().history];
@@ -163,6 +180,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
         set({ 
           savedWords: updated,
           reviewedToday: { date: today, count: newCount },
+          newToday: { date: today, count: newTodayCount },
           history: newHistory
         });
         
@@ -183,6 +201,11 @@ export const useFlashcardStore = create<FlashcardStore>()(
         const reviewed = get().reviewedToday;
         return reviewed.date === today ? reviewed.count : 0;
       },
+      getNewTodayCount: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const current = get().newToday;
+        return current.date === today ? current.count : 0;
+      },
  hydrateWords: (words, userId) => set({
  savedWords: words.map(migrateCard),
  syncUserId: userId,
@@ -198,7 +221,9 @@ export const useFlashcardStore = create<FlashcardStore>()(
     partialize: (state) => ({ 
       savedWords: state.savedWords,
       dailyGoal: state.dailyGoal,
+      dailyNewGoal: state.dailyNewGoal,
       reviewedToday: state.reviewedToday,
+      newToday: state.newToday,
       history: state.history
     }),
  onRehydrateStorage: () => (state) => {
