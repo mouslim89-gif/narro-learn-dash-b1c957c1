@@ -153,7 +153,7 @@ export function ReaderTutorial() {
   return (
     <div className="fixed inset-0 z-[110] overflow-hidden animate-fade-in-soft pointer-events-none">
       {/* Real spotlight cut-out using box-shadow */}
-      {box && (
+      {box && !popupOpen && (
         <div
           className="absolute rounded-xl pointer-events-none"
           style={{
@@ -168,7 +168,7 @@ export function ReaderTutorial() {
       )}
 
       {/* Pulsing ring halo for interactive step */}
-      {box && currentStep.isInteractive && (
+      {box && currentStep.isInteractive && !popupOpen && (
         <div
           className="absolute rounded-xl ring-2 ring-accent animate-tutorial-pulse pointer-events-none"
           style={{
@@ -183,16 +183,18 @@ export function ReaderTutorial() {
 
       {/* Click blocking layers — only blocked outside the cut-out on interactive steps */}
       {currentStep.isInteractive ? (
-        <>
-          {/* Top */}
-          <div className="absolute top-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ height: highlight.top }} />
-          {/* Bottom */}
-          <div className="absolute bottom-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top + highlight.height }} />
-          {/* Left */}
-          <div className="absolute left-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, width: highlight.left }} />
-          {/* Right */}
-          <div className="absolute right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, left: highlight.left + highlight.width }} />
-        </>
+        popupOpen ? null : (
+          <>
+            {/* Top */}
+            <div className="absolute top-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ height: highlight.top }} />
+            {/* Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top + highlight.height }} />
+            {/* Left */}
+            <div className="absolute left-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, width: highlight.left }} />
+            {/* Right */}
+            <div className="absolute right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, left: highlight.left + highlight.width }} />
+          </>
+        )
       ) : (
         <div className="absolute inset-0 pointer-events-auto bg-transparent" />
       )}
