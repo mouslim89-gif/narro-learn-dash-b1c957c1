@@ -57,8 +57,7 @@ export function ReaderTutorial() {
   const [box, setBox] = useState<Box | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [showSkipInteraction, setShowSkipInteraction] = useState(false);
-  const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const currentStep = readerSteps[stepIndex];
   const active = !dismissed && (!hasSeenReaderTutorial || alwaysReplayOnboarding) && isVisible;
