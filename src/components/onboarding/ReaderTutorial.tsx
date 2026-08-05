@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/stores/onboarding';
 import { X, ChevronLeft } from 'lucide-react';
@@ -57,8 +57,7 @@ export function ReaderTutorial() {
   const [box, setBox] = useState<Box | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [showSkipInteraction, setShowSkipInteraction] = useState(false);
-  const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const currentStep = readerSteps[stepIndex];
   const active = !dismissed && (!hasSeenReaderTutorial || alwaysReplayOnboarding) && isVisible;
@@ -116,23 +115,21 @@ export function ReaderTutorial() {
     };
   }, [active, stepIndex, currentStep.selector]);
 
-  // Interactive step: advance once the mini popup opens
+  // Interactive step: detect the mini popup so we can stop dimming (no auto-advance)
   useEffect(() => {
-    if (!active || !currentStep.isInteractive) return;
+    if (!active || !currentStep.isInteractive) {
+      setPopupOpen(false);
+      return;
+    }
 
-    setShowSkipInteraction(false);
-    skipTimerRef.current = setTimeout(() => setShowSkipInteraction(true), 6000);
-
-    const interval = setInterval(() => {
-      const popup = document.querySelector('.animate-mini-slide-up, .animate-mini-slide-down');
-      if (popup) handleNext();
-    }, 200);
-
-    return () => {
-      clearInterval(interval);
-      if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
-    };
-  }, [active, stepIndex, currentStep.isInteractive, handleNext]);
+    const check = () =>
+      setPopupOpen(
+        !!document.querySelector('.animate-mini-slide-up, .animate-mini-slide-down'),
+      );
+    check();
+    const interval = setInterval(check, 200);
+    return () => clearInterval(interval);
+  }, [active, stepIndex, currentStep.isInteractive]);
 
   if (!active) return null;
 
@@ -156,7 +153,7 @@ export function ReaderTutorial() {
   return (
     <div className="fixed inset-0 z-[110] overflow-hidden animate-fade-in-soft pointer-events-none">
       {/* Real spotlight cut-out using box-shadow */}
-      {box && (
+      {box && !popupOpen && (
         <div
           className="absolute rounded-xl pointer-events-none"
           style={{
@@ -171,7 +168,7 @@ export function ReaderTutorial() {
       )}
 
       {/* Pulsing ring halo for interactive step */}
-      {box && currentStep.isInteractive && (
+      {box && currentStep.isInteractive && !popupOpen && (
         <div
           className="absolute rounded-xl ring-2 ring-accent animate-tutorial-pulse pointer-events-none"
           style={{
@@ -186,16 +183,18 @@ export function ReaderTutorial() {
 
       {/* Click blocking layers — only blocked outside the cut-out on interactive steps */}
       {currentStep.isInteractive ? (
-        <>
-          {/* Top */}
-          <div className="absolute top-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ height: highlight.top }} />
-          {/* Bottom */}
-          <div className="absolute bottom-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top + highlight.height }} />
-          {/* Left */}
-          <div className="absolute left-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, width: highlight.left }} />
-          {/* Right */}
-          <div className="absolute right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, left: highlight.left + highlight.width }} />
-        </>
+        popupOpen ? null : (
+          <>
+            {/* Top */}
+            <div className="absolute top-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ height: highlight.top }} />
+            {/* Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top + highlight.height }} />
+            {/* Left */}
+            <div className="absolute left-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, width: highlight.left }} />
+            {/* Right */}
+            <div className="absolute right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, left: highlight.left + highlight.width }} />
+          </>
+        )
       ) : (
         <div className="absolute inset-0 pointer-events-auto bg-transparent" />
       )}
