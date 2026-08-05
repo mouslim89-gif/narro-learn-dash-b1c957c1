@@ -1,38 +1,33 @@
-# Reader onboarding — refonte fluide
+# Reader tutorial — fix spotlight + simplify overlay
 
-Refonte du tutoriel du reader : spotlight doux, transitions en spring, tap n'importe où pour avancer, et une première étape réellement interactive.
+## The bug
 
-## Ce qui change
+The spotlight hole is always stuck in the top-left corner. Cause: the SVG mask uses `motion.rect` animated on `x` / `y` / `width` / `height` / `rx`. Framer Motion treats `x` and `y` as CSS transforms, not SVG attributes, so the mask rect never moves to the target — it stays at coordinate 0,0 (top-left) with an animated transform that the mask ignores.
 
-**1. Spotlight animé**
-- Overlay sombre percé d'un trou arrondi (radius suivant l'élément visé) au lieu du `clip-path` rectangulaire actuel.
-- Le trou se déplace en douceur d'une étape à l'autre (spring), avec un anneau ambre discret qui pulse autour de la cible.
-- Léger flou sur l'overlay pour un rendu plus soigné.
+## What changes
 
-**2. Bulle plus fluide**
-- La bulle ne disparaît plus entre les étapes : elle glisse vers la nouvelle position (spring, easing Tsundoku).
-- Le texte à l'intérieur fait un cross-fade rapide.
-- Style aligné à l'app : carte `rounded-2xl`, titre `font-serif`, label d'étape en petites capitales trackées, bouton pill.
-- Flèche correctement recalée sur le centre de la cible, et bulle placée au-dessus ou en dessous automatiquement selon la place disponible.
-- Points de progression (dots) au lieu du texte « Step 1/5 ».
+**1. Remove the mask/blur entirely**
+- Back to a plain darkening: one `bg-black/50` overlay, no `backdrop-blur`, no SVG mask, nothing hidden.
+- The target is made to stand out by a highlight box drawn on top of the overlay (transparent inside, subtle amber ring + soft glow), positioned exactly on the target — no more cut-out geometry to get wrong.
 
-**3. Navigation**
-- Tap n'importe où sur l'overlay = étape suivante (avec un indice discret « Tap to continue »).
-- Bouton Continue conservé + Skip en haut à droite.
-- Retour arrière possible via un chevron discret.
+**2. Correct positioning**
+- The highlight box and the tooltip are positioned with plain inline `top` / `left` / `width` / `height` styles from `getBoundingClientRect()`, with a CSS transition for smoothness — so no transform/attribute mismatch is possible.
+- The tooltip arrow is aligned on the real center of the target, clamped inside the card.
 
-**4. Étape 1 interactive**
-- L'étape « tap a word » attend un vrai tap sur un mot : le trou du spotlight laisse passer le clic sur le token visé, et le tutoriel passe à l'étape suivante dès que le mini-popup s'ouvre.
-- Fallback : si l'utilisateur ne tape pas après ~6 s, un bouton « Skip this step » apparaît, pour ne jamais bloquer.
+**3. Remove "Tap anywhere to continue"**
+- Hint text removed, and tapping the overlay no longer advances. Navigation stays: Continue button, back chevron, X to skip (plus the interactive first step, which still advances when a word is tapped).
 
-**5. Corrections de fluidité**
-- Suppression du `setInterval` à 500 ms (repositionnement via `requestAnimationFrame` uniquement pendant les transitions + listeners resize/scroll).
-- Le `scrollIntoView` ne se déclenche que si la cible est hors écran, ce qui supprime les remontées de page intempestives.
-- Respect de `prefers-reduced-motion` : transitions instantanées.
+**4. Cleanup**
+- Remove the 100 ms `setInterval` reposition loop; reposition on resize/scroll and on step change only.
 
-## Détails techniques
+## Technical notes
 
-- Fichier principal : `src/components/onboarding/ReaderTutorial.tsx` (réécriture).
-- Spotlight : overlay SVG avec `mask` (rect plein + rect arrondi noir) pour un trou aux coins arrondis, animé via `motion` sur x/y/width/height.
-- Interactivité étape 1 : `pointer-events-none` sur la zone du trou, détection de la progression en observant l'ouverture du mini-popup (attribut/événement custom émis par le token déjà marqué `data-tutorial="token"`), sinon fallback sur un `click` capturé sur la cible.
-- Aucun changement de logique métier ; `src/stores/onboarding.ts` inchangé. Un seul petit ajout possible dans `src/pages/Reader.tsx` : émettre un événement quand un mot est tapé, si aucun signal exploitable n'existe déjà.
+- File touched: `src/components/onboarding/ReaderTutorial.tsx` only.
+- Highlight element: absolutely positioned `div` with `rounded-xl ring-2 ring-accent/70 shadow-[0_0_0_9999px_transparent]`, `pointer-events-none`, animated via `transition-all duration-300 var(--ease-out-soft)`.
+- Overlay stays `pointer-events-auto` to block accidental reader taps, except on the interactive step where the target area stays tappable.
+
+## Variations available (say which you prefer, default is A)
+
+- **A — Darkening + amber ring** (default): simple dim, target ringed.
+- **B — Darkening only**: no ring at all, only the tooltip arrow points at the target.
+- **C — Darkening + soft glow**: dim plus a diffuse light halo behind the target instead of a hard ring.
