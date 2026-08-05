@@ -154,7 +154,7 @@ export function ReaderTutorial() {
   const transitionStyle = { transition: 'all 300ms cubic-bezier(0.22, 1, 0.36, 1)' };
 
   return (
-    <div className="fixed inset-0 z-[110] overflow-hidden animate-fade-in-soft">
+    <div className="fixed inset-0 z-[110] overflow-hidden animate-fade-in-soft pointer-events-none">
       {/* Real spotlight cut-out using box-shadow */}
       {box && (
         <div
