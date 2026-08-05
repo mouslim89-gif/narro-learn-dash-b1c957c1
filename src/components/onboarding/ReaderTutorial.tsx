@@ -155,18 +155,25 @@ export function ReaderTutorial() {
 
   return (
     <div className="fixed inset-0 z-[110] overflow-hidden animate-fade-in-soft">
-      {/* Simple darkening — nothing hidden */}
-      <div
-        className={cn(
-          'absolute inset-0 bg-black/50',
-          currentStep.isInteractive ? 'pointer-events-none' : 'pointer-events-auto',
-        )}
-      />
-
-      {/* Target highlight ring */}
+      {/* Real spotlight cut-out using box-shadow */}
       {box && (
         <div
-          className="absolute rounded-xl ring-2 ring-accent/70 pointer-events-none"
+          className="absolute rounded-xl pointer-events-none"
+          style={{
+            top: highlight.top,
+            left: highlight.left,
+            width: highlight.width,
+            height: highlight.height,
+            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+            ...transitionStyle,
+          }}
+        />
+      )}
+
+      {/* Pulsing ring halo for interactive step */}
+      {box && currentStep.isInteractive && (
+        <div
+          className="absolute rounded-xl ring-2 ring-accent animate-tutorial-pulse pointer-events-none"
           style={{
             top: highlight.top,
             left: highlight.left,
@@ -175,6 +182,22 @@ export function ReaderTutorial() {
             ...transitionStyle,
           }}
         />
+      )}
+
+      {/* Click blocking layers — only blocked outside the cut-out on interactive steps */}
+      {currentStep.isInteractive ? (
+        <>
+          {/* Top */}
+          <div className="absolute top-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ height: highlight.top }} />
+          {/* Bottom */}
+          <div className="absolute bottom-0 left-0 right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top + highlight.height }} />
+          {/* Left */}
+          <div className="absolute left-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, width: highlight.left }} />
+          {/* Right */}
+          <div className="absolute right-0 pointer-events-auto bg-transparent" style={{ top: highlight.top, height: highlight.height, left: highlight.left + highlight.width }} />
+        </>
+      ) : (
+        <div className="absolute inset-0 pointer-events-auto bg-transparent" />
       )}
 
       {/* Tooltip card */}
@@ -216,9 +239,11 @@ export function ReaderTutorial() {
                 Skip
               </Button>
             )}
-            <Button onClick={handleNext} className="rounded-full px-6 font-semibold shadow-md btn-tsundoku-premium">
-              {stepIndex === readerSteps.length - 1 ? 'Start Reading' : 'Continue'}
-            </Button>
+            {!currentStep.isInteractive && (
+              <Button onClick={handleNext} className="rounded-full px-6 font-semibold shadow-md btn-tsundoku-premium">
+                {stepIndex === readerSteps.length - 1 ? 'Start Reading' : 'Continue'}
+              </Button>
+            )}
           </div>
         </div>
 
