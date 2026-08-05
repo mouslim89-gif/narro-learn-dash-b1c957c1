@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/stores/onboarding';
 import { X, ChevronLeft } from 'lucide-react';
