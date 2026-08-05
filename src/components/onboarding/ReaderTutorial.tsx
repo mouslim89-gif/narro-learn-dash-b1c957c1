@@ -16,8 +16,8 @@ interface TutorialStep {
 const readerSteps: TutorialStep[] = [
   {
     selector: '[data-tutorial="token"]',
-    title: "The heart of Tsundoku 📖",
-    description: "Tap any word to see its definition, reading (furigana), and grammar function.",
+    title: "Tap a word 📖",
+    description: "The heart of Tsundoku. Tap any word to see its definition, reading (furigana), and grammar function.",
     position: 'bottom',
     isInteractive: true,
   },
