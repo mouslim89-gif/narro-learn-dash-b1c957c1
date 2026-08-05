@@ -234,16 +234,9 @@ export function ReaderTutorial() {
             )}
           </div>
           <div className="flex items-center gap-2">
-            {currentStep.isInteractive && showSkipInteraction && (
-              <Button variant="ghost" size="sm" onClick={handleNext} className="text-xs text-muted-foreground">
-                Skip
-              </Button>
-            )}
-            {!currentStep.isInteractive && (
-              <Button onClick={handleNext} className="rounded-full px-6 font-semibold shadow-md btn-tsundoku-premium">
-                {stepIndex === readerSteps.length - 1 ? 'Start Reading' : 'Continue'}
-              </Button>
-            )}
+            <Button onClick={handleNext} className="rounded-full px-6 font-semibold shadow-md btn-tsundoku-premium">
+              {stepIndex === readerSteps.length - 1 ? 'Start Reading' : 'Continue'}
+            </Button>
           </div>
         </div>
 
