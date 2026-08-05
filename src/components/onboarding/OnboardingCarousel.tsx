@@ -128,7 +128,7 @@ export function OnboardingCarousel() {
           <Button
             variant="ghost"
             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
-            onClick={completeCarousel}
+            onClick={dismiss}
           >
             Skip
           </Button>
