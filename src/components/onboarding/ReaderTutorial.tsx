@@ -56,11 +56,12 @@ export function ReaderTutorial() {
   const [stepIndex, setStepIndex] = useState(0);
   const [box, setBox] = useState<Box | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [showSkipInteraction, setShowSkipInteraction] = useState(false);
   const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentStep = readerSteps[stepIndex];
-  const active = (!hasSeenReaderTutorial || alwaysReplayOnboarding) && isVisible;
+  const active = !dismissed && (!hasSeenReaderTutorial || alwaysReplayOnboarding) && isVisible;
 
   useEffect(() => {
     if (hasSeenReaderTutorial && !alwaysReplayOnboarding) return;
@@ -68,23 +69,23 @@ export function ReaderTutorial() {
     return () => clearTimeout(timer);
   }, [hasSeenReaderTutorial, alwaysReplayOnboarding]);
 
-  const handleNext = useCallback(() => {
-    setStepIndex((prev) => {
-      if (prev === readerSteps.length - 1) {
-        completeReaderTutorial();
-        setIsVisible(false);
-        return prev;
-      }
-      return prev + 1;
-    });
+  const close = useCallback(() => {
+    completeReaderTutorial();
+    setIsVisible(false);
+    setDismissed(true);
   }, [completeReaderTutorial]);
+
+  const handleNext = useCallback(() => {
+    if (stepIndex === readerSteps.length - 1) {
+      close();
+    } else {
+      setStepIndex((prev) => prev + 1);
+    }
+  }, [stepIndex, close]);
 
   const handlePrev = () => setStepIndex((prev) => Math.max(0, prev - 1));
 
-  const handleSkip = () => {
-    completeReaderTutorial();
-    setIsVisible(false);
-  };
+  const handleSkip = () => close();
 
   // Track the target element position
   useEffect(() => {

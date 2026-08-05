@@ -35,12 +35,20 @@ const slides = [
 export function OnboardingCarousel() {
   const { hasCompletedCarousel, completeCarousel, alwaysReplayOnboarding } = useOnboardingStore();
   const [currentSlide, setCurrentSlide] = useState(0);
+  // Local dismissal: with "always replay" on, the store flag stays false,
+  // so we need a session-level close.
+  const [dismissed, setDismissed] = useState(false);
 
-  if (hasCompletedCarousel && !alwaysReplayOnboarding) return null;
+  const dismiss = () => {
+    completeCarousel();
+    setDismissed(true);
+  };
+
+  if (dismissed || (hasCompletedCarousel && !alwaysReplayOnboarding)) return null;
 
   const nextSlide = () => {
     if (currentSlide === slides.length - 1) {
-      completeCarousel();
+      dismiss();
     } else {
       setCurrentSlide((prev) => prev + 1);
     }
@@ -120,7 +128,7 @@ export function OnboardingCarousel() {
           <Button
             variant="ghost"
             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
-            onClick={completeCarousel}
+            onClick={dismiss}
           >
             Skip
           </Button>
