@@ -116,23 +116,21 @@ export function ReaderTutorial() {
     };
   }, [active, stepIndex, currentStep.selector]);
 
-  // Interactive step: advance once the mini popup opens
+  // Interactive step: detect the mini popup so we can stop dimming (no auto-advance)
   useEffect(() => {
-    if (!active || !currentStep.isInteractive) return;
+    if (!active || !currentStep.isInteractive) {
+      setPopupOpen(false);
+      return;
+    }
 
-    setShowSkipInteraction(false);
-    skipTimerRef.current = setTimeout(() => setShowSkipInteraction(true), 6000);
-
-    const interval = setInterval(() => {
-      const popup = document.querySelector('.animate-mini-slide-up, .animate-mini-slide-down');
-      if (popup) handleNext();
-    }, 200);
-
-    return () => {
-      clearInterval(interval);
-      if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
-    };
-  }, [active, stepIndex, currentStep.isInteractive, handleNext]);
+    const check = () =>
+      setPopupOpen(
+        !!document.querySelector('.animate-mini-slide-up, .animate-mini-slide-down'),
+      );
+    check();
+    const interval = setInterval(check, 200);
+    return () => clearInterval(interval);
+  }, [active, stepIndex, currentStep.isInteractive]);
 
   if (!active) return null;
 
