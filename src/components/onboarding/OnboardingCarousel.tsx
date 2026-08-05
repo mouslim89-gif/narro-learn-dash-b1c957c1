@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/stores/onboarding';
 import { ChevronRight, ChevronLeft, BookOpen, MousePointer2, BrainCircuit, Star } from 'lucide-react';
@@ -35,6 +36,7 @@ const slides = [
 export function OnboardingCarousel() {
   const { hasCompletedCarousel, completeCarousel, alwaysReplayOnboarding } = useOnboardingStore();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const location = useLocation();
   // Local dismissal: with "always replay" on, the store flag stays false,
   // so we need a session-level close.
   const [dismissed, setDismissed] = useState(false);
@@ -44,7 +46,9 @@ export function OnboardingCarousel() {
     setDismissed(true);
   };
 
-  if (dismissed || (hasCompletedCarousel && !alwaysReplayOnboarding)) return null;
+  const isReader = location.pathname.startsWith('/reader/');
+
+  if (dismissed || isReader || (hasCompletedCarousel && !alwaysReplayOnboarding)) return null;
 
   const nextSlide = () => {
     if (currentSlide === slides.length - 1) {
