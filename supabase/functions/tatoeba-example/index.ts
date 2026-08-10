@@ -235,12 +235,23 @@ Deno.serve(async (req) => {
     }
 
     if (best.length > 0) {
+      // Merge with whatever was already cached so a small request (e.g. the word
+      // popup asking for 1 example) never shrinks the stored set.
+      const previous: Sentence[] = Array.isArray(cached?.sentences) ? cached!.sentences as Sentence[] : [];
+      const merged: Sentence[] = [];
+      const seenJp = new Set<string>();
+      for (const s of [...best, ...previous]) {
+        if (!s?.japanese || seenJp.has(s.japanese)) continue;
+        seenJp.add(s.japanese);
+        merged.push(s);
+      }
+
       await supabase.from('example_sentences').upsert({
         word,
         japanese: best[0].japanese,
         english: best[0].english,
         tokens: best[0].tokens,
-        sentences: best,
+        sentences: merged,
       });
     }
 
