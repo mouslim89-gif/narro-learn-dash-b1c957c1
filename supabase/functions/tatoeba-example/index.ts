@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
     const altWordRaw: unknown = body.altWord;
     const altWord = typeof altWordRaw === 'string' && altWordRaw.length > 0 && altWordRaw.length <= 50 ? altWordRaw : null;
     const rawLimit = Number(body.limit ?? 1);
-    const limit = Math.max(1, Math.min(5, Number.isFinite(rawLimit) ? rawLimit : 1));
+    const limit = Math.max(1, Math.min(12, Number.isFinite(rawLimit) ? rawLimit : 1));
 
     if (!word || typeof word !== 'string' || word.length > 50) {
       return new Response(
