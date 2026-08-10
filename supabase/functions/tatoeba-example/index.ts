@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
     const altWordRaw: unknown = body.altWord;
     const altWord = typeof altWordRaw === 'string' && altWordRaw.length > 0 && altWordRaw.length <= 50 ? altWordRaw : null;
     const rawLimit = Number(body.limit ?? 1);
-    const limit = Math.max(1, Math.min(5, Number.isFinite(rawLimit) ? rawLimit : 1));
+    const limit = Math.max(1, Math.min(12, Number.isFinite(rawLimit) ? rawLimit : 1));
 
     if (!word || typeof word !== 'string' || word.length > 50) {
       return new Response(
@@ -171,11 +171,15 @@ Deno.serve(async (req) => {
           ? [{ japanese: cached.japanese, english: cached.english || '', tokens: cached.tokens as Token[] }]
           : [];
 
-      const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
-      const shorts = filtered.filter((s) => isShortEnough(s.japanese));
+      const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese) && !!s.tokens);
       const best = pickBest(filtered, limit);
 
-      if (shorts.length > 0 && best.length >= limit && best.every(b => !!b.tokens)) {
+      // Serve straight from cache as soon as we have enough tokenized matches.
+      // (Previously we also required a "short" sentence, and the client inflated
+      // the limit ×4, so almost every request missed the cache and re-ran
+      // Tatoeba + AI tokenization.)
+      if (best.length >= limit) {
+
         return new Response(
           JSON.stringify({
             japanese: best[0]?.japanese ?? null,
@@ -187,6 +191,7 @@ Deno.serve(async (req) => {
         );
       }
       // If we have cached sentences but no tokens, we proceed to re-tokenize
+
     }
 
     // 2. Query Tatoeba or use existing cache
@@ -230,12 +235,23 @@ Deno.serve(async (req) => {
     }
 
     if (best.length > 0) {
+      // Merge with whatever was already cached so a small request (e.g. the word
+      // popup asking for 1 example) never shrinks the stored set.
+      const previous: Sentence[] = Array.isArray(cached?.sentences) ? cached!.sentences as Sentence[] : [];
+      const merged: Sentence[] = [];
+      const seenJp = new Set<string>();
+      for (const s of [...best, ...previous]) {
+        if (!s?.japanese || seenJp.has(s.japanese)) continue;
+        seenJp.add(s.japanese);
+        merged.push(s);
+      }
+
       await supabase.from('example_sentences').upsert({
         word,
         japanese: best[0].japanese,
         english: best[0].english,
         tokens: best[0].tokens,
-        sentences: best,
+        sentences: merged,
       });
     }
 
