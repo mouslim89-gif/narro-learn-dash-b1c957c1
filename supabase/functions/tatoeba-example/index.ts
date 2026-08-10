@@ -171,11 +171,13 @@ Deno.serve(async (req) => {
           ? [{ japanese: cached.japanese, english: cached.english || '', tokens: cached.tokens as Token[] }]
           : [];
 
-      const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese));
-      const shorts = filtered.filter((s) => isShortEnough(s.japanese));
+      const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese) && !!s.tokens);
       const best = pickBest(filtered, limit);
 
-      if (shorts.length > 0 && best.length >= limit && best.every(b => !!b.tokens)) {
+      // Serve straight from cache as soon as we have at least one tokenized match.
+      // (Previously we required best.length >= limit, which made almost every
+      // request miss the cache and re-run Tatoeba + AI tokenization.)
+      if (best.length > 0) {
         return new Response(
           JSON.stringify({
             japanese: best[0]?.japanese ?? null,
@@ -187,6 +189,7 @@ Deno.serve(async (req) => {
         );
       }
       // If we have cached sentences but no tokens, we proceed to re-tokenize
+
     }
 
     // 2. Query Tatoeba or use existing cache
