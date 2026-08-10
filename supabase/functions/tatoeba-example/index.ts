@@ -174,10 +174,12 @@ Deno.serve(async (req) => {
       const filtered = cachedSentences.filter((s) => matchesTarget(s.japanese) && !!s.tokens);
       const best = pickBest(filtered, limit);
 
-      // Serve straight from cache as soon as we have at least one tokenized match.
-      // (Previously we required best.length >= limit, which made almost every
-      // request miss the cache and re-run Tatoeba + AI tokenization.)
-      if (best.length > 0) {
+      // Serve straight from cache as soon as we have enough tokenized matches.
+      // (Previously we also required a "short" sentence, and the client inflated
+      // the limit ×4, so almost every request missed the cache and re-ran
+      // Tatoeba + AI tokenization.)
+      if (best.length >= limit) {
+
         return new Response(
           JSON.stringify({
             japanese: best[0]?.japanese ?? null,
