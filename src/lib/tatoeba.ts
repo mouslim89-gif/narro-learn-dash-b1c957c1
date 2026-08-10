@@ -50,10 +50,10 @@ export async function fetchExamples(word: string, limit = 3, altWord?: string): 
   }
 
   try {
-    // Fetch more than requested to allow for filtering of compounds
-    const fetchLimit = limit * 4;
+    // The edge function already filters compounds server-side, so ask for exactly
+    // what we need — inflating the limit made every request miss the DB cache.
     const { data, error } = await supabase.functions.invoke('tatoeba-example', {
-      body: { word, limit: fetchLimit, altWord },
+      body: { word, limit, altWord },
     });
 
     if (error) {
