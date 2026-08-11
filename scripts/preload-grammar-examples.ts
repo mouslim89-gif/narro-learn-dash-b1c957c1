@@ -1,4 +1,12 @@
-
+/**
+ * One-off backfill of the `grammar_examples` cache.
+ *
+ * Calls the `grammar-examples` edge function once per unique grammar pattern.
+ * The edge function returns its DB cache when the pattern already exists, so
+ * re-running this script is safe and costs no AI credits for done patterns.
+ *
+ * Usage: npx tsx scripts/preload-grammar-examples.ts
+ */
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -29,69 +37,97 @@ interface GrammarNote {
   jlpt: string;
 }
 
+function slugify(pattern: string): string {
+  return pattern
+    .toLowerCase()
+    .trim()
+    .replace(/[^\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf0-9a-z]/g, '-');
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** One request with exponential backoff on 429 / 5xx. */
+async function requestWithRetry(note: GrammarNote, maxAttempts = 5): Promise<'ok' | 'failed'> {
+  let delay = 2000;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/grammar-examples`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: AUTH_HEADER,
+          apikey: SUPABASE_KEY,
+        },
+        body: JSON.stringify({ pattern: note.pattern, meaning: note.meaning, jlpt: note.jlpt }),
+      });
+
+      if (resp.ok) {
+        await resp.json().catch(() => null);
+        return 'ok';
+      }
+
+      const body = await resp.text();
+      const retryable = resp.status === 429 || resp.status >= 500;
+      console.error(`  ! [${note.pattern}] ${resp.status} ${body.slice(0, 140)}`);
+      if (!retryable || attempt === maxAttempts) return 'failed';
+    } catch (e) {
+      console.error(`  ! [${note.pattern}] ${(e as Error).message}`);
+      if (attempt === maxAttempts) return 'failed';
+    }
+    await sleep(delay);
+    delay = Math.min(delay * 2, 30000);
+  }
+  return 'failed';
+}
+
 async function main() {
   const grammarPath = path.resolve(__dirname, '../src/data/book-grammar.ts');
   const grammarSrc = fs.readFileSync(grammarPath, 'utf-8');
-  
+
   const startIdx = grammarSrc.indexOf('= {') + 2;
   const endIdx = grammarSrc.lastIndexOf('};') + 1;
-  const jsonStr = grammarSrc.slice(startIdx, endIdx);
-  const bookGrammar = JSON.parse(jsonStr);
+  const bookGrammar = JSON.parse(grammarSrc.slice(startIdx, endIdx));
 
   const notesMap = new Map<string, GrammarNote>();
-  
   for (const bookId in bookGrammar) {
     for (const diff in bookGrammar[bookId]) {
       const parts = bookGrammar[bookId][diff];
-      const flatNotes = Array.isArray(parts[0]) ? parts.flat() : parts;
-      
+      const flatNotes: GrammarNote[] = Array.isArray(parts[0]) ? parts.flat() : parts;
       for (const note of flatNotes) {
-        const slug = note.pattern.toLowerCase().trim().replace(/[^\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf0-9a-z]/g, '-');
-        if (!notesMap.has(slug)) {
-          notesMap.set(slug, note);
-        }
+        const slug = slugify(note.pattern);
+        if (!notesMap.has(slug)) notesMap.set(slug, note);
       }
     }
   }
 
-  const allNotes = Array.from(notesMap.values());
-  console.log(`Found ${allNotes.length} unique grammar patterns. Processing first 50...`);
+  const allNotes = [...notesMap.values()];
+  console.log(`Found ${allNotes.length} unique grammar patterns.\n`);
 
-  const BATCH_SIZE = 5;
-  const LIMIT = 50; 
-  const subset = allNotes.slice(0, LIMIT);
+  let ok = 0;
+  let failed = 0;
+  const failures: string[] = [];
 
-  for (let i = 0; i < subset.length; i += BATCH_SIZE) {
-    const batch = subset.slice(i, i + BATCH_SIZE);
-    console.log(`Batch ${i/BATCH_SIZE + 1}/${subset.length/BATCH_SIZE}...`);
-
-    await Promise.all(batch.map(async (note) => {
-      try {
-        const resp = await fetch(`${SUPABASE_URL}/functions/v1/grammar-examples`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': AUTH_HEADER,
-            'apikey': SUPABASE_KEY,
-          },
-          body: JSON.stringify({
-            pattern: note.pattern,
-            meaning: note.meaning,
-            jlpt: note.jlpt
-          }),
-        });
-
-        if (!resp.ok) {
-          console.error(`  → Error [${note.pattern}]: ${resp.status}`);
-        }
-      } catch (e) {
-        console.error(`  → Failed [${note.pattern}]: ${e.message}`);
-      }
-    }));
-    await new Promise(r => setTimeout(r, 1000));
+  for (let i = 0; i < allNotes.length; i++) {
+    const note = allNotes[i];
+    process.stdout.write(`[${i + 1}/${allNotes.length}] ${note.pattern} … `);
+    const res = await requestWithRetry(note);
+    if (res === 'ok') {
+      ok++;
+      console.log('ok');
+    } else {
+      failed++;
+      failures.push(note.pattern);
+      console.log('FAILED');
+    }
+    // Stay comfortably below the AI gateway rate limit.
+    await sleep(1000);
   }
 
-  console.log('\nSubset preload complete!');
+  console.log(`\nDone. ok=${ok} failed=${failed}`);
+  if (failures.length) {
+    console.log('Failed patterns (re-run the script to retry, cached ones are free):');
+    for (const p of failures) console.log(`  - ${p}`);
+  }
 }
 
 main().catch(console.error);

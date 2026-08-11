@@ -41,18 +41,22 @@ export default function GrammarDetail() {
     if (!note) return;
 
     const fetchAiExamples = async () => {
-      // Check local cache first
+      // Cache-first: a valid local entry means no network call and no AI cost.
       const cacheKey = `grammar_cache_${note.pattern}_${note.jlpt}`;
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          setExamples(parsed.examples || []);
-          setFormations(parsed.formations || []);
-          setLoadingMore(false);
-          
-          // Still fetch in background to refresh if needed, or just return
-          // return; 
+          if (Array.isArray(parsed.examples) && parsed.examples.length > 0) {
+            setExamples(parsed.examples);
+            setFormations(parsed.formations || []);
+            setLoadingMore(false);
+            preloadTranslations(
+              parsed.examples.map((ex: any) => ex.japanese),
+              { onProgress: (map) => setTranslations((prev) => new Map([...prev, ...map])) },
+            );
+            return;
+          }
         } catch (e) {
           console.error("Failed to parse grammar cache", e);
         }

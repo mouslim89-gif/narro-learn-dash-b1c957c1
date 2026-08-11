@@ -9,42 +9,34 @@ export function grammarSlug(pattern: string): string {
     .replace(/[^\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf0-9a-z]/g, '-');
 }
 
-/** Patterns already handled during this session (avoids duplicate calls across books). */
+/** Patterns already handled during this session (avoids duplicate work across books). */
 const handled = new Set<string>();
 
 function localKey(note: GrammarNote) {
   return `grammar_cache_${note.pattern}_${note.jlpt}`;
 }
 
-/**
- * Generates + caches examples for a single grammar pattern.
- * Only call this for patterns that are NOT already cached server-side.
- */
-async function generateGrammar(note: GrammarNote): Promise<void> {
-  try {
-    const { data, error } = await supabase.functions.invoke('grammar-examples', {
-      body: { pattern: note.pattern, meaning: note.meaning, jlpt: note.jlpt },
-    });
-    if (error || !data) return;
-    localStorage.setItem(
-      localKey(note),
-      JSON.stringify({ examples: data.examples, formations: data.formations, timestamp: Date.now() }),
-    );
-  } catch {
-    /* silent – preloading is best effort */
-  }
+function normalizeCached(raw: any): { examples: any[]; formations: any[] } | null {
+  if (!raw) return null;
+  const examples = Array.isArray(raw) ? raw : raw.items;
+  if (!Array.isArray(examples) || examples.length === 0) return null;
+  const formations = Array.isArray(raw)
+    ? []
+    : raw.formations || (raw.structure ? [{ parts: [raw.structure] }] : []);
+  return { examples, formations };
 }
 
 /**
- * Preloads grammar examples for a book.
- * Everything already cached in the database is skipped (no AI request at all),
- * so this only ever generates truly missing patterns, once.
+ * Hydrates the local grammar cache for a book from the `grammar_examples` table.
+ *
+ * Fetch-only: this NEVER triggers an AI generation. Patterns missing from the
+ * table are generated lazily (once) when the user actually opens their page.
  */
 export async function preloadGrammarForBook(bookId: string, difficulty?: string): Promise<void> {
   const { getGrammarFlat } = await import('@/data/book-grammar');
   const difficulties = difficulty ? [difficulty] : ['simplified', 'intermediate', 'original'];
 
-  // Unique patterns across the requested difficulties.
+  // Unique patterns across the requested difficulties, minus what's already local.
   const bySlug = new Map<string, GrammarNote>();
   for (const diff of difficulties) {
     for (const note of getGrammarFlat(bookId, diff)) {
@@ -59,25 +51,25 @@ export async function preloadGrammarForBook(bookId: string, difficulty?: string)
   }
   if (bySlug.size === 0) return;
 
-  // Skip anything already cached server-side (single cheap query, no AI).
-  const slugs = [...bySlug.keys()];
-  const { data: cachedRows } = await supabase
+  // Single cheap read — no AI, no edge function.
+  const { data: rows } = await supabase
     .from('grammar_examples')
-    .select('pattern_slug')
-    .in('pattern_slug', slugs);
+    .select('pattern_slug, examples')
+    .in('pattern_slug', [...bySlug.keys()]);
 
-  for (const row of cachedRows ?? []) {
+  for (const row of rows ?? []) {
+    const note = bySlug.get(row.pattern_slug);
+    if (!note) continue;
     handled.add(row.pattern_slug);
-    bySlug.delete(row.pattern_slug);
-  }
-
-  const missing = [...bySlug.entries()];
-  if (missing.length === 0) return;
-
-  // Generate the remaining ones slowly, sequentially, to stay well under rate limits.
-  for (const [slug, note] of missing) {
-    handled.add(slug);
-    await generateGrammar(note);
-    await new Promise((r) => setTimeout(r, 1200));
+    const normalized = normalizeCached(row.examples);
+    if (!normalized) continue;
+    try {
+      localStorage.setItem(
+        localKey(note),
+        JSON.stringify({ ...normalized, timestamp: Date.now() }),
+      );
+    } catch {
+      /* quota: ignore */
+    }
   }
 }
