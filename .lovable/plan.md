@@ -25,5 +25,14 @@ Replace the placeholder with a real short project README: what Tsundoku is, stac
 - Add `mem://features/library-home` — hero + rails structure, collections, genres.
 - Refresh `mem://features/dictionary` with example sentences (`tatoeba-example`, cached tokens/furigana) and the preloading path.
 
+### 4. Skills
+Three of the six active skills are out of date:
+- **`add-book`** — still calls the app "Yomimasu" everywhere. Rename to Tsundoku and verify the pipeline steps match today's scripts (`generate-tokens.ts`, per-book grammar generation, `sync-dictionary-to-db.ts`, `preload-translations.ts`, `preload-grammar-examples.ts` for the new grammar cache).
+- **`add-book-audio`** — describes a data model that no longer exists (`audioUrl`, `durations`, `timestamps` in `books.ts`). Rewrite against the real pipeline: `book-audio` storage bucket, `audio: { [difficulty]: { durationSec } }` in `books.ts`, `book_audio_sync` table, `generate-audio-sync` edge function, `AudioPlayer` + Reader highlight/auto-scroll.
+- **`qa-continu`** — references a preview tool that no longer exists; point it at the Playwright-based browser workflow and add the current pages (`/grammar/:id`, `/my-books`, `/dictionary/:word`).
+
+`dev-loop`, `split-book-into-parts` and `tsundoku-dev` are still accurate; only small wording touch-ups if their file lists drifted.
+
 ## Notes
-Documentation only — no application code, schema or behaviour changes.
+Documentation and skills only — no application code, schema or behaviour changes.
+
