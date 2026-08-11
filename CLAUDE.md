@@ -287,9 +287,9 @@ export function MyComponent({ ... }: MyComponentProps) { ... }
   <span className="library-kanji-watermark" aria-hidden>漢</span>
   <h1 className="wordmark font-serif font-bold text-[42px] leading-none">
 
-// Section label with bullet
-<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-  <span className="section-bullet" />Label
+// Section label (never with an accent bar)
+<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Label</p>
+
 
 // Search pill input
 className="h-11 rounded-full bg-muted/60 border-transparent pl-11 text-sm shadow-inner-sm
