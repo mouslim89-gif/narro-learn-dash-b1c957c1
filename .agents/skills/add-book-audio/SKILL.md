@@ -1,35 +1,56 @@
 ---
 name: add-book-audio
-description: Automates adding synchronized audio playback and UI controls to books.
+description: Add narrated audio to an existing Tsundoku book — upload the MP3 to the book-audio bucket, register it in books.ts, and generate sentence-level sync timestamps so the Reader highlights and auto-scrolls in time with playback.
 ---
-# Add Book Audio Skill
 
-This skill automates the process of adding audio capabilities to books in the Tsundoku application. It handles everything from data structure updates to UI component integration for synchronized audio playback.
+# Add audio to a book
+
+Adds a narrated audio track to one book + difficulty, with sentence-level synchronization
+(highlight + auto-scroll in the Reader). The playback UI already exists — this skill is about
+getting the file and its sync data in place.
 
 ## When to use
-Use this skill when a user wants to:
-- Add an audio version to an existing book.
-- Implement "karaoke-style" text highlighting synchronized with audio.
-- Add audio controls (play/pause/speed) to the Reader.
+- The user provides an audio file for an existing book.
+- The user asks to enable audio / karaoke highlighting for a book.
 
-## Data Structure Requirements
-Books in `src/data/books.ts` must be updated to include:
-- `audioUrl`: String path to the audio file.
-- `durations`: Optional duration of the audio in seconds.
-- `timestamps`: Array of numbers (seconds) mapping text segments to audio positions.
+## Real data model (do not invent fields)
 
-## Implementation Workflow
+```ts
+// src/data/books.ts
+audio?: Partial<Record<Difficulty, { durationSec: number }>>
+```
 
-### 1. Update Data
-Ensure the book entry in `src/data/books.ts` has the necessary audio properties.
+There is no `audioUrl`, no `timestamps` array in `books.ts`. The file lives in Storage and the
+timestamps live in the database.
 
-### 2. Integration with Reader
-The `Reader.tsx` component uses `AudioPlayer.tsx`. Ensure the `hasAudio` flag is set correctly based on the book data.
+| Piece | Where |
+|---|---|
+| Audio file | public Storage bucket `book-audio`, path `{bookId}/{difficulty}.mp3` |
+| Sync data | table `book_audio_sync` (`book_id`, `difficulty`, `sentences: [{idx, startSec, endSec}]`, `duration_sec`) — public read, service-role write |
+| Generation | edge function `generate-audio-sync` (ElevenLabs Scribe `scribe_v1`, `language_code: jpn`, word-level timestamps aligned onto the canonical sentences sent by the client) |
+| Client cache | `src/lib/audio-sync.ts` — memory Map → IndexedDB (`idb-keyval`) → `book_audio_sync` → edge function |
+| Player | `src/components/AudioPlayer.tsx` (real `<audio>`; props `src`, `onTimeUpdate`, `onLoadedMetadata`, `seekRequestRef`, `bottomOffset`) |
 
-### 3. Sync Logic
-Use the `useAudio` hook to track `currentTime` and compare it against the `timestamps` array to highlight the current sentence or word.
+## Steps
 
-## Best Practices
-- **Format**: Use `.mp3` for maximum compatibility or `.m4a` for better quality/size ratio.
-- **Accessibility**: Always provide play/pause buttons with clear visual states.
-- **Performance**: Lazy-load audio files to avoid slowing down the initial page load.
+1. **Normalize the file**
+   ```bash
+   ffmpeg -i input.wav -b:a 192k -ac 1 output.mp3
+   ```
+2. **Upload** to `book-audio/{bookId}/{difficulty}.mp3` (Storage upload tool or the Cloud UI). Bucket is public.
+3. **Register it** in `src/data/books.ts` on that book:
+   ```ts
+   audio: { original: { durationSec: 912 } }
+   ```
+   `hasAnyAudio(book)` then shows the Headphones icon in BookCard / BookDetail / Library.
+4. **Generate the sync** — open the book in the Reader at that difficulty and press play once, or call
+   `generate-audio-sync` directly with the book's canonical sentences. First run takes ~30 s and is
+   billed once (~$0.40/h of audio); the result is cached in `book_audio_sync` for every user.
+5. **Verify** in the Reader: the active sentence gets `bg-primary/10 px-0.5`, auto-scroll centres it
+   only if the user hasn't scrolled in the last 2500 ms, and tapping a sentence background seeks
+   (taps on tokens keep their mini-popup behaviour).
+
+## Notes
+- MP3 192 kbps mono is the target format.
+- Never re-run Scribe for a book+difficulty that already has a `book_audio_sync` row — it is a paid call.
+- Never write to `book_audio_sync` from the client; only the edge function (service role) does.

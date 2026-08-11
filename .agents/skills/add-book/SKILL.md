@@ -1,9 +1,9 @@
 ---
 name: add-book
-description: "Add a new Japanese book to Yomimasu end-to-end when the user attaches a book file (.txt or .json) or pastes Japanese text and asks to add it. Handles difficulty versions, metadata, auto-split into parts, tokens, grammar notes, dictionary preloading, and sentence-translation preloading."
+description: "Add a new Japanese book to Tsundoku end-to-end when the user attaches a book file (.txt or .json) or pastes Japanese text and asks to add it. Handles difficulty versions, metadata, auto-split into parts, tokens, grammar notes, dictionary preloading, and sentence-translation preloading."
 ---
 
-# Add a new book to Yomimasu
+# Add a new book to Tsundoku
 
 When the user attaches a book (one or more `.txt`  or .json files, or pasted Japanese text) and asks to add it, run the full pipeline below. Do NOT ask the user any questions (except the anchor confirmation in step 6 if the book gets split) — infer everything via Lovable AI Gateway.
 
@@ -50,7 +50,7 @@ One Lovable AI call (Gemini 2.5 Pro) with the original text, returning JSON:
   "titleJp": "...",
   "titleEn": "...",
   "author": "...",
-  "genre": "fiction|folk-tales|sci-fi|slice-of-life|horror",
+  "genre": "folk-tales|psychological|surreal|gothic|slice-of-life|historical|sci-fi",
   "jlptLevel": "N5|N4|N3|N2|N1",
   "coverColor": "#RRGGBB",
   "readingTimeMin": 10,
@@ -136,16 +136,28 @@ npx tsx scripts/preload-translations.ts --book <id>
 - Idempotent: already-cached sentences are skipped. One-shot cost; the Reader's 🌐 toggle is then instant for every reader.
 - The `--book <id>` flag scopes the work to only the new book.
 
-### 11. Verify
+### 11. Preload grammar examples
+
+```bash
+npx tsx scripts/preload-grammar-examples.ts
+```
+
+- Fills the `grammar_examples` table (structures + example sentences) for every unique pattern, including the new book's.
+- Sequential, 1 req/s, exponential backoff on 429/5xx, resumable — patterns already cached cost nothing.
+- Without it, the first user to open a grammar point pays an AI generation.
+
+### 12. Verify
 
 - The build runs automatically — check it succeeds.
 - If split: visit `/reader/<id>/simplified/part-1`, confirm prev/next pills work, BookDetail lists the anchors, GrammarPanel on `part-2` shows only part-2 notes.
-- Confirm with the user: book id, title, JLPT, whether split (and how many parts), and that tokens + grammar + dictionary + translations are populated.
+- Confirm with the user: book id, title, JLPT, whether split (and how many parts), and that tokens + grammar + dictionary + translations + grammar examples are populated.
 
 ## Notes
 
 - The `book-tokens` file powers furigana, dictionary popup, and flashcards. Step 7 is non-optional.
 - Step 9 makes WordPopup load instantly (no Jisho round-trip on first tap). It catches conjugated forms via `b` (base form) tokens.
 - Step 10 makes the per-sentence English translation overlay instant — without it, the first reader of each sentence waits for a live AI call.
+- Step 11 makes `/grammar/:id` instant and free.
+
 - Never edit `src/integrations/supabase/types.ts`, `client.ts`, or auto-generated token files by hand.
 - Cover colors already in use: avoid duplicates by glancing at the existing books array.
