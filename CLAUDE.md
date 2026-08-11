@@ -330,10 +330,13 @@ className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center
 ### Data model
 ```ts
 type Difficulty = 'simplified' | 'intermediate' | 'original'
-type Genre = 'folk-tales' | 'fiction' | 'sci-fi' | 'slice-of-life' | 'horror'
+type Genre = 'folk-tales' | 'psychological' | 'surreal' | 'gothic'
+          | 'slice-of-life' | 'historical' | 'sci-fi'
 
 interface Book {
   id: string
+  jlptLevel: 'N5' | 'N4' | 'N3' | 'N2' | 'N1'
+  readingTimeMin: number
   content: Record<Difficulty, string>      // single-chapter books
   chapters?: Chapter[]                      // multi-chapter books
   parts?: Record<Difficulty, string[]>      // multi-part books
@@ -346,15 +349,22 @@ interface Book {
 // Part chapterId format: 'part-N' (1-indexed)
 ```
 
+Library rails are built from `src/data/collections.ts` (`Collection { id, title, subtitle?, match(book) }`)
+plus one rail per `Genre`. `ContinueHero` shows the most recently read book.
+
 ### Supabase edge functions
 Located in `supabase/functions/`. Called from `src/lib/` modules:
-- `jisho-lookup` — dictionary lookup
-- `kanji-lookup` — kanji details
+- `jisho-lookup` — dictionary lookup (result upserted into `dictionary`)
+- `kanji-lookup` — kanji details (cached in `kanji_details`)
 - `grammar-notes` / `rewrite-grammar-notes` — AI grammar explanations
+- `grammar-examples` — grammar structures + examples, cached in `grammar_examples`
+- `tatoeba-example` — example sentences + furigana tokens, cached in `example_sentences`
+- `backfill-example-tokens` — admin one-off: adds tokens to legacy example rows
 - `tts-japanese` — text-to-speech
-- `translate-sentence` / `translate-sentences-batch` — sentence translation
-- `generate-audio-sync` — ElevenLabs Scribe timestamps
-- `tatoeba-example` — example sentences
+- `translate-sentence` / `translate-sentences-batch` — sentence translation (`sentence_translations`)
+- `generate-audio-sync` — ElevenLabs Scribe timestamps (`book_audio_sync`)
+- `delete-account` — account deletion
+
 
 ### New Supabase migrations
 File naming: `supabase/migrations/YYYYMMDDHHMMSS_uuid.sql`
