@@ -1,9 +1,9 @@
 ---
 name: add-book
-description: "Add a new Japanese book to Yomimasu end-to-end when the user attaches a book file (.txt or .json) or pastes Japanese text and asks to add it. Handles difficulty versions, metadata, auto-split into parts, tokens, grammar notes, dictionary preloading, and sentence-translation preloading."
+description: "Add a new Japanese book to Tsundoku end-to-end when the user attaches a book file (.txt or .json) or pastes Japanese text and asks to add it. Handles difficulty versions, metadata, auto-split into parts, tokens, grammar notes, dictionary preloading, and sentence-translation preloading."
 ---
 
-# Add a new book to Yomimasu
+# Add a new book to Tsundoku
 
 When the user attaches a book (one or more `.txt`  or .json files, or pasted Japanese text) and asks to add it, run the full pipeline below. Do NOT ask the user any questions (except the anchor confirmation in step 6 if the book gets split) — infer everything via Lovable AI Gateway.
 
