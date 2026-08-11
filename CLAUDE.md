@@ -31,13 +31,14 @@ src/
 ├── index.css                 — Design tokens, custom utilities, animations (source of truth)
 │
 ├── pages/                    — Route-level components (export default function)
-│   ├── Library.tsx           — / (book catalog)
+│   ├── Library.tsx           — / (home: continue hero + rails)
 │   ├── BookDetail.tsx        — /book/:id
 │   ├── Reader.tsx            — /reader/:id/:difficulty[/:chapterId]
 │   ├── Flashcards.tsx        — /flashcards (SRS deck + review)
 │   ├── Dictionary.tsx        — /dictionary
 │   ├── WordDetail.tsx        — /dictionary/:word
-│   ├── MyBooks.tsx           — /my-books
+│   ├── GrammarDetail.tsx     — /grammar/:id (structures + examples)
+│   ├── MyBooks.tsx           — /my-books (shelves, streak graph, daily goals)
 │   ├── Settings.tsx          — /settings
 │   └── Auth.tsx, ResetPassword.tsx, NotFound.tsx
 │
@@ -45,18 +46,28 @@ src/
 │   ├── BottomNav.tsx         — Fixed bottom nav (hidden on reader/auth/review)
 │   ├── BookCard.tsx          — Book cover card with progress ring
 │   ├── AudioPlayer.tsx       — Synchronized audio player
-│   ├── WordPopup.tsx         — Full Jisho lookup drawer (Radix Drawer)
+│   ├── WordPopup.tsx         — Full lookup drawer (Radix Drawer)
 │   ├── WordMiniPopup.tsx     — Inline mini popup anchored to sentence
 │   ├── ReaderToken.tsx       — Single tappable token in Reader
 │   ├── FuriganaWord.tsx      — Ruby/furigana rendering
-│   ├── FuriganaSentence.tsx  — Furigana on context sentence (flashcard review)
+│   ├── FuriganaSentence.tsx  — Furigana on a full sentence (examples, extracts)
 │   ├── FlashcardReview.tsx, SrsButtons.tsx
 │   ├── GrammarPanel.tsx, ConjugationTable.tsx, ExampleSentence.tsx
 │   ├── SentenceTranslationPopup.tsx
 │   ├── TokenEditPanel.tsx, TokenEditFloatingBar.tsx
-│   ├── PlayWordButton.tsx, NavLink.tsx
+│   ├── SplashScreen.tsx      — App entry animation (admin can disable)
+│   ├── AnimatedTitle.tsx     — Per-char animated wordmark
+│   ├── DictionaryPreloader.tsx — Background dictionary/token/grammar hydration
+│   ├── HalfGauge.tsx         — SVG half-circle gauge (daily goals)
+│   ├── DailyGoalProgress.tsx — Linear daily-goal bar
+│   ├── PlayWordButton.tsx, NavLink.tsx, DelayedLink.tsx
 │   ├── ProtectedRoute.tsx, ScrollToTop.tsx
+│   ├── library/ContinueHero.tsx        — Big "continue reading" hero card
 │   ├── my-books/BookShelfRow.tsx
+│   ├── my-books/ContributionGraph.tsx  — GitHub-style activity grid
+│   ├── my-books/DailyGoalCard.tsx      — Two half-gauges (reviews / new cards)
+│   ├── onboarding/OnboardingCarousel.tsx — First-launch carousel (never in reader)
+│   ├── onboarding/ReaderTutorial.tsx     — Spotlight tutorial inside the Reader
 │   └── ui/                   — shadcn/ui components (do not modify manually)
 │
 ├── contexts/
@@ -65,11 +76,14 @@ src/
 ├── hooks/
 │   ├── use-cloud-sync.ts      — Mounts sync on login/logout
 │   ├── use-long-press.ts, use-body-scroll-lock.ts
-│   └── use-delayed.ts, use-mobile.tsx, use-toast.ts
+│   ├── use-scroll-progress.ts — Scroll-driven header var (`--p`)
+│   └── use-delayed.ts, use-delayed-nav.ts, use-mobile.tsx, use-toast.ts
 │
 ├── stores/                   — Zustand stores
 │   ├── reading-progress.ts   — Progress per book/chapter + UI prefs (fontSize, darkMode, furigana…)
-│   ├── flashcards.ts         — Saved words + SM-2 SRS
+│   ├── flashcards.ts         — Saved words + SM-2 SRS + daily goals
+│   ├── saved-grammar.ts      — Saved grammar points (`tsundoku-saved-grammar`)
+│   ├── onboarding.ts         — Carousel / reader tutorial flags + admin toggles
 │   ├── token-edit.ts         — Admin token editing state
 │   ├── user-rules.ts         — Per-user token override rules
 │   └── shared-rules.ts       — Shared token rules (admin-published)
@@ -77,32 +91,37 @@ src/
 ├── data/
 │   ├── books.ts              — Book catalog + types (Book, Chapter, Difficulty, Genre)
 │   ├── books/                — Per-book text content (ts files, 3 difficulties each)
-│   ├── book-tokens/          — Pre-tokenized token arrays per book
-│   ├── book-grammar.ts, book-dictionary.ts, book-reading-overrides.ts
+│   ├── book-tokens/          — Pre-tokenized token arrays per book (+ word-counts.ts)
+│   ├── collections.ts        — Curated library rails (Start Here, Short Reads, author…)
+│   ├── book-grammar.ts, book-dictionary.ts (deprecated stub), book-reading-overrides.ts
 │   └── dictionary.ts, token-overrides.ts
 │
 ├── lib/
 │   ├── utils.ts              — cn() helper (clsx + tailwind-merge)
 │   ├── srs.ts                — SM-2 spaced repetition algorithm
+│   ├── admin.ts              — useIsAdmin() (RPC `get_is_admin`, cached per session)
 │   ├── audio-sync.ts, dictionary-db.ts (IndexedDB shards)
-│   ├── jisho.ts, kanji.ts, tatoeba.ts, translate.ts
+│   ├── jisho.ts, kanji.ts, tatoeba.ts, translate.ts, romaji.ts
+│   ├── grammar.ts, grammar-preload.ts (fetch-only grammar cache hydration)
 │   ├── known-words.ts, merge-tokens.ts, pos-colors.ts
 │   ├── sentence-translations.ts, tokenizer.ts, token-edit-rules.ts
-│   └── sync/cloud-sync.ts, sync-status.ts
+│   └── sync/cloud-sync.ts, sync/sync-status.ts
 │
 └── integrations/
     ├── lovable/index.ts       — Lovable cloud auth (do not modify)
     └── supabase/client.ts, types.ts
 
 supabase/
-├── functions/                 — Deno edge functions (jisho-lookup, tts-japanese, grammar-notes…)
+├── functions/                 — Deno edge functions (see list below)
+│   └── _shared/               — ai-gateway.ts, auth.ts (requireUser JWT guard)
 └── migrations/                — SQL migrations (naming: YYYYMMDDHHMMSS_uuid.sql)
 
 public/dict/                   — Pre-built JSON dictionary shards (served statically)
-scripts/                       — CLI scripts (token/grammar/dict generation, Bun)
+scripts/                       — CLI scripts (tokens, grammar, dict, translations, grammar backfill)
 .lovable/
-├── plan.md                    — Current implementation plan
+├── plan.md                    — Current implementation plan (archived under plan/ once approved)
 └── memory/                    — Lovable project memory files
+
 ```
 
 ---
