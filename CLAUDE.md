@@ -206,7 +206,10 @@ Framer Motion page transition: `{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }` �
 - `.card-refined` — gradient + shadow card
 - `.shadow-inner-sm` — inset shadow for inputs
 - `.hairline-fade` — decorative fading divider
-- `.section-bullet` — left accent bar before labels
+- `.glass-subtle`, `.glass-chip-subtle`, `.glass-chip-header` — translucent chrome surfaces
+- `.btn-tsundoku-premium` — shared premium CTA style (library hero, book detail)
+- **Never** add a vertical amber accent bar before labels (the old `.section-bullet` — removed and banned)
+
 
 **Book / reader**
 - `.book-paper` — decorative cover texture (radial gradients + grain)
