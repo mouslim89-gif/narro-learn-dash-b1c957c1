@@ -381,3 +381,47 @@ File naming: `supabase/migrations/YYYYMMDDHHMMSS_uuid.sql`
 6. `.lovable/plan.md` — update when implementing a planned feature
 7. Always use `cn()` for class merging, never string concatenation for conditional classes
 8. Match the existing visual language: warm paper palette, Merriweather headings, `tap-scale`/`card-lift` on interactive elements, `rounded-full` pills for primary actions
+
+---
+
+## AI cost & caching (read before touching any AI feature)
+
+Golden rule: **a page view must never trigger an AI generation when a cache row already exists.**
+Every AI-backed feature is DB-cached and shared across all users.
+
+| Content | Source | Cache | When AI runs |
+|---|---|---|---|
+| Word definitions | Jisho via `jisho-lookup` | `dictionary` table → static shards in `public/dict/` → IndexedDB → memory | Never (no AI). Preloaded per book by `scripts/sync-dictionary-to-db.ts` + `DictionaryPreloader` |
+| Example sentences + furigana tokens | `tatoeba-example` | `example_sentences` table (merged upsert, never shrinks) | Only for a word never requested before |
+| Sentence translations | `translate-sentences-batch` | `sentence_translations` (SHA-256 hash key) | Only for sentences not preloaded by `scripts/preload-translations.ts` |
+| Kanji details | `kanji-lookup` | `kanji_details` table | First lookup of a kanji |
+| Grammar notes per book | generated offline by `scripts/generate-grammar-for-<id>.ts` | committed in `src/data/book-grammar.ts` | Only at book-authoring time |
+| Grammar structures + examples | `grammar-examples` | `grammar_examples` table (unique `pattern_slug`) + localStorage `grammar_cache_<pattern>_<jlpt>` | Only for a pattern missing from the table |
+| Book audio sync | `generate-audio-sync` (ElevenLabs Scribe) | `book_audio_sync` + IndexedDB | Once per book + difficulty |
+
+Rules that must stay true:
+- `src/lib/grammar-preload.ts` is **fetch-only** — one bulk `select` on `grammar_examples`, never a generation call.
+- `GrammarDetail` is **cache-first** — a valid localStorage entry renders immediately with no network call.
+- `scripts/preload-grammar-examples.ts` backfills every unique pattern sequentially with exponential backoff; it is resumable and free for already-cached patterns. Re-run it after adding a book (currently ~516 of 622 patterns cached).
+- Edge functions that write to a cache table use `SUPABASE_SERVICE_ROLE_KEY` (RLS blocks anon writes — this silently broke the grammar cache once).
+
+---
+
+## Admin features
+
+Admin is server-side only: the `admin_users` table + `is_admin(uuid)` / `get_is_admin()` security-definer
+functions. The client reads it through `useIsAdmin()` in `src/lib/admin.ts` (one RPC per session, cached).
+Never gate admin UI on an email string or localStorage.
+
+Admin-only surfaces:
+- **Settings → Always replay onboarding** (`onboarding.alwaysReplayOnboarding`) — carousel + reader tutorial reappear every time; both components keep a local `dismissed` state so they can still be closed for the session.
+- **Settings → Disable app animation** (`onboarding.disableAnimation`) — skips the `SplashScreen`.
+- **Token editing** in the Reader (`TokenEditPanel`, `TokenEditFloatingBar`) writing to `user_token_rules` (personal) and `shared_token_rules` (published to everyone).
+- **Content overrides** (`book_content_overrides`).
+
+---
+
+## Onboarding
+
+- `OnboardingCarousel` — first launch only, returns `null` on any `/reader/*` route.
+- `ReaderTutorial` — dimming overlay (`bg-black/50`) with a spotlight cut-out made by a `box-shadow` on a box positioned from `getBoundingClientRect()`. Steps cover: tap a word, furigana chip, translation chip, grammar notes chip, settings, progress. The word step has an animated amber ring (`.animate-tutorial-pulse`) and is interactive — tapping the word opens the mini popup (which un-dims) but only **Continue** advances the step.
