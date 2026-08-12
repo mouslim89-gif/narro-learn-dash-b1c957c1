@@ -31,6 +31,11 @@ export function useCloudSync() {
  clearWords();
  clearProgress();
  clearPreferences();
+ // Only wipe grammar if it was tied to an account (avoids clearing
+ // local-only data before auth resolves).
+ if (useSavedGrammarStore.getState().syncUserId) {
+ useSavedGrammarStore.getState().clearGrammar();
+ }
  return;
  }
 
@@ -39,14 +44,17 @@ export function useCloudSync() {
 
  const hydrate = async () => {
  try {
- const [words, progress, prefs] = await Promise.all([
+ const [words, progress, prefs, grammar] = await Promise.all([
  pullFlashcards(userId),
  pullProgress(userId),
  pullPreferences(userId),
+ pullSavedGrammar(userId).catch(() => []),
  ]);
  if (cancelled) return;
  hydrateWords(words, userId);
  hydrateProgress(progress, userId);
+ useSavedGrammarStore.getState().mergeFromCloud(grammar, userId);
+
 
  if (prefs) {
  hydratePreferences(prefs, userId);
