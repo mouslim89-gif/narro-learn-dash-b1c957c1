@@ -1,5 +1,4 @@
 import { useMemo, useRef } from'react';
-import { useNavigate } from 'react-router-dom';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 
 import { books } from'@/data/books';
@@ -17,14 +16,12 @@ import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
 import { useDelayed } from'@/hooks/use-delayed';
 
-import { useSavedGrammarStore } from '@/stores/saved-grammar';
 
 export default function MyBooks() {
 
 
  const { progress, getBookProgress } = useReadingProgressStore();
   const savedWords = useFlashcardStore(s => s.savedWords);
-  const { savedItems: savedGrammar } = useSavedGrammarStore();
 
  const showEmpty = useDelayed(300);
  const headerRef = useRef<HTMLElement>(null);
