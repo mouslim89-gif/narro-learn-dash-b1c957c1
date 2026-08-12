@@ -2,14 +2,14 @@ import { useMemo, useRef } from'react';
 import { useNavigate } from 'react-router-dom';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 
-import { books, jlptColors } from'@/data/books';
+import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 
 import { useFlashcardStore } from'@/stores/flashcards';
 import { startOfDay, format } from'date-fns';
 import { tokenWordCounts } from'@/data/book-tokens';
 import { DelayedLink as Link } from'@/components/DelayedLink';
-import { Settings, Flame, BookOpen, Bookmark, Trophy, ArrowLeft } from'lucide-react';
+import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
 import { Button } from'@/components/ui/button';
 
 import { AnimatedTitle } from'@/components/AnimatedTitle';
@@ -20,7 +20,6 @@ import { useDelayed } from'@/hooks/use-delayed';
 import { useSavedGrammarStore } from '@/stores/saved-grammar';
 
 export default function MyBooks() {
-  const navigate = useNavigate();
 
 
  const { progress, getBookProgress } = useReadingProgressStore();
