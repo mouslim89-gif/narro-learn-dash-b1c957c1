@@ -27,6 +27,8 @@ List
 
 A small segmented control sits on the Review CTA: **All / Words / Grammar**, each showing its due count. Default is All, and the deck is shuffled so words and grammar are interleaved. Tapping Review starts a session with the chosen scope.
 
+It only appears when at least one grammar point is saved. With no saved grammar the CTA looks exactly as it does today (and the Words / Grammar list switch is hidden too).
+
 ## 4. Combined counters
 
 New / Learning / Known / Due tiles, the daily goal gauges and the streak graph count words and grammar together. Filtering by a tile still applies to whichever list is currently shown.
