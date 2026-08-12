@@ -1,15 +1,14 @@
 import { useMemo, useRef } from'react';
-import { useNavigate } from 'react-router-dom';
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 
-import { books, jlptColors } from'@/data/books';
+import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 
 import { useFlashcardStore } from'@/stores/flashcards';
 import { startOfDay, format } from'date-fns';
 import { tokenWordCounts } from'@/data/book-tokens';
 import { DelayedLink as Link } from'@/components/DelayedLink';
-import { Settings, Flame, BookOpen, Bookmark, Trophy, ArrowLeft } from'lucide-react';
+import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
 import { Button } from'@/components/ui/button';
 
 import { AnimatedTitle } from'@/components/AnimatedTitle';
@@ -17,15 +16,12 @@ import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
 import { useDelayed } from'@/hooks/use-delayed';
 
-import { useSavedGrammarStore } from '@/stores/saved-grammar';
 
 export default function MyBooks() {
-  const navigate = useNavigate();
 
 
  const { progress, getBookProgress } = useReadingProgressStore();
   const savedWords = useFlashcardStore(s => s.savedWords);
-  const { savedItems: savedGrammar } = useSavedGrammarStore();
 
  const showEmpty = useDelayed(300);
  const headerRef = useRef<HTMLElement>(null);
@@ -156,37 +152,8 @@ export default function MyBooks() {
   </div>
   )}
 
-  {savedGrammar.length > 0 && (
-    <div className="mt-10">
-      <div className="flex items-center gap-2 mb-4">
-        <Bookmark className="h-5 w-5 text-accent" />
-        <h2 className="font-serif text-xl font-bold">Saved Grammar</h2>
-      </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {savedGrammar.map((item) => (
-          <div 
-            key={item.id}
-            onClick={() => navigate(`/grammar/${item.id}`, { state: { note: item } })}
-            className="rounded-2xl bg-card p-4 ring-1 ring-border/30 shadow-sm card-lift cursor-pointer flex items-center justify-between gap-4"
-          >
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span 
-                  className="rounded-full px-1.5 py-0.5 text-[8px] font-bold text-white shrink-0"
-                  style={{ backgroundColor: jlptColors[item.jlpt] || '#888' }}
-                >
-                  {item.jlpt}
-                </span>
-                <span className="font-japanese font-bold text-base truncate">{item.pattern}</span>
-              </div>
-              <p className="text-sm text-muted-foreground truncate">{item.meaning}</p>
-            </div>
-            <ArrowLeft className="h-4 w-4 text-muted-foreground rotate-180" />
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
+
+
 
  </div>
  </div>

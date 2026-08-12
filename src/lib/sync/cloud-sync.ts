@@ -74,7 +74,82 @@ function rowToSavedWord(row: any): SavedWord {
  };
 }
 
+// ============ SAVED GRAMMAR ============
+
+export interface CloudSavedGrammar {
+ id: string;
+ bookId?: string;
+ savedAt: string;
+ pattern: string;
+ meaning: string;
+ example: string;
+ jlpt: string;
+ tip: string;
+}
+
+export async function pullSavedGrammar(userId: string): Promise<CloudSavedGrammar[]> {
+ const { data, error } = await supabase
+ .from('saved_grammar')
+ .select('*')
+ .eq('user_id', userId);
+ if (error) throw error;
+ return (data ?? []).map((row: any) => {
+ const p = (row.payload ?? {}) as Record<string, any>;
+ return {
+ id: row.item_id,
+ bookId: row.book_id ?? undefined,
+ savedAt: row.saved_at ?? new Date().toISOString(),
+ pattern: p.pattern ??'',
+ meaning: p.meaning ??'',
+ example: p.example ??'',
+ jlpt: p.jlpt ??'',
+ tip: p.tip ??'',
+ };
+ });
+}
+
+export async function pushSavedGrammar(userId: string, item: CloudSavedGrammar): Promise<void> {
+ useSyncStatus.getState().startSync();
+ try {
+ const { error } = await supabase.from('saved_grammar').upsert({
+ user_id: userId,
+ item_id: item.id,
+ book_id: item.bookId ?? null,
+ saved_at: item.savedAt,
+ payload: {
+ pattern: item.pattern,
+ meaning: item.meaning,
+ example: item.example,
+ jlpt: item.jlpt,
+ tip: item.tip,
+ },
+ });
+ if (error) throw error;
+ useSyncStatus.getState().endSync(true);
+ } catch (e) {
+ console.error('pushSavedGrammar error', e);
+ useSyncStatus.getState().endSync(false);
+ }
+}
+
+export async function deleteSavedGrammar(userId: string, itemId: string): Promise<void> {
+ useSyncStatus.getState().startSync();
+ try {
+ const { error } = await supabase
+ .from('saved_grammar')
+ .delete()
+ .eq('user_id', userId)
+ .eq('item_id', itemId);
+ if (error) throw error;
+ useSyncStatus.getState().endSync(true);
+ } catch (e) {
+ console.error('deleteSavedGrammar error', e);
+ useSyncStatus.getState().endSync(false);
+ }
+}
+
 // ============ READING PROGRESS ============
+
 
 export async function pullProgress(userId: string): Promise<Record<string, ReadingProgress>> {
  const { data, error } = await supabase
