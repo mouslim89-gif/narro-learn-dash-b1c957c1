@@ -10,7 +10,7 @@ import { PlayWordButton } from'@/components/PlayWordButton';
 import { Button } from'@/components/ui/button';
 import { Input } from'@/components/ui/input';
 import { Progress } from'@/components/ui/progress';
-import { FlashcardReview } from'@/components/FlashcardReview';
+import { FlashcardReview, type ReviewCard } from'@/components/FlashcardReview';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { cn } from'@/lib/utils';
 import { romajiToKana } from'@/lib/romaji';
@@ -41,7 +41,9 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
 export default function Flashcards() {
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
  const savedGrammar = useSavedGrammarStore(s => s.savedItems);
+ const getDueGrammar = useSavedGrammarStore(s => s.getDueItems);
  const [tab, setTab] = useState<'words' | 'grammar'>('words');
+ const [scope, setScope] = useState<'all' | 'words' | 'grammar'>('all');
  const [reviewMode, setReviewMode] = useState(false);
 
  const showEmpty = useDelayed(300);
@@ -59,15 +61,18 @@ export default function Flashcards() {
  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
  const [search, setSearch] = useState('');
 
- const reviewDeck = useMemo(() => {
- const due = getDueWords();
- const deck = due.length > 0 ? [...due] : [...savedWords];
- return deck;
- // eslint-disable-next-line react-hooks/exhaustive-deps
- }, [savedWords, reviewMode]);
-
  const dueWords = useMemo(() => getDueWords(), [savedWords]); // eslint-disable-line react-hooks/exhaustive-deps
- const dueIds = useMemo(() => new Set(dueWords.map(w => w.id)), [dueWords]);
+ const dueGrammar = useMemo(() => getDueGrammar(), [savedGrammar]); // eslint-disable-line react-hooks/exhaustive-deps
+ const dueIds = useMemo(() => new Set([...dueWords, ...dueGrammar].map(w => w.id)), [dueWords, dueGrammar]);
+
+ const reviewDeck = useMemo(() => {
+   const words = scope === 'grammar' ? [] : savedWords;
+   const grammar = scope === 'words' ? [] : savedGrammar;
+   const due = [...(scope === 'grammar' ? [] : dueWords), ...(scope === 'words' ? [] : dueGrammar)];
+   const deck: ReviewCard[] = due.length > 0 ? due : [...words, ...grammar];
+   return deck;
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [savedWords, savedGrammar, scope, reviewMode]);
 
  const filteredWords = useMemo(() => {
  let words = [...savedWords];
@@ -97,10 +102,24 @@ export default function Flashcards() {
  return words;
  }, [savedWords, filter, search, sortBy, sortDir, dueIds]);
 
- const knownCount = savedWords.filter(w => (w.mastery || 0) >= 3).length;
- const learningCount = savedWords.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3).length;
- const newCount = savedWords.filter(w => !(w.mastery || 0)).length;
- const dueCount = dueWords.length;
+ const filteredGrammar = useMemo(() => {
+   let items = [...savedGrammar];
+   if (filter === 'due') items = items.filter(g => dueIds.has(g.id));
+   else if (filter === 'new') items = items.filter(g => !(g.mastery || 0));
+   else if (filter === 'learning') items = items.filter(g => (g.mastery || 0) > 0 && (g.mastery || 0) < 3);
+   else if (filter === 'known') items = items.filter(g => (g.mastery || 0) >= 3);
+   if (search.trim()) {
+     const q = search.trim().toLowerCase();
+     items = items.filter(g => g.pattern.toLowerCase().includes(q) || (g.meaning || '').toLowerCase().includes(q));
+   }
+   return items;
+ }, [savedGrammar, filter, search, dueIds]);
+
+ const all = useMemo(() => [...savedWords, ...savedGrammar], [savedWords, savedGrammar]);
+ const knownCount = all.filter(w => (w.mastery || 0) >= 3).length;
+ const learningCount = all.filter(w => (w.mastery || 0) > 0 && (w.mastery || 0) < 3).length;
+ const newCount = all.filter(w => !(w.mastery || 0)).length;
+ const dueCount = dueIds.size;
 
  if (reviewMode) {
  return (
@@ -158,63 +177,7 @@ export default function Flashcards() {
  </Link>
  </header>
 
-  {/* Words / Grammar switch */}
-  <div className="px-6 pt-4">
-    <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
-      {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
-        <button
-          key={key}
-          onClick={() => setTab(key)}
-          className={cn(
-            'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
-            tab === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
-          )}
-        >
-          {label} <span className="tabular-nums text-[11px] opacity-70">{count}</span>
-        </button>
-      ))}
-    </div>
-  </div>
-
-  {tab === 'grammar' ? (
-    savedGrammar.length === 0 ? (
-      <div className={`mt-20 flex flex-col items-center text-center px-6 transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
-          <Bookmark className="h-9 w-9 text-primary" />
-        </div>
-        <p className="mt-5 font-serif text-lg font-semibold">No grammar saved yet</p>
-        <p className="mt-1 text-sm text-muted-foreground">Save a grammar point while reading to find it here.</p>
-      </div>
-    ) : (
-      <ul className="stagger-children mt-4 space-y-2 px-6">
-        {savedGrammar.map((item) => (
-          <li key={item.id}>
-            <Link
-              to={`/grammar/${item.id}`}
-              className="flex items-center gap-3 rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift tap-scale"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white shrink-0"
-                    style={{ backgroundColor: jlptColors[item.jlpt] || '#888' }}
-                  >
-                    {item.jlpt}
-                  </span>
-                  <p className="font-japanese text-[16px] font-bold leading-tight truncate">{item.pattern}</p>
-                </div>
-                <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{item.meaning}</p>
-              </div>
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    )
-  ) : (
-  <>
-  {savedWords.length > 0 && (
-
+  {all.length > 0 && (
  <>
  {/* Hero review CTA */}
  <section className="px-6 pt-5">
@@ -239,9 +202,26 @@ export default function Flashcards() {
  </div>
  ) : (
       <Button variant="outline" className="w-full h-12 rounded-full bg-card relief-raised" onClick={enterReview}>
-        <RotateCcw className="mr-2 h-4 w-4"/>Review all words
+        <RotateCcw className="mr-2 h-4 w-4"/>Review everything
       </Button>
  )}
+
+  {savedGrammar.length > 0 && savedWords.length > 0 && (
+    <div className="mt-3 flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
+      {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
+        <button
+          key={key}
+          onClick={() => setScope(key)}
+          className={cn(
+            'flex-1 rounded-full py-1.5 text-[12px] font-semibold smooth-colors tap-scale-sm',
+            scope === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
+          )}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )}
   </section>
 
   <section className="px-6 mt-4">
@@ -272,7 +252,7 @@ export default function Flashcards() {
  <div className="mt-4 px-6 relative">
  <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
  <Input
- placeholder="Search words..."
+ placeholder={tab === 'grammar' ? 'Search grammar...' : 'Search words...'}
  value={search}
  onChange={e => setSearch(e.target.value)}
  className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10 text-sm shadow-inner-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
@@ -280,7 +260,7 @@ export default function Flashcards() {
  </div>
 
  {/* Sort */}
- <div className="mt-3 flex items-center justify-end px-6 gap-2">
+ <div className={cn('mt-3 flex items-center justify-end px-6 gap-2', tab === 'grammar' && 'hidden')}>
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <button
@@ -320,7 +300,28 @@ export default function Flashcards() {
  </>
  )}
 
- {savedWords.length === 0 ? (
+ {/* Words / Grammar list switch */}
+ {savedGrammar.length > 0 && all.length > 0 && (
+   <div className="px-6 mt-4">
+     <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
+       {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
+         <button
+           key={key}
+           onClick={() => setTab(key)}
+           className={cn(
+             'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
+             tab === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
+           )}
+         >
+           {label} <span className="tabular-nums text-[11px] opacity-70">{count}</span>
+         </button>
+       ))}
+     </div>
+   </div>
+ )}
+
+
+ {all.length === 0 ? (
  <div className={`mt-24 flex flex-col items-center text-center px-6 transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
  <Sparkles className="h-9 w-9 text-primary"/>
@@ -329,6 +330,48 @@ export default function Flashcards() {
  <p className="mt-1 text-sm text-muted-foreground">Tap a word while reading to save it here.</p>
  <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5 relief-raised">Browse Library</Button></Link>
  </div>
+ ) : tab === 'grammar' ? (
+ <ul className="stagger-children mt-2 space-y-2 px-6">
+   {filteredGrammar.map((item) => {
+     const mastery = item.mastery || 0;
+     const level = masteryLevel(mastery);
+     const isDue = dueIds.has(item.id);
+     const pct = Math.min(100, (mastery / 5) * 100);
+     return (
+       <li key={item.id}>
+         <Link
+           to={`/grammar/${item.id}`}
+           className="relative flex items-center gap-3 rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift tap-scale"
+         >
+           <span className={cn('h-10 w-1.5 flex-shrink-0 rounded-full', LEVEL_BAR[level])} aria-hidden />
+           <div className="min-w-0 flex-1">
+             <div className="flex items-center gap-2">
+               <span
+                 className="rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white shrink-0"
+                 style={{ backgroundColor: jlptColors[item.jlpt] || '#888' }}
+               >
+                 {item.jlpt}
+               </span>
+               <p className="font-japanese text-[16px] font-bold leading-tight truncate">{item.pattern}</p>
+               {isDue && <span className="ml-auto rounded-full bg-[hsl(var(--state-due)/0.15)] px-2 py-0.5 text-[10px] font-bold text-[hsl(var(--state-due))]">Due</span>}
+             </div>
+             <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{item.meaning}</p>
+             <div className="mt-2 flex items-center gap-2">
+               <Progress value={pct} className="h-1 flex-1"/>
+               <span className="text-[10px] font-semibold tabular-nums text-foreground/60">{Math.round(pct)}%</span>
+             </div>
+           </div>
+           <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+         </Link>
+       </li>
+     );
+   })}
+   {filteredGrammar.length === 0 && (
+     <p className="text-center text-sm text-muted-foreground mt-8">
+       {savedGrammar.length === 0 ? 'No grammar saved yet.' : 'No grammar matches your filters.'}
+     </p>
+   )}
+ </ul>
  ) : (
  <ul className="stagger-children mt-2 space-y-2 px-6">
  {filteredWords.map((w) => {
@@ -379,8 +422,6 @@ export default function Flashcards() {
  <p className="text-center text-sm text-muted-foreground mt-8">No words match your filters.</p>
  )}
  </ul>
-  )}
-  </>
   )}
  </div>
 

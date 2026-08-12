@@ -85,6 +85,14 @@ export interface CloudSavedGrammar {
  example: string;
  jlpt: string;
  tip: string;
+ // SRS fields (stored inside the payload jsonb)
+ mastery?: number;
+ easeFactor?: number;
+ interval?: number;
+ reps?: number;
+ lapses?: number;
+ lastReviewedAt?: string;
+ nextReviewAt?: string;
 }
 
 export async function pullSavedGrammar(userId: string): Promise<CloudSavedGrammar[]> {
@@ -104,6 +112,13 @@ export async function pullSavedGrammar(userId: string): Promise<CloudSavedGramma
  example: p.example ??'',
  jlpt: p.jlpt ??'',
  tip: p.tip ??'',
+ mastery: typeof p.mastery === 'number' ? p.mastery : undefined,
+ easeFactor: typeof p.easeFactor === 'number' ? p.easeFactor : undefined,
+ interval: typeof p.interval === 'number' ? p.interval : undefined,
+ reps: typeof p.reps === 'number' ? p.reps : undefined,
+ lapses: typeof p.lapses === 'number' ? p.lapses : undefined,
+ lastReviewedAt: p.lastReviewedAt ?? undefined,
+ nextReviewAt: p.nextReviewAt ?? undefined,
  };
  });
 }
@@ -122,6 +137,13 @@ export async function pushSavedGrammar(userId: string, item: CloudSavedGrammar):
  example: item.example,
  jlpt: item.jlpt,
  tip: item.tip,
+ mastery: item.mastery ?? 0,
+ easeFactor: item.easeFactor ?? 2.5,
+ interval: item.interval ?? 0,
+ reps: item.reps ?? 0,
+ lapses: item.lapses ?? 0,
+ lastReviewedAt: item.lastReviewedAt ?? null,
+ nextReviewAt: item.nextReviewAt ?? null,
  },
  });
  if (error) throw error;

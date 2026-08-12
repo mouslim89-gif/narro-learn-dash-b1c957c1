@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from'react';
 import { cn } from '@/lib/utils';
 import { SavedWord, useFlashcardStore } from'@/stores/flashcards';
+import { SavedGrammar, useSavedGrammarStore } from'@/stores/saved-grammar';
+import { GrammarCardFront, GrammarCardBack } from'@/components/GrammarReviewFaces';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { ExampleSentence } from'@/components/ExampleSentence';
 import { FuriganaSentence } from'@/components/FuriganaSentence';
@@ -11,8 +13,14 @@ import { toRomaji } from'wanakana';
 import { Trash2, X, BookOpen, ChevronDown, Eye, EyeClosed, Trophy, TrendingUp, Calendar } from'lucide-react';
 import confetti from 'canvas-confetti';
 
+export type ReviewCard = SavedWord | SavedGrammar;
+
+export function isGrammarCard(card: ReviewCard): card is SavedGrammar {
+  return (card as SavedGrammar).pattern !== undefined;
+}
+
 interface Props {
- deck: SavedWord[];
+ deck: ReviewCard[];
  onExit: () => void;
 }
 
@@ -20,8 +28,10 @@ const DEFAULT_MEANINGS = 3;
 
 export function FlashcardReview({ deck, onExit }: Props) {
  const { adjustMastery, removeWord } = useFlashcardStore();
+ const adjustGrammarMastery = useSavedGrammarStore(s => s.adjustMastery);
+ const removeGrammar = useSavedGrammarStore(s => s.removeGrammar);
  // Snapshot the deck once, then manage review-session deletions locally.
- const [localDeck, setLocalDeck] = useState<SavedWord[]>(() => deck);
+ const [localDeck, setLocalDeck] = useState<ReviewCard[]>(() => deck);
  const [currentIdx, setCurrentIdx] = useState(0);
  const [flipped, setFlipped] = useState(false);
  const [animClass, setAnimClass] = useState('');
@@ -122,18 +132,21 @@ export function FlashcardReview({ deck, onExit }: Props) {
   }
 
  const card = localDeck[currentIdx];
+ const grammarCard = isGrammarCard(card) ? card : null;
+ const wordCard = grammarCard ? null : (card as SavedWord);
  const progressPct = ((currentIdx + 1) / localDeck.length) * 100;
- const visibleMeanings = showAllMeanings ? card.meanings : card.meanings.slice(0, DEFAULT_MEANINGS);
- const hiddenMeaningsCount = Math.max(0, card.meanings.length - DEFAULT_MEANINGS);
+ const meanings = wordCard?.meanings ?? [];
+ const visibleMeanings = showAllMeanings ? meanings : meanings.slice(0, DEFAULT_MEANINGS);
+ const hiddenMeaningsCount = Math.max(0, meanings.length - DEFAULT_MEANINGS);
 
  const handleAnswer = (quality: SrsQualityLabel) => {
- advance(() => adjustMastery(card.id, quality));
+ advance(() => (grammarCard ? adjustGrammarMastery(card.id, quality) : adjustMastery(card.id, quality)));
  };
 
  const handleDeleteCurrent = () => {
  const deletedId = card.id;
  setShowDeleteDialog(false);
- removeWord(deletedId);
+ if (grammarCard) removeGrammar(deletedId); else removeWord(deletedId);
  setAnimClass('animate-card-out');
 
  window.setTimeout(() => {
@@ -205,14 +218,16 @@ export function FlashcardReview({ deck, onExit }: Props) {
  >
  {/* Front face */}
  <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
+ {grammarCard ? <GrammarCardFront item={grammarCard} /> : (
+ <>
  {/* decorative kanji watermark */}
  <span className="pointer-events-none select-none absolute -top-10 -right-6 font-japanese text-[220px] leading-none font-bold text-foreground/[0.025]">
- {card.word.charAt(0)}
+ {wordCard!.word.charAt(0)}
  </span>
 
  <div className="relative flex-1 flex flex-col items-center justify-center px-6">
  <p className="font-japanese text-[72px] leading-none font-bold tracking-tight text-foreground select-none drop-shadow-sm">
- {card.word}
+ {wordCard!.word}
  </p>
  <div className="mt-7 h-[2px] w-12 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent"/>
  <p
@@ -220,7 +235,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  showFrontReading ?'text-muted-foreground opacity-100':'text-muted-foreground opacity-0 blur-md select-none'}`}
  aria-hidden={!showFrontReading}
  >
- {card.reading ||'—'}
+ {wordCard!.reading ||'—'}
  </p>
  </div>
 
@@ -236,34 +251,38 @@ export function FlashcardReview({ deck, onExit }: Props) {
  >
  {showFrontReading ? <Eye className="h-[18px] w-[18px]"/> : <EyeClosed className="h-[18px] w-[18px]"/>}
  </button>
- <PlayWordButton word={card.word} reading={card.reading} size={26} />
+ <PlayWordButton word={wordCard!.word} reading={wordCard!.reading} size={26} />
  </div>
 
  <p className="absolute bottom-2.5 left-0 right-0 text-center text-[10px] uppercase tracking-[0.25em] font-medium text-muted-foreground/50 pointer-events-none">
  Tap to reveal
  </p>
+ </>
+ )}
  </div>
 
  {/* Back face */}
  <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/30 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
+ {grammarCard ? <GrammarCardBack item={grammarCard} /> : (
+ <>
  {/* Header — word + reading */}
  <div className="flex-none px-5 pt-5 pb-3">
  <div className="flex items-start justify-between gap-3">
  <div className="min-w-0 flex-1">
- <p className="font-japanese text-[34px] leading-[0.95] font-bold tracking-tight">{card.word}</p>
- <p className="font-japanese text-[15px] font-medium text-foreground/70 mt-1.5">{card.reading}</p>
+ <p className="font-japanese text-[34px] leading-[0.95] font-bold tracking-tight">{wordCard!.word}</p>
+ <p className="font-japanese text-[15px] font-medium text-foreground/70 mt-1.5">{wordCard!.reading}</p>
  <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">
- {toRomaji(card.reading || card.word)}
+ {toRomaji(wordCard!.reading || wordCard!.word)}
  </p>
  </div>
  <div data-no-flip className="shrink-0 -mr-1"onClick={(e) => e.stopPropagation()}>
- <PlayWordButton word={card.word} reading={card.reading} size={20} />
+ <PlayWordButton word={wordCard!.word} reading={wordCard!.reading} size={20} />
  </div>
  </div>
 
- {card.partsOfSpeech?.[0] && (
+ {wordCard!.partsOfSpeech?.[0] && (
  <p className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/60">
- {card.partsOfSpeech.slice(0, 2).join('·')}
+ {wordCard!.partsOfSpeech.slice(0, 2).join('·')}
  </p>
  )}
  </div>
@@ -301,7 +320,7 @@ export function FlashcardReview({ deck, onExit }: Props) {
  </section>
 
  {/* Context sentence */}
- {card.contextSentence && (
+ {wordCard!.contextSentence && (
  <section className="mt-4">
  <div className="flex items-center gap-1.5 mb-1.5">
  <BookOpen className="h-3 w-3 text-foreground/55 shrink-0"/>
@@ -309,13 +328,12 @@ export function FlashcardReview({ deck, onExit }: Props) {
  From your reading
  </p>
  </div>
-  <FuriganaSentence
-  tokens={card.contextTokens}
-  fallbackText={card.contextSentence}
-  highlight={card.word}
-  className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
-  />
-
+ <FuriganaSentence
+ tokens={wordCard!.contextTokens}
+ fallbackText={wordCard!.contextSentence}
+ highlight={wordCard!.word}
+ className="font-jp-serif text-[15px] leading-relaxed text-foreground/90 border-l-[3px] border-primary/40 pl-3"
+ />
  </section>
  )}
 
@@ -324,9 +342,11 @@ export function FlashcardReview({ deck, onExit }: Props) {
  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-1.5">
  Example
  </p>
- <ExampleSentence word={card.word} />
+ <ExampleSentence word={wordCard!.word} />
  </section>
  </div>
+ </>
+ )}
  </div>
  </div>
  </div>
