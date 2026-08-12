@@ -1,14 +1,17 @@
 import { useEffect } from'react';
 import { useAuth } from'@/contexts/AuthContext';
 import { useFlashcardStore } from'@/stores/flashcards';
+import { useSavedGrammarStore } from'@/stores/saved-grammar';
 import { useReadingProgressStore, currentPrefs } from'@/stores/reading-progress';
 import {
  pullFlashcards,
  pullProgress,
  pullPreferences,
+ pullSavedGrammar,
  pushPreferences,
  subscribeRealtime,
 } from'@/lib/sync/cloud-sync';
+
 
 /**
  * Hydrates the local Zustand stores from the cloud whenever the user changes,
