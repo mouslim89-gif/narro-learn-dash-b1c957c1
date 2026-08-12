@@ -40,7 +40,10 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
 
 export default function Flashcards() {
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
+ const savedGrammar = useSavedGrammarStore(s => s.savedItems);
+ const [tab, setTab] = useState<'words' | 'grammar'>('words');
  const [reviewMode, setReviewMode] = useState(false);
+
  const showEmpty = useDelayed(300);
  const headerRef = useRef<HTMLElement>(null);
  useScrollProgress(headerRef, 0, 56);
