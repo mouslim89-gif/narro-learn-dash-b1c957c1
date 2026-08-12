@@ -42,6 +42,8 @@ interface FlashcardStore {
   incrementMastery: (id: string) => void;
   resetMastery: (id: string) => void;
   adjustMastery: (id: string, quality: 'again' | 'hard' | 'good' | 'easy') => void;
+  /** Records one review in the shared daily counters / streak history. */
+  recordReview: (isFirstReview: boolean) => void;
   getDueCount: () => number;
   getDueWords: () => SavedWord[];
   getReviewedTodayCount: () => number;
@@ -145,12 +147,32 @@ export const useFlashcardStore = create<FlashcardStore>()(
  const w = updated.find(x => x.id === id);
  if (uid && w) schedulePush(uid, w);
  },
-      adjustMastery: (id, quality) => {
+      recordReview: (isFirstReview) => {
         const today = new Date().toISOString().split('T')[0];
         const currentReviewed = get().reviewedToday;
         const newCount = currentReviewed.date === today ? currentReviewed.count + 1 : 1;
 
         const currentNew = get().newToday;
+        const newTodayCount = isFirstReview
+          ? (currentNew.date === today ? currentNew.count + 1 : 1)
+          : (currentNew.date === today ? currentNew.count : 0);
+
+        const newHistory = [...get().history];
+        const histIdx = newHistory.findIndex(h => h.date === today);
+        if (histIdx >= 0) {
+          newHistory[histIdx] = { date: today, count: newCount };
+        } else {
+          newHistory.push({ date: today, count: newCount });
+          if (newHistory.length > 90) newHistory.shift(); // Keep 90 days
+        }
+
+        set({
+          reviewedToday: { date: today, count: newCount },
+          newToday: { date: today, count: newTodayCount },
+          history: newHistory,
+        });
+      },
+      adjustMastery: (id, quality) => {
         let isFirstReview = false;
 
         const updated = get().savedWords.map(w => {
@@ -163,27 +185,9 @@ export const useFlashcardStore = create<FlashcardStore>()(
           return { ...migrated, ...result };
         });
 
-        const newTodayCount = isFirstReview 
-          ? (currentNew.date === today ? currentNew.count + 1 : 1)
-          : (currentNew.date === today ? currentNew.count : 0);
+        set({ savedWords: updated });
+        get().recordReview(isFirstReview);
 
-        // Update history
-        let newHistory = [...get().history];
-        const histIdx = newHistory.findIndex(h => h.date === today);
-        if (histIdx >= 0) {
-          newHistory[histIdx] = { date: today, count: newCount };
-        } else {
-          newHistory.push({ date: today, count: newCount });
-          if (newHistory.length > 90) newHistory.shift(); // Keep 90 days
-        }
-
-        set({ 
-          savedWords: updated,
-          reviewedToday: { date: today, count: newCount },
-          newToday: { date: today, count: newTodayCount },
-          history: newHistory
-        });
-        
         const uid = get().syncUserId;
         const w = updated.find(x => x.id === id);
         if (uid && w) schedulePush(uid, w);
