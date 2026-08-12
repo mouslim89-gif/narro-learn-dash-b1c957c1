@@ -152,7 +152,63 @@ export default function Flashcards() {
  </Link>
  </header>
 
- {savedWords.length > 0 && (
+  {/* Words / Grammar switch */}
+  <div className="px-6 pt-4">
+    <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
+      {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
+        <button
+          key={key}
+          onClick={() => setTab(key)}
+          className={cn(
+            'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
+            tab === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
+          )}
+        >
+          {label} <span className="tabular-nums text-[11px] opacity-70">{count}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {tab === 'grammar' ? (
+    savedGrammar.length === 0 ? (
+      <div className={`mt-20 flex flex-col items-center text-center px-6 transition-opacity duration-200 ${showEmpty ?'opacity-100':'opacity-0'}`}>
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+          <Bookmark className="h-9 w-9 text-primary" />
+        </div>
+        <p className="mt-5 font-serif text-lg font-semibold">No grammar saved yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">Save a grammar point while reading to find it here.</p>
+      </div>
+    ) : (
+      <ul className="stagger-children mt-4 space-y-2 px-6">
+        {savedGrammar.map((item) => (
+          <li key={item.id}>
+            <Link
+              to={`/grammar/${item.id}`}
+              className="flex items-center gap-3 rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift tap-scale"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white shrink-0"
+                    style={{ backgroundColor: jlptColors[item.jlpt] || '#888' }}
+                  >
+                    {item.jlpt}
+                  </span>
+                  <p className="font-japanese text-[16px] font-bold leading-tight truncate">{item.pattern}</p>
+                </div>
+                <p className="mt-0.5 text-[12px] text-muted-foreground line-clamp-1">{item.meaning}</p>
+              </div>
+              <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    )
+  ) : (
+  <>
+  {savedWords.length > 0 && (
+
  <>
  {/* Hero review CTA */}
  <section className="px-6 pt-5">
