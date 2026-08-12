@@ -156,37 +156,8 @@ export default function MyBooks() {
   </div>
   )}
 
-  {savedGrammar.length > 0 && (
-    <div className="mt-10">
-      <div className="flex items-center gap-2 mb-4">
-        <Bookmark className="h-5 w-5 text-accent" />
-        <h2 className="font-serif text-xl font-bold">Saved Grammar</h2>
-      </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {savedGrammar.map((item) => (
-          <div 
-            key={item.id}
-            onClick={() => navigate(`/grammar/${item.id}`, { state: { note: item } })}
-            className="rounded-2xl bg-card p-4 ring-1 ring-border/30 shadow-sm card-lift cursor-pointer flex items-center justify-between gap-4"
-          >
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span 
-                  className="rounded-full px-1.5 py-0.5 text-[8px] font-bold text-white shrink-0"
-                  style={{ backgroundColor: jlptColors[item.jlpt] || '#888' }}
-                >
-                  {item.jlpt}
-                </span>
-                <span className="font-japanese font-bold text-base truncate">{item.pattern}</span>
-              </div>
-              <p className="text-sm text-muted-foreground truncate">{item.meaning}</p>
-            </div>
-            <ArrowLeft className="h-4 w-4 text-muted-foreground rotate-180" />
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
+
+
 
  </div>
  </div>
