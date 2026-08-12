@@ -373,7 +373,10 @@ export default function Flashcards() {
  <p className="text-center text-sm text-muted-foreground mt-8">No words match your filters.</p>
  )}
  </ul>
- )}
+  )}
+  </>
+  )}
  </div>
+
  );
 }
