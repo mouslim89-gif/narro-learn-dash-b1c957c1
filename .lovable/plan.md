@@ -18,7 +18,9 @@ Saved words (flashcards), reading progress and preferences all sync to the backe
 - `src/lib/sync/cloud-sync.ts`: add `pullSavedGrammar`, `pushSavedGrammar`, `deleteSavedGrammar`, mirroring the flashcard helpers and using `useSyncStatus`.
 - `src/stores/saved-grammar.ts`: keep the `tsundoku-saved-grammar` key unchanged; call the push/delete helpers from `saveGrammar` / `removeGrammar` when a user is signed in, plus a `mergeFromCloud(items)` action.
 - `src/hooks/use-cloud-sync.ts`: pull saved grammar alongside flashcards/progress on login and merge.
+- `src/pages/Flashcards.tsx`: local `tab` state (`'words' | 'grammar'`) driving a rounded-full segmented control in the app's pill style; grammar rows reuse the card pattern (`rounded-xl border bg-card ... card-lift tap-scale`) and link to `/grammar/:id`. Remove the grammar block from `src/pages/MyBooks.tsx`.
 - Verify with `tsgo` plus a signed-in check that a save round-trips into the table.
+
 
 ## Remaining gaps after this cycle
 
