@@ -299,6 +299,36 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_grammar: {
+        Row: {
+          book_id: string | null
+          created_at: string
+          item_id: string
+          payload: Json
+          saved_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id?: string | null
+          created_at?: string
+          item_id: string
+          payload?: Json
+          saved_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string | null
+          created_at?: string
+          item_id?: string
+          payload?: Json
+          saved_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sentence_translations: {
         Row: {
           created_at: string
