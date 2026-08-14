@@ -1,4 +1,6 @@
 import { useState, useMemo, useRef } from'react';
+import { motion } from 'framer-motion';
+
 import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
 import { useSavedGrammarStore } from'@/stores/saved-grammar';
@@ -188,24 +190,32 @@ export default function Flashcards() {
  <section className="px-6 pt-5">
  {(() => {
    const showScope = savedGrammar.length > 0 && savedWords.length > 0;
-    const scopePill = showScope ? (
-      <div className="mt-4">
-        <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
-          {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setScope(key)}
-              className={cn(
-                'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
-                scope === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-    ) : null;
+     const scopePill = showScope ? (
+       <div className="mt-4">
+         <div className="flex gap-1 rounded-full bg-muted p-1">
+           {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
+             <button
+               key={key}
+               onClick={() => setScope(key)}
+               className={cn(
+                 'relative flex h-7 flex-1 items-center justify-center rounded-full text-xs font-semibold smooth-colors',
+                 scope === key ? 'text-foreground' : 'text-muted-foreground',
+               )}
+             >
+               {scope === key && (
+                 <motion.div
+                   layoutId="seg-review-scope"
+                   className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
+                   transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+                 />
+               )}
+               <span className="relative z-10">{label}</span>
+             </button>
+           ))}
+         </div>
+       </div>
+     ) : null;
+
 
     return dueCount > 0 ? (
       <div
@@ -322,19 +332,27 @@ export default function Flashcards() {
  {/* Words / Grammar list switch */}
  {savedGrammar.length > 0 && all.length > 0 && (
    <div className="px-6 mt-4">
-     <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
-       {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
-         <button
-           key={key}
-           onClick={() => setTab(key)}
-           className={cn(
-             'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
-             tab === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
-           )}
-         >
-           {label} <span className="tabular-nums text-[11px] opacity-70">{count}</span>
-         </button>
-       ))}
+      <div className="flex gap-1 rounded-full bg-muted p-1">
+        {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={cn(
+              'relative flex h-7 flex-1 items-center justify-center gap-1 rounded-full text-xs font-semibold smooth-colors',
+              tab === key ? 'text-foreground' : 'text-muted-foreground',
+            )}
+          >
+            {tab === key && (
+              <motion.div
+                layoutId="seg-cards-list"
+                className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
+                transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+              />
+            )}
+            <span className="relative z-10">{label} <span className="tabular-nums text-[11px] opacity-70">{count}</span></span>
+          </button>
+        ))}
+
      </div>
    </div>
  )}
