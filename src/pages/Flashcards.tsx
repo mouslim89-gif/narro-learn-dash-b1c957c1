@@ -112,8 +112,13 @@ export default function Flashcards() {
      const q = search.trim().toLowerCase();
      items = items.filter(g => g.pattern.toLowerCase().includes(q) || (g.meaning || '').toLowerCase().includes(q));
    }
+   if (sortBy === 'mastery') {
+     items.sort((a, b) => (a.mastery || 0) - (b.mastery || 0));
+   }
+   // 'added' uses insertion order (oldest → newest)
+   if (sortDir === 'desc') items.reverse();
    return items;
- }, [savedGrammar, filter, search, dueIds]);
+ }, [savedGrammar, filter, search, sortBy, sortDir, dueIds]);
 
  const all = useMemo(() => [...savedWords, ...savedGrammar], [savedWords, savedGrammar]);
  const knownCount = all.filter(w => (w.mastery || 0) >= 3).length;
