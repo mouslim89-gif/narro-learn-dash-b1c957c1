@@ -104,49 +104,28 @@ export default function GrammarDetail() {
     fetchAiExamples();
   }, [note]);
 
-  // Furigana for the "From your reading" extract — cached locally, one AI call app-wide.
+  // Furigana for the "From your reading" extract — resolved from the book's
+  // pre-tokenized data (offline Kuromoji). No network call, no AI.
   useEffect(() => {
     if (!note?.example) return;
     setExampleTokens(null);
 
-    const cacheKey = `grammar_cache_${note.pattern}_${note.jlpt}`;
-    const readCache = () => {
-      try {
-        return JSON.parse(localStorage.getItem(cacheKey) || 'null') || {};
-      } catch {
-        return {};
-      }
-    };
-
-    const cached = readCache();
-    if (Array.isArray(cached.exampleTokens) && cached.exampleTokens.length > 0) {
-      setExampleTokens(cached.exampleTokens);
-      return;
-    }
+    const savedItem = id ? useSavedGrammarStore.getState().savedItems.find(i => i.id === id) : undefined;
+    const bookId: string | undefined = location.state?.bookId || savedItem?.bookId;
+    const difficulty: string | undefined = location.state?.difficulty || savedItem?.difficulty;
+    if (!bookId) return;
 
     let cancelled = false;
-    (async () => {
-      try {
-        const { data } = await supabase.functions.invoke('tatoeba-example', {
-          body: { mode: 'tokenize', sentence: note.example },
-        });
-        const tokens = data?.tokens;
-        if (!Array.isArray(tokens) || tokens.length === 0) return;
-        if (!cancelled) setExampleTokens(tokens);
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify({ ...readCache(), exampleTokens: tokens }));
-        } catch {
-          /* quota: ignore */
-        }
-      } catch (err) {
-        console.error('Failed to tokenize grammar example:', err);
-      }
-    })();
+    findSentenceTokens(bookId, note.example, difficulty)
+      .then((tokens) => {
+        if (!cancelled && tokens) setExampleTokens(tokens);
+      })
+      .catch(() => {/* fall back to plain text */});
 
     return () => {
       cancelled = true;
     };
-  }, [note]);
+  }, [note, id, location.state]);
 
 
 
@@ -157,9 +136,15 @@ export default function GrammarDetail() {
     if (saved) {
       removeGrammar(id);
     } else {
-      saveGrammar({ ...note, id });
+      saveGrammar({
+        ...note,
+        id,
+        bookId: location.state?.bookId,
+        difficulty: location.state?.difficulty,
+      });
     }
   };
+
 
   const handleBack = () => {
     if (window.history.length > 1) navigate(-1);
