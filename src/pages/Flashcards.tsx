@@ -189,22 +189,30 @@ export default function Flashcards() {
  {(() => {
    const showScope = savedGrammar.length > 0 && savedWords.length > 0;
     const scopePill = showScope ? (
-      <div className="mt-4">
-        <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
-          {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setScope(key)}
-              className={cn(
-                'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
-                scope === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+       <div className="mt-4">
+         <div className="flex gap-1 rounded-full bg-muted p-1">
+           {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
+             <button
+               key={key}
+               onClick={() => setScope(key)}
+               className={cn(
+                 'relative flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors',
+                 scope === key ? 'text-foreground' : 'text-muted-foreground',
+               )}
+             >
+               {scope === key && (
+                 <motion.div
+                   layoutId="seg-review-scope"
+                   className="absolute inset-0 rounded-full bg-card relief-raised ring-1 ring-border/40"
+                   transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+                 />
+               )}
+               <span className="relative z-10">{label}</span>
+             </button>
+           ))}
+         </div>
+       </div>
+
     ) : null;
 
     return dueCount > 0 ? (
