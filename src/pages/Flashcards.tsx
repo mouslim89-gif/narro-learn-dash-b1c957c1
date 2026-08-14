@@ -188,31 +188,31 @@ export default function Flashcards() {
  <section className="px-6 pt-5">
  {(() => {
    const showScope = savedGrammar.length > 0 && savedWords.length > 0;
-   const scopePill = showScope ? (
-     <div className="mt-4">
-       <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Review scope</p>
-       <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
-         {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
-           <button
-             key={key}
-             onClick={() => setScope(key)}
-             className={cn(
-               'flex-1 rounded-full py-1.5 text-[12px] font-semibold smooth-colors tap-scale-sm',
-               scope === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
-             )}
-           >
-             {label}
-           </button>
-         ))}
-       </div>
-     </div>
-   ) : null;
+    const scopePill = showScope ? (
+      <div className="mt-4">
+        <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
+          {([['all', 'All'], ['words', 'Words'], ['grammar', 'Grammar']] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setScope(key)}
+              className={cn(
+                'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
+                scope === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    ) : null;
 
-   return dueCount > 0 ? (
-     <div
-       className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40 card-lift"
-       style={{ backgroundImage: 'linear-gradient(135deg, hsl(36 80% 60% / 0.18) 0%, hsl(var(--card)) 60%)' }}
-     >
+    return dueCount > 0 ? (
+      <div
+        className="relative overflow-hidden rounded-2xl p-5 shadow-sm ring-1 ring-border/40"
+        style={{ backgroundImage: 'linear-gradient(135deg, hsl(36 80% 60% / 0.18) 0%, hsl(var(--card)) 60%)' }}
+      >
+
        <div className="flex items-center gap-4">
          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40">
            <Flame className="h-6 w-6" style={{ color: 'hsl(36 80% 55%)' }} />
