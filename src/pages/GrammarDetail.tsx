@@ -10,6 +10,7 @@ import { FuriganaSentence } from '@/components/FuriganaSentence';
 import { useSavedGrammarStore } from '@/stores/saved-grammar';
 import { supabase } from '@/integrations/supabase/client';
 import { preloadTranslations, type TranslationMap } from '@/lib/sentence-translations';
+import { findSentenceTokens } from '@/lib/book-token-lookup';
 
 export default function GrammarDetail() {
   const { id } = useParams<{ id: string }>();
