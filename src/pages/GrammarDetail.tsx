@@ -23,6 +23,7 @@ export default function GrammarDetail() {
   const [formations, setFormations] = useState<{ parts: string[] }[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [translations, setTranslations] = useState<TranslationMap>(new Map());
+  const [exampleTokens, setExampleTokens] = useState<{ t: string; r?: string }[] | null>(null);
 
   useEffect(() => {
     if (!note && id) {
