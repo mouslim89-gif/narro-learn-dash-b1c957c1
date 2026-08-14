@@ -1,26 +1,26 @@
-# Fix: back of card visible when advancing to the next flashcard
+# Furigana on "From your reading" (Grammar Details)
 
-## What happens today
+## Why it's missing
 
-When you answer a card, the review screen does two things at once:
+In Word Details, the reading extract is rendered with `FuriganaSentence` because the saved word carries `contextTokens` (surface + reading pairs), and when they're missing the page fetches them once via the `tatoeba-example` edge function in `tokenize` mode.
 
-- the card slides out (0.2s) and the next one slides in (0.25s)
-- the flip state resets from "back" to "front", but that reset is animated over 0.5s
+Grammar notes have no such data: `note.example` is a plain string, and Grammar Details renders it as raw text. Hence no furigana.
 
-Because the un-flip is slower than the slide, the new card is already visible on screen while it is still rotating back — so you briefly see the previous card's back face.
+## What to build
 
-## The fix
+Give the grammar extract the exact same treatment as Word Details:
 
-Reset the flip instantly (no rotation animation) while the card is off screen, then re-enable the flip transition for the user's own taps.
+1. Grammar Details resolves tokens for `note.example`:
+   - reuse the local grammar cache entry (`grammar_cache_<pattern>_<jlpt>`) if it already holds `exampleTokens`;
+   - otherwise one call to `tatoeba-example` with `{ mode: 'tokenize', sentence: note.example }`, then store the result back into that same cache entry.
+2. Render with `<FuriganaSentence tokens={...} fallbackText={note.example} />`, no `highlight` (per your choice: no pattern highlighting).
+3. Keep the current look: same card, same `font-jp-serif`, same left border. While tokens load, the plain sentence stays visible (no skeleton, no layout jump).
 
-Concretely, in `src/components/FlashcardReview.tsx`:
+## Cost safety
 
-- add a short-lived `instantReset` state
-- in `advance()` and in `handleDeleteCurrent()`, set it to `true` at the same moment `setFlipped(false)` / `setCurrentIdx` happen, and clear it on the next animation frame
-- when `instantReset` is true, the inner flip container gets `transition-none` instead of `transition-transform duration-500`
+The `tokenize` mode currently reads a cache but never writes one, so the same sentence could be re-tokenized by AI for every user. Fix that in the same pass: after tokenizing, upsert the sentence + tokens into `example_sentences` so the result is shared globally. Combined with the localStorage entry, each grammar extract costs at most one AI call ever, app-wide.
 
-Result: the new card always appears already showing its front, with no flash of the previous back face. The manual tap-to-flip animation stays exactly as it is.
+## Files touched
 
-## Notes
-
-No changes to SRS logic, deck handling, or styling.
+- `src/pages/GrammarDetail.tsx` — token resolution + `FuriganaSentence` rendering.
+- `supabase/functions/tatoeba-example/index.ts` — persist tokenize-mode results (service-role upsert).
