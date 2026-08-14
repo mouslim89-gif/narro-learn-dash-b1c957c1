@@ -132,15 +132,14 @@ const App = () => (
  <Sonner />
  <BrowserRouter>
  <AuthProvider>
-  <DarkModeSync />
-  <CloudSyncMount />
-  <SplashScreen />
-  <OnboardingCarousel />
-  <DictionaryPreloader />
-  <AnimatedRoutes />
-
-
-
+  <MotionPreference>
+   <DarkModeSync />
+   <CloudSyncMount />
+   <SplashScreen />
+   <OnboardingCarousel />
+   <DictionaryPreloader />
+   <AnimatedRoutes />
+  </MotionPreference>
  </AuthProvider>
  </BrowserRouter>
 
