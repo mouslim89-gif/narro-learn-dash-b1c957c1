@@ -102,8 +102,16 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ tokens: cached.tokens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
-      // 2. Tokenize with AI
+      // 2. Tokenize with AI, then persist so this sentence is never re-tokenized.
       const tokens = await tokenizeWithAI(sentence, key);
+      if (Array.isArray(tokens) && tokens.length > 0 && !(tokens.length === 1 && !tokens[0].r)) {
+        await supabase.from('example_sentences').upsert({
+          word: `tok:${sentence}`,
+          japanese: sentence,
+          english: '',
+          tokens,
+        });
+      }
       return new Response(JSON.stringify({ tokens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
