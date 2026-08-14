@@ -253,6 +253,26 @@
  inset 0 1px 2px hsl(0 0% 0% / 0.30);
 }
 
+/* Segmented control sliding pill. Same raised language as .relief-raised, but
+   with a vertically balanced shadow so the pill doesn't read as sitting high
+   inside its track (very visible on dark tracks). */
+.seg-pill {
+  box-shadow:
+    0 1px 0 hsl(210 22% 15% / 0.12),
+    0 1px 3px hsl(210 22% 15% / 0.14),
+    inset 0 1px 0 hsl(0 0% 100% / 0.75),
+    inset 0 -1px 0 hsl(210 22% 15% / 0.08);
+}
+.dark .seg-pill {
+  box-shadow:
+    0 0 4px hsl(0 0% 0% / 0.30),
+    0 1px 2px hsl(0 0% 0% / 0.22),
+    inset 0 1px 0 hsl(0 0% 100% / 0.08),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.18);
+}
+
+
+
 /* Inset relief for "active" or "pressed" states (e.g. toggles, saved states).
    Simulates the element being pressed into the surface with inner shadows. */
 .relief-inset {
