@@ -34,23 +34,31 @@ export function FlashcardReview({ deck, onExit }: Props) {
  const [localDeck, setLocalDeck] = useState<ReviewCard[]>(() => deck);
  const [currentIdx, setCurrentIdx] = useState(0);
  const [flipped, setFlipped] = useState(false);
- const [animClass, setAnimClass] = useState('');
- const [showDeleteDialog, setShowDeleteDialog] = useState(false);
- const [showAllMeanings, setShowAllMeanings] = useState(false);
- const [showFrontReading, setShowFrontReading] = useState(false);
- const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const [animClass, setAnimClass] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAllMeanings, setShowAllMeanings] = useState(false);
+  const [showFrontReading, setShowFrontReading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
  const advance = useCallback((action?: () => void) => {
  action?.();
  setAnimClass('animate-card-out');
- setTimeout(() => {
- setFlipped(false);
- setShowAllMeanings(false);
- setShowFrontReading(false);
- setCurrentIdx(i => i + 1);
- setAnimClass('animate-card-in');
- setTimeout(() => setAnimClass(''), 260);
- }, 200);
+    setTimeout(() => {
+      setIsResetting(true);
+      setFlipped(false);
+      setShowAllMeanings(false);
+      setShowFrontReading(false);
+      setCurrentIdx(i => i + 1);
+      setAnimClass('animate-card-in');
+      
+      // Clear the reset flag on next frame
+      requestAnimationFrame(() => {
+        setIsResetting(false);
+      });
+      
+      setTimeout(() => setAnimClass(''), 260);
+    }, 200);
  }, []);
 
   const { dailyGoal, getReviewedTodayCount } = useFlashcardStore();
@@ -149,16 +157,22 @@ export function FlashcardReview({ deck, onExit }: Props) {
  if (grammarCard) removeGrammar(deletedId); else removeWord(deletedId);
  setAnimClass('animate-card-out');
 
- window.setTimeout(() => {
- const nextDeck = localDeck.filter((word) => word.id !== deletedId);
- setLocalDeck(nextDeck);
- setCurrentIdx((index) => Math.min(index, nextDeck.length));
- setFlipped(false);
- setShowAllMeanings(false);
- setShowFrontReading(false);
- setAnimClass('animate-card-in');
- window.setTimeout(() => setAnimClass(''), 260);
- }, 200);
+    window.setTimeout(() => {
+      setIsResetting(true);
+      const nextDeck = localDeck.filter((word) => word.id !== deletedId);
+      setLocalDeck(nextDeck);
+      setCurrentIdx((index) => Math.min(index, nextDeck.length));
+      setFlipped(false);
+      setShowAllMeanings(false);
+      setShowFrontReading(false);
+      setAnimClass('animate-card-in');
+      
+      requestAnimationFrame(() => {
+        setIsResetting(false);
+      });
+
+      window.setTimeout(() => setAnimClass(''), 260);
+    }, 200);
  };
 
  return (
@@ -212,10 +226,13 @@ export function FlashcardReview({ deck, onExit }: Props) {
  setFlipped(!flipped);
  }}
  >
- <div
- className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
- flipped ?'rotate-y-180':''}`}
- >
+            <div
+              className={cn(
+                "relative w-full h-full transform-style-3d",
+                isResetting ? "transition-none" : "transition-transform duration-500",
+                flipped ? "rotate-y-180" : ""
+              )}
+            >
  {/* Front face */}
  <div className="backface-hidden absolute inset-0 flex flex-col rounded-[28px] bg-gradient-to-br from-card via-card to-muted/40 border border-border/60 shadow-[0_12px_36px_-18px_hsl(var(--foreground)/0.12),0_2px_8px_-4px_hsl(var(--foreground)/0.05)] overflow-hidden">
  {grammarCard ? <GrammarCardFront item={grammarCard} /> : (
