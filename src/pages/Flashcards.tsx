@@ -205,7 +205,7 @@ export default function Flashcards() {
                {scope === key && (
                  <motion.div
                    layoutId="seg-review-scope"
-                   className="absolute inset-0 rounded-full bg-card relief-raised ring-1 ring-border/40"
+                   className="absolute inset-0 rounded-full bg-card seg-pill ring-1 ring-border/40"
                    transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
                  />
                )}
@@ -345,7 +345,7 @@ export default function Flashcards() {
             {tab === key && (
               <motion.div
                 layoutId="seg-cards-tab"
-                className="absolute inset-0 rounded-full bg-card relief-raised ring-1 ring-border/40"
+                className="absolute inset-0 rounded-full bg-card seg-pill ring-1 ring-border/40"
                 transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
               />
             )}

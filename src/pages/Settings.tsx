@@ -167,7 +167,7 @@ export default function Settings() {
                     {fontSize === opt.value && (
                       <motion.div
                         layoutId="seg-fontsize-settings"
-                        className="absolute inset-0 rounded-full bg-card relief-raised ring-1 ring-border/40"
+                        className="absolute inset-0 rounded-full bg-card seg-pill ring-1 ring-border/40"
                         transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
                       />
                     )}
