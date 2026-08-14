@@ -332,19 +332,27 @@ export default function Flashcards() {
  {/* Words / Grammar list switch */}
  {savedGrammar.length > 0 && all.length > 0 && (
    <div className="px-6 mt-4">
-     <div className="flex items-center gap-1 rounded-full bg-muted/60 p-1 shadow-inner-sm">
-       {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
-         <button
-           key={key}
-           onClick={() => setTab(key)}
-           className={cn(
-             'flex-1 rounded-full py-2 text-[13px] font-semibold smooth-colors tap-scale-sm',
-             tab === key ? 'bg-background text-foreground shadow-sm ring-1 ring-border/40' : 'text-muted-foreground',
-           )}
-         >
-           {label} <span className="tabular-nums text-[11px] opacity-70">{count}</span>
-         </button>
-       ))}
+      <div className="flex gap-1 rounded-full bg-muted p-1">
+        {([['words', 'Words', savedWords.length], ['grammar', 'Grammar', savedGrammar.length]] as const).map(([key, label, count]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={cn(
+              'relative flex h-7 flex-1 items-center justify-center gap-1 rounded-full text-xs font-semibold smooth-colors',
+              tab === key ? 'text-foreground' : 'text-muted-foreground',
+            )}
+          >
+            {tab === key && (
+              <motion.div
+                layoutId="seg-cards-list"
+                className="absolute inset-0 rounded-full bg-background/90 relief-raised ring-1 ring-border/40"
+                transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.8 }}
+              />
+            )}
+            <span className="relative z-10">{label} <span className="tabular-nums text-[11px] opacity-70">{count}</span></span>
+          </button>
+        ))}
+
      </div>
    </div>
  )}
