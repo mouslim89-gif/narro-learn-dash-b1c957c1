@@ -265,7 +265,7 @@ export default function Settings() {
                   <div className="flex items-center gap-3">
                     <Wrench className="h-4 w-4 text-muted-foreground" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">Disable App Animation</span>
+                      <span className="text-sm font-medium">Disable animations</span>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Admin only</span>
                     </div>
                   </div>

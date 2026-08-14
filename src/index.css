@@ -661,6 +661,14 @@
  transition: opacity 0.4s var(--ease-out-soft);
 }
 
+/* Global motion kill-switch (Settings → Disable animations) */
+html.no-anim *,
+html.no-anim *::before,
+html.no-anim *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* Entrance animations */
 @keyframes fade-in-up {
  0% { opacity: 0; transform: translateY(8px); }
