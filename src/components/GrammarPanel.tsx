@@ -255,7 +255,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const id = slugifyPattern(note.pattern);
-                                navigate(`/grammar/${id}`, { state: { note } });
+                                navigate(`/grammar/${id}`, { state: { note, bookId, difficulty } });
                               }}
                             >
                               <ExternalLink className="h-3.5 w-3.5" />

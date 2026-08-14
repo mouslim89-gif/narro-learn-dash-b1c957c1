@@ -12,6 +12,8 @@ import {
 export interface SavedGrammar extends GrammarNote, SrsCard {
   id: string;
   bookId?: string;
+  /** Difficulty variant the extract came from — used to resolve furigana locally. */
+  difficulty?: string;
   savedAt: string;
   mastery: number;
 }
