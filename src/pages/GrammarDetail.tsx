@@ -104,6 +104,52 @@ export default function GrammarDetail() {
     fetchAiExamples();
   }, [note]);
 
+  // Furigana for the "From your reading" extract — cached locally, one AI call app-wide.
+  useEffect(() => {
+    if (!note?.example) return;
+    setExampleTokens(null);
+
+    const cacheKey = `grammar_cache_${note.pattern}_${note.jlpt}`;
+    const readCache = () => {
+      try {
+        return JSON.parse(localStorage.getItem(cacheKey) || 'null') || {};
+      } catch {
+        return {};
+      }
+    };
+
+    const cached = readCache();
+    if (Array.isArray(cached.exampleTokens) && cached.exampleTokens.length > 0) {
+      setExampleTokens(cached.exampleTokens);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase.functions.invoke('tatoeba-example', {
+          body: { mode: 'tokenize', sentence: note.example },
+        });
+        const tokens = data?.tokens;
+        if (!Array.isArray(tokens) || tokens.length === 0) return;
+        if (!cancelled) setExampleTokens(tokens);
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ ...readCache(), exampleTokens: tokens }));
+        } catch {
+          /* quota: ignore */
+        }
+      } catch (err) {
+        console.error('Failed to tokenize grammar example:', err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [note]);
+
+
+
   const saved = id ? isSaved(id) : false;
 
   const toggleSave = () => {
