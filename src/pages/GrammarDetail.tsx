@@ -23,6 +23,7 @@ export default function GrammarDetail() {
   const [formations, setFormations] = useState<{ parts: string[] }[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [translations, setTranslations] = useState<TranslationMap>(new Map());
+  const [exampleTokens, setExampleTokens] = useState<{ t: string; r?: string }[] | null>(null);
 
   useEffect(() => {
     if (!note && id) {
@@ -102,6 +103,52 @@ export default function GrammarDetail() {
 
     fetchAiExamples();
   }, [note]);
+
+  // Furigana for the "From your reading" extract — cached locally, one AI call app-wide.
+  useEffect(() => {
+    if (!note?.example) return;
+    setExampleTokens(null);
+
+    const cacheKey = `grammar_cache_${note.pattern}_${note.jlpt}`;
+    const readCache = () => {
+      try {
+        return JSON.parse(localStorage.getItem(cacheKey) || 'null') || {};
+      } catch {
+        return {};
+      }
+    };
+
+    const cached = readCache();
+    if (Array.isArray(cached.exampleTokens) && cached.exampleTokens.length > 0) {
+      setExampleTokens(cached.exampleTokens);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase.functions.invoke('tatoeba-example', {
+          body: { mode: 'tokenize', sentence: note.example },
+        });
+        const tokens = data?.tokens;
+        if (!Array.isArray(tokens) || tokens.length === 0) return;
+        if (!cancelled) setExampleTokens(tokens);
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ ...readCache(), exampleTokens: tokens }));
+        } catch {
+          /* quota: ignore */
+        }
+      } catch (err) {
+        console.error('Failed to tokenize grammar example:', err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [note]);
+
+
 
   const saved = id ? isSaved(id) : false;
 
@@ -259,7 +306,7 @@ export default function GrammarDetail() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm">
           <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
           <div className="font-jp-serif text-lg leading-relaxed text-foreground/90 border-l-4 border-primary/20 pl-4 py-1">
-            {note.example}
+            <FuriganaSentence tokens={exampleTokens ?? undefined} fallbackText={note.example} />
           </div>
         </section>
 
