@@ -279,7 +279,7 @@ export default function Flashcards() {
  </div>
 
  {/* Sort */}
- <div className={cn('mt-3 flex items-center justify-end px-6 gap-2', tab === 'grammar' && 'hidden')}>
+ <div className="mt-3 flex items-center justify-end px-6 gap-2">
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <button
