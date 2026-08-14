@@ -306,7 +306,7 @@ export default function GrammarDetail() {
         <section className="rounded-2xl bg-card p-5 ring-1 ring-border/40 shadow-sm">
           <h2 className="font-serif text-lg font-semibold mb-3">From your reading</h2>
           <div className="font-jp-serif text-lg leading-relaxed text-foreground/90 border-l-4 border-primary/20 pl-4 py-1">
-            {note.example}
+            <FuriganaSentence tokens={exampleTokens ?? undefined} fallbackText={note.example} />
           </div>
         </section>
 
