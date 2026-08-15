@@ -72,6 +72,46 @@ export default function Privacy() {
         <p>We never sell your data and we never share it for advertising.</p>
       </LegalSection>
 
+      <LegalSection heading="Data collected, at a glance">
+        <p>
+          This summary matches the disclosures we make in the App Store privacy label and the Google Play Data safety
+          form.
+        </p>
+        <div className="overflow-hidden rounded-xl ring-1 ring-border/40">
+          <table className="w-full text-left text-[13px]">
+            <thead className="bg-muted/60 text-[11px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 font-semibold">Data</th>
+                <th className="px-3 py-2 font-semibold">Purpose</th>
+                <th className="px-3 py-2 font-semibold">Linked to you</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/40">
+              <tr>
+                <td className="px-3 py-2">Contact info: email address</td>
+                <td className="px-3 py-2">Account and sign-in</td>
+                <td className="px-3 py-2">Yes</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2">App activity: reading progress, saved words and grammar, review history</td>
+                <td className="px-3 py-2">App functionality and sync</td>
+                <td className="px-3 py-2">Yes</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2">Purchases: subscription status and renewal date</td>
+                <td className="px-3 py-2">Managing your access</td>
+                <td className="px-3 py-2">Yes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          No data is used for tracking across other companies&apos; apps or websites, none is shared with data brokers
+          or advertisers, and no advertising identifiers are collected. All data is encrypted in transit. You can
+          request deletion of all of it at any time.
+        </p>
+      </LegalSection>
+
       <LegalSection heading="How long we keep it">
         <p>
           We keep your data for as long as your account exists. You can delete your account at any time from{' '}
