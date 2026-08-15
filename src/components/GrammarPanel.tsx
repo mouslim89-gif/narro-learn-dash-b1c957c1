@@ -27,6 +27,7 @@ interface GrammarPanelProps {
 
 export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
   const navigate = useNavigate();
+  const { isPremium, requirePremium } = usePremium();
 
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
