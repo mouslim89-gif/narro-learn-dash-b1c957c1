@@ -309,31 +309,44 @@ export default function BookDetail() {
               const cp = chapterProgressMap[ch.id];
               const pct = cp?.progressPercent ?? 0;
               const done = pct >= 100;
+              const locked = !isPremium && !isChapterFree(book, difficulty, ch.id);
+              const inner = (
+                <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
+                  <div className="flex items-center gap-3">
+                    <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
+                    done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
+                    {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                    <p className={cn('font-serif text-[15px] font-semibold leading-snug truncate', locked && 'text-muted-foreground')}>{ch.title}</p>
+                    {pct > 0 && !done && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                    <Progress value={pct} className="h-1 flex-1"/>
+                    <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
+                    </div>
+                    )}
+                    </div>
+                    {locked
+                      ? <Lock className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
+                      : <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>}
+                  </div>
+                </div>
+              );
               return (
                 <li key={ch.id}>
-                  <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
-                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
-                      <div className="flex items-center gap-3">
-                        <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
-                        done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
-                        {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                        <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
-                        {pct > 0 && !done && (
-                        <div className="mt-1.5 flex items-center gap-2">
-                        <Progress value={pct} className="h-1 flex-1"/>
-                        <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
-                        </div>
-                        )}
-                        </div>
-                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
-                      </div>
-                    </div>
-                  </Link>
+                  {locked ? (
+                    <button type="button" className="block w-full" onClick={() => requirePremium('chapters')}>
+                      {inner}
+                    </button>
+                  ) : (
+                    <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
+                      {inner}
+                    </Link>
+                  )}
                 </li>
               );
             })}
+
           </ul>
         </section>
       )}
