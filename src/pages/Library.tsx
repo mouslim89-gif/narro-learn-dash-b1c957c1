@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { romajiToKana } from '@/lib/romaji';
 import { ContinueHero } from '@/components/library/ContinueHero';
+import { PremiumCard } from '@/components/library/PremiumCard';
 import { cn } from '@/lib/utils';
 
 interface BookRailProps {
@@ -185,7 +186,11 @@ export default function Library() {
         </div>
       </Link>
     </section>
-  )}
+   )}
+
+   <PremiumCard />
+
+
 
 
   {/* Layout structure: Mixed Genre and Collections */}
