@@ -16,14 +16,23 @@ interface PlanOption {
   title: string;
   price: string;
   note: string;
+  sub?: string;
   badge?: string;
 }
 
 const PLANS: PlanOption[] = [
-  { id: 'monthly', title: 'Monthly', price: '$4.99', note: 'Billed every month' },
-  { id: 'yearly', title: 'Yearly', price: '$44.99', note: 'Billed every 12 months', badge: 'Best value' },
+  { id: 'monthly', title: 'Monthly', price: '$4.99', note: 'Billed every month', sub: '$4.99/mo' },
+  {
+    id: 'yearly',
+    title: 'Yearly',
+    price: '$44.99',
+    note: '7 days free, then billed every 12 months',
+    sub: '$3.75/mo, save $14.89 a year',
+    badge: '25% OFF',
+  },
   { id: 'lifetime', title: 'Lifetime', price: '$99.99', note: 'One payment, forever' },
 ];
+
 
 const BENEFITS = [
   'Every chapter of every book',
