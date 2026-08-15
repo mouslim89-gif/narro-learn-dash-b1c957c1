@@ -82,7 +82,7 @@ function AnimatedRoutes() {
  const { user, loading } = useAuth();
  const isReviewing = useFlashcardStore(s => s.isReviewing);
  const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
- const isLegalRoute = location.pathname ==='/terms'|| location.pathname ==='/privacy';
+ const isLegalRoute = ['/terms','/privacy','/credits','/support','/account-deletion'].includes(location.pathname);
  const path = location.pathname;
  const isDetailRoute =
  path.startsWith('/reader/') ||
