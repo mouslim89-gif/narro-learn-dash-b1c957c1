@@ -71,21 +71,51 @@ export default function Terms() {
 
       <LegalSection heading="6. Subscriptions and billing">
         <p>
-          Tsundoku offers a paid subscription that unlocks the full app. The price, billing period and included features
-          are shown before you confirm your purchase, and payments are processed by our payment provider. Subscriptions
-          renew automatically for the same period unless you cancel before the renewal date. Cancelling stops future
-          charges and keeps your access until the end of the period you already paid for.
+          Tsundoku offers an auto-renewing paid subscription that unlocks the full app. The subscription title, its
+          duration and its price per period are shown in the app before you confirm, and payment is charged on
+          confirmation of purchase. Prices include applicable taxes where required. We may change prices for future
+          billing periods and will tell you in advance so you can cancel if you disagree.
         </p>
         <p>
-          Prices include applicable taxes where required. We may change prices for future billing periods and will tell
-          you in advance so you can cancel if you disagree. Payments already made are not refunded on a pro rata basis
-          unless the law requires it.
+          <strong>Purchases made inside the mobile app.</strong> These are sold and billed by Apple through the App
+          Store or by Google through Google Play. The subscription renews automatically for the same period unless it is
+          cancelled at least 24 hours before the end of the current period. You manage and cancel it in your App Store
+          or Google Play account settings, not in Tsundoku, and refunds for these purchases are handled by the store
+          under its own policy. Deleting your Tsundoku account does not cancel a store subscription.
+        </p>
+        <p>
+          <strong>Purchases made on the web.</strong> These are processed by our payment provider and renew
+          automatically for the same period unless you cancel before the renewal date. Cancelling stops future charges
+          and keeps your access until the end of the period you already paid for. Payments already made are not refunded
+          on a pro rata basis unless the law requires it.
         </p>
         <p>
           <strong>EU right of withdrawal.</strong> As a consumer in the EU you normally have 14 days to withdraw from a
           purchase. By asking for immediate access to the paid digital content, you request that we begin performance
           during that period and acknowledge that you lose the right of withdrawal once the content has been fully
           supplied. Where the right still applies, write to us at the address above.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="7. Apps obtained from the App Store">
+        <p>
+          If you downloaded Tsundoku from the Apple App Store, the following applies. These terms are concluded between
+          you and us only, not with Apple, and we alone are responsible for the app and its content. Your licence to use
+          the app is a non-transferable licence to run it on Apple-branded devices you own or control, as permitted by
+          the App Store Terms of Service.
+        </p>
+        <p>
+          Apple has no obligation to provide maintenance or support for the app. If the app fails to conform to any
+          applicable warranty, you may notify Apple and Apple will refund the purchase price; to the maximum extent
+          permitted by law, Apple has no other warranty obligation. We, not Apple, are responsible for addressing any
+          claim relating to the app, including product liability, failure to conform to legal requirements, consumer
+          protection claims, and any third-party claim that the app infringes intellectual property rights.
+        </p>
+        <p>
+          You confirm that you are not located in a country subject to a US Government embargo or designated as a
+          terrorist-supporting country, and that you are not on any US Government list of prohibited or restricted
+          parties. Apple and its subsidiaries are third-party beneficiaries of these terms and may enforce them against
+          you.
         </p>
       </LegalSection>
 
