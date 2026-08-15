@@ -41,10 +41,10 @@ export default function Support() {
 
       <LegalSection heading="Subscription and billing">
         <p>
-          Subscriptions bought inside the mobile app are handled by the App Store or Google Play: manage or cancel them
-          from your store account settings, and request refunds through the store. For subscriptions bought on the web,
-          write to the address above.
+          Subscriptions are handled by the App Store or Google Play: manage or cancel them from your store account
+          settings, and request refunds through the store.
         </p>
+
       </LegalSection>
 
       <LegalSection heading="Account and data">

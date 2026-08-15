@@ -73,44 +73,25 @@ export default function Privacy() {
       </LegalSection>
 
       <LegalSection heading="Data collected, at a glance">
+        <ul className="list-disc space-y-1.5 pl-5">
+          <li>
+            <strong>Email address</strong>: for your account and sign-in.
+          </li>
+          <li>
+            <strong>App activity</strong>: reading progress, saved words and grammar, review history, for the app to
+            work and to sync across your devices.
+          </li>
+          <li>
+            <strong>Subscription status</strong>: to manage your access.
+          </li>
+        </ul>
         <p>
-          This summary matches the disclosures we make in the App Store privacy label and the Google Play Data safety
-          form.
-        </p>
-        <div className="overflow-hidden rounded-xl ring-1 ring-border/40">
-          <table className="w-full text-left text-[13px]">
-            <thead className="bg-muted/60 text-[11px] uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 font-semibold">Data</th>
-                <th className="px-3 py-2 font-semibold">Purpose</th>
-                <th className="px-3 py-2 font-semibold">Linked to you</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/40">
-              <tr>
-                <td className="px-3 py-2">Contact info: email address</td>
-                <td className="px-3 py-2">Account and sign-in</td>
-                <td className="px-3 py-2">Yes</td>
-              </tr>
-              <tr>
-                <td className="px-3 py-2">App activity: reading progress, saved words and grammar, review history</td>
-                <td className="px-3 py-2">App functionality and sync</td>
-                <td className="px-3 py-2">Yes</td>
-              </tr>
-              <tr>
-                <td className="px-3 py-2">Purchases: subscription status and renewal date</td>
-                <td className="px-3 py-2">Managing your access</td>
-                <td className="px-3 py-2">Yes</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          No data is used for tracking across other companies&apos; apps or websites, none is shared with data brokers
-          or advertisers, and no advertising identifiers are collected. All data is encrypted in transit. You can
-          request deletion of all of it at any time.
+          All of it is linked to your account. Nothing is used for tracking across other companies&apos; apps or
+          websites, nothing is shared with data brokers or advertisers, and no advertising identifiers are collected.
+          All data is encrypted in transit, and you can request deletion of all of it at any time.
         </p>
       </LegalSection>
+
 
       <LegalSection heading="How long we keep it">
         <p>
