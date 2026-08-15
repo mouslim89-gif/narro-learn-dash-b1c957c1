@@ -37,7 +37,7 @@ const PLANS: PlanOption[] = [
 const BENEFITS = [
   'Every chapter of every book',
   'Review mode with spaced repetition',
-  'Grammar notes while you read',
+  'Grammar explanations while you read',
   'Sentence translations',
   'Book audio with sentence sync',
 ];
@@ -45,7 +45,7 @@ const BENEFITS = [
 const FEATURE_PITCH: Partial<Record<PremiumFeature, string>> = {
   chapters: 'Keep reading this book',
   review: 'Unlock review mode',
-  'grammar-notes': 'Unlock grammar notes',
+  'grammar-notes': 'Unlock grammar explanations',
   translations: 'Unlock translations',
   audio: 'Unlock book audio',
 };
