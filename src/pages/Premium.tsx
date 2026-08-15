@@ -266,8 +266,7 @@ export default function Premium() {
           </>
         )}
 
-          </>
-        )}
+
 
         <div className="mt-6 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
           <Link to="/terms" className="underline underline-offset-2">Terms</Link>
