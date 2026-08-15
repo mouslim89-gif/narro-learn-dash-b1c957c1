@@ -13,6 +13,9 @@ import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
 import { hydrateDictionaryForBook, hydrateDictionaryFromTokens } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
+import { usePremium } from '@/hooks/use-premium';
+import { isChapterFree } from '@/lib/entitlements';
+
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
 import { WordMiniPopup } from '@/components/WordMiniPopup';
@@ -199,7 +202,9 @@ export default function Reader() {
  known: highlightKnown,
  };
  const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
+ const { isPremium, requirePremium } = usePremium();
  const saved = id ? getProgress(id, chapterId) : undefined;
+
 
  const [difficulty, setDifficulty] = useState<Difficulty>(
  (diffParam as Difficulty) || saved?.difficulty ||'simplified');
