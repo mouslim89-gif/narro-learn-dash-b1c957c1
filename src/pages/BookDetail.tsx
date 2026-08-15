@@ -5,7 +5,10 @@ import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasPart
 
 import { useEffect, useState, useMemo } from 'react';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
-import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles } from'lucide-react';
+import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles, Lock } from'lucide-react';
+import { usePremium } from'@/hooks/use-premium';
+import { isChapterFree } from'@/lib/entitlements';
+
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
@@ -20,6 +23,8 @@ export default function BookDetail() {
  const { id } = useParams();
  const goTo = useDelayedNav();
  const book = books.find((b) => b.id === id);
+ const { isPremium, requirePremium } = usePremium();
+
   const { getBookProgress, getChapterProgress } = useReadingProgressStore();
   const { savedWords } = useFlashcardStore();
   const bookProgress = id ? getBookProgress(id) : undefined;
