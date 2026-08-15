@@ -47,7 +47,7 @@ export function OnboardingCarousel() {
   };
 
   const isReader = location.pathname.startsWith('/reader/');
-  const isLegal = location.pathname === '/terms' || location.pathname === '/privacy';
+  const isLegal = ['/terms', '/privacy', '/credits', '/support', '/account-deletion'].includes(location.pathname);
 
   if (dismissed || isReader || isLegal || (hasCompletedCarousel && !alwaysReplayOnboarding)) return null;
 
