@@ -1095,7 +1095,7 @@ export default function Reader() {
     {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
   </HeaderChip>
   <HeaderChip
-    onClick={handleToggleTranslations}
+    onClick={() => { if (requirePremium('translations')) handleToggleTranslations(); }}
     active={showTranslations}
     title={showTranslations ? 'Hide translations' : 'Show translations'}
     data-tutorial="translation"
@@ -1103,9 +1103,10 @@ export default function Reader() {
     <Languages className="h-5 w-5" />
   </HeaderChip>
 
-  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
+  <HeaderChip onClick={() => { if (requirePremium('grammar-notes')) setShowGrammar(true); }} title="Grammar Notes" data-tutorial="grammar">
     <BookType className="h-5 w-5" />
   </HeaderChip>
+
    <HeaderChip
 
    onClick={() => setShowSettings(!showSettings)}
