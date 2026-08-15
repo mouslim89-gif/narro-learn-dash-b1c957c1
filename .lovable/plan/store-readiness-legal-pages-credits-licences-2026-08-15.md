@@ -8,6 +8,7 @@ All three sit outside `ProtectedRoute`, share the existing `LegalPage` layout, a
 
 **1. `/credits` | Credits & licences**
 Required by the licences of the data the app ships:
+
 - JMdict / JMnedict (Electronic Dictionary Research and Development Group, CC BY-SA 4.0) for word definitions, via Jisho.
 - KANJIDIC2 (EDRDG, CC BY-SA 4.0) for kanji details.
 - Tatoeba Project (CC BY 2.0 FR) for example sentences.
@@ -18,7 +19,7 @@ Each entry: name, what it is used for, licence name, link to the licence and to 
 **2. `/support` | Support & contact**
 Both stores want a reachable support URL. Contains: contact email, expected reply time, how to report a bug or a wrong definition, and a link to the two legal pages.
 
-**3. `/account-deletion`**
+**3. `/account-deletion**`
 Google Play requires a public web page, reachable without installing the app, that explains how to delete the account and what data is deleted or kept. Text only, pointing at Settings > Delete account for signed-in users and at the contact email otherwise. Lists exactly what is erased (account, progress, flashcards, saved grammar, preferences) and what is retained (billing records, for the legal accounting period).
 
 **4. Legal notice**
@@ -27,6 +28,7 @@ Added as a section at the top of `/terms` rather than a fourth page: trading nam
 ## Changes to the existing pages
 
 **Terms**
+
 - Legal notice block (above).
 - Apple-mandated clauses, required whenever an app is sold on the App Store: the terms are between you and Tsundoku and not with Apple; Apple has no obligation to provide support or maintenance; Apple is a third-party beneficiary entitled to enforce the terms; the publisher, not Apple, handles product claims, warranty and intellectual-property claims; export-control and US-embargo compliance statement.
 - Rewritten subscription section to cover in-app purchases: purchases made inside the mobile app are billed by Apple or Google, renew automatically unless cancelled at least 24 hours before the period ends, are managed and cancelled from the store account settings, and refunds for those purchases are handled by the store under its own policy. Web purchases keep the current wording, including the EU 14-day withdrawal clause.
@@ -34,6 +36,7 @@ Added as a section at the top of `/terms` rather than a fourth page: trading nam
 - Age requirement kept at 16 so it stays consistent with the age rating declared in both stores.
 
 **Privacy**
+
 - A short table mapping the collected data to the categories used by Apple's privacy nutrition label and Google's Data safety form (identifiers: email; app activity: reading and review history; purchases: subscription status), stating for each that it is linked to the user, not used for tracking, and not shared with third parties for advertising.
 - Explicit statement that no data is used for tracking across apps or websites, which is the answer both forms need.
 - Link to `/account-deletion`.
@@ -51,3 +54,9 @@ Settings > About gains three rows: Credits & licences, Support, Account deletion
 ## Still on you before submitting
 
 Fill in the legal-identity placeholders and the subscription price and period, then set the same Privacy, Support and Account-deletion URLs in App Store Connect and the Play Console, and answer the Data safety form to match the table in the Privacy page.
+
+The name is : Mavsarov M.
+
+Email is [thetsundokuapp@gmail.com](mailto:thetsundokuapp@gmail.com) 
+
+Country Belgium 
