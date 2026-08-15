@@ -13,6 +13,9 @@ import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
 import { hydrateDictionaryForBook, hydrateDictionaryFromTokens } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
+import { usePremium } from '@/hooks/use-premium';
+import { isChapterFree } from '@/lib/entitlements';
+
 import { FuriganaWord } from '@/components/FuriganaWord';
 import { WordPopup } from '@/components/WordPopup';
 import { WordMiniPopup } from '@/components/WordMiniPopup';
@@ -199,7 +202,9 @@ export default function Reader() {
  known: highlightKnown,
  };
  const chapterId = chapterParam || DEFAULT_CHAPTER_ID;
+ const { isPremium, requirePremium } = usePremium();
  const saved = id ? getProgress(id, chapterId) : undefined;
+
 
  const [difficulty, setDifficulty] = useState<Difficulty>(
  (diffParam as Difficulty) || saved?.difficulty ||'simplified');
@@ -260,11 +265,16 @@ export default function Reader() {
  const scrollTargetRef = useRef<number | null>(null);
 
  const book = books.find((b) => b.id === id);
+ const chapterLocked = !!book && !isPremium && !isChapterFree(book, difficulty, chapterId);
+ useEffect(() => {
+ if (chapterLocked) navigate('/premium', { replace: true, state: { feature: 'chapters' } });
+ }, [chapterLocked, navigate]);
  const audioVariant = book?.audio?.[difficulty];
  const audioUrl = useMemo(
  () => (id && audioVariant ? buildAudioUrl(id, difficulty) : null),
  [id, difficulty, audioVariant]
  );
+
 
  // Use pre-baked Kuromoji tokens, then aggressively merge conjugated forms
  // (verb + auxiliaries + て-compound auxiliaries) into single clickable units.
@@ -1085,7 +1095,7 @@ export default function Reader() {
     {showFurigana ? <Eye className="h-5 w-5" /> : <EyeClosed className="h-5 w-5" />}
   </HeaderChip>
   <HeaderChip
-    onClick={handleToggleTranslations}
+    onClick={() => { if (requirePremium('translations')) handleToggleTranslations(); }}
     active={showTranslations}
     title={showTranslations ? 'Hide translations' : 'Show translations'}
     data-tutorial="translation"
@@ -1093,9 +1103,10 @@ export default function Reader() {
     <Languages className="h-5 w-5" />
   </HeaderChip>
 
-  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
+  <HeaderChip onClick={() => { if (requirePremium('grammar-notes')) setShowGrammar(true); }} title="Grammar Notes" data-tutorial="grammar">
     <BookType className="h-5 w-5" />
   </HeaderChip>
+
    <HeaderChip
 
    onClick={() => setShowSettings(!showSettings)}
@@ -1232,7 +1243,7 @@ export default function Reader() {
  <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
- <Switch checked={showTranslations} onCheckedChange={handleToggleTranslations} />
+ <Switch checked={showTranslations} onCheckedChange={() => { if (requirePremium('translations')) handleToggleTranslations(); }} />
  </div>
  </div>
 
@@ -1662,7 +1673,7 @@ export default function Reader() {
   onJumpToExample={jumpToExample}
   />
 
- {audioUrl && (
+ {audioUrl && isPremium && (
  <AudioPlayer
  src={audioUrl}
  bottomOffset={0}

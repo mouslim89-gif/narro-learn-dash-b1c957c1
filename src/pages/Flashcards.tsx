@@ -5,7 +5,7 @@ import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
 import { useSavedGrammarStore } from'@/stores/saved-grammar';
 import { jlptColors } from'@/data/books';
-import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check, Bookmark, ChevronRight } from'lucide-react';
+import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check, Bookmark, ChevronRight, Lock } from'lucide-react';
 
 import { DelayedLink as Link } from'@/components/DelayedLink';
 import { PlayWordButton } from'@/components/PlayWordButton';
@@ -15,6 +15,8 @@ import { Progress } from'@/components/ui/progress';
 import { FlashcardReview, type ReviewCard } from'@/components/FlashcardReview';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { cn } from'@/lib/utils';
+import { usePremium } from'@/hooks/use-premium';
+
 import { romajiToKana } from'@/lib/romaji';
 import {
  DropdownMenu,
@@ -41,7 +43,9 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
 };
 
 export default function Flashcards() {
+ const { requirePremium, isPremium } = usePremium();
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
+
  const savedGrammar = useSavedGrammarStore(s => s.savedItems);
  const getDueGrammar = useSavedGrammarStore(s => s.getDueItems);
  const [tab, setTab] = useState<'words' | 'grammar'>('words');
@@ -53,10 +57,12 @@ export default function Flashcards() {
  useScrollProgress(headerRef, 0, 56);
 
  const enterReview = () => {
+   if (!requirePremium('review')) return;
    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
    const run = () => { setReviewMode(true); setIsReviewing(true); };
    if (reduce) run(); else window.setTimeout(run, 250);
  };
+
  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
  const [filter, setFilter] = useState<StatusFilter>('all');
  const [sortBy, setSortBy] = useState<SortOption>('added');
@@ -233,8 +239,9 @@ export default function Flashcards() {
            <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
          </div>
          <Button size="sm" className="rounded-full px-4 relief-premium" onClick={enterReview}>
-           Review <ArrowRight className="ml-1 h-3.5 w-3.5" />
+           Review {isPremium ? <ArrowRight className="ml-1 h-3.5 w-3.5" /> : <Lock className="ml-1 h-3.5 w-3.5" />}
          </Button>
+
        </div>
        {scopePill}
      </div>

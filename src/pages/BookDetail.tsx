@@ -5,7 +5,10 @@ import { books, difficultyConfig, genreLabels, hasAnyAudio, hasChapters, hasPart
 
 import { useEffect, useState, useMemo } from 'react';
 import { hydrateDictionaryForBook } from '@/lib/dictionary-db';
-import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles } from'lucide-react';
+import { ArrowLeft, ArrowRight, Headphones, BookOpen, Clock, CheckCircle2, ChevronRight, Sparkles, Lock } from'lucide-react';
+import { usePremium } from'@/hooks/use-premium';
+import { isChapterFree } from'@/lib/entitlements';
+
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
 import { useReadingProgressStore } from'@/stores/reading-progress';
@@ -20,6 +23,8 @@ export default function BookDetail() {
  const { id } = useParams();
  const goTo = useDelayedNav();
  const book = books.find((b) => b.id === id);
+ const { isPremium, requirePremium } = usePremium();
+
   const { getBookProgress, getChapterProgress } = useReadingProgressStore();
   const { savedWords } = useFlashcardStore();
   const bookProgress = id ? getBookProgress(id) : undefined;
@@ -304,31 +309,44 @@ export default function BookDetail() {
               const cp = chapterProgressMap[ch.id];
               const pct = cp?.progressPercent ?? 0;
               const done = pct >= 100;
+              const locked = !isPremium && !isChapterFree(book, difficulty, ch.id);
+              const inner = (
+                <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
+                  <div className="flex items-center gap-3">
+                    <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
+                    done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
+                    {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                    <p className={cn('font-serif text-[15px] font-semibold leading-snug truncate', locked && 'text-muted-foreground')}>{ch.title}</p>
+                    {pct > 0 && !done && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                    <Progress value={pct} className="h-1 flex-1"/>
+                    <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
+                    </div>
+                    )}
+                    </div>
+                    {locked
+                      ? <Lock className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
+                      : <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>}
+                  </div>
+                </div>
+              );
               return (
                 <li key={ch.id}>
-                  <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
-                    <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left relief-raised">
-                      <div className="flex items-center gap-3">
-                        <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
-                        done ?'bg-primary/15 text-primary ring-primary/20':'bg-muted text-muted-foreground ring-border/40')}>
-                        {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                        <p className="font-serif text-[15px] font-semibold leading-snug truncate">{ch.title}</p>
-                        {pct > 0 && !done && (
-                        <div className="mt-1.5 flex items-center gap-2">
-                        <Progress value={pct} className="h-1 flex-1"/>
-                        <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{pct}%</span>
-                        </div>
-                        )}
-                        </div>
-                        <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
-                      </div>
-                    </div>
-                  </Link>
+                  {locked ? (
+                    <button type="button" className="block w-full" onClick={() => requirePremium('chapters')}>
+                      {inner}
+                    </button>
+                  ) : (
+                    <Link to={`/reader/${book.id}/${difficulty}/${ch.id}`} className="block">
+                      {inner}
+                    </Link>
+                  )}
                 </li>
               );
             })}
+
           </ul>
         </section>
       )}
@@ -346,9 +364,8 @@ export default function BookDetail() {
  const cp = chapterProgressMap[partId];
  const pct = cp?.progressPercent ?? 0;
  const done = pct >= 100;
- return (
- <li key={partId}>
- <Link to={`/reader/${book.id}/${difficulty}/${partId}`} className="block">
+ const locked = !isPremium && !isChapterFree(book, difficulty, partId);
+ const inner = (
  <div className="card-lift tap-scale w-full rounded-xl bg-card p-4 text-left ring-1 ring-border/40 shadow-sm">
  <div className="flex items-center gap-3">
  <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-bold tabular-nums ring-1',
@@ -356,7 +373,7 @@ export default function BookDetail() {
  {done ? <CheckCircle2 className="h-4 w-4"/> : idx + 1}
  </span>
  <div className="min-w-0 flex-1">
- <p className="font-serif text-[15px] font-semibold leading-snug">{title}</p>
+ <p className={cn('font-serif text-[15px] font-semibold leading-snug', locked && 'text-muted-foreground')}>{title}</p>
  {pct > 0 && !done && (
  <div className="mt-1.5 flex items-center gap-2">
  <Progress value={pct} className="h-1 flex-1"/>
@@ -364,10 +381,24 @@ export default function BookDetail() {
  </div>
  )}
  </div>
- <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
+ {locked
+ ? <Lock className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>
+ : <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground"/>}
  </div>
  </div>
+ );
+ return (
+ <li key={partId}>
+ {locked ? (
+ <button type="button" className="block w-full" onClick={() => requirePremium('chapters')}>
+ {inner}
+ </button>
+ ) : (
+ <Link to={`/reader/${book.id}/${difficulty}/${partId}`} className="block">
+ {inner}
  </Link>
+ )}
+
  </li>
  );
  })}
