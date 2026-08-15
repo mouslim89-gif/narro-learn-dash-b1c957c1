@@ -1,5 +1,5 @@
 import { useState } from'react';
-import { Navigate, useLocation, useNavigate } from'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2 } from'lucide-react';
 import { Button } from'@/components/ui/button';
 import { Input } from'@/components/ui/input';
@@ -177,6 +177,13 @@ export default function Auth() {
  </>
  )}
  </Button>
+
+ <p className="pt-1 text-center text-[11px] leading-relaxed text-muted-foreground">
+ By continuing you agree to our{' '}
+ <Link to="/terms" className="font-medium text-accent underline underline-offset-4">Terms of Service</Link>
+ {' '}and{' '}
+ <Link to="/privacy" className="font-medium text-accent underline underline-offset-4">Privacy Policy</Link>.
+ </p>
  </form>
  </div>
 

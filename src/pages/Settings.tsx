@@ -7,7 +7,7 @@ import { useReadingProgressStore, type FontSize } from '@/stores/reading-progres
 import { useOnboardingStore } from '@/stores/onboarding';
 import { Button } from '@/components/ui/button';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { HelpCircle, RefreshCw, Wrench } from 'lucide-react';
+import { HelpCircle, RefreshCw, Wrench, ChevronRight } from 'lucide-react';
 import { useIsAdmin } from '@/lib/admin';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -316,6 +316,17 @@ export default function Settings() {
               </div>
               <div className="text-xs text-muted-foreground font-mono">v1.0</div>
             </div>
+          </div>
+
+          <div className="mt-3 rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <Link to="/terms" className="flex items-center justify-between px-4 py-4 tap-scale">
+              <span className="text-[15px]">Terms of Service</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link to="/privacy" className="flex items-center justify-between px-4 py-4 tap-scale">
+              <span className="text-[15px]">Privacy Policy</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </div>
         </section>
 
