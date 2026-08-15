@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { romajiToKana } from '@/lib/romaji';
 import { ContinueHero } from '@/components/library/ContinueHero';
+import { PremiumUpsellCard } from '@/components/library/PremiumUpsellCard';
+
 import { cn } from '@/lib/utils';
 
 interface BookRailProps {
@@ -196,7 +198,10 @@ export default function Library() {
     progress={progress} 
   />
   
+  <PremiumUpsellCard />
+
   <BookRail 
+
     title={genreLabels['folk-tales']} 
     books={books.filter(b => b.genre === 'folk-tales')} 
     progress={progress} 
