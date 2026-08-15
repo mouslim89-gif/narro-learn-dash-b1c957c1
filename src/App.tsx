@@ -30,6 +30,8 @@ import GrammarDetail from"./pages/GrammarDetail";
 import Auth from"./pages/Auth";
 
 import ResetPassword from"./pages/ResetPassword";
+import Terms from"./pages/Terms";
+import Privacy from"./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +79,7 @@ function AnimatedRoutes() {
  const { user, loading } = useAuth();
  const isReviewing = useFlashcardStore(s => s.isReviewing);
  const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
+ const isLegalRoute = location.pathname ==='/terms'|| location.pathname ==='/privacy';
  const path = location.pathname;
  const isDetailRoute =
  path.startsWith('/reader/') ||
@@ -85,7 +88,7 @@ function AnimatedRoutes() {
  path.startsWith('/grammar/') ||
  path ==='/settings';
 
- const hideNav = isDetailRoute || isReviewing || isAuthRoute;
+ const hideNav = isDetailRoute || isReviewing || isAuthRoute || isLegalRoute;
  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
  return (
@@ -104,6 +107,8 @@ function AnimatedRoutes() {
  <Routes location={location}>
  <Route path="/auth"element={<Auth />} />
  <Route path="/reset-password"element={<ResetPassword />} />
+ <Route path="/terms"element={<Terms />} />
+ <Route path="/privacy"element={<Privacy />} />
  <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
  <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
  <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />

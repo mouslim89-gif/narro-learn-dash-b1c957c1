@@ -47,8 +47,9 @@ export function OnboardingCarousel() {
   };
 
   const isReader = location.pathname.startsWith('/reader/');
+  const isLegal = location.pathname === '/terms' || location.pathname === '/privacy';
 
-  if (dismissed || isReader || (hasCompletedCarousel && !alwaysReplayOnboarding)) return null;
+  if (dismissed || isReader || isLegal || (hasCompletedCarousel && !alwaysReplayOnboarding)) return null;
 
   const nextSlide = () => {
     if (currentSlide === slides.length - 1) {
