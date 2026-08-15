@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { ChevronDown, ExternalLink, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { slugifyPattern } from '@/lib/grammar';
 
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { usePremium } from '@/hooks/use-premium';
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
@@ -26,6 +27,7 @@ interface GrammarPanelProps {
 
 export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
   const navigate = useNavigate();
+  const { isPremium, requirePremium } = usePremium();
 
   const [notes, setNotes] = useState<GrammarNote[]>([]);
   const [loading, setLoading] = useState(false);
@@ -81,14 +83,31 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
       .finally(() => setLoading(false));
   }, [open, fetched, text, bookId, difficulty, partIdx]);
 
+  // Notes follow the order their example appears in the chapter text.
+  const sortedNotes = useMemo(() => {
+    return notes
+      .map((note, i) => {
+        const pos = note.example ? text.indexOf(note.example) : -1;
+        return { note, i, pos: pos === -1 ? Number.MAX_SAFE_INTEGER : pos };
+      })
+      .sort((a, b) => (a.pos - b.pos) || (a.i - b.i))
+      .map((e) => e.note);
+  }, [notes, text]);
+
+  // Free users only get the first note; don't pay for translations behind the lock.
+  const readableNotes = useMemo(
+    () => (isPremium ? sortedNotes : sortedNotes.slice(0, 1)),
+    [sortedNotes, isPremium],
+  );
+
   // Batch preload translations for examples once notes are loaded
   useEffect(() => {
-    if (notes.length === 0 || !open) return;
+    if (readableNotes.length === 0 || !open) return;
 
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
 
-    const examples = notes.map(n => n.example).filter(Boolean);
+    const examples = readableNotes.map(n => n.example).filter(Boolean);
     if (examples.length === 0) return;
 
     preloadTranslations(examples, {
@@ -101,7 +120,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
     return () => {
       abortControllerRef.current?.abort();
     };
-  }, [notes, open]);
+  }, [readableNotes, open]);
 
   const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
@@ -174,13 +193,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
 
           {!loading && !error && notes.length > 0 && (
             <div className="flex flex-col gap-3">
-              {[...notes]
-                .sort((a, b) => {
-                  const order = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 } as const;
-                  return (order[a.jlpt] ?? 99) - (order[b.jlpt] ?? 99);
-                })
+              {sortedNotes
                 .map((note, i) => {
-                  const expanded = expandedIdx === i;
+                  const locked = !isPremium && i > 0;
+                  const expanded = !locked && expandedIdx === i;
                   const hash = hashes.get(note.example);
                   const translation = hash ? translations.get(hash) : null;
 
@@ -190,7 +206,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                       className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors"
                     >
                       <button
-                        onClick={() => setExpandedIdx(expanded ? null : i)}
+                        onClick={() => {
+                          if (locked) { requirePremium('grammar-notes'); return; }
+                          setExpandedIdx(expanded ? null : i);
+                        }}
                         className="w-full p-4 text-left tap-scale flex flex-col gap-1"
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -205,15 +224,27 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                               {note.pattern}
                             </span>
                           </div>
-                          <ChevronDown 
-                            className={cn(
-                              "h-4 w-4 text-muted-foreground flex-shrink-0 mt-1 transition-transform duration-200",
-                              expanded && "rotate-180"
-                            )} 
-                          />
+                          {locked ? (
+                            <Lock className="h-4 w-4 text-accent flex-shrink-0 mt-1" />
+                          ) : (
+                            <ChevronDown
+                              className={cn(
+                                "h-4 w-4 text-muted-foreground flex-shrink-0 mt-1 transition-transform duration-200",
+                                expanded && "rotate-180"
+                              )}
+                            />
+                          )}
                         </div>
-                        <p className="font-serif text-sm text-muted-foreground">{note.meaning}</p>
+                        <p
+                          className={cn(
+                            "font-serif text-sm text-muted-foreground",
+                            locked && "blur-[3px] select-none opacity-70"
+                          )}
+                        >
+                          {note.meaning}
+                        </p>
                       </button>
+
 
                       {expanded && (
                         <div className="px-4 pb-4 pt-0 space-y-3 animate-fade-in-soft">

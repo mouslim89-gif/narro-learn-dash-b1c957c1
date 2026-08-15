@@ -32,7 +32,7 @@ export function PremiumUpsellCard() {
               Unlock the full library
             </h3>
             <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">
-              Every chapter, review mode, grammar notes, translations and audio.
+              Every chapter, review mode, grammar explanations, translations and audio.
             </p>
           </div>
         </div>

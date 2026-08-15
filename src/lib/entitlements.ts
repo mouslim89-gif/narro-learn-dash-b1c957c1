@@ -11,7 +11,7 @@ export type PremiumFeature =
 export const FEATURE_LABELS: Record<PremiumFeature, string> = {
   chapters: 'Full books',
   review: 'Review mode',
-  'grammar-notes': 'Grammar notes',
+  'grammar-notes': 'Grammar explanations',
   translations: 'Translations',
   audio: 'Book audio',
 };

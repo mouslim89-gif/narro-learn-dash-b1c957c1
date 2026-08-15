@@ -1103,7 +1103,7 @@ export default function Reader() {
     <Languages className="h-5 w-5" />
   </HeaderChip>
 
-  <HeaderChip onClick={() => { if (requirePremium('grammar-notes')) setShowGrammar(true); }} title="Grammar Notes" data-tutorial="grammar">
+  <HeaderChip onClick={() => setShowGrammar(true)} title="Grammar Notes" data-tutorial="grammar">
     <BookType className="h-5 w-5" />
   </HeaderChip>
 
