@@ -119,7 +119,7 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="7. Availability and no warranty">
+      <LegalSection heading="8. Availability and no warranty">
         <p>
           Tsundoku is provided &quot;as is&quot;. We do our best to keep it available and accurate, but we do not
           guarantee uninterrupted service, or that definitions, translations and grammar explanations, some of which are
@@ -127,7 +127,7 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="8. Liability">
+      <LegalSection heading="9. Liability">
         <p>
           To the extent permitted by law, we are not liable for indirect or consequential damage, lost data or lost
           profits arising from your use of the app. Nothing here limits liability that cannot be limited by law,
@@ -135,7 +135,7 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="9. Termination">
+      <LegalSection heading="10. Termination">
         <p>
           You may stop using Tsundoku and delete your account at any time. We may suspend or end access if you breach
           these terms, or if we discontinue the service, in which case we will give reasonable notice where possible and
@@ -143,14 +143,14 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="10. Changes">
+      <LegalSection heading="11. Changes">
         <p>
           We may update these terms as the app evolves. The date at the top reflects the latest version, and material
           changes will be announced in the app. Continuing to use Tsundoku after a change means you accept it.
         </p>
       </LegalSection>
 
-      <LegalSection heading="11. Governing law">
+      <LegalSection heading="12. Governing law">
         <p>
           These terms are governed by the law applicable at our place of establishment, without affecting the mandatory
           consumer protections available to you in your country of residence, whose courts you may always turn to.
