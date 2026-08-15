@@ -54,6 +54,8 @@ export default function Settings() {
     useReadingProgressStore();
   const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
+  const { isPremium, plan } = usePremium();
+
   const { user, signOut } = useAuth();
   const { dailyGoal, setDailyGoal, dailyNewGoal, setDailyNewGoal } = useFlashcardStore();
   const navigate = useNavigate();
