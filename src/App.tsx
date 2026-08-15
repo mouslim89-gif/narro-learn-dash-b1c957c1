@@ -15,6 +15,8 @@ import { useOnboardingStore } from "@/stores/onboarding";
 
 
 import { useCloudSync } from"@/hooks/use-cloud-sync";
+import { useSubscriptionSync } from"@/hooks/use-premium";
+
 import { useReadingProgressStore } from"@/stores/reading-progress";
 import { useFlashcardStore } from"@/stores/flashcards";
 import Library from"./pages/Library";
@@ -35,6 +37,8 @@ import Privacy from"./pages/Privacy";
 import Credits from"./pages/Credits";
 import Support from"./pages/Support";
 import AccountDeletion from"./pages/AccountDeletion";
+import Premium from"./pages/Premium";
+
 
 const queryClient = new QueryClient();
 
@@ -74,8 +78,10 @@ function MotionPreference({ children }: { children: React.ReactNode }) {
 
 function CloudSyncMount() {
  useCloudSync();
+ useSubscriptionSync();
  return null;
 }
+
 
 function AnimatedRoutes() {
  const location = useLocation();
@@ -89,7 +95,9 @@ function AnimatedRoutes() {
  path.startsWith('/book/') ||
  (path.startsWith('/dictionary/') && path !=='/dictionary') ||
  path.startsWith('/grammar/') ||
+ path ==='/premium'||
  path ==='/settings';
+
 
  const hideNav = isDetailRoute || isReviewing || isAuthRoute || isLegalRoute;
  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
@@ -125,6 +133,7 @@ function AnimatedRoutes() {
  <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
  <Route path="/grammar/:id"element={<ProtectedRoute><GrammarDetail /></ProtectedRoute>} />
  <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+  <Route path="/premium"element={<ProtectedRoute><Premium /></ProtectedRoute>} />
 
  <Route path="*"element={<NotFound />} />
  </Routes>
