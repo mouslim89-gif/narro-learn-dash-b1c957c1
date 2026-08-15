@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { ChevronDown, ExternalLink, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { slugifyPattern } from '@/lib/grammar';
 
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { getGrammarFlat, getGrammarForPart, type GrammarNote } from '@/data/book-grammar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { usePremium } from '@/hooks/use-premium';
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { preloadTranslations, hashSentence, type TranslationMap } from '@/lib/sentence-translations';
