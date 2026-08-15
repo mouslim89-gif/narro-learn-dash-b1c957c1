@@ -295,9 +295,14 @@ export function MyComponent({ ... }: MyComponentProps) { ... }
 className="h-11 rounded-full bg-muted/60 border-transparent pl-11 text-sm shadow-inner-sm
            focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
 
-// Back button (fixed top-left)
-className="absolute left-5 top-5 z-10 flex h-10 w-10 items-center justify-center
-           rounded-full bg-background/70 backdrop-blur-md ring-1 ring-border/40"
+// Round header button / back button — ALWAYS include `header-chip` (gives the raised relief).
+// Canonical form (Word Detail, Grammar Detail, Legal pages):
+<Button variant="ghost" size="icon" aria-label="Back"
+  className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip">
+  <ArrowLeft className="h-[18px] w-[18px]" />
+</Button>
+// Fixed-overlay variant (Book Detail) adds:
+// "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 ... header-chip"
 
 // Section heading
 <h3 className="font-serif text-lg font-semibold text-foreground">
