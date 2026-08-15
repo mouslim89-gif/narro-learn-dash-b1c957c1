@@ -41,7 +41,9 @@ const LEVEL_BAR: Record<'new' | 'learning' | 'known', string> = {
 };
 
 export default function Flashcards() {
+ const { requirePremium, isPremium } = usePremium();
  const { savedWords, removeWord, getDueWords, setIsReviewing } = useFlashcardStore();
+
  const savedGrammar = useSavedGrammarStore(s => s.savedItems);
  const getDueGrammar = useSavedGrammarStore(s => s.getDueItems);
  const [tab, setTab] = useState<'words' | 'grammar'>('words');
@@ -53,10 +55,12 @@ export default function Flashcards() {
  useScrollProgress(headerRef, 0, 56);
 
  const enterReview = () => {
+   if (!requirePremium('review')) return;
    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
    const run = () => { setReviewMode(true); setIsReviewing(true); };
    if (reduce) run(); else window.setTimeout(run, 250);
  };
+
  const exitReview = () => { setReviewMode(false); setIsReviewing(false); };
  const [filter, setFilter] = useState<StatusFilter>('all');
  const [sortBy, setSortBy] = useState<SortOption>('added');
