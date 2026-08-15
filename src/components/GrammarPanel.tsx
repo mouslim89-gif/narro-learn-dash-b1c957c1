@@ -83,14 +83,31 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
       .finally(() => setLoading(false));
   }, [open, fetched, text, bookId, difficulty, partIdx]);
 
+  // Notes follow the order their example appears in the chapter text.
+  const sortedNotes = useMemo(() => {
+    return notes
+      .map((note, i) => {
+        const pos = note.example ? text.indexOf(note.example) : -1;
+        return { note, i, pos: pos === -1 ? Number.MAX_SAFE_INTEGER : pos };
+      })
+      .sort((a, b) => (a.pos - b.pos) || (a.i - b.i))
+      .map((e) => e.note);
+  }, [notes, text]);
+
+  // Free users only get the first note; don't pay for translations behind the lock.
+  const readableNotes = useMemo(
+    () => (isPremium ? sortedNotes : sortedNotes.slice(0, 1)),
+    [sortedNotes, isPremium],
+  );
+
   // Batch preload translations for examples once notes are loaded
   useEffect(() => {
-    if (notes.length === 0 || !open) return;
+    if (readableNotes.length === 0 || !open) return;
 
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
 
-    const examples = notes.map(n => n.example).filter(Boolean);
+    const examples = readableNotes.map(n => n.example).filter(Boolean);
     if (examples.length === 0) return;
 
     preloadTranslations(examples, {
@@ -103,7 +120,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
     return () => {
       abortControllerRef.current?.abort();
     };
-  }, [notes, open]);
+  }, [readableNotes, open]);
 
   const sectionLabel = "text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground";
 
