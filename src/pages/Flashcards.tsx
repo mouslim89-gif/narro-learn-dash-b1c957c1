@@ -15,6 +15,8 @@ import { Progress } from'@/components/ui/progress';
 import { FlashcardReview, type ReviewCard } from'@/components/FlashcardReview';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { cn } from'@/lib/utils';
+import { usePremium } from'@/hooks/use-premium';
+
 import { romajiToKana } from'@/lib/romaji';
 import {
  DropdownMenu,
