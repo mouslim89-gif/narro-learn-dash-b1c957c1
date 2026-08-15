@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { romajiToKana } from '@/lib/romaji';
 import { ContinueHero } from '@/components/library/ContinueHero';
+import { PremiumUpsellCard } from '@/components/library/PremiumUpsellCard';
+
 import { cn } from '@/lib/utils';
 
 interface BookRailProps {
