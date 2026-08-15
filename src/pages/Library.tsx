@@ -185,7 +185,11 @@ export default function Library() {
         </div>
       </Link>
     </section>
-  )}
+   )}
+
+   <PremiumCard />
+
+
 
 
   {/* Layout structure: Mixed Genre and Collections */}
