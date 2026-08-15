@@ -383,6 +383,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          original_transaction_id: string | null
+          plan: string | null
+          platform: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          original_transaction_id?: string | null
+          plan?: string | null
+          platform?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          original_transaction_id?: string | null
+          plan?: string | null
+          platform?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           created_at: string
@@ -483,6 +516,7 @@ export type Database = {
     Functions: {
       get_is_admin: { Args: never; Returns: boolean }
       is_admin: { Args: { _uid: string }; Returns: boolean }
+      is_premium: { Args: { _uid: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
