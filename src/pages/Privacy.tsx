@@ -5,15 +5,15 @@ export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      metaTitle="Privacy Policy — Tsundoku"
+      metaTitle="Privacy Policy | Tsundoku"
       metaDescription="How Tsundoku collects, uses and protects your personal data, and how to exercise your GDPR rights."
       canonicalPath="/privacy"
       lastUpdated="15 August 2026"
     >
       <LegalSection heading="Who we are">
         <p>
-          Tsundoku is a Japanese reading app operated from Belgium. Tsundoku is the data controller for the
-          personal data described below. You can reach us at{' '}
+          Tsundoku is a Japanese reading app and is the data controller for the personal data described below. You can
+          reach us at{' '}
           <a className="font-medium text-accent underline underline-offset-4" href="mailto:thetsundokuapp@gmail.com">
             thetsundokuapp@gmail.com
           </a>
@@ -25,23 +25,28 @@ export default function Privacy() {
         <p>We only collect what the app needs to work:</p>
         <ul className="list-disc space-y-1.5 pl-5">
           <li>
-            <strong>Account data</strong> — your email address and the authentication data required to sign you in.
+            <strong>Account data</strong>: your email address and the authentication data required to sign you in.
           </li>
           <li>
-            <strong>Learning data</strong> — your reading progress, saved words, saved grammar points, flashcard review
+            <strong>Learning data</strong>: your reading progress, saved words, saved grammar points, flashcard review
             history and app preferences.
+          </li>
+          <li>
+            <strong>Subscription data</strong>: your plan, its status and its renewal date, so we know what your account
+            has access to.
           </li>
         </ul>
         <p>
-          We do not collect your name, address, phone number or payment details, and we run no advertising, tracking or
-          analytics.
+          Card and payment details are handled directly by our payment provider and never reach our servers. We run no
+          advertising, tracking or analytics.
         </p>
       </LegalSection>
 
       <LegalSection heading="Why we use it">
         <p>
-          Your data is used solely to provide the service you asked for: keeping you signed in, saving your progress and
-          syncing it across your devices. The legal basis is the performance of our contract with you (Article 6(1)(b)
+          Your data is used solely to provide the service you asked for: keeping you signed in, saving your progress,
+          syncing it across your devices and managing your subscription. The legal basis is the performance of our
+          contract with you (Article 6(1)(b) GDPR), and our legal obligations for billing records (Article 6(1)(c)
           GDPR).
         </p>
       </LegalSection>
@@ -57,9 +62,10 @@ export default function Privacy() {
         <p>We rely on a small number of service providers to run Tsundoku:</p>
         <ul className="list-disc space-y-1.5 pl-5">
           <li>our hosting and backend provider, which stores your account and learning data on our behalf;</li>
+          <li>our payment provider, which processes subscription payments and holds your billing details;</li>
           <li>
             dictionary, translation and AI services used to generate word definitions, example sentences and sentence
-            translations. Only the Japanese word or sentence being looked up is sent to them — never your identity,
+            translations. Only the Japanese word or sentence being looked up is sent to them, never your identity,
             email or account data.
           </li>
         </ul>
@@ -73,7 +79,7 @@ export default function Privacy() {
             Settings
           </Link>
           ; deletion is immediate and permanent, and removes your account together with your progress, flashcards and
-          saved grammar.
+          saved grammar. Billing records are kept for as long as accounting law requires.
         </p>
       </LegalSection>
 
@@ -95,9 +101,8 @@ export default function Privacy() {
           and we will respond within one month.
         </p>
         <p>
-          If you believe your data is not handled properly, you may lodge a complaint with the Belgian Data Protection
-          Authority (Autorité de protection des données / Gegevensbeschermingsautoriteit), Rue de la Presse 35, 1000
-          Brussels.
+          If you believe your data is not handled properly, you may lodge a complaint with the data protection authority
+          of your country of residence.
         </p>
       </LegalSection>
 
