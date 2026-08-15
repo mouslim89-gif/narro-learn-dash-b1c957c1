@@ -29,6 +29,7 @@ export function LegalPage({
   metaDescription,
   canonicalPath,
   lastUpdated,
+  eyebrow = 'Legal',
   children,
 }: LegalPageProps) {
   const navigate = useNavigate();
