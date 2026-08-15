@@ -9,6 +9,7 @@ interface LegalPageProps {
   metaDescription: string;
   canonicalPath: string;
   lastUpdated: string;
+  eyebrow?: string;
   children: ReactNode;
 }
 
