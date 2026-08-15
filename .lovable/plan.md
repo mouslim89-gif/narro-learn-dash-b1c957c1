@@ -17,3 +17,12 @@
   - Locked card: pattern + JLPT badge render normally; the meaning paragraph gets `blur-[3px] select-none opacity-70`, a `Lock` icon (lucide) sits at the chevron position, and the button's onClick calls `requirePremium('grammar-notes')` rather than toggling `expandedIdx`. Locked cards can never expand.
   - Translation preloading only runs for the notes that are actually readable (free note + all notes when premium), so we don't pay for translations behind the lock.
 - No backend, entitlement, or paywall-copy changes; `grammar-notes` stays in `PremiumFeature`.
+
+## Premium wording
+
+In premium-facing copy only, "grammar notes" becomes "grammar explanations":
+- `src/pages/Premium.tsx`: benefit line "Grammar explanations while you read" and the feature headline "Unlock grammar explanations".
+- `src/lib/entitlements.ts`: `FEATURE_LABELS['grammar-notes']` becomes "Grammar explanations".
+- `src/components/library/PremiumUpsellCard.tsx`: "Every chapter, review mode, grammar explanations, translations and audio."
+
+The reader panel title stays "Grammar Notes", and the legal/credits pages are untouched.
