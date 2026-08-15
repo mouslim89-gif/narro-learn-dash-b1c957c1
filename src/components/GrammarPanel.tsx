@@ -193,13 +193,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
 
           {!loading && !error && notes.length > 0 && (
             <div className="flex flex-col gap-3">
-              {[...notes]
-                .sort((a, b) => {
-                  const order = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 } as const;
-                  return (order[a.jlpt] ?? 99) - (order[b.jlpt] ?? 99);
-                })
+              {sortedNotes
                 .map((note, i) => {
-                  const expanded = expandedIdx === i;
+                  const locked = !isPremium && i > 0;
+                  const expanded = !locked && expandedIdx === i;
                   const hash = hashes.get(note.example);
                   const translation = hash ? translations.get(hash) : null;
 
@@ -209,7 +206,10 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                       className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors"
                     >
                       <button
-                        onClick={() => setExpandedIdx(expanded ? null : i)}
+                        onClick={() => {
+                          if (locked) { requirePremium('grammar-notes'); return; }
+                          setExpandedIdx(expanded ? null : i);
+                        }}
                         className="w-full p-4 text-left tap-scale flex flex-col gap-1"
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -224,15 +224,27 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                               {note.pattern}
                             </span>
                           </div>
-                          <ChevronDown 
-                            className={cn(
-                              "h-4 w-4 text-muted-foreground flex-shrink-0 mt-1 transition-transform duration-200",
-                              expanded && "rotate-180"
-                            )} 
-                          />
+                          {locked ? (
+                            <Lock className="h-4 w-4 text-accent flex-shrink-0 mt-1" />
+                          ) : (
+                            <ChevronDown
+                              className={cn(
+                                "h-4 w-4 text-muted-foreground flex-shrink-0 mt-1 transition-transform duration-200",
+                                expanded && "rotate-180"
+                              )}
+                            />
+                          )}
                         </div>
-                        <p className="font-serif text-sm text-muted-foreground">{note.meaning}</p>
+                        <p
+                          className={cn(
+                            "font-serif text-sm text-muted-foreground",
+                            locked && "blur-[3px] select-none opacity-70"
+                          )}
+                        >
+                          {note.meaning}
+                        </p>
                       </button>
+
 
                       {expanded && (
                         <div className="px-4 pb-4 pt-0 space-y-3 animate-fade-in-soft">
