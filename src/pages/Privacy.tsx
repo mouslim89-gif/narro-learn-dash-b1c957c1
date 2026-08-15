@@ -119,7 +119,12 @@ export default function Privacy() {
             Settings
           </Link>
           ; deletion is immediate and permanent, and removes your account together with your progress, flashcards and
-          saved grammar. Billing records are kept for as long as accounting law requires.
+          saved grammar. Billing records are kept for as long as accounting law requires. Full details, including how to
+          request deletion by email, are on the{' '}
+          <Link className="font-medium text-accent underline underline-offset-4" to="/account-deletion">
+            Account deletion
+          </Link>{' '}
+          page.
         </p>
       </LegalSection>
 
