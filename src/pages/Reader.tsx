@@ -1243,7 +1243,7 @@ export default function Reader() {
  <Languages className="h-4 w-4 text-muted-foreground"/>
  Show English translations
  </span>
- <Switch checked={showTranslations} onCheckedChange={handleToggleTranslations} />
+ <Switch checked={showTranslations} onCheckedChange={() => { if (requirePremium('translations')) handleToggleTranslations(); }} />
  </div>
  </div>
 
@@ -1673,7 +1673,7 @@ export default function Reader() {
   onJumpToExample={jumpToExample}
   />
 
- {audioUrl && (
+ {audioUrl && isPremium && (
  <AudioPlayer
  src={audioUrl}
  bottomOffset={0}
