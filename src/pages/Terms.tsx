@@ -77,18 +77,13 @@ export default function Terms() {
           billing periods and will tell you in advance so you can cancel if you disagree.
         </p>
         <p>
-          <strong>Purchases made inside the mobile app.</strong> These are sold and billed by Apple through the App
-          Store or by Google through Google Play. The subscription renews automatically for the same period unless it is
-          cancelled at least 24 hours before the end of the current period. You manage and cancel it in your App Store
-          or Google Play account settings, not in Tsundoku, and refunds for these purchases are handled by the store
-          under its own policy. Deleting your Tsundoku account does not cancel a store subscription.
+          Subscriptions are sold and billed by Apple through the App Store or by Google through Google Play. The
+          subscription renews automatically for the same period unless it is cancelled at least 24 hours before the end
+          of the current period. You manage and cancel it in your App Store or Google Play account settings, not in
+          Tsundoku, and refunds are handled by the store under its own policy. Deleting your Tsundoku account does not
+          cancel a store subscription.
         </p>
-        <p>
-          <strong>Purchases made on the web.</strong> These are processed by our payment provider and renew
-          automatically for the same period unless you cancel before the renewal date. Cancelling stops future charges
-          and keeps your access until the end of the period you already paid for. Payments already made are not refunded
-          on a pro rata basis unless the law requires it.
-        </p>
+
         <p>
           <strong>EU right of withdrawal.</strong> As a consumer in the EU you normally have 14 days to withdraw from a
           purchase. By asking for immediate access to the paid digital content, you request that we begin performance
