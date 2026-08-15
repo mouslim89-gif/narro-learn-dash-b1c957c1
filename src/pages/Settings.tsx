@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { HelpCircle, RefreshCw, Wrench, ChevronRight } from 'lucide-react';
 import { useIsAdmin } from '@/lib/admin';
+import { usePremium } from '@/hooks/use-premium';
+import { openManageSubscriptions } from '@/lib/iap';
+
 
 import { useAuth } from '@/contexts/AuthContext';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
@@ -140,6 +143,42 @@ export default function Settings() {
                 </span>
               </button>
             </div>
+          </div>
+        </section>
+
+        {/* Subscription */}
+        <section>
+          <SectionLabel>Subscription</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex flex-col">
+                <span className="text-[15px] font-medium">Plan</span>
+                <span className="text-[11px] text-muted-foreground">
+                  {isPremium ? (plan === 'lifetime' ? 'Premium | Lifetime' : 'Premium') : 'Free'}
+                </span>
+              </div>
+              {isPremium ? (
+                <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                  Premium
+                </span>
+              ) : (
+                <Link
+                  to="/premium"
+                  className="rounded-full bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground tap-scale-sm"
+                >
+                  Upgrade
+                </Link>
+              )}
+            </div>
+            {isPremium && (
+              <button
+                onClick={() => openManageSubscriptions()}
+                className="w-full px-4 py-4 flex items-center justify-between text-[15px] smooth-colors tap-scale-sm"
+              >
+                <span>Manage subscription</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </section>
 
