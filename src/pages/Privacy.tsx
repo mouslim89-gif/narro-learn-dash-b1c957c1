@@ -106,12 +106,6 @@ export default function Privacy() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="Children">
-        <p>
-          Tsundoku is not directed at children under 16. If you believe a child has created an account, contact us and
-          we will delete it.
-        </p>
-      </LegalSection>
 
       <LegalSection heading="Changes to this policy">
         <p>
