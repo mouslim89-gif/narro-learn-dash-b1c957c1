@@ -265,11 +265,16 @@ export default function Reader() {
  const scrollTargetRef = useRef<number | null>(null);
 
  const book = books.find((b) => b.id === id);
+ const chapterLocked = !!book && !isPremium && !isChapterFree(book, difficulty, chapterId);
+ useEffect(() => {
+ if (chapterLocked) navigate('/premium', { replace: true, state: { feature: 'chapters' } });
+ }, [chapterLocked, navigate]);
  const audioVariant = book?.audio?.[difficulty];
  const audioUrl = useMemo(
  () => (id && audioVariant ? buildAudioUrl(id, difficulty) : null),
  [id, difficulty, audioVariant]
  );
+
 
  // Use pre-baked Kuromoji tokens, then aggressively merge conjugated forms
  // (verb + auxiliaries + て-compound auxiliaries) into single clickable units.
