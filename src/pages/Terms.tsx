@@ -12,12 +12,23 @@ export default function Terms() {
     >
       <LegalSection heading="1. Who we are">
         <p>
-          Tsundoku (&quot;we&quot;, &quot;us&quot;) is a Japanese reading app. Contact:{' '}
-          <a className="font-medium text-accent underline underline-offset-4" href="mailto:thetsundokuapp@gmail.com">
-            thetsundokuapp@gmail.com
-          </a>
-          . By creating an account or using the app, you agree to these terms.
+          Tsundoku (&quot;we&quot;, &quot;us&quot;) is a Japanese reading app published by an individual developer. By
+          creating an account or using the app, you agree to these terms.
         </p>
+        <ul className="list-none space-y-1 pl-0 text-[15px]">
+          <li>
+            <strong>Publisher</strong>: Mavsarov M., trading as Tsundoku
+          </li>
+          <li>
+            <strong>Country of establishment</strong>: Belgium
+          </li>
+          <li>
+            <strong>Contact</strong>:{' '}
+            <a className="font-medium text-accent underline underline-offset-4" href="mailto:thetsundokuapp@gmail.com">
+              thetsundokuapp@gmail.com
+            </a>
+          </li>
+        </ul>
       </LegalSection>
 
       <LegalSection heading="2. Eligibility">
