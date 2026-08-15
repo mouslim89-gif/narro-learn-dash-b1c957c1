@@ -184,6 +184,11 @@ export default function Auth() {
  {' '}and{' '}
  <Link to="/privacy" className="font-medium text-accent underline underline-offset-4">Privacy Policy</Link>.
  </p>
+ <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+ <Link to="/credits" className="underline underline-offset-4">Credits</Link>
+ {' · '}
+ <Link to="/support" className="underline underline-offset-4">Support</Link>
+ </p>
  </form>
  </div>
 
