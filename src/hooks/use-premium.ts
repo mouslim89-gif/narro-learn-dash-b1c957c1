@@ -2,8 +2,10 @@ import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/lib/admin';
+import { supabase } from '@/integrations/supabase/client';
 import { isEntitled, useSubscriptionStore } from '@/stores/subscription';
 import type { PremiumFeature } from '@/lib/entitlements';
+
 
 /** Mounted once in App: hydrates the entitlement and keeps it fresh. */
 export function useSubscriptionSync() {
@@ -30,8 +32,6 @@ export function useSubscriptionSync() {
 
 // Kept separate so the effect above stays readable.
 function supabaseChannel(userId: string, onChange: () => void) {
-  // Lazy import avoids pulling realtime into modules that don't need it.
-  const { supabase } = require('@/integrations/supabase/client');
   return supabase
     .channel(`subscription-${userId}`)
     .on(
@@ -41,6 +41,7 @@ function supabaseChannel(userId: string, onChange: () => void) {
     )
     .subscribe();
 }
+
 
 export function usePremium() {
   const navigate = useNavigate();
