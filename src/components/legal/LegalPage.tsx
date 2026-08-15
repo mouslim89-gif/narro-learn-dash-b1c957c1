@@ -9,6 +9,7 @@ interface LegalPageProps {
   metaDescription: string;
   canonicalPath: string;
   lastUpdated: string;
+  eyebrow?: string;
   children: ReactNode;
 }
 
@@ -28,6 +29,7 @@ export function LegalPage({
   metaDescription,
   canonicalPath,
   lastUpdated,
+  eyebrow = 'Legal',
   children,
 }: LegalPageProps) {
   const navigate = useNavigate();
@@ -72,7 +74,7 @@ export function LegalPage({
           <ArrowLeft className="h-[18px] w-[18px]" />
         </Button>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] uppercase tracking-wider leading-none text-muted-foreground">Legal</p>
+          <p className="text-[10px] uppercase tracking-wider leading-none text-muted-foreground">{eyebrow}</p>
           <p className="mt-0.5 truncate font-serif text-base font-bold">{title}</p>
         </div>
       </header>

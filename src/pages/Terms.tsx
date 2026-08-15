@@ -12,12 +12,23 @@ export default function Terms() {
     >
       <LegalSection heading="1. Who we are">
         <p>
-          Tsundoku (&quot;we&quot;, &quot;us&quot;) is a Japanese reading app. Contact:{' '}
-          <a className="font-medium text-accent underline underline-offset-4" href="mailto:thetsundokuapp@gmail.com">
-            thetsundokuapp@gmail.com
-          </a>
-          . By creating an account or using the app, you agree to these terms.
+          Tsundoku (&quot;we&quot;, &quot;us&quot;) is a Japanese reading app published by an individual developer. By
+          creating an account or using the app, you agree to these terms.
         </p>
+        <ul className="list-none space-y-1 pl-0 text-[15px]">
+          <li>
+            <strong>Publisher</strong>: Mavsarov M., trading as Tsundoku
+          </li>
+          <li>
+            <strong>Country of establishment</strong>: Belgium
+          </li>
+          <li>
+            <strong>Contact</strong>:{' '}
+            <a className="font-medium text-accent underline underline-offset-4" href="mailto:thetsundokuapp@gmail.com">
+              thetsundokuapp@gmail.com
+            </a>
+          </li>
+        </ul>
       </LegalSection>
 
       <LegalSection heading="2. Eligibility">
@@ -60,15 +71,23 @@ export default function Terms() {
 
       <LegalSection heading="6. Subscriptions and billing">
         <p>
-          Tsundoku offers a paid subscription that unlocks the full app. The price, billing period and included features
-          are shown before you confirm your purchase, and payments are processed by our payment provider. Subscriptions
-          renew automatically for the same period unless you cancel before the renewal date. Cancelling stops future
-          charges and keeps your access until the end of the period you already paid for.
+          Tsundoku offers an auto-renewing paid subscription that unlocks the full app. The subscription title, its
+          duration and its price per period are shown in the app before you confirm, and payment is charged on
+          confirmation of purchase. Prices include applicable taxes where required. We may change prices for future
+          billing periods and will tell you in advance so you can cancel if you disagree.
         </p>
         <p>
-          Prices include applicable taxes where required. We may change prices for future billing periods and will tell
-          you in advance so you can cancel if you disagree. Payments already made are not refunded on a pro rata basis
-          unless the law requires it.
+          <strong>Purchases made inside the mobile app.</strong> These are sold and billed by Apple through the App
+          Store or by Google through Google Play. The subscription renews automatically for the same period unless it is
+          cancelled at least 24 hours before the end of the current period. You manage and cancel it in your App Store
+          or Google Play account settings, not in Tsundoku, and refunds for these purchases are handled by the store
+          under its own policy. Deleting your Tsundoku account does not cancel a store subscription.
+        </p>
+        <p>
+          <strong>Purchases made on the web.</strong> These are processed by our payment provider and renew
+          automatically for the same period unless you cancel before the renewal date. Cancelling stops future charges
+          and keeps your access until the end of the period you already paid for. Payments already made are not refunded
+          on a pro rata basis unless the law requires it.
         </p>
         <p>
           <strong>EU right of withdrawal.</strong> As a consumer in the EU you normally have 14 days to withdraw from a
@@ -78,7 +97,29 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="7. Availability and no warranty">
+      <LegalSection heading="7. Apps obtained from the App Store">
+        <p>
+          If you downloaded Tsundoku from the Apple App Store, the following applies. These terms are concluded between
+          you and us only, not with Apple, and we alone are responsible for the app and its content. Your licence to use
+          the app is a non-transferable licence to run it on Apple-branded devices you own or control, as permitted by
+          the App Store Terms of Service.
+        </p>
+        <p>
+          Apple has no obligation to provide maintenance or support for the app. If the app fails to conform to any
+          applicable warranty, you may notify Apple and Apple will refund the purchase price; to the maximum extent
+          permitted by law, Apple has no other warranty obligation. We, not Apple, are responsible for addressing any
+          claim relating to the app, including product liability, failure to conform to legal requirements, consumer
+          protection claims, and any third-party claim that the app infringes intellectual property rights.
+        </p>
+        <p>
+          You confirm that you are not located in a country subject to a US Government embargo or designated as a
+          terrorist-supporting country, and that you are not on any US Government list of prohibited or restricted
+          parties. Apple and its subsidiaries are third-party beneficiaries of these terms and may enforce them against
+          you.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="8. Availability and no warranty">
         <p>
           Tsundoku is provided &quot;as is&quot;. We do our best to keep it available and accurate, but we do not
           guarantee uninterrupted service, or that definitions, translations and grammar explanations, some of which are
@@ -86,7 +127,7 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="8. Liability">
+      <LegalSection heading="9. Liability">
         <p>
           To the extent permitted by law, we are not liable for indirect or consequential damage, lost data or lost
           profits arising from your use of the app. Nothing here limits liability that cannot be limited by law,
@@ -94,7 +135,7 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="9. Termination">
+      <LegalSection heading="10. Termination">
         <p>
           You may stop using Tsundoku and delete your account at any time. We may suspend or end access if you breach
           these terms, or if we discontinue the service, in which case we will give reasonable notice where possible and
@@ -102,14 +143,14 @@ export default function Terms() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="10. Changes">
+      <LegalSection heading="11. Changes">
         <p>
           We may update these terms as the app evolves. The date at the top reflects the latest version, and material
           changes will be announced in the app. Continuing to use Tsundoku after a change means you accept it.
         </p>
       </LegalSection>
 
-      <LegalSection heading="11. Governing law">
+      <LegalSection heading="12. Governing law">
         <p>
           These terms are governed by the law applicable at our place of establishment, without affecting the mandatory
           consumer protections available to you in your country of residence, whose courts you may always turn to.

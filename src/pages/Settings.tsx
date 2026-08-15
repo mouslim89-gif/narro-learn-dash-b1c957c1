@@ -327,6 +327,18 @@ export default function Settings() {
               <span className="text-[15px]">Privacy Policy</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>
+            <Link to="/credits" className="flex items-center justify-between px-4 py-4 tap-scale">
+              <span className="text-[15px]">Credits &amp; licences</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link to="/support" className="flex items-center justify-between px-4 py-4 tap-scale">
+              <span className="text-[15px]">Support</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link to="/account-deletion" className="flex items-center justify-between px-4 py-4 tap-scale">
+              <span className="text-[15px]">Account deletion</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </div>
         </section>
 
