@@ -5,7 +5,7 @@ import { useScrollProgress } from'@/hooks/use-scroll-progress';
 import { useFlashcardStore } from'@/stores/flashcards';
 import { useSavedGrammarStore } from'@/stores/saved-grammar';
 import { jlptColors } from'@/data/books';
-import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check, Bookmark, ChevronRight } from'lucide-react';
+import { Trash2, RotateCcw, Search, ArrowUpDown, ArrowUp, ArrowDown, Settings, Sparkles, Flame, GraduationCap, CheckCircle2, ArrowRight, Check, Bookmark, ChevronRight, Lock } from'lucide-react';
 
 import { DelayedLink as Link } from'@/components/DelayedLink';
 import { PlayWordButton } from'@/components/PlayWordButton';
@@ -239,8 +239,9 @@ export default function Flashcards() {
            <p className="mt-1 text-[12px] text-muted-foreground">Keep your streak going</p>
          </div>
          <Button size="sm" className="rounded-full px-4 relief-premium" onClick={enterReview}>
-           Review <ArrowRight className="ml-1 h-3.5 w-3.5" />
+           Review {isPremium ? <ArrowRight className="ml-1 h-3.5 w-3.5" /> : <Lock className="ml-1 h-3.5 w-3.5" />}
          </Button>
+
        </div>
        {scopePill}
      </div>
