@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface LegalPageProps {
   title: string;
@@ -61,13 +62,15 @@ export function LegalPage({
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/50 bg-background/80 px-6 pb-3 pt-3 backdrop-blur-md">
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={handleBack}
           aria-label="Back"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 backdrop-blur-md tap-scale-sm"
+          className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
         >
           <ArrowLeft className="h-[18px] w-[18px]" />
-        </button>
+        </Button>
         <div className="min-w-0 flex-1">
           <p className="text-[10px] uppercase tracking-wider leading-none text-muted-foreground">Legal</p>
           <p className="mt-0.5 truncate font-serif text-base font-bold">{title}</p>
