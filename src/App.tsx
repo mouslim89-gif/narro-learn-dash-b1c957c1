@@ -32,6 +32,9 @@ import Auth from"./pages/Auth";
 import ResetPassword from"./pages/ResetPassword";
 import Terms from"./pages/Terms";
 import Privacy from"./pages/Privacy";
+import Credits from"./pages/Credits";
+import Support from"./pages/Support";
+import AccountDeletion from"./pages/AccountDeletion";
 
 const queryClient = new QueryClient();
 
