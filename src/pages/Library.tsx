@@ -196,7 +196,10 @@ export default function Library() {
     progress={progress} 
   />
   
+  <PremiumUpsellCard />
+
   <BookRail 
+
     title={genreLabels['folk-tales']} 
     books={books.filter(b => b.genre === 'folk-tales')} 
     progress={progress} 
