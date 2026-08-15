@@ -135,28 +135,33 @@ export default function Premium() {
 
   return (
     <div className="min-h-screen pb-14">
-      <header className="px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Back"
-          onClick={() => navigate(-1)}
-          className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
-        >
-          <ArrowLeft className="h-[18px] w-[18px]" />
-        </Button>
-      </header>
+      <div className="library-header-bg relative overflow-hidden">
+        <span className="library-kanji-watermark" aria-hidden>読</span>
+        <header className="relative px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Back"
+            onClick={() => navigate(-1)}
+            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
+          >
+            <ArrowLeft className="h-[18px] w-[18px]" />
+          </Button>
+        </header>
+
+        <div className="relative px-6 pt-6 pb-7">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Tsundoku Premium
+          </p>
+          <h1 className="mt-2 font-serif text-[30px] font-bold leading-tight">{heading}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Chapter one of every book is free. Premium opens the rest of the library and every study tool.
+          </p>
+        </div>
+      </div>
 
       <div className="px-6 pt-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Tsundoku Premium
-        </p>
-        <h1 className="mt-2 font-serif text-[30px] font-bold leading-tight">{heading}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Chapter one of every book is free. Premium opens the rest of the library and every study tool.
-        </p>
-
-        <ul className="mt-6 space-y-2.5">
+        <ul className="space-y-2.5">
           {BENEFITS.map((b) => (
             <li key={b} className="flex items-start gap-2.5 text-[15px]">
               <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/15 ring-1 ring-accent/25">
@@ -183,14 +188,24 @@ export default function Premium() {
                     onClick={() => setSelected(plan.id)}
                     aria-pressed={active}
                     className={cn(
-                      'w-full rounded-2xl bg-card px-4 py-4 text-left ring-1 smooth-colors tap-scale',
+                      'w-full rounded-2xl px-4 py-4 text-left ring-1 smooth-colors tap-scale',
                       active
-                        ? 'ring-2 ring-accent/60 shadow-md'
-                        : 'ring-border/30 shadow-sm',
+                        ? 'bg-accent/[0.07] ring-2 ring-accent/60 shadow-md'
+                        : 'bg-card ring-border/30 shadow-sm',
                     )}
                   >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={cn(
+                          'flex h-5 w-5 shrink-0 items-center justify-center rounded-full ring-1 smooth-colors',
+                          active
+                            ? 'bg-accent text-accent-foreground ring-accent'
+                            : 'bg-transparent ring-border',
+                        )}
+                      >
+                        {active && <Check className="h-3 w-3" />}
+                      </span>
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-serif text-[17px] font-semibold">{plan.title}</span>
                           {plan.badge && (
@@ -200,6 +215,11 @@ export default function Premium() {
                           )}
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">{plan.note}</p>
+                        {plan.sub && (
+                          <p className="mt-0.5 text-[11px] font-medium text-accent tabular-nums">
+                            {plan.sub}
+                          </p>
+                        )}
                       </div>
                       <span className="font-serif text-[17px] font-bold tabular-nums">{plan.price}</span>
                     </div>
@@ -214,7 +234,13 @@ export default function Premium() {
               disabled={busy !== null}
               className="btn-tsundoku-premium mt-6 h-12 w-full rounded-full text-[15px] font-semibold shadow-md"
             >
-              {busy === 'buy' ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}
+              {busy === 'buy' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : selected === 'yearly' ? (
+                'Start 7 day free trial'
+              ) : (
+                'Continue'
+              )}
             </Button>
 
             {!available && (
@@ -233,9 +259,13 @@ export default function Premium() {
             </button>
 
             <p className="mt-5 text-center text-[11px] leading-relaxed text-muted-foreground">
-              Monthly and yearly plans renew automatically unless cancelled at least 24 hours before the
-              end of the period. Manage or cancel in your App Store or Google Play account settings.
+              The yearly plan starts with 7 days free, then renews at $44.99 a year unless cancelled at
+              least 24 hours before the trial ends. Monthly and yearly plans renew automatically. Manage
+              or cancel in your App Store or Google Play account settings.
             </p>
+          </>
+        )}
+
           </>
         )}
 
