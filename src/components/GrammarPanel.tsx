@@ -101,6 +101,39 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
     [sortedNotes, isPremium],
   );
 
+  // Focus example logic: expand and scroll when panel opens
+  const [internalFocus, setInternalFocus] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (open && focusExample) {
+      setInternalFocus(focusExample);
+    } else if (!open) {
+      setInternalFocus(null);
+    }
+  }, [open, focusExample]);
+
+  useEffect(() => {
+    if (open && internalFocus && sortedNotes.length > 0) {
+      const idx = sortedNotes.findIndex(n => n.example === internalFocus);
+      if (idx !== -1) {
+        const locked = !isPremium && idx > 0;
+        if (locked) {
+          requirePremium('grammar-notes');
+          // Reset focus so we don't keep prompting if they close the paywall
+          setInternalFocus(null);
+        } else {
+          setExpandedIdx(idx);
+          // Small delay to allow render then scroll
+          setTimeout(() => {
+            const el = document.getElementById(`grammar-note-${idx}`);
+            el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }, 100);
+          setInternalFocus(null);
+        }
+      }
+    }
+  }, [open, internalFocus, sortedNotes, isPremium, requirePremium]);
+
   // Batch preload translations for examples once notes are loaded
   useEffect(() => {
     if (readableNotes.length === 0 || !open) return;
