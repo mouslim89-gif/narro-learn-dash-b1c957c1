@@ -5,16 +5,15 @@ import { books } from'@/data/books';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 
 import { useFlashcardStore } from'@/stores/flashcards';
-import { startOfDay, format } from'date-fns';
-import { tokenWordCounts } from'@/data/book-tokens';
-import { DelayedLink as Link } from'@/components/DelayedLink';
-import { Settings, Flame, BookOpen, Bookmark, Trophy } from'lucide-react';
-import { Button } from'@/components/ui/button';
+import { startOfDay } from 'date-fns';
+import { tokenWordCounts } from '@/data/book-tokens';
+import { DelayedLink as Link } from '@/components/DelayedLink';
+import { Settings, Flame, BookOpen, Bookmark, Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-import { AnimatedTitle } from'@/components/AnimatedTitle';
-import { BookShelfRow } from'@/components/my-books/BookShelfRow';
-import { ContributionGraph } from '@/components/my-books/ContributionGraph';
-import { useDelayed } from'@/hooks/use-delayed';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
+import { BookShelfRow } from '@/components/my-books/BookShelfRow';
+import { useDelayed } from '@/hooks/use-delayed';
 
 
 export default function MyBooks() {
