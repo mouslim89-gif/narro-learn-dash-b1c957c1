@@ -4,7 +4,7 @@ import { Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const words = ['今日', 'は', '天気', 'が', 'いい', 'です', 'ね', '。'];
-const bars = [10, 18, 26, 14, 22, 30, 16, 24, 12, 20, 28, 15];
+const bars = [14, 24, 32, 18, 28, 34, 20, 30, 16, 26, 32, 20];
 
 export function AudioDemo({ active }: { active: boolean }) {
   const reduced = useReducedMotion();
@@ -40,13 +40,13 @@ export function AudioDemo({ active }: { active: boolean }) {
           <Pause className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <div className="flex h-8 items-center gap-[3px]">
+          <div className="flex h-9 items-end gap-[3px]">
             {bars.map((h, i) => (
               <motion.span
                 key={i}
                 className="w-1.5 flex-1 rounded-full bg-accent/40"
-                style={{ height: 8 }}
-                animate={active && !reduced ? { height: [8, h, 8] } : { height: 10 }}
+                style={{ height: 12 }}
+                animate={active && !reduced ? { height: [12, h, 12] } : { height: 18 }}
                 transition={{ repeat: Infinity, duration: 0.9, delay: i * 0.06, ease: 'easeInOut' }}
               />
             ))}
