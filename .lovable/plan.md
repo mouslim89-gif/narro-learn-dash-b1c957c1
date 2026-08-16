@@ -1,18 +1,20 @@
-# Keep the highlight sub-rows visible when the master toggle is off
+# Settings: highlight the Subscription card and fix the Upgrade button
 
-## Problem
+## Changes (free users only)
 
-In the reader settings, turning off "Highlight saved words" removes the three sub-rows (New words / Learning / Known) from the panel, which makes the panel jump and hides the user's per-level choices.
+1. **Upgrade button** uses the app's shared premium CTA relief (`btn-tsundoku-premium`) like every other primary action: primary navy pill, raised relief, press scale. Same size and position as now.
 
-## Change
+2. **Subscription card** gets the same treatment as the Premium card on the Library home:
+   - accent-tinted gradient wash over the card surface
+   - subtle accent border/ring instead of the neutral ring
+   - faint kanji watermark (読) in the background
+   - a small "Tsundoku Premium" uppercase label above the "Plan / Free" line
 
-Always render the three sub-rows. When the master toggle is off, they stay in place but are disabled:
-
-- Sub-row switches become non-interactive (`disabled`) and visually dimmed (reduced opacity on the row, muted text and dot).
-- Their stored values are untouched, so re-enabling the master toggle restores the exact previous configuration.
-- No layout shift: the card keeps the same height in both states.
+For premium users the card stays exactly as it is today (neutral card, Premium pill, Manage subscription row), so the highlight only appears when there is something to upsell.
 
 ## Technical detail
 
-Single file: `src/pages/Reader.tsx`, "Highlights" section.
-Replace the `{showKnownHighlights && (...)}` conditional with an always-rendered block, adding `disabled={!showKnownHighlights}` on the three `Switch` components and a `cn(...)` class applying `opacity-45 pointer-events-none` (opacity transition via `smooth-colors`) to each sub-row when the master toggle is off. No store or logic changes.
+Single file: `src/pages/Settings.tsx`, Subscription section.
+- Wrap the card classes in `cn(...)` keyed on `!isPremium` to add `border-accent/25`, the inline `linear-gradient(135deg, hsl(var(--accent) / 0.16) 0%, hsl(var(--card)) 62%)` background, `relative overflow-hidden`, and the `library-kanji-watermark` span (same values as `PremiumUpsellCard.tsx`).
+- Replace the Upgrade `Link` classes with `rounded-full px-5 py-2.5 text-[13px] font-semibold btn-tsundoku-premium tap-scale-sm`.
+No store, routing, or logic changes.
