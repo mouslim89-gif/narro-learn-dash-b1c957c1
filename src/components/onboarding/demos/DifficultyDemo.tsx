@@ -1,68 +1,67 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+const modes = ['Simplified', 'Intermediate', 'Original'] as const;
+const texts: Record<(typeof modes)[number], string> = {
+  Simplified: 'むかしむかし、あるところに おじいさんと おばあさんが いました。',
+  Intermediate: '昔々、ある所に、お爺さんとお婆さんが住んでいました。',
+  Original: '今は昔、竹取の翁といふもの有りけり。',
+};
 
 export function DifficultyDemo({ active }: { active: boolean }) {
-  const modes = ['Simplified', 'Intermediate', 'Original'];
-  const text = {
-    Simplified: 'むかしむかし、あるところに、おじいさんとおばあさんがいました。',
-    Intermediate: '昔々、ある所に、お爺さんとお婆さんが住んでいました。',
-    Original: '今は昔、竹取の翁といふものありけり。'
-  };
+  const reduced = useReducedMotion();
+  const [idx, setIdx] = useState(0);
 
-  const [currentIdx, setCurrentIdx] = React.useState(0);
-
-  React.useEffect(() => {
-    if (!active) return;
-    const interval = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % modes.length);
-    }, 2500);
+  useEffect(() => {
+    if (!active || reduced) return;
+    const interval = setInterval(() => setIdx((p) => (p + 1) % modes.length), 2600);
     return () => clearInterval(interval);
-  }, [active]);
+  }, [active, reduced]);
 
   return (
-    <div className="relative h-full w-full flex flex-col items-center justify-center p-6 bg-muted/30">
-      {/* Segmented Control Mock */}
-      <div className="flex gap-1 rounded-full bg-card ring-1 ring-border/40 p-1 mb-10 relative">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-6 p-6">
+      <div className="flex rounded-full bg-muted p-1 ring-1 ring-border/40">
         {modes.map((mode, i) => (
-          <div
+          <button
             key={mode}
-            className={`relative px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 z-10 ${
-              i === currentIdx ? 'text-foreground' : 'text-muted-foreground'
-            }`}
+            type="button"
+            onClick={() => setIdx(i)}
+            className="relative rounded-full px-3 py-1.5"
           >
-            {mode}
-          </div>
+            {i === idx && (
+              <motion.span
+                layoutId="onb-difficulty-pill"
+                transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                className="absolute inset-0 rounded-full bg-background ring-1 ring-border/40 elev-soft"
+              />
+            )}
+            <span
+              className={cn(
+                'relative text-[10px] font-bold uppercase tracking-[0.12em] transition-colors',
+                i === idx ? 'text-foreground' : 'text-muted-foreground',
+              )}
+            >
+              {mode}
+            </span>
+          </button>
         ))}
-        <motion.div
-          animate={{ x: currentIdx * 88 }} // Rough estimation for demo
-          className="absolute inset-y-1 left-1 w-[84px] bg-background rounded-full shadow-sm ring-1 ring-border/20"
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        />
       </div>
 
-      {/* Text Preview */}
-      <div className="bg-card p-8 rounded-3xl border shadow-sm w-full max-w-[300px] min-h-[160px] flex items-center justify-center text-center">
+      <div className="flex min-h-[120px] w-full max-w-[300px] items-center justify-center px-2 text-center">
         <AnimatePresence mode="wait">
           <motion.p
-            key={currentIdx}
-            initial={{ opacity: 0, y: 10 }}
+            key={idx}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-lg font-japanese leading-relaxed"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="reader-text font-japanese text-[17px] leading-[2.1] text-foreground"
           >
-            {text[modes[currentIdx] as keyof typeof text]}
+            {texts[modes[idx]]}
           </motion.p>
         </AnimatePresence>
       </div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={active ? { opacity: 1 } : {}}
-        transition={{ delay: 0.5 }}
-        className="mt-8 text-sm text-center font-medium text-muted-foreground"
-      >
-        Read what you want, at the level you want.
-      </motion.p>
     </div>
   );
 }
-import React from 'react';
