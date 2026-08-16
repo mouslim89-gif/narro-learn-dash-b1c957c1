@@ -1697,6 +1697,7 @@ export default function Reader() {
  open={showGrammar}
   onClose={() => setShowGrammar(false)}
   onJumpToExample={jumpToExample}
+  focusExample={focusGrammarExample}
   />
 
  {audioUrl && isPremium && (
