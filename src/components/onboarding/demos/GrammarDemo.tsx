@@ -4,7 +4,7 @@ import { Lock } from 'lucide-react';
 export function GrammarDemo({ active }: { active: boolean }) {
   return (
     <div className="relative h-full w-full flex flex-col items-center justify-center p-6 bg-muted/30">
-      <div className="w-full max-w-[300px] perspective-1000">
+      <div className="w-full max-w-[300px]" style={{ perspective: 1000 }}>
         <motion.div
           animate={active ? {
             rotateY: [0, 0, 180, 180],
@@ -15,10 +15,14 @@ export function GrammarDemo({ active }: { active: boolean }) {
             repeatDelay: 1,
             ease: "easeInOut"
           }}
-          className="relative w-full h-48 preserve-3d"
+          style={{ transformStyle: 'preserve-3d' }}
+          className="relative w-full h-48"
         >
           {/* Front: Structure */}
-          <div className="absolute inset-0 backface-hidden bg-card rounded-2xl border shadow-sm p-6 flex flex-col items-center justify-center text-center">
+          <div 
+            style={{ backfaceVisibility: 'hidden' }}
+            className="absolute inset-0 bg-card rounded-2xl border shadow-sm p-6 flex flex-col items-center justify-center text-center"
+          >
             <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent mb-3">Structure</span>
             <div className="text-xl font-japanese font-bold">
               Dictionary form <span className="text-accent">+</span> のだ
@@ -26,9 +30,12 @@ export function GrammarDemo({ active }: { active: boolean }) {
           </div>
 
           {/* Back: Meaning */}
-          <div className="absolute inset-0 backface-hidden bg-card rounded-2xl border shadow-sm p-6 flex flex-col items-center justify-center text-center rotate-y-180">
+          <div 
+            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+            className="absolute inset-0 bg-card rounded-2xl border shadow-sm p-6 flex flex-col items-center justify-center text-center"
+          >
             <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">Explanation</span>
-            <p className="text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed px-4">
               Used to provide an explanation, emphasize a reason, or add emotional weight.
             </p>
           </div>
