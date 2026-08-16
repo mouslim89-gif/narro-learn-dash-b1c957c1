@@ -31,7 +31,9 @@ export function WordMiniPopup({
  sentenceRect,
  onClose,
  onShowMore,
- onTranslateSentence,
+  onTranslateSentence,
+  grammarPattern,
+  onShowGrammar,
 }: WordMiniPopupProps) {
  const { addWord, hasWord, removeWord } = useFlashcardStore();
  const popupRef = useRef<HTMLDivElement>(null);
