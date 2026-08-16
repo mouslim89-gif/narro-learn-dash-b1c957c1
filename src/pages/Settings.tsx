@@ -151,9 +151,27 @@ export default function Settings() {
         {/* Subscription */}
         <section>
           <SectionLabel>Subscription</SectionLabel>
-          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
-            <div className="flex items-center justify-between px-4 py-4">
+          <div 
+            className={cn(
+              "rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40 relative overflow-hidden",
+              !isPremium && "border border-accent/25"
+            )}
+            style={!isPremium ? {
+              backgroundImage: 'linear-gradient(135deg, hsl(var(--accent) / 0.16) 0%, hsl(var(--card)) 62%)',
+            } : undefined}
+          >
+            {!isPremium && (
+              <span className="library-kanji-watermark" aria-hidden>
+                読
+              </span>
+            )}
+            <div className="flex items-center justify-between px-4 py-4 relative z-10">
               <div className="flex flex-col">
+                {!isPremium && (
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-0.5">
+                    Tsundoku Premium
+                  </p>
+                )}
                 <span className="text-[15px] font-medium">Plan</span>
                 <span className="text-[11px] text-muted-foreground">
                   {isPremium ? (plan === 'lifetime' ? 'Premium | Lifetime' : 'Premium') : 'Free'}
@@ -166,7 +184,7 @@ export default function Settings() {
               ) : (
                 <Link
                   to="/premium"
-                  className="rounded-full bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground tap-scale-sm"
+                  className="rounded-full px-5 py-2.5 text-[13px] font-semibold btn-tsundoku-premium tap-scale-sm"
                 >
                   Upgrade
                 </Link>
