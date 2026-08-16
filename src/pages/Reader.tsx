@@ -1627,28 +1627,46 @@ export default function Reader() {
     </nav>
   )}
 
- {miniPopup && (
- <WordMiniPopup
- word={miniPopup.text}
- baseForm={miniPopup.baseForm}
- reading={miniPopup.reading}
- pos={miniPopup.pos}
- contextSentence={miniPopup.contextSentence}
- contextTokens={miniPopup.contextTokens}
- sentenceRect={miniPopup.sentenceRect}
- onClose={() => setMiniPopup(null)}
- onShowMore={() => {
- const { text, baseForm, reading, pos, contextSentence, contextTokens } = miniPopup;
- setMiniPopup(null);
- setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
- }}
- onTranslateSentence={() => {
- const idx = miniPopup.sentenceIdx;
- const jp = miniPopup.contextSentence ||'';
- triggerSentenceTranslation(idx, jp);
- }}
- />
- )}
+ {miniPopup && (() => {
+   const currentNotes = (partIdx !== null && partIdx !== undefined)
+     ? getGrammarForPart(id || '', difficulty, partIdx)
+     : getGrammarFlat(id || '', difficulty);
+   
+   const context = (miniPopup.contextSentence || '').replace(/[\s　。、]/g, '');
+   const matchingNote = context ? currentNotes.find(n => {
+     const ex = (n.example || '').replace(/[\s　。、]/g, '');
+     return ex && (context.includes(ex) || ex.includes(context));
+   }) : null;
+
+   return (
+     <WordMiniPopup
+       word={miniPopup.text}
+       baseForm={miniPopup.baseForm}
+       reading={miniPopup.reading}
+       pos={miniPopup.pos}
+       contextSentence={miniPopup.contextSentence}
+       contextTokens={miniPopup.contextTokens}
+       sentenceRect={miniPopup.sentenceRect}
+       grammarPattern={matchingNote?.pattern}
+       onShowGrammar={matchingNote ? () => {
+         setFocusGrammarExample(matchingNote.example);
+         setShowGrammar(true);
+         setMiniPopup(null);
+       } : undefined}
+       onClose={() => setMiniPopup(null)}
+       onShowMore={() => {
+         const { text, baseForm, reading, pos, contextSentence, contextTokens } = miniPopup;
+         setMiniPopup(null);
+         setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
+       }}
+       onTranslateSentence={() => {
+         const idx = miniPopup.sentenceIdx;
+         const jp = miniPopup.contextSentence || '';
+         triggerSentenceTranslation(idx, jp);
+       }}
+     />
+   );
+ })()}
 
  {sentenceTranslation && (
  <SentenceTranslationPopup
