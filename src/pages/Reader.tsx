@@ -1257,31 +1257,36 @@ export default function Reader() {
  <span className="text-[15px] font-medium">Highlight saved words</span>
  <Switch checked={showKnownHighlights} onCheckedChange={setShowKnownHighlights} />
  </div>
- {showKnownHighlights && (
- <>
- <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
- <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-new"/>
- New words
- </span>
- <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
- </div>
- <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
- <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-learning"/>
- Learning
- </span>
- <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
- </div>
- <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
- <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-known"/>
- Known
- </span>
- <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
- </div>
- </>
- )}
+        <div className={cn(
+          "flex items-center justify-between gap-3 px-4 py-3 pl-8 smooth-colors",
+          !showKnownHighlights && "opacity-45 pointer-events-none"
+        )}>
+          <span className="flex items-center gap-2.5 text-sm">
+            <span className="color-dot color-dot-new"/>
+            New words
+          </span>
+          <Switch checked={highlightNew} onCheckedChange={setHighlightNew} disabled={!showKnownHighlights} />
+        </div>
+        <div className={cn(
+          "flex items-center justify-between gap-3 px-4 py-3 pl-8 smooth-colors",
+          !showKnownHighlights && "opacity-45 pointer-events-none"
+        )}>
+          <span className="flex items-center gap-2.5 text-sm">
+            <span className="color-dot color-dot-learning"/>
+            Learning
+          </span>
+          <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} disabled={!showKnownHighlights} />
+        </div>
+        <div className={cn(
+          "flex items-center justify-between gap-3 px-4 py-3 pl-8 smooth-colors",
+          !showKnownHighlights && "opacity-45 pointer-events-none"
+        )}>
+          <span className="flex items-center gap-2.5 text-sm">
+            <span className="color-dot color-dot-known"/>
+            Known
+          </span>
+          <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} disabled={!showKnownHighlights} />
+        </div>
  </div>
  </section>
 
