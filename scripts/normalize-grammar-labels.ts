@@ -233,8 +233,9 @@ function normalize(s: string, book: string, key: string): string {
 
   for (const [re, rep] of labelMap) out = out.replace(re, rep);
 
-  // cleanup double Volitional form form
-  out = out.replace(/\bVolitional form form\b/gi, "Volitional form");
+  // cleanup multiple 'form' repeats and 'luxury' artifact
+  out = out.replace(/\bform(?:\s+form)+\b/gi, "form");
+  out = out.replace(/\s+luxury\b/gi, "");
 
   // capitalize first letter (skip if starts with non-letter like ～ or 〜 or Japanese)
   const first = out.charAt(0);
