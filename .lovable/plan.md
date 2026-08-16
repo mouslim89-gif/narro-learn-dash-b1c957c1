@@ -1,20 +1,20 @@
-# Settings: highlight the Subscription card and fix the Upgrade button
+# Remove the kanji watermark and the "Tsundoku Premium" label from the premium cards
 
-## Changes (free users only)
+## Change
 
-1. **Upgrade button** uses the app's shared premium CTA relief (`btn-tsundoku-premium`) like every other primary action: primary navy pill, raised relief, press scale. Same size and position as now.
+Both premium cards keep their accent gradient wash and border, but lose the two decorative elements:
 
-2. **Subscription card** gets the same treatment as the Premium card on the Library home:
-   - accent-tinted gradient wash over the card surface
-   - subtle accent border/ring instead of the neutral ring
-   - faint kanji watermark (読) in the background
-   - a small "Tsundoku Premium" uppercase label above the "Plan / Free" line
+- The faint 読 kanji watermark in the background.
+- The small uppercase "Tsundoku Premium" label above the title.
 
-For premium users the card stays exactly as it is today (neutral card, Premium pill, Manage subscription row), so the highlight only appears when there is something to upsell.
+Cards affected:
+
+1. **Library home upsell card** — now reads just the title "Unlock the full library" plus its one line of copy, with the sparkles tile.
+2. **Settings > Subscription card** — now reads just "Plan / Free" with the Upgrade button.
+
+Nothing else changes: same gradient, same border, same layout and spacing.
 
 ## Technical detail
 
-Single file: `src/pages/Settings.tsx`, Subscription section.
-- Wrap the card classes in `cn(...)` keyed on `!isPremium` to add `border-accent/25`, the inline `linear-gradient(135deg, hsl(var(--accent) / 0.16) 0%, hsl(var(--card)) 62%)` background, `relative overflow-hidden`, and the `library-kanji-watermark` span (same values as `PremiumUpsellCard.tsx`).
-- Replace the Upgrade `Link` classes with `rounded-full px-5 py-2.5 text-[13px] font-semibold btn-tsundoku-premium tap-scale-sm`.
-No store, routing, or logic changes.
+- `src/components/library/PremiumUpsellCard.tsx`: remove the `library-kanji-watermark` span and the "Tsundoku Premium" `<p>`.
+- `src/pages/Settings.tsx`, Subscription section: remove the `library-kanji-watermark` span and the conditional "Tsundoku Premium" `<p>`; drop the now-unneeded `relative overflow-hidden` wrapper bits only if nothing else depends on them.
