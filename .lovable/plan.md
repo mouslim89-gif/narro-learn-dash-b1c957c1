@@ -1,22 +1,22 @@
-# Plan - Clean up Word Mini Popup UI
+# Plan - Refine Grammar Formation Highlighting
 
-Remove the translation shortcut and simplify the "Common" badge to just an icon in the `WordMiniPopup` component to save space for mobile view.
+The current logic for highlighting grammar formations in `GrammarDetail.tsx` relies on a simple regex check for Japanese characters (`[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]`). While effective for many cases, it incorrectly highlights grammatical categories that happen to include Japanese labels (e.g., "Volitional form" generated as "意向形" or mixed terms) or fails when categories are purely English but intended to be muted. The user wants to ensure grammatical categories remain muted (gray) and literal Japanese pattern parts are highlighted (amber).
 
 ## Proposed Changes
 
-### Reader Components
+### Logic Improvements
+- Refine the detection logic in `GrammarDetail.tsx` to better distinguish between literal Japanese patterns and grammatical descriptions.
+- Instead of just checking for "any Japanese character", I will check if the part is one of a set of known grammatical placeholders (e.g., "Verb", "Noun", "Plain form", etc.) or if it matches common description patterns.
+- I will also add a fallback to check for purely Japanese strings (literal particles/suffixes) to be highlighted.
 
-#### `src/components/WordMiniPopup.tsx`
-- Remove the "Translate sentence" button (`Languages` icon button).
-- Modify the "Common" badge:
-    - Remove the "Common" text.
-    - Keep only the `✦` (or use a dedicated icon if preferred, but keeping the star symbol is requested).
-    - Adjust padding to make it a small circular badge.
+### Implementation Details
+- Update the condition in `GrammarDetail.tsx` (around line 241) to use a more robust helper function for determining the highlight style.
+- This helper will prioritize muting common grammatical terms (in both English and common Japanese terminology used by the AI) and highlighting literal strings that are likely the target pattern parts.
 
 ## Technical Details
-- The `onTranslateSentence` prop in `WordMiniPopupProps` will remain for now to avoid breaking parent components, but it won't be rendered.
-- The badge style will be updated from `px-1.5 py-0.5` to a more square/circular `w-5 h-5 flex items-center justify-center` style.
 
-## Impact
-- Cleaner UI in the mini popup, especially on narrow mobile screens.
-- Reduced visual clutter by removing redundant text in the commonality indicator.
+### `src/pages/GrammarDetail.tsx`
+- Replace the inline regex check with a logic that:
+    1. Checks for a list of common grammatical terms (e.g., "Verb", "Noun", "i-Adjective", "na-Adjective", "Dictionary form", "Masu stem", "Volitional", "Plain", "Te-form").
+    2. Checks for terms containing "form", "stem", "base", "clause".
+    3. Highlights parts that are entirely Japanese (no Latin characters) AND are not specifically in a "blacklist" of Japanese grammatical terms (like 意向形, 辞書形).
