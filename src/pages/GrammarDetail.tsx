@@ -234,21 +234,36 @@ export default function GrammarDetail() {
                           </div>
                         )}
                         <div className="flex flex-wrap items-center gap-y-2">
-                          {f.parts.map((part, pi) => (
-                            <div key={pi} className="flex items-center">
-                              <span className={cn(
-                                "inline-block rounded-lg border px-2 py-0.5 text-xs font-bold transition-colors shadow-sm",
-                                /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part) 
-                                  ? "font-japanese bg-accent/15 text-accent border-accent/30" 
-                                  : "bg-muted/60 text-foreground border-border/80"
-                              )}>
-                                {part}
-                              </span>
-                              {pi < f.parts.length - 1 && (
-                                <span className="text-foreground font-black text-sm px-1.5 drop-shadow-sm">+</span>
-                              )}
-                            </div>
-                          ))}
+                          {f.parts.map((part, pi) => {
+                            const commonGrammarTerms = [
+                              'verb', 'noun', 'adjective', 'adverb', 'particle', 'form', 
+                              'stem', 'base', 'clause', '辞書形', '意向形', '可能形', 
+                              '受身形', '使役形', 'テ形', 'た形', 'ない形', 'ます形'
+                            ];
+                            const isGrammarTerm = commonGrammarTerms.some(term => 
+                              part.toLowerCase().includes(term)
+                            );
+                            const hasJapanese = /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(part);
+                            
+                            // Highlight if it has Japanese AND is not a recognized grammar term
+                            const shouldHighlight = hasJapanese && !isGrammarTerm;
+
+                            return (
+                              <div key={pi} className="flex items-center">
+                                <span className={cn(
+                                  "inline-block rounded-lg border px-2 py-0.5 text-xs font-bold transition-colors shadow-sm",
+                                  shouldHighlight
+                                    ? "font-japanese bg-accent/15 text-accent border-accent/30" 
+                                    : "bg-muted/60 text-foreground border-border/80"
+                                )}>
+                                  {part}
+                                </span>
+                                {pi < f.parts.length - 1 && (
+                                  <span className="text-foreground font-black text-sm px-1.5 drop-shadow-sm">+</span>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     ))
