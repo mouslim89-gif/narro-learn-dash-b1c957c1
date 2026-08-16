@@ -22,6 +22,7 @@ import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { ReaderToken } from '@/components/ReaderToken';
 import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
+import { getGrammarFlat, getGrammarForPart } from '@/data/book-grammar';
 import { ReaderTutorial } from '@/components/onboarding/ReaderTutorial';
 import { Progress } from '@/components/ui/progress';
 
