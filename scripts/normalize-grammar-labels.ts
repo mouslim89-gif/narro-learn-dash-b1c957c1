@@ -32,18 +32,22 @@ const labelMap: [RegExp, string][] = [
   [/\bi[-\s]?adjective\b/gi, "I-adjective"],
   [/\bna[-\s]?adjective\s*stem\b/gi, "Na-adjective stem"],
   [/\bna[-\s]?adjective\b/gi, "Na-adjective"],
-  [/\bvolitional\s*form\b/gi, "Volitional form"],
-  [/\bvolitional\b/gi, "Volitional form"],
+  [/\bvolitional(?!\s+form)\b/gi, "Volitional form"],
+  [/\bvolitional\s+form\b/gi, "Volitional form"],
   [/\bverb[-\s]*conditional\b/gi, "Conditional form"],
-  [/\bconditional\s*form\b/gi, "Conditional form"],
+  [/\bconditional(?!\s+form)\b/gi, "Conditional form"],
+  [/\bconditional\s+form\b/gi, "Conditional form"],
   [/\bba[-\s]?form\b/gi, "Conditional form"],
-  [/\bpotential\s*form\b/gi, "Potential form"],
-  [/\bpassive\s*form\b/gi, "Passive form"],
-  [/\bcausative\s*form\b/gi, "Causative form"],
-  [/\bimperative\s*form\b/gi, "Imperative form"],
+  [/\bpotential(?!\s+form)\b/gi, "Potential form"],
+  [/\bpotential\s+form\b/gi, "Potential form"],
+  [/\bpassive(?!\s+form)\b/gi, "Passive form"],
+  [/\bpassive\s+form\b/gi, "Passive form"],
+  [/\bcausative(?!\s+form)\b/gi, "Causative form"],
+  [/\bcausative\s+form\b/gi, "Causative form"],
+  [/\bimperative(?!\s+form)\b/gi, "Imperative form"],
+  [/\bimperative\s+form\b/gi, "Imperative form"],
   [/\bnoun\b/g, "Noun"],
   [/\bclause\b/gi, "Clause"],
-  [/\bVolitional form form\b/gi, "Volitional form"],
 ];
 
 const rashomonJPMap: [RegExp, string][] = [
@@ -229,8 +233,9 @@ function normalize(s: string, book: string, key: string): string {
 
   for (const [re, rep] of labelMap) out = out.replace(re, rep);
 
-  // cleanup double Volitional form form
-  out = out.replace(/\bVolitional form form\b/gi, "Volitional form");
+  // cleanup multiple 'form' repeats and 'luxury' artifact
+  out = out.replace(/\bform(?:\s+form)+\b/gi, "form");
+  out = out.replace(/\s+luxury\b/gi, "");
 
   // capitalize first letter (skip if starts with non-letter like ～ or 〜 or Japanese)
   const first = out.charAt(0);
