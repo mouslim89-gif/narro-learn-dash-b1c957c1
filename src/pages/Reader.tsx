@@ -226,8 +226,10 @@ export default function Reader() {
  }
  });
 
- const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
+  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
+  const [focusGrammarExample, setFocusGrammarExample] = useState<string | undefined>(undefined);
+  
   
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
