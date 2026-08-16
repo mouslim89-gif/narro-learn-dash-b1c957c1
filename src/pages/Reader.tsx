@@ -193,7 +193,37 @@ export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
   const goTo = useDelayedNav();
- const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { 
+    updateProgress, 
+    getProgress, 
+    flushPendingProgressPushes, 
+    fontSize, 
+    setFontSize, 
+    readerDarkMode, 
+    setReaderDarkMode, 
+    showFurigana, 
+    setShowFurigana, 
+    showTranslations, 
+    setShowTranslations, 
+    japaneseFont, 
+    setJapaneseFont, 
+    setHasSeenLongPressHint, 
+    showKnownHighlights, 
+    setShowKnownHighlights, 
+    highlightNew, 
+    setHighlightNew, 
+    highlightLearning, 
+    setHighlightLearning, 
+    highlightKnown, 
+    setHighlightKnown 
+  } = useReadingProgressStore();
+
+  useEffect(() => {
+    if (japaneseFont !== 'sans') {
+      const face = japaneseFont === 'serif' ? 'Noto Serif JP' : 'Klee One';
+      document.fonts.load(`16px "${face}"`).catch(console.error);
+    }
+  }, [japaneseFont]);
 
  const knownIndex = useKnownWordsIndex();
  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
