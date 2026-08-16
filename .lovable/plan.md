@@ -1,19 +1,31 @@
-# Plan - Fix Onboarding Visibility
+# Onboarding: arrows instead of the Continue button
 
-The user reported that the last 3 pages of the onboarding show nothing. After investigation, the components (`GrammarDemo`, `AudioDemo`, `FlashcardDemo`) are present but their internal animation logic or layout constraints within the new `OnboardingCarousel` "Stage" container (`rounded-3xl bg-card`) might be causing visibility issues during transitions or on specific devices.
+Replace the full-width "Continue" / "Start reading" pill at the bottom of the onboarding carousel with arrow navigation.
 
-## Proposed Changes
+## Proposed layout (recommended)
 
-### Onboarding Demos
-- **GrammarDemo**: Simplify the animation logic. Remove the `setTimeout` dependency for initial visibility to ensure it renders immediately when `active` is true.
-- **AudioDemo**: Ensure the waveform animation starts reliably and the layout fills the container appropriately.
-- **FlashcardDemo**: Check the 3D perspective and ensure the card and `HalfGauge` are correctly sized for the stage.
-- **OnboardingCarousel**: Ensure `AnimatePresence` doesn't leave the stage empty during slide transitions.
+A single bottom row under the copy block:
 
-### Verification
-- Run a fresh Playwright check to capture screenshots of all slides in a mobile viewport.
+```text
+[ <- ]                                   [ -> ]
+ back                                    next
+```
+
+- Left: circular back arrow (`ArrowLeft`), 44px, `header-chip` relief style, hidden/disabled on the first slide.
+- Right: circular next arrow (`ArrowRight`), 52px, filled with the premium CTA style (`btn-tsundoku-premium`) so it stays the clear primary action.
+- On the last slide the right arrow becomes a short "Start reading" pill (arrow alone would not communicate that the onboarding ends), or optionally a check icon.
+- Both keep `tap-scale` press feedback; existing swipe gestures and progress bars stay unchanged.
+
+## Variations (pick one)
+
+1. **Split row (recommended)** — back arrow left, next arrow right, edge aligned. Feels native and leaves the stage roomy.
+2. **Right cluster** — both arrows grouped bottom-right, back arrow ghost, next arrow filled.
+3. **Arrow only** — no back button at all, single filled next arrow bottom-right; back is done by swiping.
 
 ## Technical details
-- The `Stage` container in `OnboardingCarousel.tsx` is an `absolute inset-0` div inside a relative parent.
-- Some demos might be relying on height/width properties that don't play well with the new container.
-- I will harmonize the `active` prop usage to ensure all demos mount their interactive elements immediately.
+
+- File: `src/components/onboarding/OnboardingCarousel.tsx`.
+- Remove the `<button>` currently rendering `isLast ? 'Start reading' : 'Continue'`; render the arrow row in its place, still calling `goTo(index + 1)` / `goTo(index - 1)`.
+- Import `ArrowLeft` / `ArrowRight` from `lucide-react`.
+- Add `aria-label="Previous"` / `aria-label="Next"` for accessibility.
+- No other file changes.
