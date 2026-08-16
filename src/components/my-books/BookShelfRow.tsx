@@ -9,11 +9,10 @@ import type { ReadingProgress } from'@/stores/reading-progress';
 export function BookShelfRow({ book, progress }: { book: Book; progress: ReadingProgress }) {
  const done = progress.progressPercent >= 100;
  return (
- <Link
- to={`/book/${book.id}`}
- className="group block rounded-xl border bg-card p-3 ring-1 ring-border/30 card-lift tap-scale"
- style={{ backgroundImage:`linear-gradient(110deg, ${book.coverColor}14 0%, hsl(var(--card)) 50%)`}}
- >
+    <Link
+      to={`/book/${book.id}`}
+      className="group block rounded-2xl border bg-card p-3 ring-1 ring-border/30 shadow-sm card-lift tap-scale"
+    >
  <div className="flex items-center gap-4">
  <div
  className="book-paper relative flex h-24 w-16 flex-shrink-0 items-end overflow-hidden rounded-md p-2 shadow-md ring-1 ring-black/5"
