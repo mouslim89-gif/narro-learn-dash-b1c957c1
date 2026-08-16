@@ -160,18 +160,8 @@ export default function Settings() {
               backgroundImage: 'linear-gradient(135deg, hsl(var(--accent) / 0.16) 0%, hsl(var(--card)) 62%)',
             } : undefined}
           >
-            {!isPremium && (
-              <span className="library-kanji-watermark" aria-hidden>
-                読
-              </span>
-            )}
             <div className="flex items-center justify-between px-4 py-4 relative z-10">
               <div className="flex flex-col">
-                {!isPremium && (
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-0.5">
-                    Tsundoku Premium
-                  </p>
-                )}
                 <span className="text-[15px] font-medium">Plan</span>
                 <span className="text-[11px] text-muted-foreground">
                   {isPremium ? (plan === 'lifetime' ? 'Premium | Lifetime' : 'Premium') : 'Free'}
