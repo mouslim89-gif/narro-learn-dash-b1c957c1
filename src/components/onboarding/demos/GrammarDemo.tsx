@@ -1,60 +1,63 @@
-import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { BookType } from 'lucide-react';
 
 export function GrammarDemo({ active }: { active: boolean }) {
+  const reduced = useReducedMotion();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!active) {
+      setOpen(false);
+      return;
+    }
+    const t = setTimeout(() => setOpen(true), reduced ? 0 : 700);
+    return () => clearTimeout(t);
+  }, [active, reduced]);
+
   return (
-    <div className="relative h-full w-full flex flex-col items-center justify-center p-6 bg-muted/30">
-      <div className="w-full max-w-[300px]" style={{ perspective: 1000 }}>
-        <motion.div
-          animate={active ? {
-            rotateY: [0, 0, 180, 180],
-          } : { rotateY: 0 }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            repeatDelay: 1,
-            ease: "easeInOut"
-          }}
-          style={{ transformStyle: 'preserve-3d' }}
-          className="relative w-full h-48"
-        >
-          {/* Front: Structure */}
-          <div 
-            style={{ backfaceVisibility: 'hidden' }}
-            className="absolute inset-0 bg-card rounded-2xl border shadow-sm p-6 flex flex-col items-center justify-center text-center"
-          >
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent mb-3">Structure</span>
-            <div className="text-xl font-japanese font-bold">
-              Dictionary form <span className="text-accent">+</span> のだ
-            </div>
-          </div>
-
-          {/* Back: Meaning */}
-          <div 
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-            className="absolute inset-0 bg-card rounded-2xl border shadow-sm p-6 flex flex-col items-center justify-center text-center"
-          >
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">Explanation</span>
-            <p className="text-sm leading-relaxed px-4">
-              Used to provide an explanation, emphasize a reason, or add emotional weight.
-            </p>
-          </div>
-        </motion.div>
+    <div className="flex h-full w-full flex-col items-center justify-center gap-5 p-6">
+      <div className="reader-text font-japanese text-lg leading-[2.2] text-center text-foreground">
+        forget<span className="sr-only" />
+      </div>
+      <div className="reader-text -mt-14 font-japanese text-lg leading-[2.2] text-center text-foreground">
+        今日は<span className="rounded bg-accent/15 px-0.5 text-accent">行くのだ</span>。
       </div>
 
-      <div className="mt-8 flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/20 rounded-full">
-        <Lock className="h-3 w-3 text-accent" />
-        <span className="text-[11px] font-bold text-accent uppercase tracking-wider">Premium explanations</span>
-      </div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={active ? { opacity: 1 } : {}}
-        transition={{ delay: 0.5 }}
-        className="mt-6 text-sm text-center font-medium text-muted-foreground"
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 rounded-full bg-muted px-3.5 py-2 ring-1 ring-border/40 tap-scale-sm"
       >
-        Deep dive into grammar with AI-powered notes.
-      </motion.p>
+        <BookType className="h-4 w-4 text-accent" />
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+          Grammar Notes
+        </span>
+      </button>
+
+      <div className="h-[136px] w-full max-w-[290px]">
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+              className="rounded-2xl bg-background p-4 ring-1 ring-border/50 elev-soft"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Structure
+              </p>
+              <p className="mt-2 font-japanese text-base font-bold text-foreground">
+                Dictionary form <span className="text-accent">+</span> のだ
+              </p>
+              <p className="mt-3 text-sm leading-snug text-muted-foreground">
+                Gives an explanation or a reason behind what is being said.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
