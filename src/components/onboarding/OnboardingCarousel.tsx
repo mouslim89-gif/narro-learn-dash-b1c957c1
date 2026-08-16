@@ -133,7 +133,7 @@ export function OnboardingCarousel() {
         {/* Stage */}
         <div className="flex min-h-0 flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
           <div className="relative min-h-0 flex-1 overflow-hidden rounded-3xl bg-card ring-1 ring-border/30 elev-soft">
-            <AnimatePresence initial={false} custom={direction} mode="wait">
+            <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
                 key={index}
                 custom={direction}
