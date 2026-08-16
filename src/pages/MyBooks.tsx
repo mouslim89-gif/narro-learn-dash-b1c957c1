@@ -36,47 +36,42 @@ export default function MyBooks() {
  return list;
  }, [progress]);
 
- const stats = useMemo(() => {
- const entries = Object.entries(progress);
- const booksCompleted = entries.filter(([, p]) => p.progressPercent >= 100).length;
+  const stats = useMemo(() => {
+    const entries = Object.entries(progress);
+    const booksCompleted = entries.filter(([, p]) => p.progressPercent >= 100).length;
 
- let wordsRead = 0;
- let totalMinutes = 0;
- for (const [key, p] of entries) {
- const bookId = key.includes('__') ? key.split('__')[0] : key;
- const book = books.find(b => b.id === bookId);
- if (!book) continue;
- totalMinutes += Math.round(book.readingTimeMin * (p.progressPercent / 100));
- const tokenCount = tokenWordCounts[key]?.[p.difficulty] ?? tokenWordCounts[bookId]?.[p.difficulty] ?? 0;
- wordsRead += Math.round(tokenCount * (p.progressPercent / 100));
- }
+    let wordsRead = 0;
+    let totalMinutes = 0;
+    for (const [key, p] of entries) {
+      const bookId = key.includes('__') ? key.split('__')[0] : key;
+      const book = books.find(b => b.id === bookId);
+      if (!book) continue;
+      totalMinutes += Math.round(book.readingTimeMin * (p.progressPercent / 100));
+      const tokenCount = tokenWordCounts[key]?.[p.difficulty] ?? tokenWordCounts[bookId]?.[p.difficulty] ?? 0;
+      wordsRead += Math.round(tokenCount * (p.progressPercent / 100));
+    }
 
- const readDateStrings = new Set<string>();
- for (const [, p] of entries) {
- readDateStrings.add(format(new Date(p.lastReadAt),'yyyy-MM-dd'));
- }
+    const readDates = entries
+      .map(([, p]) => startOfDay(new Date(p.lastReadAt)).getTime())
+      .sort((a, b) => b - a);
+    const uniqueDates = [...new Set(readDates)];
+    let streak = 0;
+    const today = startOfDay(new Date()).getTime();
+    for (let i = 0; i < uniqueDates.length; i++) {
+      const expected = today - i * 86400000;
+      if (uniqueDates[i] === expected) streak++;
+      else break;
+    }
 
- const readDates = entries
- .map(([, p]) => startOfDay(new Date(p.lastReadAt)).getTime())
- .sort((a, b) => b - a);
- const uniqueDates = [...new Set(readDates)];
- let streak = 0;
- const today = startOfDay(new Date()).getTime();
- for (let i = 0; i < uniqueDates.length; i++) {
- const expected = today - i * 86400000;
- if (uniqueDates[i] === expected) streak++;
- else break;
- }
+    return { booksCompleted, totalMinutes, streak, wordsSaved: savedWords.length, wordsRead };
+  }, [progress, savedWords.length]);
 
- return { booksCompleted, totalMinutes, streak, wordsSaved: savedWords.length, wordsRead, readDateStrings };
- }, [progress, savedWords.length]);
-
- const STAT_TILES = [
- { key:'streak', value: stats.streak, label:'Day streak', Icon: Flame, tint:'36 80% 60%'},
- { key:'words', value: stats.wordsRead, label:'Words read', Icon: BookOpen, tint:'180 50% 45%'},
- { key:'saved', value: stats.wordsSaved, label:'Words saved', Icon: Bookmark, tint:'270 45% 60%'},
- { key:'completed', value: stats.booksCompleted, label:'Books done', Icon: Trophy, tint:'40 90% 55%'},
- ];
+  const STAT_TILES = [
+    { key: 'streak', value: stats.streak, label: 'Streak', Icon: Flame },
+    { key: 'words', value: stats.wordsRead, label: 'Words', Icon: BookOpen },
+    { key: 'saved', value: stats.wordsSaved, label: 'Saved', Icon: Bookmark },
+    { key: 'completed', value: stats.booksCompleted, label: 'Done', Icon: Trophy },
+  ];
 
  return (
  <div className="pb-20">
