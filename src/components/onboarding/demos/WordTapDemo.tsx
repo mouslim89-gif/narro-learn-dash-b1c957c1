@@ -1,104 +1,93 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { FuriganaWord } from '@/components/FuriganaWord';
-import { Search, Globe, Volume2, BookType, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Volume2, Bookmark } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const before = ['今日', 'は'];
+const after = ['が', 'いい', 'です', 'ね', '。'];
 
 export function WordTapDemo({ active }: { active: boolean }) {
+  const reduced = useReducedMotion();
+  const [tapped, setTapped] = useState(false);
+
+  useEffect(() => {
+    if (!active) {
+      setTapped(false);
+      return;
+    }
+    const t = setTimeout(() => setTapped(true), reduced ? 0 : 900);
+    return () => clearTimeout(t);
+  }, [active, reduced]);
+
   return (
-    <div className="relative h-full w-full flex flex-col items-center justify-center p-6 bg-muted/30">
-      {/* Mock Reader Sentence */}
-      <div className="bg-card p-6 rounded-2xl border shadow-sm w-full max-w-[280px] mb-8 relative">
-        <div className="flex flex-wrap gap-y-6 text-xl font-japanese leading-relaxed">
-          <span>今日</span>
-          <span>は</span>
-          <motion.div
-            animate={active ? {
-              backgroundColor: ['rgba(var(--accent-rgb), 0)', 'rgba(var(--accent-rgb), 0.15)', 'rgba(var(--accent-rgb), 0.15)']
-            } : {}}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="rounded px-1 relative cursor-pointer"
-          >
-            <FuriganaWord 
-              text="天気" 
-              reading="てんき" 
-              furiganaVisible={true}
-              onClick={() => {}}
-              className={active ? "text-accent font-bold transition-colors delay-1000" : ""}
+    <div className="flex h-full w-full flex-col items-center justify-center gap-5 p-6">
+      <div className="reader-text font-japanese text-xl leading-[2.4] text-foreground">
+        {before.map((w) => (
+          <span key={w}>{w}</span>
+        ))}
+        <button
+          type="button"
+          onClick={() => setTapped(true)}
+          className={cn(
+            'relative rounded px-0.5 transition-colors duration-300',
+            tapped ? 'bg-accent/15 text-accent' : 'bg-transparent',
+          )}
+        >
+          <ruby>
+            天気
+            <rt className="text-[0.5em] text-muted-foreground">てんき</rt>
+          </ruby>
+          {active && !reduced && !tapped && (
+            <motion.span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-accent/50"
+              animate={{ opacity: [0.15, 0.7, 0.15], scale: [1, 1.12, 1] }}
+              transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
             />
-            
-            {/* Animated Tap Indicator */}
-            {active && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ 
-                  scale: [0, 1.2, 1], 
-                  opacity: [0, 1, 0] 
-                }}
-                transition={{ delay: 0.8, duration: 0.6 }}
-                className="absolute inset-0 bg-accent/30 rounded-full scale-150 pointer-events-none"
-              />
-            )}
-          </motion.div>
-          <span>が</span>
-          <span>いい</span>
-          <span>です</span>
-          <span>ね</span>
-          <span>。</span>
-        </div>
+          )}
+        </button>
+        {after.map((w, i) => (
+          <span key={i}>{w}</span>
+        ))}
       </div>
 
-      {/* Mock Popup */}
-      <AnimatePresence>
-        {active && (
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 1.2, type: 'spring', damping: 20 }}
-            className="w-full max-w-[300px] bg-card rounded-2xl border shadow-lg overflow-hidden"
-          >
-            <div className="p-4 border-b border-border/40 flex items-center justify-between">
-              <div className="flex items-baseline gap-2">
-                <h3 className="text-2xl font-japanese font-bold">天気</h3>
-                <span className="text-sm text-muted-foreground">てんき</span>
-              </div>
-              <div className="flex gap-2">
-                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                  <Volume2 className="h-4 w-4 text-muted-foreground" />
+      <div className="h-[132px] w-full max-w-[290px]">
+        <AnimatePresence>
+          {tapped && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+              className="rounded-2xl bg-background p-4 ring-1 ring-border/50 elev-soft"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-japanese text-xl font-bold leading-none">天気</p>
+                  <p className="mt-1 text-xs text-muted-foreground">てんき</p>
+                </div>
+                <div className="flex gap-1.5">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    <Volume2 className="h-4 w-4" />
+                  </span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/15 text-accent">
+                    <Bookmark className="h-4 w-4" />
+                  </span>
                 </div>
               </div>
-            </div>
-            <div className="p-4 space-y-3">
-              <div className="flex gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">Noun</span>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  Noun
+                </span>
+                <span className="rounded-full bg-[hsl(var(--n4)/0.15)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[hsl(var(--n4))]">
+                  N4
+                </span>
               </div>
-              <p className="text-sm leading-snug">Weather; the elements.</p>
-              
-              <div className="flex gap-2 pt-2">
-                <div className="h-9 w-9 rounded-full border flex items-center justify-center text-muted-foreground">
-                  <Search className="h-4 w-4" />
-                </div>
-                <div className="h-9 w-9 rounded-full border flex items-center justify-center text-muted-foreground">
-                  <Globe className="h-4 w-4" />
-                </div>
-                <div className="h-9 w-9 rounded-full border flex items-center justify-center text-muted-foreground">
-                  <BookType className="h-4 w-4" />
-                </div>
-                <button className="flex-1 h-9 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-2">
-                  <Sparkles className="h-3 w-3" /> Save
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={active ? { opacity: 1 } : {}}
-        transition={{ delay: 0.5 }}
-        className="mt-6 text-sm text-center font-medium text-muted-foreground"
-      >
-        Tap any word to see its meaning instantly.
-      </motion.p>
+              <p className="mt-2 text-sm leading-snug text-foreground">Weather; the elements</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
