@@ -1,22 +1,39 @@
-# Plan - Refine Grammar Formation Highlighting
+# Fix corrupted grammar pattern labels
 
-The current logic for highlighting grammar formations in `GrammarDetail.tsx` relies on a simple regex check for Japanese characters (`[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]`). While effective for many cases, it incorrectly highlights grammatical categories that happen to include Japanese labels (e.g., "Volitional form" generated as "意向形" or mixed terms) or fails when categories are purely English but intended to be muted. The user wants to ensure grammatical categories remain muted (gray) and literal Japanese pattern parts are highlighted (amber).
+## What is wrong
 
-## Proposed Changes
+The label in your screenshot reads "Volitional form form form + とした/とする". The duplication is in the data file `src/data/book-grammar.ts`, not in the display code.
 
-### Logic Improvements
-- Refine the detection logic in `GrammarDetail.tsx` to better distinguish between literal Japanese patterns and grammatical descriptions.
-- Instead of just checking for "any Japanese character", I will check if the part is one of a set of known grammatical placeholders (e.g., "Verb", "Noun", "Plain form", etc.) or if it matches common description patterns.
-- I will also add a fallback to check for purely Japanese strings (literal particles/suffixes) to be highlighted.
+Cause: the label-normalization script has two overlapping rules, `volitional form -> Volitional form` and `volitional -> Volitional form`. The second rule re-matches the word inside an already-normalized label, so every run of the script appends another "form". The script's single cleanup rule only removes one duplication, not two.
 
-### Implementation Details
-- Update the condition in `GrammarDetail.tsx` (around line 241) to use a more robust helper function for determining the highlight style.
-- This helper will prioritize muting common grammatical terms (in both English and common Japanese terminology used by the AI) and highlighting literal strings that are likely the target pattern parts.
+## Full audit of the data (622 unique patterns)
 
-## Technical Details
+Confirmed issues, all in `src/data/book-grammar.ts`:
 
-### `src/pages/GrammarDetail.tsx`
-- Replace the inline regex check with a logic that:
-    1. Checks for a list of common grammatical terms (e.g., "Verb", "Noun", "i-Adjective", "na-Adjective", "Dictionary form", "Masu stem", "Volitional", "Plain", "Te-form").
-    2. Checks for terms containing "form", "stem", "base", "clause".
-    3. Highlights parts that are entirely Japanese (no Latin characters) AND are not specifically in a "blacklist" of Japanese grammatical terms (like 意向形, 辞書形).
+- 21 labels with `Volitional form form form`
+- 8 labels with `Volitional form form`
+- 1 label with `Conditional form form (ば)`
+- 3 labels ending with a stray English word `luxury`:
+  - `Dictionary form + にちがいない luxury`
+  - `Te-form + たまらない luxury`
+  - `Volitional form form form + と思う luxury`
+- 1 typo label: `Volitional form form form + とるす` (should be `とする`)
+- 1 duplicated note: in `gyofukuki / simplified / part 2`, two notes share the exact same meaning ("To try to do something or to be about to do something") with patterns `とした/とする` and `としました`. This is the second card in your screenshot.
+
+No other repeated-word or garbled labels were found.
+
+## What I will do
+
+1. Clean the labels in `src/data/book-grammar.ts`:
+   - collapse any `form form...` run back to a single `form`
+   - drop the trailing `luxury` artifacts
+   - fix `とるす` to `とする`
+2. Remove the duplicated `としました` note in `gyofukuki / simplified / part 2`, keeping the `Volitional form + とした/とする` one.
+3. Fix `scripts/normalize-grammar-labels.ts` so it can never reintroduce the bug: make the bare `volitional` rule ignore an already-followed "form", and make the cleanup rule collapse any number of repeats (same for `conditional`, `potential`, `passive`, `causative`, `imperative`, `te`, `dictionary`).
+4. Cache check: labels are the cache key (`pattern_slug`) for grammar structures/examples. Most corrected labels already have a cached row in the database, so no regeneration is needed for them. For the few corrected labels with no cached row, I will run the existing preload script only for those missing patterns (a handful of requests, not a full re-run).
+
+## Technical notes
+
+- Files touched: `src/data/book-grammar.ts`, `scripts/normalize-grammar-labels.ts`.
+- No UI/component change; `GrammarPanel` and `GrammarDetail` render the label as-is.
+- The old corrupted `pattern_slug` rows in `grammar_examples` are left in place (harmless, unreferenced); no destructive database change.
