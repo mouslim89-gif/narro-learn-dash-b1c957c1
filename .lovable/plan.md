@@ -1,46 +1,54 @@
-# Onboarding refonte: showcase animé des fonctionnalités
+# Onboarding rebuild: premium, on-brand, mobile-first
 
-L'onboarding actuel est une carte modale générique (icônes Lucide sur pastilles bleu/vert/violet, texte centré). Il ne montre rien de ce que l'app sait faire et sort du thème Tsundoku.
+The current carousel is visually broken and off-brand. It will be rebuilt so every screen looks like a real slice of Tsundoku, with no mention of AI or Premium.
 
-Nouveau principe: chaque écran est plein écran, sur fond papier, et **montre** la fonctionnalité avec une mini-démo animée plutôt que de la décrire avec une icône.
+## What is broken today
 
-## Les écrans
+- The demos animate `rgba(var(--accent-rgb), ...)` but `--accent-rgb` does not exist in `index.css`, so highlights render transparent (Word Tap, Audio).
+- The difficulty selector pill slides by a hardcoded `x: currentIdx * 88`, which does not match the real chip widths, so the pill drifts off its label.
+- Demos use hardcoded hex colors (`bg-[#2a3c4a]`), raw borders and shadows instead of the app tokens and utility classes.
+- Slides are sized for tall phones: the demo area plus the text block overflows on short screens, cutting the CTA. Nothing is scroll-safe and safe-area padding is only applied at the top.
+- The grammar slide mentions AI, the flashcard/grammar slides show a "Premium explanations" lock badge.
+- The card is a real 3D flip with `perspective` set on the wrong element, so the back face shows through.
 
-1. **Welcome — Tsundoku**
-   Wordmark Merriweather animé lettre par lettre (même esprit que le splash), sous-titre "Learn Japanese by reading real literature", et une pile de 3 couvertures de livres qui se déploient en éventail.
+## Design direction
 
-2. **Tap any word** (démo interactive)
-   Une vraie phrase japonaise avec furigana. Un doigt/curseur animé vient taper un mot, le mot s'illumine en ambre, et une mini popup de définition monte du bas exactement comme dans le Reader. L'utilisateur peut aussi taper le mot lui-même.
+One consistent frame for all six screens, matching the app:
 
-3. **Three difficulty levels**
-   La même phrase se réécrit en boucle: Simplified → Intermediate → Original, avec le segmented pill de difficulté qui glisse. Montre qu'on peut lire au-dessus de son niveau.
+```text
+ [ progress bars ]                 [ x ]
+ -------------------------------------
+ |                                   |
+ |        DEMO STAGE (fixed          |
+ |        aspect, centered,          |
+ |        real app components)       |
+ |                                   |
+ -------------------------------------
+   Serif title (font-serif)
+   Muted description
+   [  Continue  ]  (pill CTA)
+```
 
-4. **Grammar, explained**
-   Une carte de grammar note qui se retourne: pattern (ex. `Dictionary form + のだ`) puis l'explication qui apparaît.
+- Background: `bg-background` with the same soft radial wash used by the library header.
+- Titles `font-serif`, descriptions `text-muted-foreground`, section labels small uppercase tracked.
+- Demo stage: a single card surface `rounded-3xl bg-card ring-1 ring-border/30 elev-soft`, fixed aspect so height never fights the text block.
+- CTA: the app pill button (`rounded-full`, `h-12`, `btn-tsundoku-premium` relief) with `tap-scale`.
+- Everything sized off a mobile viewport first; the stage shrinks with `min-h-0` and `flex-1` so the CTA is always visible on small screens, plus bottom safe-area padding.
 
-5. **Remember what you read**
-   Une flashcard qui se retourne recto/verso puis part sur le côté, avec les 4 boutons SRS et une demi-jauge d'objectif quotidien qui se remplit.
+## The six screens (copy without AI or Premium)
 
-6. **Listen and follow**
-   Ligne de texte avec surlignage progressif synchronisé et une petite waveform qui pulse.
+1. Welcome: real book covers using the app's `book-paper` cover treatment fanning into place. "Read real Japanese literature, one story at a time."
+2. Tap a word: a real reader line built from the same token/furigana rendering as the reader, tapping opens a mini popup styled exactly like `WordMiniPopup`. "Tap any word for its reading and meaning."
+3. Levels: the reader's real segmented control with a sliding pill measured from the actual element, cycling Simplified / Intermediate / Original text. "Same story, three levels."
+4. Grammar: a reader-style grammar chip opening a panel that shows the pattern structure and its meaning, styled like `GrammarPanel`. "See how each sentence is built."
+5. Audio: reader text with word-by-word highlight synced to a waveform, using the real `AudioPlayer` visual language. "Listen while you read."
+6. Remember: a flashcard front/back with the real SRS buttons and a `HalfGauge` daily goal. "Save words and review them at the right time."
 
-7. **Ready** — CTA "Start reading" pleine largeur (`btn-tsundoku-premium`), qui ferme l'onboarding.
+## Technical notes
 
-## Navigation et look
-
-- Plein écran, fond `background` avec le dégradé radial `library-header-bg`, pas de carte modale ni de backdrop flou.
-- Swipe horizontal (drag Framer Motion) + tap sur la moitié droite/gauche pour avancer/reculer; bouton "Next" en pill en bas, "Skip" discret en haut à droite.
-- Indicateur de progression: barres fines qui se remplissent (style stories), pas des points.
-- Chaque démo se rejoue à l'entrée de son écran et se met en pause quand l'écran n'est pas actif.
-- Palette strictement thème: paper background, navy `primary`, ambre `accent`. Aucune pastille bleu/vert/violet.
-- Respecte `disableAnimation` (admin): dans ce cas les démos s'affichent dans leur état final, sans mouvement.
-- Respecte aussi `prefers-reduced-motion`.
-
-## Détails techniques
-
-- `src/components/onboarding/OnboardingCarousel.tsx` réécrit: coquille plein écran, gestion des slides, swipe, progression, skip. Garde intactes la logique existante (`hasCompletedCarousel`, `alwaysReplayOnboarding`, `dismissed` local, exclusion `/reader/*` et pages légales) et le store `onboarding-storage`.
-- Nouveau dossier `src/components/onboarding/demos/` avec un composant par démo (`WordTapDemo`, `DifficultyDemo`, `GrammarDemo`, `FlashcardDemo`, `AudioDemo`, `BooksFanDemo`), chacun recevant `active: boolean`.
-- Les démos sont **statiques et autonomes**: phrase et tokens en dur dans le composant, zéro appel réseau, zéro requête IA, zéro dépendance au dictionnaire ou à Supabase. Aucun coût.
-- Réutilise `FuriganaWord` pour le rendu japonais et `HalfGauge` pour la jauge; le reste est du markup local calqué visuellement sur `WordMiniPopup`, `GrammarPanel` et `FlashcardReview` (pas d'import de ces composants, pour ne pas traîner leur état).
-- Animations en Framer Motion avec l'easing maison `[0.22, 1, 0.36, 1]`.
-- Aucune modification du Reader, du store, ni du tutoriel in-reader (`ReaderTutorial`) qui reste tel quel.
+- Rewrite `src/components/onboarding/OnboardingCarousel.tsx` shell (layout, progress bars, safe areas, swipe, CTA). Keep the existing dismissal logic, store flags and the reader/legal route exclusions unchanged.
+- Rewrite the six files in `src/components/onboarding/demos/` to use design tokens only (`bg-accent/15`, `text-accent`, `ring-border/40`) and the shared utilities (`elev-soft`, `card-lift`, `tap-scale`, `book-paper`). No `--accent-rgb`, no hex colors, no hover styles.
+- Sliding pills use Framer Motion `layoutId`, the same pattern as the review scope selector, instead of hardcoded pixel offsets.
+- Card flip: `perspective` on the parent wrapper, `transformStyle: preserve-3d` on the rotating child, `backfaceVisibility: hidden` on both faces.
+- All demos stay purely local: no network, no Supabase, no AI calls, no images generated.
+- Respect `useReducedMotion`: loops stop, transitions become simple fades.
