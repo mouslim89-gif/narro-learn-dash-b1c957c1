@@ -2,123 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
- :root {
- --background: 36 33% 97%;
- --foreground: 210 22% 15%;
+  :root {
+    --background: 36 33% 97%;
+    --foreground: 210 22% 15%;
 
- --card: 0 0% 100%;
- --card-foreground: 210 22% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 22% 15%;
 
- --popover: 0 0% 100%;
- --popover-foreground: 210 22% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 22% 15%;
 
- --primary: 210 29% 24%;
- --primary-foreground: 36 33% 97%;
+    --primary: 210 29% 24%;
+    --primary-foreground: 36 33% 97%;
 
- --secondary: 36 20% 88%;
- --secondary-foreground: 210 22% 15%;
+    --secondary: 36 20% 88%;
+    --secondary-foreground: 210 22% 15%;
 
- --muted: 36 15% 93%;
- --muted-foreground: 210 10% 50%;
+    --muted: 36 15% 93%;
+    --muted-foreground: 210 10% 50%;
 
- --accent: 36 76% 40%;
- --accent-foreground: 0 0% 100%;
+    --accent: 36 76% 40%;
+    --accent-foreground: 0 0% 100%;
 
- --destructive: 0 65% 48%;
- --destructive-foreground: 0 0% 100%;
+    --destructive: 0 65% 48%;
+    --destructive-foreground: 0 0% 100%;
 
- --border: 36 15% 88%;
- --input: 36 15% 88%;
- --ring: 210 29% 24%;
+    --border: 36 15% 88%;
+    --input: 36 15% 88%;
+    --ring: 210 29% 24%;
 
- --radius: 0.5rem;
+    --radius: 0.5rem;
 
- --sidebar-background: 36 20% 96%;
- --sidebar-foreground: 210 22% 15%;
- --sidebar-primary: 210 29% 24%;
- --sidebar-primary-foreground: 36 33% 97%;
- --sidebar-accent: 36 15% 93%;
- --sidebar-accent-foreground: 210 22% 15%;
- --sidebar-border: 36 15% 88%;
- --sidebar-ring: 210 29% 24%;
+    --sidebar-background: 36 20% 96%;
+    --sidebar-foreground: 210 22% 15%;
+    --sidebar-primary: 210 29% 24%;
+    --sidebar-primary-foreground: 36 33% 97%;
+    --sidebar-accent: 36 15% 93%;
+    --sidebar-accent-foreground: 210 22% 15%;
+    --sidebar-border: 36 15% 88%;
+    --sidebar-ring: 210 29% 24%;
 
-  --n5: 168 50% 35%;
-  --n4: 200 55% 42%;
-  --n3: 36 60% 45%;
-  --n2: 20 60% 45%;
-  --n1: 0 50% 42%;
+    --n5: 168 50% 35%;
+    --n4: 200 55% 42%;
+    --n3: 36 60% 45%;
+    --n2: 20 60% 45%;
+    --n1: 0 50% 42%;
 
-  /* Mastery / state tokens — aligned with .known-* highlights */
-  --state-new: 38 92% 50%;       /* amber */
-  --state-learning: 199 89% 48%; /* sky */
-  --state-known: 160 84% 39%;    /* emerald */
-  --state-due: 36 80% 55%;       /* warm amber, matches accent family */
+    /* Mastery / state tokens — aligned with .known-* highlights */
+    --state-new: 38 92% 50%;       /* amber */
+    --state-learning: 199 89% 48%; /* sky */
+    --state-known: 160 84% 39%;    /* emerald */
+    --state-due: 36 80% 55%;       /* warm amber, matches accent family */
   }
 
- .dark {
- --background: 220 15% 8%;
- --foreground: 36 15% 90%;
+  .dark {
+    --background: 220 15% 8%;
+    --foreground: 36 15% 90%;
 
- --card: 220 15% 12%;
- --card-foreground: 36 15% 90%;
+    --card: 220 15% 12%;
+    --card-foreground: 36 15% 90%;
 
- --popover: 220 15% 12%;
- --popover-foreground: 36 15% 90%;
+    --popover: 220 15% 12%;
+    --popover-foreground: 36 15% 90%;
 
- --primary: 36 50% 65%;
- --primary-foreground: 220 15% 8%;
+    --primary: 36 50% 65%;
+    --primary-foreground: 220 15% 8%;
 
- --secondary: 220 12% 20%;
- --secondary-foreground: 36 15% 90%;
+    --secondary: 220 12% 20%;
+    --secondary-foreground: 36 15% 90%;
 
- --muted: 220 12% 18%;
- --muted-foreground: 36 10% 55%;
+    --muted: 220 12% 18%;
+    --muted-foreground: 36 10% 55%;
 
- --accent: 36 76% 50%;
- --accent-foreground: 220 15% 8%;
+    --accent: 36 76% 50%;
+    --accent-foreground: 220 15% 8%;
 
- --destructive: 0 55% 40%;
- --destructive-foreground: 0 0% 100%;
+    --destructive: 0 55% 40%;
+    --destructive-foreground: 0 0% 100%;
 
- --border: 220 12% 20%;
-  --input: 220 12% 20%;
-  --ring: 36 50% 65%;
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+    --ring: 36 50% 65%;
 
-  --state-new: 43 96% 56%;
-  --state-learning: 198 93% 60%;
-  --state-known: 158 64% 52%;
-  --state-due: 36 80% 60%;
+    --state-new: 43 96% 56%;
+    --state-learning: 198 93% 60%;
+    --state-known: 158 64% 52%;
+    --state-due: 36 80% 60%;
   }
-}
 
-@layer base {
- * {
- @apply border-border;
- }
+  * {
+    @apply border-border;
+  }
 
- html {
- /* Prevent scroll-anchoring feedback loop with the collapsing sticky headers:
-    header shrinks → browser re-anchors scroll → --p changes → header grows → infinite jitter */
- overflow-anchor: none;
- }
+  html {
+    /* Prevent scroll-anchoring feedback loop with the collapsing sticky headers:
+       header shrinks → browser re-anchors scroll → --p changes → header grows → infinite jitter */
+    overflow-anchor: none;
+  }
 
- body {
- @apply bg-background text-foreground;
- font-family:'Inter', sans-serif;
- }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
 
- h1, h2, h3, h4, h5, h6 {
- font-family:'Merriweather', serif;
- }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', serif;
+  }
 
- .font-japanese {
- font-family:'Noto Sans JP', sans-serif;
- }
+  .font-japanese {
+    font-family: 'Noto Sans JP', sans-serif;
   }
 }
 
@@ -131,777 +124,3 @@
 .font-jp-hand {
   font-family: 'Klee One', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
 }
-
-/* 3D Flip Card */
-.perspective-800 {
- perspective: 800px;
-}
-.transform-style-3d {
- transform-style: preserve-3d;
-}
-.backface-hidden {
- backface-visibility: hidden;
-}
-.rotate-y-180 {
- transform: rotateY(180deg);
-}
-
-/* Subtle tap feedback for reader words */
-@keyframes word-tap {
- 0% { background-color: transparent; }
- 50% { background-color: hsl(var(--accent) / 0.1); }
- 100% { background-color: transparent; }
-}
-
-@keyframes card-slide-out {
- 0% { opacity: 1; transform: translateX(0); }
- 100% { opacity: 0; transform: translateX(-60px); }
-}
-@keyframes card-slide-in {
- 0% { opacity: 0; transform: translateX(60px); }
- 100% { opacity: 1; transform: translateX(0); }
-}
-.animate-card-out {
-  animation: card-slide-out 0.2s ease-in forwards;
-}
-.animate-card-in {
-  animation: card-slide-in 0.25s ease-out forwards;
-}
-
-/* Reader tutorial pulsing highlight */
-@keyframes tutorial-pulse {
-  0% { transform: scale(1); opacity: 0.9; }
-  100% { transform: scale(1.15); opacity: 0; }
-}
-.animate-tutorial-pulse {
-  animation: tutorial-pulse 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-}
-
-
-/* Mini popup slide-in (anchored to a sentence) */
-@keyframes mini-slide-up {
- 0% { opacity: 0; transform: translateY(8px) scale(0.97); }
- 100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes mini-slide-down {
- 0% { opacity: 0; transform: translateY(-8px) scale(0.97); }
- 100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-.animate-mini-slide-up {
- animation: mini-slide-up 0.18s ease-out;
- transform-origin: bottom center;
-}
-.animate-mini-slide-down {
- animation: mini-slide-down 0.18s ease-out;
- transform-origin: top center;
-}
-
-/* Paper texture for book covers — subtle grain + soft vignette */
-.book-paper {
- background-image:
- radial-gradient(ellipse at 30% 20%, hsl(0 0% 100% / 0.18), transparent 60%),
- radial-gradient(ellipse at 70% 90%, hsl(0 0% 0% / 0.22), transparent 65%),
- repeating-linear-gradient(
- 115deg,
- hsl(0 0% 100% / 0.04) 0px,
- hsl(0 0% 100% / 0.04) 1px,
- transparent 1px,
- transparent 3px
- ),
- repeating-linear-gradient(
- 25deg,
- hsl(0 0% 0% / 0.035) 0px,
- hsl(0 0% 0% / 0.035) 1px,
- transparent 1px,
- transparent 4px
- );
-}
-
-/* Subtle elevation for cards */
-.elev-soft {
- box-shadow:
- 0 1px 2px hsl(210 22% 15% / 0.04),
- 0 4px 12px -2px hsl(210 22% 15% / 0.06);
-}
-
-/* Header chip — circular icon buttons in page mastheads.
-   Adds a soft, tactile relief: ambient drop shadow + crisp inner highlight on top,
-   subtle inner shadow on bottom so the chip feels physically raised off the page. */
-/* Standard raised relief — the app's default elevation language.
-   Soft, slightly diffuse drop shadow + inset top highlight. Background is left
-   to the caller (e.g. bg-card, bg-foreground/0.08). Apply to any element that
-   should feel physically raised off the page. */
-.relief-raised {
- box-shadow:
- 0 1px 0 hsl(210 22% 15% / 0.15),
- 0 2px 4px -1px hsl(210 22% 15% / 0.18),
- inset 0 1px 0 hsl(0 0% 100% / 0.75),
- inset 0 -1px 0 hsl(210 22% 15% / 0.10);
-}
-.dark .relief-raised {
- box-shadow:
- 0 1px 2px hsl(0 0% 0% / 0.35),
- 0 2px 6px -1px hsl(0 0% 0% / 0.40),
- inset 0 1px 0 hsl(0 0% 100% / 0.08),
- inset 0 -1px 0 hsl(0 0% 0% / 0.30);
-}
-.relief-raised:active {
- box-shadow:
- 0 1px 2px hsl(210 22% 15% / 0.10),
- inset 0 1px 2px hsl(210 22% 15% / 0.10);
-}
-.dark .relief-raised:active {
- box-shadow:
- 0 1px 2px hsl(0 0% 0% / 0.30),
- inset 0 1px 2px hsl(0 0% 0% / 0.30);
-}
-
-/* Segmented control sliding pill. Same raised language as .relief-raised, but
-   with a vertically balanced shadow so the pill doesn't read as sitting high
-   inside its track (very visible on dark tracks). */
-.seg-pill {
-  box-shadow:
-    0 1px 0 hsl(210 22% 15% / 0.12),
-    0 1px 3px hsl(210 22% 15% / 0.14),
-    inset 0 1px 0 hsl(0 0% 100% / 0.75),
-    inset 0 -1px 0 hsl(210 22% 15% / 0.08);
-}
-.dark .seg-pill {
-  box-shadow:
-    0 0 4px hsl(0 0% 0% / 0.30),
-    0 1px 2px hsl(0 0% 0% / 0.22),
-    inset 0 1px 0 hsl(0 0% 100% / 0.08),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.18);
-}
-
-
-
-/* Inset relief for "active" or "pressed" states (e.g. toggles, saved states).
-   Simulates the element being pressed into the surface with inner shadows. */
-.relief-inset {
-  box-shadow: 
-    inset 0 2px 4px -1px hsl(210 22% 15% / 0.18),
-    inset 0 2px 0 hsl(210 22% 15% / 0.05),
-    inset 0 -1px 0 hsl(0 0% 100% / 0.45);
-}
-.dark .relief-inset {
-  box-shadow: 
-    inset 0 2px 6px -1px hsl(0 0% 0% / 0.40),
-    inset 0 1px 0 hsl(0 0% 0% / 0.28),
-    inset 0 -1px 0 hsl(0 0% 100% / 0.04);
-}
-
-
-/* Raised relief tuned for saturated/colored backgrounds (e.g. bg-accent).
-   Same shadow language as .relief-raised but with reduced top highlight so it
-   doesn't wash out on warm/colored fills, and a slightly stronger drop shadow
-   to match the perceived volume of the standard relief on light surfaces. */
-.relief-raised-accent {
-  box-shadow:
-    0 1px 0 hsl(210 22% 15% / 0.20),
-    0 2px 5px -1px hsl(210 22% 15% / 0.25),
-    inset 0 1px 0 hsl(0 0% 100% / 0.22),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.18);
-}
-.dark .relief-raised-accent {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.40),
-    0 2px 6px -1px hsl(0 0% 0% / 0.45),
-    inset 0 1px 0 hsl(0 0% 100% / 0.12),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.30);
-}
-.relief-raised-accent:active {
-  box-shadow:
-    0 1px 2px hsl(210 22% 15% / 0.15),
-    inset 0 1px 2px hsl(0 0% 0% / 0.18);
-}
-.dark .relief-raised-accent:active {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.30),
-    inset 0 1px 2px hsl(0 0% 0% / 0.30);
-}
-
-/* Premium relief for major CTAs — same shadow language as .relief-raised,
-   tuned for the dark primary background so it stays bombé. */
-.btn-tsundoku-premium {
-  position: relative;
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  overflow: hidden;
-  box-shadow:
-    0 1px 0 hsl(210 22% 15% / 0.20),
-    0 2px 4px -1px hsl(210 22% 15% / 0.25),
-    inset 0 1px 0 hsl(0 0% 100% / 0.18),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.22);
-  transition: transform 0.18s var(--ease-out-soft), box-shadow 0.18s var(--ease-out-soft), filter 0.18s var(--ease-out-soft);
-  border: none !important;
-}
-.dark .btn-tsundoku-premium {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.35),
-    0 2px 6px -1px hsl(0 0% 0% / 0.40),
-    inset 0 1px 0 hsl(0 0% 100% / 0.10),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.30);
-}
-
-.btn-tsundoku-premium::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(
-    to bottom,
-    hsl(0 0% 100% / 0.08),
-    transparent
-  );
-  pointer-events: none;
-}
-
-.btn-tsundoku-premium:active {
-  background-color: hsl(var(--primary)) !important;
-  filter: brightness(0.92);
-  box-shadow:
-    0 1px 2px hsl(210 22% 15% / 0.15),
-    inset 0 1px 2px hsl(0 0% 0% / 0.20);
-  transform: scale(0.96);
-}
-.dark .btn-tsundoku-premium:active {
-  box-shadow:
-    0 1px 2px hsl(0 0% 0% / 0.30),
-    inset 0 1px 2px hsl(0 0% 0% / 0.35);
-}
-
-
-
-/* Alias for the premium relief if needed elsewhere */
-.relief-premium {
-  @apply btn-tsundoku-premium;
-}
-
-
-
-/* Header chip — circular icon buttons in page mastheads. Uses the standard raised relief. */
-
-.header-chip {
- box-shadow:
- 0 1px 0 hsl(210 22% 15% / 0.15),
- 0 2px 4px -1px hsl(210 22% 15% / 0.18),
- inset 0 1px 0 hsl(0 0% 100% / 0.75),
- inset 0 -1px 0 hsl(210 22% 15% / 0.10);
-}
-.dark .header-chip {
- box-shadow:
- 0 1px 2px hsl(0 0% 0% / 0.35),
- 0 2px 6px -1px hsl(0 0% 0% / 0.40),
- inset 0 1px 0 hsl(0 0% 100% / 0.08),
- inset 0 -1px 0 hsl(0 0% 0% / 0.30);
-}
-.header-chip:active {
- box-shadow:
- 0 1px 2px hsl(210 22% 15% / 0.10),
- inset 0 1px 2px hsl(210 22% 15% / 0.10);
-}
-.dark .header-chip:active {
- box-shadow:
- 0 1px 2px hsl(0 0% 0% / 0.30),
- inset 0 1px 2px hsl(0 0% 0% / 0.30);
-}
-
-/* Bottom nav dock — crisp, defined relief (no diffuse blur). */
-.nav-dock {
- box-shadow:
- 0 1px 0 hsl(210 22% 15% / 0.18),
- 0 2px 0 hsl(210 22% 15% / 0.12),
- 0 3px 0 hsl(210 22% 15% / 0.06),
- inset 0 1px 0 hsl(0 0% 100% / 0.9),
- inset 0 -1px 0 hsl(210 22% 15% / 0.10);
-}
-.dark .nav-dock {
- box-shadow:
- 0 1px 0 hsl(0 0% 0% / 0.5),
- 0 2px 0 hsl(0 0% 0% / 0.35),
- inset 0 1px 0 hsl(0 0% 100% / 0.08),
- inset 0 -1px 0 hsl(0 0% 0% / 0.35);
-}
-
-/* Active nav pill — uses .relief-raised for the shadow; this class only sets the tint. */
-.nav-pill-active {
- background-color: hsl(var(--foreground) / 0.08);
-}
-.dark .nav-pill-active {
- background-color: hsl(var(--foreground) / 0.10);
-}
-
-/* Wordmark — refined letter-spacing for the brand */
-.wordmark {
- font-family:'Merriweather', serif;
- font-weight: 900;
- letter-spacing: -0.02em;
-}
-
-/* Reader text — uniform character spacing, no justification artifacts */
-.reader-text {
- letter-spacing: 0 !important;
- word-spacing: 0 !important;
- text-align: left;
- font-feature-settings:"palt"0; /* full-width metrics → even spacing */
- word-break: normal; /* allow CJK breaks between tokens (tokens themselves are nowrap) */
- overflow-wrap: break-word; /* fallback for long latin strings */
- line-break: strict; /* respect Japanese kinsoku line-break rules */
-}
-/* Japanese text breaks naturally between characters; line-break: strict enforces kinsoku */
-.reader-text ruby {
- ruby-align: center;
-}
-.reader-text rt {
- letter-spacing: 0;
- font-feature-settings:"palt"0;
-}
-
-/* ──────────────────────────────────────────
- Known-words highlights (saved flashcards)
- 3 mastery levels — soft tinted backgrounds
- ────────────────────────────────────────── */
-.known-new,
-.known-learning,
-.known-known {
- border-radius: 3px;
- padding: 0 1.5px;
- transition: background-color 0.15s ease;
-}
-/* New (mastery 0) — amber */
-.known-new {
- background-color: hsl(38 92% 50% / 0.15);
-}
-.dark .known-new {
- background-color: hsl(43 96% 56% / 0.20);
-}
-/* Learning (mastery 1–2) — sky */
-.known-learning {
- background-color: hsl(199 89% 48% / 0.15);
-}
-.dark .known-learning {
- background-color: hsl(198 93% 60% / 0.20);
-}
-/* Known (mastery 3+) — emerald */
-.known-known {
- background-color: hsl(160 84% 39% / 0.15);
-}
-.dark .known-known {
- background-color: hsl(158 64% 52% / 0.20);
-}
-
-/* ──────────────────────────────────────────
- Library header — subtle decorative gradient
- ────────────────────────────────────────── */
-.library-header-bg {
- background:
- radial-gradient(ellipse 60% 80% at 20% 0%, hsl(var(--accent) / 0.05), transparent 70%),
- radial-gradient(ellipse 50% 60% at 90% 20%, hsl(var(--primary) / 0.04), transparent 70%);
-}
-.library-kanji-watermark {
- font-family:'Noto Serif JP', serif;
- position: absolute;
- bottom: 8px;
- right: 12px;
- font-weight: 900;
- font-size: clamp(96px, 24vw, 160px);
- line-height: 0.85;
- color: hsl(var(--foreground) / 0.06);
- pointer-events: none;
- user-select: none;
-}
-.dark .library-kanji-watermark {
- color: hsl(var(--foreground) / 0.08);
-}
-.shadow-inner-sm { box-shadow: inset 0 1px 0 0 hsl(var(--foreground) / 0.04); }
-
-/* Hairline divider with soft fade on both ends */
-.hairline-fade {
- height: 1px;
- background: linear-gradient(
- to right,
- transparent,
- hsl(var(--border)) 20%,
- hsl(var(--border)) 80%,
- transparent
- );
-}
-
-
-
-
-/* Refined card with inner gradient + ring */
-.card-refined {
- background:
- linear-gradient(to bottom, hsl(var(--card)) 0%, hsl(var(--muted) / 0.3) 100%);
- box-shadow:
- 0 1px 2px hsl(210 22% 15% / 0.04),
- 0 8px 24px -8px hsl(210 22% 15% / 0.10);
-}
-.dark .card-refined {
- background:
- linear-gradient(to bottom, hsl(var(--card)) 0%, hsl(var(--muted) / 0.4) 100%);
-}
-
-/* Reader chrome icon button — unified hover/active */
-.reader-icon-btn {
- display: inline-flex;
- align-items: center;
- justify-content: center;
- width: 2.25rem;
- height: 2.25rem;
- border-radius: 9999px;
- color: hsl(var(--muted-foreground));
- transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
-}
-.reader-icon-btn[data-active="true"] {
- color: hsl(var(--primary));
- background-color: hsl(var(--primary) / 0.10);
-}
-
-/* Reader settings panel — drawer-style soft shadow */
-.reader-settings-panel {
- box-shadow: 0 6px 20px -6px hsl(220 15% 8% / 0.10);
-}
-.reader-settings-section {
- display: flex;
- align-items: center;
- gap: 0.4rem;
- margin-bottom: 0.5rem;
- font-size: 10px;
- font-weight: 600;
- text-transform: uppercase;
- letter-spacing: 0.15em;
- color: hsl(var(--muted-foreground));
-}
-.reader-settings-bullet {
- display: inline-block;
- width: 4px;
- height: 4px;
- border-radius: 9999px;
- background: hsl(var(--accent));
-}
-
-/* Reader progress — slim gradient bar */
-.reader-progress-track {
- position: relative;
- height: 2px;
- background: hsl(var(--muted));
- overflow: hidden;
-}
-.reader-progress-fill {
- height: 100%;
- background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
- border-radius: 9999px;
- transition: width 0.2s ease;
-}
-
-/* Primary button — subtle inner top highlight */
-.btn-primary-glow {
- box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.10);
-}
-
-/* Color swatch dot for legend */
-.color-dot {
- display: inline-block;
- width: 0.625rem;
- height: 0.625rem;
- border-radius: 9999px;
- flex-shrink: 0;
-}
-.color-dot-new { background-color: hsl(38 92% 50% / 0.6); }
-.color-dot-learning { background-color: hsl(199 89% 48% / 0.6); }
-.color-dot-known { background-color: hsl(160 84% 39% / 0.6); }
-
-/* Hide scrollbar utility */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* ──────────────────────────────────────────
- Apple-like motion system
- Subtle, spring-out easing, ~150–280ms
- ────────────────────────────────────────── */
-
-/* Easing tokens (CSS custom props for reuse) */
-:root {
- --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1); /* spring-like ease-out */
- --ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1); /* snappier ease-out */
- --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-@media (prefers-reduced-motion: reduce) {
- .reader-text,
- .reader-text rt {
- transition: none !important;
- }
-}
-
-/* Universal tap feedback — apply on any interactive surface */
-.tap-scale {
- transition: transform 0.18s var(--ease-out-soft), box-shadow 0.18s var(--ease-out-soft), background-color 0.18s var(--ease-out-soft);
- -webkit-tap-highlight-color: transparent;
- touch-action: manipulation;
-}
-.tap-scale:active {
- transform: scale(0.96);
-}
-.tap-scale-sm {
- transition: transform 0.15s var(--ease-out-soft), background-color 0.15s var(--ease-out-soft);
- -webkit-tap-highlight-color: transparent;
- touch-action: manipulation;
-}
-.tap-scale-sm:active {
- transform: scale(0.92);
- background-color: hsl(var(--foreground) / 0.08);
-}
-
-/* Card lift — soft hover + tap */
-.card-lift {
- transition:
- transform 0.25s var(--ease-out-soft),
- box-shadow 0.25s var(--ease-out-soft);
- -webkit-tap-highlight-color: transparent;
-}
-.card-lift:active {
- transform: scale(0.985);
-}
-
-/* Subtle ripple-like flash on press (color-only, no layout) */
-.press-flash {
- position: relative;
- overflow: hidden;
-}
-.press-flash::after {
- content:"";
- position: absolute;
- inset: 0;
- background: radial-gradient(circle at center, hsl(var(--foreground) / 0.08), transparent 60%);
- opacity: 0;
- pointer-events: none;
- transition: opacity 0.4s var(--ease-out-soft);
-}
-
-/* Global motion kill-switch (Settings → Disable animations) */
-html.no-anim *,
-html.no-anim *::before,
-html.no-anim *::after {
-  animation: none !important;
-  transition: none !important;
-}
-
-/* Entrance animations */
-@keyframes fade-in-up {
- 0% { opacity: 0; transform: translateY(8px); }
- 100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes fade-in-soft {
- 0% { opacity: 0; }
- 100% { opacity: 1; }
-}
-@keyframes scale-pop {
- 0% { opacity: 0; transform: scale(0.94); }
- 100% { opacity: 1; transform: scale(1); }
-}
-.animate-fade-in-up {
- animation: fade-in-up 0.42s var(--ease-out-soft) both;
-}
-.animate-fade-in-soft {
- animation: fade-in-soft 0.3s var(--ease-out-soft) both;
-}
-.animate-scale-pop {
- animation: scale-pop 0.28s var(--ease-out-soft) both;
-}
-
-/* Stagger helpers — apply to a parent, children animate in sequence */
-.stagger-children > * {
- animation: fade-in-up 0.45s var(--ease-out-soft) both;
-}
-.stagger-children > *:nth-child(1) { animation-delay: 0.02s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.07s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.12s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.17s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.22s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.27s; }
-.stagger-children > *:nth-child(7) { animation-delay: 0.32s; }
-.stagger-children > *:nth-child(8) { animation-delay: 0.37s; }
-.stagger-children > *:nth-child(n+9) { animation-delay: 0.4s; }
-
-/* Reader paragraph stagger uses the shared .stagger-children utility */
-
-/* ──────────────────────────────────────────
- Animated title — letter-by-letter entrance
- ────────────────────────────────────────── */
-@keyframes title-char-in {
- 0% { opacity: 0; transform: translateY(0.4em) rotate(2deg); filter: blur(2px); }
- 100% { opacity: 1; transform: translateY(0) rotate(0); filter: blur(0); }
-}
-.animated-title {
- display: inline-block;
- white-space: pre-wrap;
-}
-.animated-title__char {
- display: inline-block;
- opacity: 0;
- will-change: transform, opacity, filter;
- animation: title-char-in 0.38s var(--ease-out-soft) both;
-}
-
-/* Smooth color/opacity transitions — apply to icons, labels */
-.smooth-colors {
- transition: color 0.2s var(--ease-out-soft), background-color 0.2s var(--ease-out-soft), opacity 0.2s var(--ease-out-soft);
-}
-
-/* Soft pulse — for badges/indicators (replaces harsh animate-pulse) */
-@keyframes soft-pulse {
- 0%, 100% { opacity: 1; transform: scale(1); }
- 50% { opacity: 0.7; transform: scale(0.92); }
-}
-.animate-soft-pulse {
-  animation: soft-pulse 1.8s var(--ease-in-out-soft) infinite;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
-}
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s ease-in-out infinite;
-}
-
-/* Sentence flash highlight when jumping from a grammar example.
-   Uses box-decoration-break so multi-line spans get padded/rounded
-   on each line fragment instead of one harsh box. */
-.sentence-highlight-flash {
-  background-color: hsl(var(--accent) / 0.18);
-  border-radius: 0.35rem;
-  padding: 0.02em 0.25em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  animation: sentence-flash-in 0.18s var(--ease-out-soft) both;
-  transition: background-color 600ms var(--ease-out-soft);
-}
-
-@keyframes sentence-flash-in {
-  0%   { background-color: hsl(var(--accent) / 0); }
-  100% { background-color: hsl(var(--accent) / 0.18); }
-}
-
-/* Inline translation reveal — radiates outward from an anchor sentence */
-@keyframes translation-reveal {
-  0% { opacity: 0; transform: translateY(-4px); filter: blur(2px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
-.translation-reveal {
-  opacity: 0;
-  animation: translation-reveal 0.32s var(--ease-out-soft) both;
-  will-change: opacity, transform, filter;
-}
-
-
-
-/* Respect user motion preferences */
-@media (prefers-reduced-motion: reduce) {
- *,
- *::before,
- *::after {
- animation-duration: 0.01ms !important;
- animation-iteration-count: 1 !important;
- transition-duration: 0.01ms !important;
- scroll-behavior: auto !important;
- }
-}
-
-/* xs breakpoint helper for very narrow screens */
-@media (min-width: 360px) {
- .xs\:block { display: block; }
-}
-
-/* Premium audio player slider — strong contrast track vs fill */
-.audio-slider [data-orientation="horizontal"] {
- height: 0.375rem;
-}
-/* Unfilled track (Radix Track is the first child span) */
-.audio-slider > span[data-orientation="horizontal"] {
- background: hsl(var(--muted-foreground) / 0.22);
-}
-/* Filled portion (Radix Range — nested span inside the Track) */
-.audio-slider > span[data-orientation="horizontal"] > span {
- background: hsl(var(--primary));
-}
-.audio-slider [role="slider"] {
- height: 0.875rem;
- width: 0.875rem;
- border-width: 2px;
- background: hsl(var(--primary));
- border-color: hsl(var(--card));
- box-shadow: 0 1px 4px hsl(0 0% 0% / 0.25);
-}
-
-
-/* Reader article — inset/pressed shadow effect */
-.reader-article-inset {
-  box-shadow:
-    inset 0 2px 3px hsl(220 15% 8% / 0.14),
-    inset 0 0 0 1px hsl(220 15% 8% / 0.06);
-}
-.dark .reader-article-inset {
-  box-shadow:
-    inset 0 2px 3px hsl(0 0% 0% / 0.55),
-    inset 0 0 0 1px hsl(0 0% 0% / 0.28);
-}
-
-/* BottomNav links — keep scale tap but no background flash on press */
-.bottom-nav-link:active {
-  background-color: transparent !important;
-}
-
-/* Sentence flash highlight when jumping from a grammar example.
-   Uses box-decoration-break so multi-line spans get padded/rounded
-   on each line fragment instead of one harsh box. */
-.sentence-highlight-flash {
-  background-color: hsl(var(--accent) / 0.22);
-  box-shadow: inset 0 0 0 1px hsl(var(--accent) / 0.35);
-  border-radius: 0.35rem;
-  padding: 0.05em 0.25em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  transition: background-color 600ms var(--ease-out-soft),
-              box-shadow 600ms var(--ease-out-soft);
-}
-
-/* ──────────────────────────────────────────
-   Glass surfaces — experimental
-   ────────────────────────────────────────── */
-.glass-subtle {
-  background: hsl(var(--background) / 0.42);
-  backdrop-filter: blur(6px) saturate(180%);
-  -webkit-backdrop-filter: blur(6px) saturate(180%);
-  border-bottom: 1px solid hsl(var(--border) / 0.35);
-  transform: translateZ(0);
-  will-change: backdrop-filter;
-  isolation: isolate;
-}
-.glass-chip-subtle {
-  background: hsl(var(--background) / 0.32) !important;
-  backdrop-filter: blur(5px) saturate(180%);
-  -webkit-backdrop-filter: blur(5px) saturate(180%);
-  transform: translateZ(0);
-  will-change: backdrop-filter;
-  isolation: isolate;
-}
-
-/* Reader header chip — incolore, plus flou que le header lui-même.
-   Le header est en glass-subtle (blur 6px). Ce chip pousse à blur 14px
-   et n'a qu'un voile très léger pour rester lisible sans teinte propre. */
-.glass-chip-header {
-  background: hsl(var(--background) / 0.10) !important;
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  transform: translateZ(0);
-  will-change: backdrop-filter;
-  isolation: isolate;
-}
-
