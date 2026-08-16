@@ -1,35 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/stores/onboarding';
-import { ChevronRight, ChevronLeft, BookOpen, MousePointer2, BrainCircuit, Star } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Demo components
+import { BooksFanDemo } from './demos/BooksFanDemo';
+import { WordTapDemo } from './demos/WordTapDemo';
+import { DifficultyDemo } from './demos/DifficultyDemo';
+import { GrammarDemo } from './demos/GrammarDemo';
+import { FlashcardDemo } from './demos/FlashcardDemo';
+import { AudioDemo } from './demos/AudioDemo';
 
 const slides = [
   {
-    title: "Welcome to Tsundoku! 👋",
-    description: "Your new companion for learning Japanese through reading. Dive into your favorite stories.",
-    icon: <BookOpen className="w-12 h-12 text-primary" />,
-    color: "bg-blue-50 dark:bg-blue-900/20",
+    title: "Welcome to Tsundoku",
+    description: "Your journey into Japanese literature begins here. Read real stories, not textbooks.",
+    demo: (active: boolean) => <BooksFanDemo active={active} />,
   },
   {
-    title: "Read, tap, learn",
-    description: "Unsure about a word? Tap it to instantly see its definition, grammar, and pronunciation.",
-    icon: <MousePointer2 className="w-12 h-12 text-primary" />,
-    color: "bg-orange-50 dark:bg-orange-900/20",
+    title: "Tap to Understand",
+    description: "Instant lookups for any word. Definition, grammar, and pitch accent at your fingertips.",
+    demo: (active: boolean) => <WordTapDemo active={active} />,
   },
   {
-    title: "Memorize for good",
-    description: "Add words to your flashcards. Our spaced repetition system (SRS) takes care of anchoring them in your memory.",
-    icon: <BrainCircuit className="w-12 h-12 text-primary" />,
-    color: "bg-green-50 dark:bg-green-900/20",
+    title: "Levels for Everyone",
+    description: "Switch between Simplified, Intermediate, and Original versions of the same story.",
+    demo: (active: boolean) => <DifficultyDemo active={active} />,
   },
   {
-    title: "Ready for the adventure?",
-    description: "Pick a book from the library and start your linguistic journey right now.",
-    icon: <Star className="w-12 h-12 text-primary" />,
-    color: "bg-purple-50 dark:bg-purple-900/20",
+    title: "Grammar, Simplified",
+    description: "Stuck on a sentence? Our AI-powered grammar explanations break it down for you.",
+    demo: (active: boolean) => <GrammarDemo active={active} />,
+  },
+  {
+    title: "Synchronized Audio",
+    description: "Listen to professional narration while you read. Perfectly synced, line by line.",
+    demo: (active: boolean) => <AudioDemo active={active} />,
+  },
+  {
+    title: "Never Forget",
+    description: "Save words to your flashcards. Spaced repetition ensures they stay in your memory.",
+    demo: (active: boolean) => <FlashcardDemo active={active} />,
   },
 ];
 
@@ -37,9 +51,10 @@ export function OnboardingCarousel() {
   const { hasCompletedCarousel, completeCarousel, alwaysReplayOnboarding } = useOnboardingStore();
   const [currentSlide, setCurrentSlide] = useState(0);
   const location = useLocation();
-  // Local dismissal: with "always replay" on, the store flag stays false,
-  // so we need a session-level close.
   const [dismissed, setDismissed] = useState(false);
+
+  // Auto-advance logic (optional, but nice for "demo" feel)
+  // Removed for now to allow users to read at their own pace
 
   const dismiss = () => {
     completeCarousel();
@@ -59,8 +74,9 @@ export function OnboardingCarousel() {
     }
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => Math.max(0, prev - 1));
+  const handleDragEnd = (event: any, info: any) => {
+    if (info.offset.x < -50) nextSlide();
+    if (info.offset.x > 50 && currentSlide > 0) setCurrentSlide(prev => prev - 1);
   };
 
   return (
@@ -69,75 +85,83 @@ export function OnboardingCarousel() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6"
+        className="fixed inset-0 z-[100] flex flex-col bg-background"
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="max-w-md w-full bg-card rounded-3xl shadow-2xl border overflow-hidden relative"
-        >
-          <div className={cn("h-48 flex items-center justify-center transition-colors duration-500", slides[currentSlide].color)}>
-            <motion.div
-              key={currentSlide}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              {slides[currentSlide].icon}
-            </motion.div>
-          </div>
-
-          <div className="p-8 text-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <h2 className="text-2xl font-bold mb-4 font-serif">{slides[currentSlide].title}</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {slides[currentSlide].description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="mt-8 flex justify-between items-center">
-              <div className="flex gap-1.5">
-                {slides.map((_, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "h-1.5 rounded-full transition-all duration-300",
-                      i === currentSlide ? "w-6 bg-primary" : "w-1.5 bg-border"
-                    )}
-                  />
-                ))}
-              </div>
-
-              <div className="flex gap-3">
-                {currentSlide > 0 && (
-                  <Button variant="ghost" size="icon" onClick={prevSlide}>
-                    <ChevronLeft className="w-5 h-5" />
-                  </Button>
-                )}
-                <Button onClick={nextSlide} className="rounded-full px-6">
-                  {currentSlide === slides.length - 1 ? "Let's go!" : "Next"}
-                  {currentSlide < slides.length - 1 && <ChevronRight className="ml-2 w-4 h-4" />}
-                </Button>
-              </div>
+        {/* Progress Bars (Story style) */}
+        <div className="flex gap-1.5 px-4 pt-4 pb-2 mt-[env(safe-area-inset-top,0px)]">
+          {slides.map((_, i) => (
+            <div key={i} className="flex-1 h-1 bg-border/40 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full bg-primary"
+                initial={{ width: "0%" }}
+                animate={{ width: i < currentSlide ? "100%" : i === currentSlide ? "100%" : "0%" }}
+                transition={{ duration: i === currentSlide ? 0.4 : 0.2 }}
+              />
             </div>
-          </div>
+          ))}
+        </div>
 
+        {/* Header Actions */}
+        <div className="flex justify-end px-4 py-2">
           <Button
             variant="ghost"
-            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+            size="icon"
+            className="rounded-full bg-muted/50 backdrop-blur-sm"
             onClick={dismiss}
           >
-            Skip
+            <X className="h-5 w-5" />
           </Button>
-        </motion.div>
+        </div>
+
+        {/* Content Area (Swipeable) */}
+        <div className="flex-1 relative overflow-hidden">
+          <motion.div
+            key={currentSlide}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            onDragEnd={handleDragEnd}
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="absolute inset-0 flex flex-col"
+          >
+            {/* Demo Visualization */}
+            <div className="flex-1 flex items-center justify-center">
+              {slides[currentSlide].demo(true)}
+            </div>
+
+            {/* Text & CTA */}
+            <div className="px-8 pb-12 pt-6 bg-gradient-to-t from-background via-background to-transparent">
+              <motion.h2 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-3xl font-serif font-bold mb-3"
+              >
+                {slides[currentSlide].title}
+              </motion.h2>
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-muted-foreground leading-relaxed mb-10 text-lg"
+              >
+                {slides[currentSlide].description}
+              </motion.p>
+
+              <Button 
+                onClick={nextSlide} 
+                className="w-full h-14 rounded-full text-lg font-bold shadow-lg shadow-primary/10 flex items-center justify-center gap-2 group"
+              >
+                {currentSlide === slides.length - 1 ? "Start Reading" : "Continue"}
+                {currentSlide < slides.length - 1 && (
+                  <ChevronRight className="h-5 w-5 transition-transform group-active:translate-x-1" />
+                )}
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
