@@ -23,6 +23,7 @@ interface GrammarPanelProps {
   open: boolean;
   onClose: () => void;
   onJumpToExample?: (example: string) => void;
+  focusExample?: string;
 }
 
 export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
