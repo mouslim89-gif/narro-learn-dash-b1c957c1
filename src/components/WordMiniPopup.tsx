@@ -244,19 +244,14 @@ export function WordMiniPopup({
     </button>
   )}
       {(result as any)?.is_common && (
-        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary ring-1 ring-primary/20">
-          ✦ Common
+        <span 
+          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary ring-1 ring-primary/20"
+          title="Common word"
+        >
+          ✦
         </span>
       )}
- {result && !loading && onTranslateSentence && contextSentence && (
- <button
- onClick={onTranslateSentence}
- className="flex items-center gap-0.5 text-[11px] font-semibold text-muted-foreground transition-colors"
- title="Translate sentence"
- >
- <Languages className="h-3 w-3"/>
- </button>
- )}
+
  {result && !loading && (
  <button
  onClick={onShowMore}
