@@ -237,6 +237,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                   return (
                     <div
                       key={i}
+                      id={`grammar-note-${i}`}
                       className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors"
                     >
                       <button
