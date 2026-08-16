@@ -22,6 +22,7 @@ import { WordMiniPopup } from '@/components/WordMiniPopup';
 import { ReaderToken } from '@/components/ReaderToken';
 import { SentenceTranslationPopup } from '@/components/SentenceTranslationPopup';
 import { GrammarPanel } from '@/components/GrammarPanel';
+import { getGrammarFlat, getGrammarForPart } from '@/data/book-grammar';
 import { ReaderTutorial } from '@/components/onboarding/ReaderTutorial';
 import { Progress } from '@/components/ui/progress';
 
@@ -226,8 +227,10 @@ export default function Reader() {
  }
  });
 
- const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
+  const [scrollPercent, setScrollPercent] = useState(saved?.progressPercent || 0);
   const [showGrammar, setShowGrammar] = useState(false);
+  const [focusGrammarExample, setFocusGrammarExample] = useState<string | undefined>(undefined);
+  
   
   const [highlightedSentenceIdx, setHighlightedSentenceIdx] = useState<number | null>(null);
   const [activeSentence, setActiveSentence] = useState<number | null>(null);
@@ -1625,28 +1628,46 @@ export default function Reader() {
     </nav>
   )}
 
- {miniPopup && (
- <WordMiniPopup
- word={miniPopup.text}
- baseForm={miniPopup.baseForm}
- reading={miniPopup.reading}
- pos={miniPopup.pos}
- contextSentence={miniPopup.contextSentence}
- contextTokens={miniPopup.contextTokens}
- sentenceRect={miniPopup.sentenceRect}
- onClose={() => setMiniPopup(null)}
- onShowMore={() => {
- const { text, baseForm, reading, pos, contextSentence, contextTokens } = miniPopup;
- setMiniPopup(null);
- setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
- }}
- onTranslateSentence={() => {
- const idx = miniPopup.sentenceIdx;
- const jp = miniPopup.contextSentence ||'';
- triggerSentenceTranslation(idx, jp);
- }}
- />
- )}
+ {miniPopup && (() => {
+   const currentNotes = (partIdx !== null && partIdx !== undefined)
+     ? getGrammarForPart(id || '', difficulty, partIdx)
+     : getGrammarFlat(id || '', difficulty);
+   
+   const context = (miniPopup.contextSentence || '').replace(/[\s　。、]/g, '');
+   const matchingNote = context ? currentNotes.find(n => {
+     const ex = (n.example || '').replace(/[\s　。、]/g, '');
+     return ex && (context.includes(ex) || ex.includes(context));
+   }) : null;
+
+   return (
+     <WordMiniPopup
+       word={miniPopup.text}
+       baseForm={miniPopup.baseForm}
+       reading={miniPopup.reading}
+       pos={miniPopup.pos}
+       contextSentence={miniPopup.contextSentence}
+       contextTokens={miniPopup.contextTokens}
+       sentenceRect={miniPopup.sentenceRect}
+       grammarPattern={matchingNote?.pattern}
+       onShowGrammar={matchingNote ? () => {
+         setFocusGrammarExample(matchingNote.example);
+         setShowGrammar(true);
+         setMiniPopup(null);
+       } : undefined}
+       onClose={() => setMiniPopup(null)}
+       onShowMore={() => {
+         const { text, baseForm, reading, pos, contextSentence, contextTokens } = miniPopup;
+         setMiniPopup(null);
+         setFullPopupWord({ text, baseForm, reading, pos, contextSentence, contextTokens });
+       }}
+       onTranslateSentence={() => {
+         const idx = miniPopup.sentenceIdx;
+         const jp = miniPopup.contextSentence || '';
+         triggerSentenceTranslation(idx, jp);
+       }}
+     />
+   );
+ })()}
 
  {sentenceTranslation && (
  <SentenceTranslationPopup
@@ -1676,6 +1697,7 @@ export default function Reader() {
  open={showGrammar}
   onClose={() => setShowGrammar(false)}
   onJumpToExample={jumpToExample}
+  focusExample={focusGrammarExample}
   />
 
  {audioUrl && isPremium && (

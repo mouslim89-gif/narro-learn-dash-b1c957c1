@@ -23,9 +23,10 @@ interface GrammarPanelProps {
   open: boolean;
   onClose: () => void;
   onJumpToExample?: (example: string) => void;
+  focusExample?: string;
 }
 
-export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
+export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample, focusExample }: GrammarPanelProps) {
   const navigate = useNavigate();
   const { isPremium, requirePremium } = usePremium();
 
@@ -99,6 +100,39 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
     () => (isPremium ? sortedNotes : sortedNotes.slice(0, 1)),
     [sortedNotes, isPremium],
   );
+
+  // Focus example logic: expand and scroll when panel opens
+  const [internalFocus, setInternalFocus] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (open && focusExample) {
+      setInternalFocus(focusExample);
+    } else if (!open) {
+      setInternalFocus(null);
+    }
+  }, [open, focusExample]);
+
+  useEffect(() => {
+    if (open && internalFocus && sortedNotes.length > 0) {
+      const idx = sortedNotes.findIndex(n => n.example === internalFocus);
+      if (idx !== -1) {
+        const locked = !isPremium && idx > 0;
+        if (locked) {
+          requirePremium('grammar-notes');
+          // Reset focus so we don't keep prompting if they close the paywall
+          setInternalFocus(null);
+        } else {
+          setExpandedIdx(idx);
+          // Small delay to allow render then scroll
+          setTimeout(() => {
+            const el = document.getElementById(`grammar-note-${idx}`);
+            el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }, 100);
+          setInternalFocus(null);
+        }
+      }
+    }
+  }, [open, internalFocus, sortedNotes, isPremium, requirePremium]);
 
   // Batch preload translations for examples once notes are loaded
   useEffect(() => {
@@ -203,6 +237,7 @@ export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose,
                   return (
                     <div
                       key={i}
+                      id={`grammar-note-${i}`}
                       className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm overflow-hidden smooth-colors"
                     >
                       <button

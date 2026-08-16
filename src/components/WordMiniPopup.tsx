@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef } from'react';
-import { Star, ChevronRight, Loader2, Languages } from'lucide-react';
+import { Star, ChevronRight, Loader2, Languages, BookType } from'lucide-react';
 import { toRomaji } from 'wanakana';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
@@ -15,8 +15,10 @@ interface WordMiniPopupProps {
  contextTokens?: { t: string; r?: string }[];
  sentenceRect: { top: number; bottom: number; left: number; right: number };
  onClose: () => void;
- onShowMore: () => void;
- onTranslateSentence?: () => void;
+  onShowMore: () => void;
+  onTranslateSentence?: () => void;
+  grammarPattern?: string;
+  onShowGrammar?: () => void;
 }
 
 export function WordMiniPopup({
@@ -29,7 +31,9 @@ export function WordMiniPopup({
  sentenceRect,
  onClose,
  onShowMore,
- onTranslateSentence,
+  onTranslateSentence,
+  grammarPattern,
+  onShowGrammar,
 }: WordMiniPopupProps) {
  const { addWord, hasWord, removeWord } = useFlashcardStore();
  const popupRef = useRef<HTMLDivElement>(null);
@@ -229,7 +233,16 @@ export function WordMiniPopup({
  <Star className="h-3.5 w-3.5"fill={saved ?'currentColor':'none'} />
  </button>
  )}
- <div className="flex-1"/>
+  <div className="flex-1"/>
+  {result && !loading && onShowGrammar && grammarPattern && (
+    <button
+      onClick={onShowGrammar}
+      className="flex items-center justify-center h-7 w-7 rounded-full bg-accent/10 text-accent ring-1 ring-accent/20 smooth-colors tap-scale-sm"
+      title={`Grammar: ${grammarPattern}`}
+    >
+      <BookType className="h-3.5 w-3.5" />
+    </button>
+  )}
       {(result as any)?.is_common && (
         <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary ring-1 ring-primary/20">
           ✦ Common
