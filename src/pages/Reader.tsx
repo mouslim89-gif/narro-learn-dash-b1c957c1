@@ -225,6 +225,13 @@ export default function Reader() {
     }
   }, [japaneseFont]);
 
+  useEffect(() => {
+    if (japaneseFont !== 'sans') {
+      const face = japaneseFont === 'serif' ? 'Noto Serif JP' : 'Klee One';
+      document.fonts.load(`16px "${face}"`).catch(console.error);
+    }
+  }, [japaneseFont]);
+
  const knownIndex = useKnownWordsIndex();
  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
  new: highlightNew,
