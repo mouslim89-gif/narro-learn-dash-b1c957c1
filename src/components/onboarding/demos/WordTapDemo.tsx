@@ -20,7 +20,8 @@ export function WordTapDemo({ active }: { active: boolean }) {
             <FuriganaWord 
               text="天気" 
               reading="てんき" 
-              showFurigana={true}
+              furiganaVisible={true}
+              onClick={() => {}}
               className={active ? "text-accent font-bold transition-colors delay-1000" : ""}
             />
             
