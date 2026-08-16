@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { useOnboardingStore } from '@/stores/onboarding';
-import { X } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { BooksFanDemo } from './demos/BooksFanDemo';
@@ -177,15 +177,35 @@ export function OnboardingCarousel() {
               </motion.div>
             </AnimatePresence>
 
-            <button
-              type="button"
-              onClick={() => goTo(index + 1)}
-              className={cn(
-                'btn-tsundoku-premium mt-6 flex h-12 w-full items-center justify-center rounded-full text-[15px] font-semibold tap-scale',
-              )}
-            >
-              {isLast ? 'Start reading' : 'Continue'}
-            </button>
+            <div className="mt-6 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => goTo(index - 1)}
+                aria-label="Previous"
+                className={cn(
+                  'flex h-12 w-12 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 header-chip smooth-colors tap-scale-sm transition-opacity duration-200',
+                  index === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                )}
+              >
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => goTo(index + 1)}
+                aria-label={isLast ? 'Start reading' : 'Next'}
+                className={cn(
+                  'btn-tsundoku-premium flex items-center justify-center rounded-full font-semibold tap-scale transition-all duration-300',
+                  isLast ? 'h-12 px-8 text-[15px]' : 'h-14 w-14'
+                )}
+              >
+                {isLast ? (
+                  'Start reading'
+                ) : (
+                  <ArrowRight className="h-6 w-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
