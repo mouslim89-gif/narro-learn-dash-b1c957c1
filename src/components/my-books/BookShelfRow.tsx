@@ -6,8 +6,19 @@ import { difficultyConfig, hasAnyAudio } from'@/data/books';
 import { Progress } from'@/components/ui/progress';
 import type { ReadingProgress } from'@/stores/reading-progress';
 
-export function BookShelfRow({ book, progress }: { book: Book; progress: ReadingProgress }) {
- const done = progress.progressPercent >= 100;
+export function BookShelfRow({ 
+  book, 
+  progress, 
+  variant = 'reading' 
+}: { 
+  book: Book; 
+  progress?: ReadingProgress; 
+  variant?: 'reading' | 'finished' | 'unread' 
+}) {
+  const isUnread = variant === 'unread';
+  const displayProgress = progress?.progressPercent ?? 0;
+  const done = displayProgress >= 100 || variant === 'finished';
+
  return (
  <Link
  to={`/book/${book.id}`}
@@ -34,16 +45,26 @@ export function BookShelfRow({ book, progress }: { book: Book; progress: Reading
  </div>
  <p className="text-[11px] text-muted-foreground truncate">{book.author}</p>
   <div className="mt-2 flex items-center gap-2">
-  <span className="text-[10px] font-semibold text-foreground/70 truncate">{difficultyConfig[progress.difficulty].label}</span>
+  <span className="text-[10px] font-semibold text-foreground/70 truncate">{difficultyConfig[progress?.difficulty || 'simplified'].label}</span>
   {hasAnyAudio(book) && <Headphones className="h-3 w-3 text-muted-foreground"/>}
   </div>
- <div className="mt-2 flex items-center gap-2">
- <Progress value={progress.progressPercent} className="h-1.5 flex-1"/>
- <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{Math.round(progress.progressPercent)}%</span>
- </div>
- <p className="mt-1 text-[10px] text-muted-foreground">
- {formatDistanceToNow(new Date(progress.lastReadAt), { addSuffix: true })}
- </p>
+ {isUnread ? (
+   <p className="mt-2 text-[10px] text-muted-foreground">
+     {book.readingTimeMin} min · {book.jlptLevel}
+   </p>
+ ) : (
+   <>
+    <div className="mt-2 flex items-center gap-2">
+    <Progress value={displayProgress} className="h-1.5 flex-1"/>
+    <span className="text-[10px] font-semibold tabular-nums text-foreground/70">{Math.round(displayProgress)}%</span>
+    </div>
+    {progress && (
+      <p className="mt-1 text-[10px] text-muted-foreground">
+      {formatDistanceToNow(new Date(progress.lastReadAt), { addSuffix: true })}
+      </p>
+    )}
+   </>
+ )}
  </div>
  </div>
  </Link>
