@@ -1,31 +1,31 @@
-# My Books: cleanup and design alignment
+# Onboarding: arrows instead of the Continue button
 
-Remove the activity graph and restyle the page so it reads like the rest of Tsundoku (Library / Book Detail language): quiet cards, hairline separators, serif section headings, no colored gradient tiles.
+Replace the full-width "Continue" / "Start reading" pill at the bottom of the onboarding carousel with arrow navigation.
 
-## What changes
+## Proposed layout (recommended)
 
-**1. Remove the activity graph**
-- Delete the graph section from the page and delete its component file.
-- Drop the now-unused date-set computation from the page's stats.
-- Nothing replaces it.
+A single bottom row under the copy block:
 
-**2. Stats become one compact strip**
-- Replace the four tinted gradient tiles with a single rounded card: 4 columns separated by vertical hairlines, muted icon above a tabular number, small uppercase tracked label below.
-- Same surface treatment as other cards in the app (`rounded-2xl bg-card ring-1 ring-border/30 shadow-sm`), no colored gradients, no `card-lift` (it is not tappable).
-- Numbers use the serif face for weight consistency with other stat displays; labels use the standard section-label style.
+```text
+[ <- ]                                   [ -> ]
+ back                                    next
+```
 
-**3. Shelf list**
-- Stays one flat list sorted by last read.
-- Add a standard section heading row above it ("Your shelf" + book count on the right) matching the Library rail heading pattern.
-- `BookShelfRow` keeps its structure but is aligned to the shared card recipe: same ring/border/radius as other cards, tighter meta row, progress bar and percentage kept.
+- Left: circular back arrow (`ArrowLeft`), 44px, `header-chip` relief style, hidden/disabled on the first slide.
+- Right: circular next arrow (`ArrowRight`), 52px, filled with the premium CTA style (`btn-tsundoku-premium`) so it stays the clear primary action.
+- On the last slide the right arrow becomes a short "Start reading" pill (arrow alone would not communicate that the onboarding ends), or optionally a check icon.
+- Both keep `tap-scale` press feedback; existing swipe gestures and progress bars stay unchanged.
 
-**4. Spacing and rhythm**
-- Consistent `px-6` gutters, section spacing matched to Library, `pb-20` for the bottom nav.
-- Empty state unchanged.
+## Variations (pick one)
 
-## Technical notes
+1. **Split row (recommended)** — back arrow left, next arrow right, edge aligned. Feels native and leaves the stage roomy.
+2. **Right cluster** — both arrows grouped bottom-right, back arrow ghost, next arrow filled.
+3. **Arrow only** — no back button at all, single filled next arrow bottom-right; back is done by swiping.
 
-- `src/pages/MyBooks.tsx`: remove `ContributionGraph` import/usage and `readDateStrings`; replace the `STAT_TILES` grid with the compact strip; add the shelf section heading.
-- `src/components/my-books/ContributionGraph.tsx`: deleted.
-- `src/components/my-books/BookShelfRow.tsx`: styling only, no behavior change.
-- Header, scroll-driven `--p` behavior, streak/stat calculations and stores are untouched.
+## Technical details
+
+- File: `src/components/onboarding/OnboardingCarousel.tsx`.
+- Remove the `<button>` currently rendering `isLast ? 'Start reading' : 'Continue'`; render the arrow row in its place, still calling `goTo(index + 1)` / `goTo(index - 1)`.
+- Import `ArrowLeft` / `ArrowRight` from `lucide-react`.
+- Add `aria-label="Previous"` / `aria-label="Next"` for accessibility.
+- No other file changes.
