@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef } from'react';
-import { Star, ChevronRight, Loader2, Languages } from'lucide-react';
+import { Star, ChevronRight, Loader2, Languages, BookType } from'lucide-react';
 import { toRomaji } from 'wanakana';
 import { PlayWordButton } from'@/components/PlayWordButton';
 import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
