@@ -17,10 +17,7 @@ export function GrammarDemo({ active }: { active: boolean }) {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-5 p-6">
-      <div className="reader-text font-japanese text-lg leading-[2.2] text-center text-foreground">
-        forget<span className="sr-only" />
-      </div>
-      <div className="reader-text -mt-14 font-japanese text-lg leading-[2.2] text-center text-foreground">
+      <div className="reader-text text-center font-japanese text-lg leading-[2.2] text-foreground">
         今日は<span className="rounded bg-accent/15 px-0.5 text-accent">行くのだ</span>。
       </div>
 
