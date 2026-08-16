@@ -21,7 +21,7 @@ export function FlashcardDemo({ active }: { active: boolean }) {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-5 p-6">
-      <div className="w-full max-w-[250px]" style={{ perspective: 1000 }}>
+      <div className="w-full max-w-[250px] shrink-0" style={{ perspective: 1000 }}>
         <motion.div
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 26 }}

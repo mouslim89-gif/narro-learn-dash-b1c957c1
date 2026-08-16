@@ -11,7 +11,8 @@ export function GrammarDemo({ active }: { active: boolean }) {
       setOpen(false);
       return;
     }
-    const t = setTimeout(() => setOpen(true), reduced ? 0 : 700);
+    // Show faster or immediately if reduced motion
+    const t = setTimeout(() => setOpen(true), reduced ? 0 : 400);
     return () => clearTimeout(t);
   }, [active, reduced]);
 

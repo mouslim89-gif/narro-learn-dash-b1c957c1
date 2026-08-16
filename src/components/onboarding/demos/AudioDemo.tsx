@@ -46,7 +46,7 @@ export function AudioDemo({ active }: { active: boolean }) {
                 key={i}
                 className="w-1.5 flex-1 rounded-full bg-accent/40"
                 style={{ height: 12 }}
-                animate={active && !reduced ? { height: [12, h, 12] } : { height: 18 }}
+                animate={active && !reduced ? { height: [12, h, 12] } : { height: 14 }}
                 transition={{ repeat: Infinity, duration: 0.9, delay: i * 0.06, ease: 'easeInOut' }}
               />
             ))}
