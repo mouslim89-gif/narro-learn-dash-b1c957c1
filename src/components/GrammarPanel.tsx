@@ -26,7 +26,7 @@ interface GrammarPanelProps {
   focusExample?: string;
 }
 
-export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample }: GrammarPanelProps) {
+export function GrammarPanel({ text, bookId, difficulty, partIdx, open, onClose, onJumpToExample, focusExample }: GrammarPanelProps) {
   const navigate = useNavigate();
   const { isPremium, requirePremium } = usePremium();
 
