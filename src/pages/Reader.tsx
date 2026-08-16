@@ -193,7 +193,44 @@ export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
   const goTo = useDelayedNav();
- const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
+  const { 
+    updateProgress, 
+    getProgress, 
+    flushPendingProgressPushes, 
+    fontSize, 
+    setFontSize, 
+    readerDarkMode, 
+    setReaderDarkMode, 
+    showFurigana, 
+    setShowFurigana, 
+    showTranslations, 
+    setShowTranslations, 
+    japaneseFont, 
+    setJapaneseFont, 
+    setHasSeenLongPressHint, 
+    showKnownHighlights, 
+    setShowKnownHighlights, 
+    highlightNew, 
+    setHighlightNew, 
+    highlightLearning, 
+    setHighlightLearning, 
+    highlightKnown, 
+    setHighlightKnown 
+  } = useReadingProgressStore();
+
+  useEffect(() => {
+    if (japaneseFont !== 'sans') {
+      const face = japaneseFont === 'serif' ? 'Noto Serif JP' : 'Klee One';
+      document.fonts.load(`16px "${face}"`).catch(console.error);
+    }
+  }, [japaneseFont]);
+
+  useEffect(() => {
+    if (japaneseFont !== 'sans') {
+      const face = japaneseFont === 'serif' ? 'Noto Serif JP' : 'Klee One';
+      document.fonts.load(`16px "${face}"`).catch(console.error);
+    }
+  }, [japaneseFont]);
 
  const knownIndex = useKnownWordsIndex();
  const knownTogglesByLevel: Record<KnownLevel, boolean> = {
@@ -1253,36 +1290,52 @@ export default function Reader() {
  <section>
  <SectionLabel>Highlights</SectionLabel>
  <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
- <div className="flex items-center justify-between gap-3 px-4 py-4">
- <span className="text-[15px] font-medium">Highlight saved words</span>
- <Switch checked={showKnownHighlights} onCheckedChange={setShowKnownHighlights} />
- </div>
- {showKnownHighlights && (
- <>
- <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
- <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-new"/>
- New words
- </span>
- <Switch checked={highlightNew} onCheckedChange={setHighlightNew} />
- </div>
- <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
- <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-learning"/>
- Learning
- </span>
- <Switch checked={highlightLearning} onCheckedChange={setHighlightLearning} />
- </div>
- <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
- <span className="flex items-center gap-2.5 text-sm">
- <span className="color-dot color-dot-known"/>
- Known
- </span>
- <Switch checked={highlightKnown} onCheckedChange={setHighlightKnown} />
- </div>
- </>
- )}
- </div>
+              <div className="flex items-center justify-between gap-3 px-4 py-4">
+                <span className="text-[15px] font-medium">Highlight saved words</span>
+                <Switch checked={showKnownHighlights} onCheckedChange={setShowKnownHighlights} />
+              </div>
+              
+              <div 
+                className={cn(
+                  "smooth-colors", 
+                  !showKnownHighlights && "opacity-40 pointer-events-none grayscale-[0.2]"
+                )}
+              >
+                <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
+                  <span className="flex items-center gap-2.5 text-sm">
+                    <span className="color-dot color-dot-new"/>
+                    New words
+                  </span>
+                  <Switch 
+                    checked={highlightNew} 
+                    onCheckedChange={setHighlightNew}
+                    disabled={!showKnownHighlights}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
+                  <span className="flex items-center gap-2.5 text-sm">
+                    <span className="color-dot color-dot-learning"/>
+                    Learning
+                  </span>
+                  <Switch 
+                    checked={highlightLearning} 
+                    onCheckedChange={setHighlightLearning}
+                    disabled={!showKnownHighlights}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-3 pl-8">
+                  <span className="flex items-center gap-2.5 text-sm">
+                    <span className="color-dot color-dot-known"/>
+                    Known
+                  </span>
+                  <Switch 
+                    checked={highlightKnown} 
+                    onCheckedChange={setHighlightKnown}
+                    disabled={!showKnownHighlights}
+                  />
+                </div>
+              </div>
+            </div>
  </section>
 
  {isAdmin && (
