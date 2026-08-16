@@ -1,31 +1,27 @@
-# Onboarding: arrows instead of the Continue button
+# Grammar note shortcut in the word mini popup
 
-Replace the full-width "Continue" / "Start reading" pill at the bottom of the onboarding carousel with arrow navigation.
+When a tapped word belongs to a sentence covered by a grammar note, show a small grammar button in the mini popup that opens the Grammar Notes panel directly on that note.
 
-## Proposed layout (recommended)
+## Behaviour
 
-A single bottom row under the copy block:
+- The button appears only when the tapped sentence matches a grammar note of the current chapter/part. Otherwise nothing is added (no dead button).
+- Tapping it closes the mini popup and opens the Grammar Notes drawer with the matching note already expanded and scrolled into view.
+- If that note is locked for free users (only the first note is free today), tapping still opens the panel and triggers the existing premium prompt, exactly like tapping the locked row in the panel.
 
-```text
-[ <- ]                                   [ -> ]
- back                                    next
-```
+## Placement options
 
-- Left: circular back arrow (`ArrowLeft`), 44px, `header-chip` relief style, hidden/disabled on the first slide.
-- Right: circular next arrow (`ArrowRight`), 52px, filled with the premium CTA style (`btn-tsundoku-premium`) so it stays the clear primary action.
-- On the last slide the right arrow becomes a short "Start reading" pill (arrow alone would not communicate that the onboarding ends), or optionally a check icon.
-- Both keep `tap-scale` press feedback; existing swipe gestures and progress bars stay unchanged.
+1. Recommended: an icon button right after the star, same 28px round style as the star (`BookType` icon, amber accent tint when available). Keeps the header rhythm: word, audio, star, grammar, then Translate / More on the right.
+2. Grouped on the right, next to the Translate icon, so all "sentence level" actions sit together and the star stays alone as the "word level" action.
+3. A small text chip under the definitions ("Grammar: ～ておく") that names the pattern. More explicit, but taller popup.
 
-## Variations (pick one)
+## Matching logic
 
-1. **Split row (recommended)** — back arrow left, next arrow right, edge aligned. Feels native and leaves the stage roomy.
-2. **Right cluster** — both arrows grouped bottom-right, back arrow ghost, next arrow filled.
-3. **Arrow only** — no back button at all, single filled next arrow bottom-right; back is done by swiping.
+Grammar notes carry an `example` string that is an excerpt of the chapter text. A note matches the tapped sentence when the normalized sentence contains the normalized example, or the example contains the sentence (normalization: strip whitespace and trailing 。/、). First match wins, following the same order the panel uses.
 
-## Technical details
+## Technical changes
 
-- File: `src/components/onboarding/OnboardingCarousel.tsx`.
-- Remove the `<button>` currently rendering `isLast ? 'Start reading' : 'Continue'`; render the arrow row in its place, still calling `goTo(index + 1)` / `goTo(index - 1)`.
-- Import `ArrowLeft` / `ArrowRight` from `lucide-react`.
-- Add `aria-label="Previous"` / `aria-label="Next"` for accessibility.
-- No other file changes.
+- `src/pages/Reader.tsx`: compute the note list for the current part with `getGrammarForPart` / `getGrammarFlat` (memoized, no network, no AI), resolve the match for `miniPopup.contextSentence`, pass `grammarPattern` and `onShowGrammar` to `WordMiniPopup`. `onShowGrammar` closes the mini popup, stores the target example in state, and opens `GrammarPanel`.
+- `src/components/WordMiniPopup.tsx`: new optional props `grammarPattern?: string` and `onShowGrammar?: () => void`; render the button only when both are set.
+- `src/components/GrammarPanel.tsx`: new optional `focusExample?: string` prop. On open, expand the note whose example matches and scroll its card into view (ref map + `scrollIntoView({ block: 'center' })`); if that note is locked, call `requirePremium('grammar-notes')` instead of expanding. Reset the focus once consumed so normal opens behave as before.
+
+No backend, data, or cost impact: everything reads the prebaked `book-grammar` data already in the bundle.
