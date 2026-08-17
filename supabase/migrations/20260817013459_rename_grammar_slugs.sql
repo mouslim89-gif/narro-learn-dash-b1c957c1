@@ -243,3 +243,15 @@ UPDATE public.grammar_examples SET pattern_slug = 'plain-negative-ければな�
 UPDATE public.saved_grammar SET item_id = 'plain-negative-ければならない-core' WHERE item_id = 'plain-negative-remove-い-ければならない-core' AND NOT EXISTS (SELECT 1 FROM public.saved_grammar WHERE item_id = 'plain-negative-ければならない-core');
 DELETE FROM public.grammar_examples WHERE pattern_slug = 'plain-negative-remove-い-ければならない-core';
 DELETE FROM public.saved_grammar WHERE item_id = 'plain-negative-remove-い-ければならない-core';
+UPDATE public.grammar_examples SET pattern_slug = 'i-adjective-そうな' WHERE pattern_slug = 'i-adjective-drop-い-そうな' AND NOT EXISTS (SELECT 1 FROM public.grammar_examples WHERE pattern_slug = 'i-adjective-そうな');
+UPDATE public.saved_grammar SET item_id = 'i-adjective-そうな' WHERE item_id = 'i-adjective-drop-い-そうな' AND NOT EXISTS (SELECT 1 FROM public.saved_grammar WHERE item_id = 'i-adjective-そうな');
+DELETE FROM public.grammar_examples WHERE pattern_slug = 'i-adjective-drop-い-そうな';
+DELETE FROM public.saved_grammar WHERE item_id = 'i-adjective-drop-い-そうな';
+UPDATE public.grammar_examples SET pattern_slug = 'i-adjective-くなる-na-adjective-になる' WHERE pattern_slug = 'i-adjective-without-い-くなる-na-adjective-になる' AND NOT EXISTS (SELECT 1 FROM public.grammar_examples WHERE pattern_slug = 'i-adjective-くなる-na-adjective-になる');
+UPDATE public.saved_grammar SET item_id = 'i-adjective-くなる-na-adjective-になる' WHERE item_id = 'i-adjective-without-い-くなる-na-adjective-になる' AND NOT EXISTS (SELECT 1 FROM public.saved_grammar WHERE item_id = 'i-adjective-くなる-na-adjective-になる');
+DELETE FROM public.grammar_examples WHERE pattern_slug = 'i-adjective-without-い-くなる-na-adjective-になる';
+DELETE FROM public.saved_grammar WHERE item_id = 'i-adjective-without-い-くなる-na-adjective-になる';
+UPDATE public.grammar_examples SET pattern_slug = 'plain-negative-くて' WHERE pattern_slug = 'plain-negative-without-い-くて' AND NOT EXISTS (SELECT 1 FROM public.grammar_examples WHERE pattern_slug = 'plain-negative-くて');
+UPDATE public.saved_grammar SET item_id = 'plain-negative-くて' WHERE item_id = 'plain-negative-without-い-くて' AND NOT EXISTS (SELECT 1 FROM public.saved_grammar WHERE item_id = 'plain-negative-くて');
+DELETE FROM public.grammar_examples WHERE pattern_slug = 'plain-negative-without-い-くて';
+DELETE FROM public.saved_grammar WHERE item_id = 'plain-negative-without-い-くて';

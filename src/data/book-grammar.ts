@@ -3757,7 +3757,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
         {
           "example": "短く見えなくて",
           "meaning": "Not doing X and...; because not X",
-          "pattern": "Plain negative (without い) + くて",
+          "pattern": "Plain negative + くて",
           "tip": "This is the Te-form of negative verbs/adjectives used to connect sentences or show a reason/cause.",
           "jlpt": "N4"
         },
@@ -3773,7 +3773,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
           "tip": "When you use the transitive version する instead of なる, it means to intentionally make something reach that state.",
           "meaning": "To make something (adjective)",
           "example": "鼻を短くする薬",
-          "pattern": "I-adjective (without い) + くなる / Na-adjective + になる"
+          "pattern": "I-adjective + くなる / Na-adjective + になる"
         },
         {
           "example": "15センチのままでした",
@@ -6365,7 +6365,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
         {
           "example": "悲しそうな顔",
           "tip": "Since it modifies the Noun 'kao' (face) here, it takes the 'na' attributive ending.",
-          "pattern": "I-adjective (drop い) + そうな",
+          "pattern": "I-adjective + そうな",
           "meaning": "Looking like; appearing as if; describes an external appearance or atmosphere",
           "jlpt": "N4"
         },
