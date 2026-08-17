@@ -1,5 +1,5 @@
-import { bookGrammar, type GrammarNote } from './data/book-grammar';
-import { slugifyPattern } from './lib/grammar';
+import { bookGrammar, type GrammarNote } from '@/data/book-grammar';
+import { slugifyPattern } from '@/lib/grammar';
 
 export interface IndexedGrammarNote extends GrammarNote {
   id: string;
