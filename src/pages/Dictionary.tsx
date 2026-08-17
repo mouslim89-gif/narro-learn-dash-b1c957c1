@@ -435,7 +435,7 @@ export default function DictionaryPage() {
         {grammarPoints.map((note) => (
           <button
             key={note.id}
-            onClick={() => goTo(`/grammar/${note.id}`, { state: { note } })}
+            onClick={(e) => goTo(`/grammar/${note.id}`, e, { state: { note } })}
             className="relative flex items-center justify-between rounded-2xl bg-card p-4 ring-1 ring-border/40 shadow-sm transition-all tap-scale text-left"
           >
             <div className="flex flex-col gap-1 pr-6">
