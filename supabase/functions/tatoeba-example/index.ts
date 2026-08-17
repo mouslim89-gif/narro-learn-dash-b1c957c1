@@ -68,8 +68,15 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  // Auth is optional: cached examples are public read-only data and must stay
+  // available even when the client has no user session (anon key only).
+  // Only AI generation (tokenization) is restricted to signed-in users.
   const auth = await requireUser(req, corsHeaders);
-  if ("error" in auth) return auth.error;
+  const isUser = !("error" in auth);
+  const unauthorized = () => new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 
   const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) {
@@ -103,6 +110,7 @@ Deno.serve(async (req) => {
       }
 
       // 2. Tokenize with AI, then persist so this sentence is never re-tokenized.
+      if (!isUser) return unauthorized();
       const tokens = await tokenizeWithAI(sentence, key);
       if (Array.isArray(tokens) && tokens.length > 0 && !(tokens.length === 1 && !tokens[0].r)) {
         await supabase.from('example_sentences').upsert({
@@ -235,9 +243,10 @@ Deno.serve(async (req) => {
 
     const best = pickBest(collected, limit);
 
-    // 3. Tokenize best sentences
+    // 3. Tokenize best sentences (AI: signed-in users only)
     for (const s of best) {
       if (!s.tokens) {
+        if (!isUser) continue;
         s.tokens = await tokenizeWithAI(s.japanese, key);
       }
     }
