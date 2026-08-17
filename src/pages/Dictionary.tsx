@@ -352,13 +352,12 @@ export default function DictionaryPage() {
  <div
  role="link"
  tabIndex={0}
- onClick={() => goTo(`/dictionary/${encodeURIComponent(word)}`)}
- onKeyDown={(e) => {
- if (e.key ==='Enter'|| e.key ==='') {
- e.preventDefault();
- goTo(`/dictionary/${encodeURIComponent(word)}`);
- }
- }}
+  onClick={(e) => goTo(`/dictionary/${encodeURIComponent(word)}`, e)}
+  onKeyDown={(e) => {
+    if (e.key ==='Enter'|| e.key ==='') {
+      goTo(`/dictionary/${encodeURIComponent(word)}`, e);
+    }
+  }}
  className="group cursor-pointer -m-1 p-1 pr-6 rounded-lg relative"
  >
  {/* Word + reading inline */}
