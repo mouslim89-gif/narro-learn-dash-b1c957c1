@@ -1,19 +1,23 @@
-import { useState, useEffect, useRef } from'react';
-import { useScrollProgress } from'@/hooks/use-scroll-progress';
-import { ConjugationTable } from'@/components/ConjugationTable';
-import { useSearchParams } from'react-router-dom';
-import { DelayedLink as Link } from'@/components/DelayedLink';
-import { useDelayedNav } from'@/hooks/use-delayed-nav';
-import { useFlashcardStore, type SavedWord } from'@/stores/flashcards';
-import { searchJisho, getDisplayWord, type JishoResult } from'@/lib/jisho';
-import { Search, Star, Loader2, X, Settings, ChevronRight } from'lucide-react';
-import { Button } from'@/components/ui/button';
-import { PlayWordButton } from'@/components/PlayWordButton';
-import { toRomaji } from'wanakana';
-import { ExampleSentence } from'@/components/ExampleSentence';
-import { Input } from'@/components/ui/input';
-import { AnimatedTitle } from'@/components/AnimatedTitle';
-import { romajiToKana } from'@/lib/romaji';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useScrollProgress } from '@/hooks/use-scroll-progress';
+import { ConjugationTable } from '@/components/ConjugationTable';
+import { useSearchParams } from 'react-router-dom';
+import { DelayedLink as Link } from '@/components/DelayedLink';
+import { useDelayedNav } from '@/hooks/use-delayed-nav';
+import { useFlashcardStore, type SavedWord } from '@/stores/flashcards';
+import { searchJisho, getDisplayWord, type JishoResult } from '@/lib/jisho';
+import { Search, Star, Loader2, X, Settings, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { PlayWordButton } from '@/components/PlayWordButton';
+import { toRomaji } from 'wanakana';
+import { ExampleSentence } from '@/components/ExampleSentence';
+import { Input } from '@/components/ui/input';
+import { AnimatedTitle } from '@/components/AnimatedTitle';
+import { romajiToKana } from '@/lib/romaji';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getAllGrammarPoints } from '@/lib/grammar-index';
+import { cn } from '@/lib/utils';
+import { jlptColors } from '@/data/books';
 
 /**
  * Rerank Jisho results so exact English-definition matches come first.
