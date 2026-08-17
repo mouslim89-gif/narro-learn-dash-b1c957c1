@@ -72,6 +72,10 @@ export default function GrammarDetail() {
             meaning: note.meaning,
             jlpt: note.jlpt
           }
+        }, {
+          headers: {
+            'x-allow-ai': 'false' // Safety: do not generate on user click
+          }
         });
         
         if (data) {
