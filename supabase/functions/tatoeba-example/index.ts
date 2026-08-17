@@ -243,9 +243,10 @@ Deno.serve(async (req) => {
 
     const best = pickBest(collected, limit);
 
-    // 3. Tokenize best sentences
+    // 3. Tokenize best sentences (AI: signed-in users only)
     for (const s of best) {
       if (!s.tokens) {
+        if (!isUser) continue;
         s.tokens = await tokenizeWithAI(s.japanese, key);
       }
     }
