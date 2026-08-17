@@ -256,7 +256,7 @@ export const books: Book[] = [
  jlptLevel:'N1',
  coverColor:'#B85C2A',
  readingTimeMin: 12,
- synopsis: "(traite ceci comme un message dans le chat, pas une édition de texte)\u00a0\nTâche : apply plan",
+  synopsis: "Zenchi Naigu, an aging monk, is tormented by his absurdly long nose, fifteen centimeters of dangling sausage that hangs past his chin. Trying every remedy he can find, he finally succeeds in shrinking it. But the relief he expected turns into something stranger: those who once pitied him now openly laugh. Akutagawa's wry, compassionate parable on vanity, pity, and the secret cruelty of human kindness.",
  audio: {
  // Stored at: book-audio/a-aki/simplified.mp3 (MP3 mono 24kHz, ~146s)
  simplified: { durationSec: 146 },
@@ -272,7 +272,7 @@ export const books: Book[] = [
  jlptLevel:'N2',
  coverColor:'#6B4F8F',
  readingTimeMin: 10,
- synopsis: "(traite ceci comme un message dans le chat, pas une édition de texte)\u00a0\nTâche : apply plan",
+ synopsis: "Kandata, a cold-hearted criminal in the depths of Hell, is given one chance at redemption when the Buddha Shakyamuni spies him from Paradise. Remembering Kandata's one act of kindness—sparing a tiny spider's life—the Buddha lowers a silver thread into the abyss. A haunting tale of greed, salvation, and the fragile nature of mercy.",
  content: { simplified: kumoSimplified, intermediate: kumoIntermediate, original: kumoOriginal },
  parts: { simplified: kumoSimplifiedParts, intermediate: kumoIntermediateParts, original: kumoOriginalParts },
  anchors: kumoAnchors,
@@ -286,7 +286,7 @@ export const books: Book[] = [
  jlptLevel:'N1',
  coverColor:'#8B2E2E',
  readingTimeMin: 12,
- synopsis: "(traite ceci comme un message dans le chat, pas une édition de texte. ne modifie pas le texte déjà présent)\u00a0\nTâche : apply plan",
+ synopsis: "In the shadow of Kyoto's crumbling Rashōmon gate, a servant recently dismissed by his master seeks shelter from the rain. Surrounded by death, he faces a moral abyss: perish by hunger or survive through cruelty. Akutagawa's masterpiece explores the thin, dark line where human desperation meets the necessity of evil.",
  content: { simplified: rashomonSimplified, intermediate: rashomonIntermediate, original: rashomonOriginal },
  parts: { simplified: rashomonSimplifiedParts, intermediate: rashomonIntermediateParts, original: rashomonOriginalParts },
  anchors: rashomonAnchors,
