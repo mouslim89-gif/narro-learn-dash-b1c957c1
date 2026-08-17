@@ -256,7 +256,7 @@ export const books: Book[] = [
  jlptLevel:'N1',
  coverColor:'#B85C2A',
  readingTimeMin: 12,
-  synopsis: "Zenchi Naigu, an aging monk, is tormented by his absurdly long nose, fifteen centimeters of dangling sausage that hangs past his chin. Trying every remedy he can find, he finally succeeds in shrinking it. But the relief he expected turns into something stranger: those who once pitied him now openly laugh. Akutagawa's wry, compassionate parable on vanity, pity, and the secret cruelty of human kindness.",
+  synopsis: "A poet flips through his notebook of autumn observations, capturing the fleeting, bittersweet transitions of the season. Through fragmented notes on dragonflies, cosmos flowers, and abandoned beaches, Dazai Osamu explores how autumn subtly infiltrates the end of summer, serving as a \"cunning demon\" that prepares its arrival while people are still distracted by the heat.",
  audio: {
  // Stored at: book-audio/a-aki/simplified.mp3 (MP3 mono 24kHz, ~146s)
  simplified: { durationSec: 146 },
