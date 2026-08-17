@@ -71,8 +71,7 @@ export default function GrammarDetail() {
             pattern: note.pattern,
             meaning: note.meaning,
             jlpt: note.jlpt
-          }
-        }, {
+          },
           headers: {
             'x-allow-ai': 'false' // Safety: do not generate on user click
           }
