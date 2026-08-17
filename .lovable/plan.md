@@ -1,50 +1,45 @@
-# Clean up non-standard grammar patterns
+# Stop grammar generation when opening a grammar point
 
-51 of the 615 unique grammar points in the index don't follow the standard `Slot + Japanese` format. Where they come from:
+## Verified cause
 
-| Group | Count | Books |
-|---|---|---|
-| Legacy `～` patterns (`～のに`, `～らしい`, `～ておく`…) | 35 | a-aki (most), rashomon |
-| Adverb / honorific prefixed (`まるで + Noun + のように`, `なかなか + Plain negative`, `お + Masu-stem + になる`) | 12 | lemon, urashima, sakura, hana, hashire-merosu, kumo-no-ito, gyofukuki, matsu |
-| Lexical entries with Japanese labels (`お目にかける`, `まいりました (Humble verb)`, `次第に`, `時とすると / 時とすれば`, `（疑問詞）～か`) | 4 | urashima, rashomon, lemon |
+- The database already contains **518 cached grammar-example rows**.
+- **505 of those 518 keys use the legacy slug format** with repeated or leading/trailing hyphens, such as `te-form---ある`.
+- The grammar index now creates canonical IDs by collapsing and trimming hyphens, such as `te-form-ある`.
+- Slug generation is currently inconsistent:
+  - the grammar index collapses and trims hyphens;
+  - the detail preloader, backfill script, and `grammar-examples` function do not;
+  - the recent rename migration targets simplified old keys that do not match the real legacy database keys.
+- Therefore, renamed grammar points miss both local and database caches. The function interprets that miss as permission to generate new content immediately.
 
-Root cause: the label normalizer (`scripts/normalize-grammar-labels.ts`) only had a full mapping table for `rashomon`; **a-aki was never normalized**, and the generic rules don't touch adverb-led or lexical patterns.
+## Plan
 
-## What gets fixed
+1. **Create one canonical grammar slug function**
+   - Use the same lowercase, replacement, repeated-hyphen collapse, and edge trimming rules everywhere.
+   - Apply it to the grammar index, local preloader, backfill script, saved grammar IDs, and backend cache lookup.
 
-1. **Legacy `～` patterns → slot format.** Each is rewritten with its real formation, e.g.
-   - `～のに` → `Dictionary form + のに`
-   - `～ておく (～て置く)` → `Te-form + おく`
-   - `～はず (～筈)` → `Dictionary form + はず`
-   - `～と (Conditional form)` → `Dictionary form + と`
-   Parenthetical kanji variants are dropped; the variant stays in the meaning/tip if useful.
+2. **Repair the existing cache instead of regenerating it**
+   - Build a migration from the actual legacy database keys to the current canonical grammar patterns.
+   - Preserve existing `examples` and `formations` payloads.
+   - Merge collisions safely when multiple legacy labels now represent one canonical point.
+   - Update matching saved grammar IDs without deleting a user's existing canonical save.
 
-2. **Adverb / honorific patterns → slot-only.** The leading lexical word is removed:
-   - `まるで + Noun + のように / まるで + Dictionary form + かのように` → `Noun + のように`
-   - `なかなか + Plain negative`, `全く + Plain negative`, `さらに + Plain negative` → `Plain negative` variants folded into the correct slot form; where removing the adverb leaves nothing meaningful, the note is merged into the existing equivalent pattern instead of creating an empty one.
-   - `お + Masu-stem + になる` → `Masu-stem + になる`, `お + Masu-stem + する/したい` → `Masu-stem + する`, etc.
-   Where the rewrite collides with an already existing pattern, the two notes are deduplicated (the index already dedupes by slug, so the book-level note keeps its own meaning text).
+3. **Remove AI generation from the user click path**
+   - Grammar Detail will read local cache first, then the shared database cache.
+   - A cache miss will return a clear unavailable state and will not call AI from the app UI.
+   - Keep generation exclusively in the explicit admin/backfill process, so opening a page can never spend credits.
 
-3. **Lexical entries: kept, labels cleaned.**
-   - `（疑問詞）～か` → `Question word + か`
-   - `まいりました (Humble verb)` → `まいる (humble verb)`
-   - `お目にかける`, `次第に`, `時とすると / 時とすれば` keep their Japanese head word, with English-only descriptive labels and no stray Japanese metadata.
+4. **Finish and verify the preload**
+   - Compare every canonical grammar point in the catalog against the repaired database cache.
+   - Generate only genuinely missing points, sequentially, with bounded retry for `429`/`5xx` only.
+   - Re-check until every catalog slug has a valid examples/formations payload.
 
-4. **Cache key migration.** Renaming a pattern changes its slug, which is the key for:
-   - `grammar_examples.pattern_slug` (cached AI examples)
-   - `saved_grammar.item_id` (user bookmarks)
-   A migration maps every old slug to its new slug in both tables, so no examples are regenerated (no AI cost) and no user loses a saved point. Rows that would collide with an existing new slug are dropped rather than duplicated.
+5. **Regression coverage**
+   - Test representative unchanged, renamed, Japanese-containing, and punctuation-heavy patterns.
+   - Verify that opening each test point performs a cache read only, returns its stored content, and creates no AI Gateway request.
 
-5. **Normalizer hardening.** `scripts/normalize-grammar-labels.ts` gains the full a-aki mapping plus the adverb-stripping and lexical-label rules, so a re-run is idempotent and future books can't reintroduce these shapes.
+## Technical scope
 
-## Verification
-
-- Re-run the audit script: expect 0 patterns outside the standard format (aside from the 4 intentional lexical entries).
-- Confirm `grammar_examples` row count is unchanged and every new slug resolves to a cached row.
-- Spot-check the Dictionary → Grammar list and a few detail pages (a-aki and rashomon entries) for correct structure rendering.
-
-## Technical notes
-
-- Data edit is done by a one-off transform over `src/data/book-grammar.ts` (parsed as JSON, rewritten in place), same approach as the existing normalize script.
-- Slug generation stays `slugifyPattern` from `src/lib/grammar.ts`; the migration is generated from the old → new pattern pairs so keys stay in sync.
-- No UI changes.
+- Frontend: `src/pages/GrammarDetail.tsx`, `src/lib/grammar.ts`, `src/lib/grammar-preload.ts`
+- Backend: `supabase/functions/grammar-examples/index.ts`
+- Backfill tooling: `scripts/preload-grammar-examples.ts`
+- Database: a corrective cache/save migration based on actual legacy keys
