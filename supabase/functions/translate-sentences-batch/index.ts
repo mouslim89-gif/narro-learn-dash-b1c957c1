@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
   }
 
   const auth = await requireUser(req, corsHeaders);
-  if ("error" in auth) return auth.error;
+  const isUser = !("error" in auth);
 
   try {
     const json = await req.json();
