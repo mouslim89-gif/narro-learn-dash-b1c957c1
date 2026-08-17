@@ -68,8 +68,15 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  // Auth is optional: cached examples are public read-only data and must stay
+  // available even when the client has no user session (anon key only).
+  // Only AI generation (tokenization) is restricted to signed-in users.
   const auth = await requireUser(req, corsHeaders);
-  if ("error" in auth) return auth.error;
+  const isUser = !("error" in auth);
+  const unauthorized = () => new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 
   const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) {
