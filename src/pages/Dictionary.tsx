@@ -56,62 +56,86 @@ function rankByRelevance(results: JishoResult[], query: string): JishoResult[] {
 }
 
 export default function DictionaryPage() {
- const goTo = useDelayedNav();
- const [searchParams] = useSearchParams();
- const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ??'';
- const [query, setQuery] = useState(initial);
- const { addWord, removeWord, hasWord } = useFlashcardStore();
- const [jishoResults, setJishoResults] = useState<JishoResult[]>(() => {
- try {
- // v2: invalidates results cached before the English-search fix.
- sessionStorage.removeItem('dictionary:results');
- const cachedQuery = sessionStorage.getItem('dictionary:query');
- const cachedResults = sessionStorage.getItem('dictionary:results:v2');
- if (cachedQuery && cachedQuery === initial && cachedResults) {
- return JSON.parse(cachedResults) as JishoResult[];
- }
- } catch {/* ignore */}
- return [];
- });
- const [searching, setSearching] = useState(false);
- const inputRef = useRef<HTMLInputElement>(null);
- const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial :'');
- const headerRef = useRef<HTMLElement>(null);
- useScrollProgress(headerRef, 0, 56);
+  const goTo = useDelayedNav();
+  const [searchParams] = useSearchParams();
+  const [mode, setMode] = useState<'words' | 'grammar'>('words');
+  const [jlptFilter, setJlptFilter] = useState<string | null>(null);
+  
+  const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ?? '';
+  const [query, setQuery] = useState(initial);
+  const { addWord, removeWord, hasWord } = useFlashcardStore();
+  
+  const [jishoResults, setJishoResults] = useState<JishoResult[]>(() => {
+    try {
+      sessionStorage.removeItem('dictionary:results');
+      const cachedQuery = sessionStorage.getItem('dictionary:query');
+      const cachedResults = sessionStorage.getItem('dictionary:results:v2');
+      if (cachedQuery && cachedQuery === initial && cachedResults) {
+        return JSON.parse(cachedResults) as JishoResult[];
+      }
+    } catch {/* ignore */}
+    return [];
+  });
+  
+  const [searching, setSearching] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial : '');
+  const headerRef = useRef<HTMLElement>(null);
+  useScrollProgress(headerRef, 0, 56);
 
- useEffect(() => {
- sessionStorage.setItem('dictionary:query', query);
- }, [query]);
+  const grammarPoints = useMemo(() => {
+    if (mode !== 'grammar') return [];
+    let list = getAllGrammarPoints();
+    
+    if (jlptFilter) {
+      list = list.filter(p => p.jlpt === jlptFilter);
+    }
+    
+    if (query.trim()) {
+      const q = query.toLowerCase().trim();
+      list = list.filter(p => 
+        p.pattern.toLowerCase().includes(q) || 
+        p.meaning.toLowerCase().includes(q)
+      );
+    }
+    
+    return list;
+  }, [mode, jlptFilter, query]);
 
- useEffect(() => {
- if (!query.trim()) {
- setJishoResults([]);
- sessionStorage.removeItem('dictionary:results:v2');
- lastFetchedRef.current ='';
- return;
- }
+  useEffect(() => {
+    sessionStorage.setItem('dictionary:query', query);
+  }, [query]);
 
- if (query === lastFetchedRef.current) return;
+  useEffect(() => {
+    if (mode !== 'words') return;
+    if (!query.trim()) {
+      setJishoResults([]);
+      sessionStorage.removeItem('dictionary:results:v2');
+      lastFetchedRef.current = '';
+      return;
+    }
 
- const timeout = setTimeout(async () => {
- setSearching(true);
- try {
- const results = await searchJisho(romajiToKana(query) ?? query);
- const ranked = rankByRelevance(results, query);
- setJishoResults(ranked);
- lastFetchedRef.current = query;
- try {
- sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
- } catch {/* quota — ignore */}
- } catch {
- setJishoResults([]);
- } finally {
- setSearching(false);
- }
- }, 400);
+    if (query === lastFetchedRef.current) return;
 
- return () => clearTimeout(timeout);
- }, [query]);
+    const timeout = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const results = await searchJisho(romajiToKana(query) ?? query);
+        const ranked = rankByRelevance(results, query);
+        setJishoResults(ranked);
+        lastFetchedRef.current = query;
+        try {
+          sessionStorage.setItem('dictionary:results:v2', JSON.stringify(ranked));
+        } catch {/* quota — ignore */}
+      } catch {
+        setJishoResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [query, mode]);
 
   const handleToggleSave = (result: JishoResult) => {
     const disp = getDisplayWord(result);
@@ -179,45 +203,124 @@ export default function DictionaryPage() {
  </Link>
  </header>
 
- {/* Search pill */}
- <div className="mt-5 px-6 relative">
- <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
- <Input
- ref={inputRef}
- value={query}
- onChange={(e) => setQuery(e.target.value)}
- placeholder="Search in Japanese or English..."
- className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10 text-sm shadow-inner-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
- />
- {query && (
- <button
- type="button"
- onPointerDown={(e) => {
- // Fire on press and prevent the input below from stealing focus,
- // which used to require a second tap and visually shifted the icon.
- e.preventDefault();
- e.stopPropagation();
- clearQuery();
- }}
- aria-label="Clear search"
- className="absolute right-8 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted active:bg-muted/80 smooth-colors"
- >
- <X className="h-4 w-4"/>
- </button>
- )}
- </div>
+  {/* Tab Switcher */}
+  <div className="mt-4 px-6">
+    <div className="relative flex w-full items-center gap-1 rounded-full bg-muted/60 p-1 ring-1 ring-border/20 shadow-inner-sm">
+      <AnimatePresence mode="popLayout" initial={false}>
+        {mode === 'words' && (
+          <motion.div
+            layoutId="tab-pill"
+            className="absolute bottom-1 left-1 top-1 w-[calc(50%-4px)] rounded-full bg-card shadow-sm ring-1 ring-border/20"
+            transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+          />
+        )}
+        {mode === 'grammar' && (
+          <motion.div
+            layoutId="tab-pill"
+            className="absolute bottom-1 right-1 top-1 w-[calc(50%-4px)] rounded-full bg-card shadow-sm ring-1 ring-border/20"
+            transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+          />
+        )}
+      </AnimatePresence>
+      <button
+        onClick={() => setMode('words')}
+        className={cn(
+          "relative z-10 flex h-9 flex-1 items-center justify-center text-xs font-bold transition-colors",
+          mode === 'words' ? "text-foreground" : "text-muted-foreground"
+        )}
+      >
+        Words
+      </button>
+      <button
+        onClick={() => setMode('grammar')}
+        className={cn(
+          "relative z-10 flex h-9 flex-1 items-center justify-center text-xs font-bold transition-colors",
+          mode === 'grammar' ? "text-foreground" : "text-muted-foreground"
+        )}
+      >
+        Grammar
+      </button>
+    </div>
+  </div>
 
- {searching && (
- <div className="mt-6 flex justify-center">
- <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3.5 py-1.5 ring-1 ring-border/40 shadow-inner-sm">
- <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground"/>
- <span className="text-xs font-medium text-muted-foreground">Searching…</span>
- </div>
- </div>
- )}
+  {/* Search pill */}
+  <div className="mt-4 px-6 relative">
+    <Search className="absolute left-9 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+    <Input
+      ref={inputRef}
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder={mode === 'grammar' ? "Search grammar..." : "Search in Japanese or English..."}
+      className="h-11 rounded-full bg-muted/60 border-transparent pl-11 pr-10 text-sm shadow-inner-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:bg-background"
+    />
+    {query && (
+      <button
+        type="button"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          clearQuery();
+        }}
+        aria-label="Clear search"
+        className="absolute right-8 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted active:bg-muted/80 smooth-colors"
+      >
+        <X className="h-4 w-4"/>
+      </button>
+    )}
+  </div>
 
- <div className="stagger-children mt-5 flex flex-col gap-3 px-6">
+  {/* JLPT Filters for Grammar */}
+  {mode === 'grammar' && (
+    <div className="mt-4 px-6">
+      <div className="no-scrollbar -mx-6 flex items-center gap-2 overflow-x-auto px-6 pb-2">
+        <button
+          onClick={() => setJlptFilter(null)}
+          className={cn(
+            "h-8 flex-shrink-0 rounded-full px-4 text-xs font-bold ring-1 smooth-colors tap-scale-sm",
+            !jlptFilter 
+              ? "bg-primary text-primary-foreground ring-primary" 
+              : "bg-muted/60 text-muted-foreground ring-border/40"
+          )}
+        >
+          All
+        </button>
+        {['N5', 'N4', 'N3', 'N2', 'N1'].map((level) => {
+          const active = jlptFilter === level;
+          const color = active ? (jlptColors as any)[level] : null;
+          return (
+            <button
+              key={level}
+              onClick={() => setJlptFilter(level)}
+              className={cn(
+                "h-8 flex-shrink-0 rounded-full px-4 text-xs font-bold ring-1 transition-all tap-scale-sm",
+                active 
+                  ? "text-white ring-transparent shadow-sm"
+                  : "bg-muted/60 text-muted-foreground ring-border/40"
+              )}
+              style={active ? { backgroundColor: color } : {}}
+            >
+              {level}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  {searching && mode === 'words' && (
+    <div className="mt-6 flex justify-center">
+      <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3.5 py-1.5 ring-1 ring-border/40 shadow-inner-sm">
+        <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground"/>
+        <span className="text-xs font-medium text-muted-foreground">Searching…</span>
+      </div>
+    </div>
+  )}
+
+  <div className={cn("stagger-children flex flex-col gap-3 px-6 pb-20", mode === 'grammar' ? "mt-4" : "mt-5")}>
+    {mode === 'words' ? (
+      <>
         {jishoResults.map((result, idx) => {
+
           const disp = getDisplayWord(result, query);
           const word = disp.word || result.slug;
           const reading = disp.reading;
@@ -318,23 +421,71 @@ export default function DictionaryPage() {
  partsOfSpeech={result.senses.flatMap(s => s.parts_of_speech)}
  />
  </div>
- );
- })}
- {!searching && query.trim() && jishoResults.length === 0 && (
- <p className="mt-8 text-center text-sm text-muted-foreground">No results found.</p>
- )}
- {!query.trim() && (
- <div className="mt-16 flex flex-col items-center text-center">
- <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
- <Search className="h-9 w-9 text-primary"/>
- </div>
- <p className="mt-5 font-serif text-lg font-semibold">Search the dictionary</p>
- <p className="mt-1 text-sm text-muted-foreground">
- Type a word in Japanese or English to get started.
- </p>
- </div>
- )}
- </div>
- </div>
- );
+      </>
+    ) : (
+      <>
+        <div className="flex items-center justify-between px-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            {grammarPoints.length} grammar points
+          </p>
+        </div>
+        
+        {grammarPoints.map((note) => (
+          <button
+            key={note.id}
+            onClick={() => goTo(`/grammar/${note.id}`, { state: { note } })}
+            className="relative flex items-center justify-between rounded-2xl bg-card p-4 ring-1 ring-border/40 shadow-sm transition-all tap-scale text-left"
+          >
+            <div className="flex flex-col gap-1 pr-6">
+              <div className="flex items-center gap-2">
+                <span className="font-japanese text-base font-bold text-foreground">
+                  {note.pattern}
+                </span>
+                <span 
+                  className="rounded-full px-2 py-0.5 text-[9px] font-bold text-white shadow-sm"
+                  style={{ backgroundColor: (jlptColors as any)[note.jlpt] }}
+                >
+                  {note.jlpt}
+                </span>
+              </div>
+              <p className="line-clamp-1 text-xs text-muted-foreground">
+                {note.meaning}
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+          </button>
+        ))}
+
+        {grammarPoints.length === 0 && (
+          <div className="mt-12 flex flex-col items-center text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+              <Search className="h-9 w-9 text-primary"/>
+            </div>
+            <p className="mt-5 font-serif text-lg font-semibold">No grammar found</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Try adjusting your search or JLPT filters.
+            </p>
+          </div>
+        )}
+      </>
+    )}
+
+    {mode === 'words' && !searching && query.trim() && jishoResults.length === 0 && (
+      <p className="mt-8 text-center text-sm text-muted-foreground">No results found.</p>
+    )}
+    
+    {mode === 'words' && !query.trim() && (
+      <div className="mt-16 flex flex-col items-center text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+          <Search className="h-9 w-9 text-primary"/>
+        </div>
+        <p className="mt-5 font-serif text-lg font-semibold">Search the dictionary</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Type a word in Japanese or English to get started.
+        </p>
+      </div>
+    )}
+  </div>
+</div>
+);
 }
