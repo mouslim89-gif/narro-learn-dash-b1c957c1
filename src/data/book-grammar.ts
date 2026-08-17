@@ -295,7 +295,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
         {
           "jlpt": "N4",
           "meaning": "To become; describes a change in state.",
-          "pattern": "I-adjective (remove い) + くなる",
+          "pattern": "I-adjective + くなる",
           "tip": "For Na-adjectives and Nouns, use になる instead of くなる.",
           "example": "怖くなりました"
         },
@@ -325,7 +325,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
         {
           "tip": "When used with adjectives, you must drop the final い or な before adding そう. For いい (good), it becomes よさそう.",
           "example": "とても悲しそうなかおをしました。",
-          "pattern": "I-adjective (remove い) + そうな",
+          "pattern": "I-adjective + そうな",
           "jlpt": "N3",
           "meaning": "To look like; to appear to be a certain way based on visual impression."
         }
@@ -1933,7 +1933,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
         },
         {
           "meaning": "Must; have to; it is necessary to do",
-          "pattern": "Plain negative (remove い) + ければならない core",
+          "pattern": "Plain negative + ければならない core",
           "jlpt": "N4",
           "example": "助けなければならない",
           "tip": "This is a formal and strong way to express obligation. In casual speech, it often shortens to ～なきゃ."
@@ -2002,7 +2002,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
           "example": "恥ずかしくなって",
           "meaning": "Indicates a change in state, meaning 'to become' or 'to start being'.",
           "tip": "For Na-adjectives and Nouns, use になる instead of くなる.",
-          "pattern": "I-adjective (remove い) + くなる",
+          "pattern": "I-adjective + くなる",
           "jlpt": "N4"
         }
       ]
@@ -3078,7 +3078,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
           "meaning": "Regrettably; completely; indicates the completion of an action or a sense of regret/surprise"
         },
         {
-          "pattern": "I-adjective (remove い) + く + Verb",
+          "pattern": "I-adjective + く + Verb",
           "meaning": "Turns an I-adjective into an adverb to describe how an action is performed",
           "tip": "Change 'ookii' to 'ookiku' to modify the verb 'suu' (breathe).",
           "example": "大きく息を吸うと",
@@ -3089,7 +3089,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
           "example": "レモンの冷たさ",
           "tip": "Commonly used for physical properties like length (nagasa), weight (omosa), and coldness (tsumetasa).",
           "meaning": "State or degree; turns an adjective into a Noun to indicate a measurable quality or feeling",
-          "pattern": "I-adjective (remove い) + さ"
+          "pattern": "I-adjective + さ"
         },
         {
           "meaning": "Too much; indicates an excessive degree or a state that is beyond a limit",
@@ -6006,7 +6006,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
           "meaning": "To do something for someone of lower status, an animal, or a plant."
         },
         {
-          "pattern": "I-adjective (remove い) + そうだ",
+          "pattern": "I-adjective + そうだ",
           "jlpt": "N4",
           "tip": "When describing feelings of others, this form is necessary because you cannot directly state another person's emotions.",
           "example": "苦しそうでした",
@@ -6769,7 +6769,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
         {
           "meaning": "Indicates a change in state or the result of a process (to become/to reach a state).",
           "jlpt": "N4",
-          "pattern": "I-adjective (remove い) + くなる",
+          "pattern": "I-adjective + くなる",
           "example": "帰ってこなくなりました",
           "tip": "For nouns and Na-adjectives, use になる instead of くなる."
         },
@@ -6799,7 +6799,7 @@ export const bookGrammar: Record<string, Record<string, GrammarNote[][]>> = {
           "tip": "Usually used with subjective feelings like emotions or physical sensations (hungry, lonely, itchy).",
           "jlpt": "N3",
           "meaning": "Used to express that a physical or mental feeling is so strong that it is unbearable.",
-          "pattern": "I-adjective (remove い) + くてたまらない"
+          "pattern": "I-adjective + くてたまらない"
         },
         {
           "tip": "Often pairs with a negative verb to emphasize the extremity of a situation.",
