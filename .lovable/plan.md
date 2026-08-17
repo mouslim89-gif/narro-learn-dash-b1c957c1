@@ -1,45 +1,44 @@
-# Stop grammar generation when opening a grammar point
+# Capacitor packaging with hot reload
 
-## Verified cause
+Goal: run Tsundoku as a real native app (Android first, iOS ready) on a device, with live reload pointing at the Lovable preview so you see changes instantly without rebuilding.
 
-- The database already contains **518 cached grammar-example rows**.
-- **505 of those 518 keys use the legacy slug format** with repeated or leading/trailing hyphens, such as `te-form---ある`.
-- The grammar index now creates canonical IDs by collapsing and trimming hyphens, such as `te-form-ある`.
-- Slug generation is currently inconsistent:
-  - the grammar index collapses and trims hyphens;
-  - the detail preloader, backfill script, and `grammar-examples` function do not;
-  - the recent rename migration targets simplified old keys that do not match the real legacy database keys.
-- Therefore, renamed grammar points miss both local and database caches. The function interprets that miss as permission to generate new content immediately.
+## What gets added
 
-## Plan
+1. Capacitor dependencies: `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`.
+2. `capacitor.config.ts` at the project root:
+   - `appId`: `app.lovable.tsundoku` (final store ID can be changed later, before first store upload)
+   - `appName`: `Tsundoku`
+   - `webDir`: `dist`
+   - `server.url`: the Lovable preview URL + `cleartext: true` so the native shell loads the live app (this is the hot reload switch)
+3. Safe-area handling check: the app already uses `viewport-fit=cover` and `env(safe-area-inset-*)`, so status bar / gesture bar spacing stays correct in the native shell.
+4. Optional small additions kept minimal and on-theme: status bar style matching the current `theme-color`, and keeping the splash flow as the existing in-app `SplashScreen`.
 
-1. **Create one canonical grammar slug function**
-   - Use the same lowercase, replacement, repeated-hyphen collapse, and edge trimming rules everywhere.
-   - Apply it to the grammar index, local preloader, backfill script, saved grammar IDs, and backend cache lookup.
+Nothing else in the app changes. No UI, no business logic.
 
-2. **Repair the existing cache instead of regenerating it**
-   - Build a migration from the actual legacy database keys to the current canonical grammar patterns.
-   - Preserve existing `examples` and `formations` payloads.
-   - Merge collisions safely when multiple legacy labels now represent one canonical point.
-   - Update matching saved grammar IDs without deleting a user's existing canonical save.
+## Two modes, one config
 
-3. **Remove AI generation from the user click path**
-   - Grammar Detail will read local cache first, then the shared database cache.
-   - A cache miss will return a clear unavailable state and will not call AI from the app UI.
-   - Keep generation exclusively in the explicit admin/backfill process, so opening a page can never spend credits.
+- **Hot reload (dev)**: `server.url` present, the APK is a thin shell around the preview URL. Edit in Lovable, pull to refresh or just navigate, changes appear on the phone.
+- **Store build (later)**: remove/comment `server.url`, run `npm run build` then `npx cap sync`, and the app runs from bundled `dist` assets. This is required for Play Store / App Store submission.
 
-4. **Finish and verify the preload**
-   - Compare every canonical grammar point in the catalog against the repaired database cache.
-   - Generate only genuinely missing points, sequentially, with bounded retry for `429`/`5xx` only.
-   - Re-check until every catalog slug has a valid examples/formations payload.
+## Steps you run locally (Capacitor cannot build APKs inside Lovable)
 
-5. **Regression coverage**
-   - Test representative unchanged, renamed, Japanese-containing, and punctuation-heavy patterns.
-   - Verify that opening each test point performs a cache read only, returns its stored content, and creates no AI Gateway request.
+```text
+1. Export project to GitHub, then git pull locally
+2. npm install
+3. npx cap add android      (and: npx cap add ios, on a Mac)
+4. npm run build
+5. npx cap sync android
+6. npx cap run android      (device or emulator, Android Studio required)
+```
 
-## Technical scope
+After that, day-to-day dev is: change code in Lovable, the phone reloads from the preview URL. Re-run `npx cap sync` only when native deps or the config change.
 
-- Frontend: `src/pages/GrammarDetail.tsx`, `src/lib/grammar.ts`, `src/lib/grammar-preload.ts`
-- Backend: `supabase/functions/grammar-examples/index.ts`
-- Backfill tooling: `scripts/preload-grammar-examples.ts`
-- Database: a corrective cache/save migration based on actual legacy keys
+## Notes on in-app purchases
+
+`src/lib/iap.ts` already expects `window.Tsundoku.iap` to be provided by the native shell. Capacitor alone does not provide it. Once the shell runs, the next step is a purchases plugin (RevenueCat or `@capacitor-community/in-app-purchases`) wired to expose that same interface, so no app code changes are needed. Out of scope for this plan unless you want it now.
+
+## Technical details
+
+- `android/` and `ios/` folders are generated locally by `cap add` and are not created here.
+- Cleartext is enabled only because the dev server URL is used; the store build has no `server` block.
+- The Cloud/Supabase auth flow works unchanged in the WebView since it uses localStorage and the same origin as the preview.
