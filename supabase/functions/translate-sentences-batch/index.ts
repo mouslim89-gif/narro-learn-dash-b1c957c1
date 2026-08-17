@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
   }
 
   const auth = await requireUser(req, corsHeaders);
-  if ("error" in auth) return auth.error;
+  const isUser = !("error" in auth);
 
   try {
     const json = await req.json();
@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
     }
 
     // Missing sentences → translate (parallel, capped)
-    const missing = uniqueHashes.filter((h) => !results.has(h));
+    const missing = isUser ? uniqueHashes.filter((h) => !results.has(h)) : [];
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (missing.length > 0 && !apiKey) {
       return new Response(JSON.stringify({ error: "Translation service not configured" }), {
