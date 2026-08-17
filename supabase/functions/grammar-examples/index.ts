@@ -14,7 +14,12 @@ Deno.serve(async (req) => {
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
 
     const { pattern, meaning, jlpt, count = 3 } = await req.json();
-    const slug = pattern.toLowerCase().trim().replace(/[^\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf0-9a-z]/g, '-');
+    const slug = pattern
+      .toLowerCase()
+      .trim()
+      .replace(/[^\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf0-9a-z]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
 
     // Supabase client for caching
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -39,6 +44,15 @@ Deno.serve(async (req) => {
         : (cached.examples.formations || (cached.examples.structure ? [{ parts: [cached.examples.structure] }] : null));
       
       return new Response(JSON.stringify({ examples, formations }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Prevent AI generation on user click if the header is present
+    const allowAi = req.headers.get('x-allow-ai') !== 'false';
+    if (!allowAi) {
+      return new Response(JSON.stringify({ error: "Examples not pre-generated. Contact admin." }), {
+        status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

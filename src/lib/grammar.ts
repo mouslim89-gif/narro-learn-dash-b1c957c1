@@ -1,3 +1,4 @@
+/** Canonical grammar slug logic. Must be used everywhere (index, cache, DB). */
 export function slugifyPattern(pattern: string): string {
   return pattern
     .toLowerCase()

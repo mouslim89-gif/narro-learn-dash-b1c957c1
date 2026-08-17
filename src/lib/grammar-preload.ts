@@ -1,13 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { GrammarNote } from '@/data/book-grammar';
+import { slugifyPattern } from '@/lib/grammar';
 
-/** Must stay identical to the slug logic in the `grammar-examples` edge function. */
-export function grammarSlug(pattern: string): string {
-  return pattern
-    .toLowerCase()
-    .trim()
-    .replace(/[^\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf0-9a-z]/g, '-');
-}
+/** Alias for compatibility. */
+export const grammarSlug = slugifyPattern;
 
 /** Patterns already handled during this session (avoids duplicate work across books). */
 const handled = new Set<string>();
