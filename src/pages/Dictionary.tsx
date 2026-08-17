@@ -420,7 +420,9 @@ export default function DictionaryPage() {
  dictForm={word}
  partsOfSpeech={result.senses.flatMap(s => s.parts_of_speech)}
  />
- </div>
+            </div>
+          );
+        })}
       </>
     ) : (
       <>
