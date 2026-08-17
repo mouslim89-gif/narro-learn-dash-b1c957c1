@@ -110,6 +110,7 @@ Deno.serve(async (req) => {
       }
 
       // 2. Tokenize with AI, then persist so this sentence is never re-tokenized.
+      if (!isUser) return unauthorized();
       const tokens = await tokenizeWithAI(sentence, key);
       if (Array.isArray(tokens) && tokens.length > 0 && !(tokens.length === 1 && !tokens[0].r)) {
         await supabase.from('example_sentences').upsert({
