@@ -64,6 +64,7 @@ export default function DictionaryPage() {
   const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ?? '';
   const [query, setQuery] = useState(initial);
   const { addWord, removeWord, hasWord } = useFlashcardStore();
+  const savedWords = useFlashcardStore((s) => s.savedWords);
   
   const [jishoResults, setJishoResults] = useState<JishoResult[]>(() => {
     try {
@@ -324,7 +325,7 @@ export default function DictionaryPage() {
           const disp = getDisplayWord(result, query);
           const word = disp.word || result.slug;
           const reading = disp.reading;
-          const { savedWords } = useFlashcardStore();
+          
           const savedCard = savedWords.find(s => 
             s.id === word || 
             s.word === word || 
