@@ -339,17 +339,19 @@ export default function Reader() {
  const tokensFull = useMemo(() => {
  if (!id) return [];
  if (tokensLoading) return [];
- const tokenKey = chapterKey(id, chapterId);
- const raw = tokensForBook[tokenKey]?.[difficulty] || tokensForBook[id]?.[difficulty];
- // Layer rules: shared (admin-published, visible to all) → user saved (cloud) → user pending (local).
- const allRules = [
- ...((sharedRules[id] ?? []).map((r) => r.rule)),
- ...((sharedRules['*'] ?? []).map((r) => r.rule)),
- ...((savedRules[id] ?? []).map((r) => r.rule)),
- ...((savedRules['*'] ?? []).map((r) => r.rule)),
- ...(pendingRules[id] ?? []),
- ...(pendingRules['*'] ?? []),
- ];
+    const tokenKey = chapterKey(id, chapterId);
+    const raw = tokensForBook[tokenKey]?.[difficulty] || tokensForBook[id]?.[difficulty];
+    
+    // Build time baked rules (manifest can be added later)
+    // For now, layer rules: shared (admin-published) → user saved (cloud) → user pending (local).
+    const allRules = [
+      ...((sharedRules[id] ?? []).map((r) => r.rule)),
+      ...((sharedRules['*'] ?? []).map((r) => r.rule)),
+      ...((savedRules[id] ?? []).map((r) => r.rule)),
+      ...((savedRules['*'] ?? []).map((r) => r.rule)),
+      ...(pendingRules[id] ?? []),
+      ...(pendingRules['*'] ?? []),
+    ];
  if (raw && raw.length > 0) {
  let out = applyTokenOverrides(id, cleanRubyTokens(raw));
  // Apply custom rules before automatic post-processing so rules like
