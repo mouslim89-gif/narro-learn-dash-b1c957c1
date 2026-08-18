@@ -60,6 +60,7 @@ export default function DictionaryPage() {
   const [searchParams] = useSearchParams();
   const [mode, setMode] = useState<'words' | 'grammar'>('words');
   const [jlptFilter, setJlptFilter] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(10);
   
   const initial = searchParams.get('q') ?? sessionStorage.getItem('dictionary:query') ?? '';
   const [query, setQuery] = useState(initial);
@@ -111,6 +112,7 @@ export default function DictionaryPage() {
     if (mode !== 'words') return;
     if (!query.trim()) {
       setJishoResults([]);
+      setVisibleCount(10);
       sessionStorage.removeItem('dictionary:results:v2');
       lastFetchedRef.current = '';
       return;
@@ -120,6 +122,7 @@ export default function DictionaryPage() {
 
     const timeout = setTimeout(async () => {
       setSearching(true);
+      setVisibleCount(10);
       try {
         const results = await searchJisho(romajiToKana(query) ?? query);
         const ranked = rankByRelevance(results, query);
@@ -320,7 +323,7 @@ export default function DictionaryPage() {
   <div className={cn("stagger-children flex flex-col gap-3 px-6 pb-20", mode === 'grammar' ? "mt-4" : "mt-5")}>
     {mode === 'words' ? (
       <>
-        {jishoResults.map((result, idx) => {
+        {jishoResults.slice(0, visibleCount).map((result, idx) => {
 
           const disp = getDisplayWord(result, query);
           const word = disp.word || result.slug;
@@ -432,7 +435,7 @@ export default function DictionaryPage() {
           </p>
         </div>
         
-        {grammarPoints.map((note) => (
+        {grammarPoints.slice(0, visibleCount).map((note) => (
           <button
             key={note.id}
             onClick={(e) => goTo(`/grammar/${note.id}`, e, { state: { note } })}
@@ -470,6 +473,16 @@ export default function DictionaryPage() {
           </div>
         )}
       </>
+    )}
+
+    {((mode === 'words' && jishoResults.length > visibleCount) || (mode === 'grammar' && grammarPoints.length > visibleCount)) && (
+      <Button 
+        variant="ghost" 
+        onClick={() => setVisibleCount(prev => prev + 10)}
+        className="mt-4 w-full rounded-2xl bg-muted/40 py-8 text-sm font-semibold text-muted-foreground hover:bg-muted/60"
+      >
+        Load more
+      </Button>
     )}
 
     {mode === 'words' && !searching && query.trim() && jishoResults.length === 0 && (
