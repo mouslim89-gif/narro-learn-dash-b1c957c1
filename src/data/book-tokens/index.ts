@@ -1,4 +1,5 @@
 import bakedRules from './baked-rules.json';
+import { tokenWordCounts } from './word-counts';
 
 export interface BookToken {
   t: string;
@@ -20,4 +21,4 @@ export async function loadBookTokens(bookId: string): Promise<BookTokenMap> {
   }
 }
 
-export { bakedRules };
+export { bakedRules, tokenWordCounts };
