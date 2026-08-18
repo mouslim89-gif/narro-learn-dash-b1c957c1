@@ -6,13 +6,10 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   ios: {
     contentInset: 'never',
-    backgroundColor: '#F7F4EF',
-    scrollEnabled: false
-  },
-  android: {
-    overScrollMode: 'never'
+    backgroundColor: '#F7F4EF'
   },
   plugins: {
+
     SplashScreen: {
       launchAutoHide: false,
       backgroundColor: "#F7F4EF",

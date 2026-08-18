@@ -5,17 +5,8 @@
 @tailwind utilities;
 
 @layer base {
-  html, body, #root {
-    overscroll-behavior: none;
-    height: 100%;
-    overflow: hidden;
-    -webkit-text-size-adjust: 100%;
-    touch-action: manipulation;
-  }
-
-  #root {
-    display: flex;
-    flex-direction: column;
+  html, body {
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -24,7 +15,6 @@
   }
 
   :root {
-    --header-top: calc(env(safe-area-inset-top) + 20px);
     --background: 36 33% 97%;
     --foreground: 210 22% 15%;
     --card: 0 0% 100%;
@@ -327,7 +317,7 @@
   @apply bg-background/80 backdrop-blur-md ring-1 ring-border/40 shadow-sm;
 }
 
-/* Entrance animations */
+/* Animation utilities... */
 .animate-fade-in-up {
   animation: fade-in-up 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -352,31 +342,6 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Falling title animation */
-.animated-title__char {
-  display: inline-block;
-  opacity: 0;
-  animation: title-char-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes title-char-in {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.no-anim .animated-title__char,
-.no-anim * {
-  animation: none !important;
-  transition: none !important;
-  opacity: 1 !important;
-}
-
 .tap-scale {
   @apply transition-transform active:scale-[0.965];
 }
@@ -386,88 +351,6 @@
 .card-lift {
   @apply transition-all hover:-translate-y-[2px] active:scale-[0.985];
 }
-
-/* Library UI */
-.library-header-bg {
-  background: radial-gradient(circle at 0% 0%, hsl(var(--accent) / 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 100% 100%, hsl(var(--primary) / 0.03) 0%, transparent 50%);
-}
-
-.library-kanji-watermark {
-  @apply absolute -right-4 -top-8 select-none font-serif text-[180px] font-black text-foreground/[0.03];
-  pointer-events: none;
-}
-
-/* Generic Utilities */
-.shadow-inner-sm {
-  box-shadow: inset 0 2px 4px 0 hsl(210 22% 15% / 0.06);
-}
-
-.card-refined {
-  @apply rounded-2xl bg-card p-5 ring-1 ring-border/30 shadow-sm elev-soft;
-}
-
-.hairline-fade {
-  @apply h-px w-full bg-gradient-to-r from-transparent via-border/60 to-transparent;
-}
-
-.press-flash {
-  @apply relative overflow-hidden after:absolute after:inset-0 after:bg-white/10 after:opacity-0 active:after:opacity-100 after:transition-opacity;
-}
-
-.smooth-colors {
-  @apply transition-colors duration-200;
-}
-
-.stagger-children > * {
-  opacity: 0;
-  animation: fade-in-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
-.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
-
-.animate-soft-pulse {
-  animation: soft-pulse 2s infinite;
-}
-@keyframes soft-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
-}
-
-/* Reader Chrome */
-.reader-icon-btn {
-  @apply flex h-9 w-9 items-center justify-center rounded-full bg-background/80 ring-1 ring-border/40 backdrop-blur-md tap-scale-sm;
-}
-
-.reader-settings-panel {
-  @apply rounded-3xl bg-background/95 p-6 shadow-2xl ring-1 ring-border/20 backdrop-blur-xl;
-}
-
-.reader-settings-section {
-  @apply space-y-4 py-4;
-}
-
-.reader-settings-bullet {
-  @apply h-1 w-1 rounded-full bg-primary/30;
-}
-
-.btn-primary-glow {
-  @apply relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-t before:from-white/0 before:to-white/10;
-}
-
-.audio-slider .relative {
-  @apply flex h-5 w-full touch-none select-none items-center;
-}
-
-.color-dot-new { @apply h-2 w-2 rounded-full bg-[hsl(var(--state-new))]; }
-.color-dot-learning { @apply h-2 w-2 rounded-full bg-[hsl(var(--state-learning))]; }
-.color-dot-known { @apply h-2 w-2 rounded-full bg-[hsl(var(--state-known))]; }
 
 /* No Scrollbar */
 .no-scrollbar::-webkit-scrollbar {
@@ -489,19 +372,6 @@
   font-family: 'Merriweather', serif;
   font-weight: 900;
   letter-spacing: -0.02em;
-}
-
-.page-top {
-  padding-top: var(--header-top);
-}
-
-/* Hide scrollbars globally but keep functionality */
-* {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-::-webkit-scrollbar {
-  display: none !important;
 }
 
 /* Colors for mastery levels */

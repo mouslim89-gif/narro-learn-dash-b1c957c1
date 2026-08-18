@@ -62,13 +62,8 @@ export function LegalPage({
   };
 
   return (
-    <div className="min-h-full bg-background pb-20">
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/50 bg-background/80 px-6 backdrop-blur-md"
-        style={{ 
-          paddingTop: 'var(--header-top)',
-          paddingBottom: '12px'
-        }}
-      >
+    <div className="min-h-screen bg-background pb-20">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/50 bg-background/80 px-6 pb-3 pt-3 backdrop-blur-md">
         <Button
           variant="ghost"
           size="icon"

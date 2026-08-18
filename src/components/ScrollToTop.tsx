@@ -1,20 +1,14 @@
-import { useLayoutEffect, useContext } from "react";
-import { useLocation } from "react-router-dom";
-import { ScrollContext } from "@/hooks/use-scroll-progress";
+import { useLayoutEffect } from"react";
+import { useLocation } from"react-router-dom";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  const containerRef = useContext(ScrollContext);
+ const { pathname } = useLocation();
 
-  useLayoutEffect(() => {
-    if (containerRef?.current) {
-      containerRef.current.scrollTo(0, 0);
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname, containerRef]);
+ useLayoutEffect(() => {
+ window.scrollTo(0, 0);
+ }, [pathname]);
 
-  return null;
+ return null;
 };
 
 export default ScrollToTop;
