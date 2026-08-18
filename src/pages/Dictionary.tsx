@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
 import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams } from 'react-router-dom';
@@ -83,7 +83,33 @@ export default function DictionaryPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial : '');
   const headerRef = useRef<HTMLElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   useScrollProgress(headerRef, 0, 56);
+
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + 10);
+  }, []);
+
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        loadMore();
+      }
+    }, {
+      rootMargin: '200px',
+    });
+
+    if (sentinelRef.current) {
+      observerRef.current.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, [loadMore]);
 
   const grammarPoints = useMemo(() => {
     if (mode !== 'grammar') return [];
@@ -178,7 +204,7 @@ export default function DictionaryPage() {
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
  style={{
- paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingTop: 'calc(env(safe-area-inset-top) + 40px - var(--p, 0) * 28px)',
  paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
@@ -476,13 +502,9 @@ export default function DictionaryPage() {
     )}
 
     {((mode === 'words' && jishoResults.length > visibleCount) || (mode === 'grammar' && grammarPoints.length > visibleCount)) && (
-      <Button 
-        variant="ghost" 
-        onClick={() => setVisibleCount(prev => prev + 10)}
-        className="mt-4 w-full rounded-2xl bg-muted/40 py-8 text-sm font-semibold text-muted-foreground hover:bg-muted/60"
-      >
-        Load more
-      </Button>
+      <div ref={sentinelRef} className="h-20 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
+      </div>
     )}
 
     {mode === 'words' && !searching && query.trim() && jishoResults.length === 0 && (
