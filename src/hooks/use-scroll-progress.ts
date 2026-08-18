@@ -1,4 +1,6 @@
-import { useEffect, type RefObject } from 'react';
+import { useEffect, type RefObject, useContext, createContext } from 'react';
+
+export const ScrollContext = createContext<RefObject<HTMLDivElement> | null>(null);
 
 /**
  * Writes a CSS variable `--p` (0 → 1) on `ref.current` based on window scrollY
