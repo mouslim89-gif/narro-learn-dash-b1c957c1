@@ -5,12 +5,17 @@
 @tailwind utilities;
 
 @layer base {
-  html, body {
+  html, body, #root {
     overscroll-behavior: none;
     height: 100%;
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
     touch-action: manipulation;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
   }
 
   body {
