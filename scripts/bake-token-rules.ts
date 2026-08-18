@@ -70,14 +70,13 @@ async function bakeRules() {
     }
     
     const prefix = content.slice(0, startIdx + startMarker.length);
-    // The JSON block ends at the last '}' before the sequence '};'
-    // We search for the specific end of the object assignment.
-    const suffixStart = content.lastIndexOf('};');
-    if (suffixStart === -1) {
+    // The JSON block ends just before '};'
+    const suffixIdx = content.lastIndexOf('};');
+    if (suffixIdx === -1) {
        console.error(`Could not find end of tokens object in ${file}`);
        continue;
     }
-    const jsonStr = content.slice(startIdx + startMarker.length, suffixStart + 1);
+    const jsonStr = content.slice(startIdx + startMarker.length, suffixIdx);
     
     try {
       const data = JSON.parse(jsonStr);
