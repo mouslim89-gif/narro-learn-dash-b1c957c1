@@ -96,7 +96,7 @@ export default function MyBooks() {
  <div className="min-w-0">
          <AnimatedTitle
  text="My Books"
- className="font-serif font-bold leading-none tracking-tight"
+ className="font-serif font-bold leading-[1.05] tracking-tight"
  style={{ 
     '--title-scale': 'calc(1 - var(--p, 0) * 0.25)', 
     fontSize: '32px'

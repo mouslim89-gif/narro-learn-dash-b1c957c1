@@ -103,7 +103,7 @@ export default function Library() {
  <div className="relative z-10 min-w-0">
          <AnimatedTitle
  text="Tsundoku"
- className="wordmark font-serif font-bold tracking-tight leading-none text-foreground"
+ className="wordmark font-serif font-bold tracking-tight leading-[1.05] text-foreground"
  style={{ 
     '--title-scale': 'calc(1 - var(--p, 0) * 0.429)', 
     fontSize: '42px'
