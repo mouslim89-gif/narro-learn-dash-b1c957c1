@@ -162,9 +162,9 @@ export default function Flashcards() {
  <header
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
- style={{
- paddingTop: 'calc(40px - var(--p, 0) * 28px)',
- paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
+  style={{
+    paddingTop: 'calc(var(--header-top) + 20px - var(--p, 0) * 16px)',
+    paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
  WebkitBackdropFilter: 'blur(calc(var(--p, 0) * 16px))',

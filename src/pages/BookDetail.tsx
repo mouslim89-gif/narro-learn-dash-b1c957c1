@@ -156,15 +156,18 @@ export default function BookDetail() {
 
  return (
  <div className="pb-24">
- <header
- className="relative overflow-hidden px-6 pt-10 pb-6"
- style={{ backgroundImage:`linear-gradient(160deg, ${book.coverColor}1f 0%, hsl(var(--background)) 65%)`}}
- >
+  <header
+    className="relative overflow-hidden px-6 pt-safe pb-6"
+    style={{ 
+      backgroundImage:`linear-gradient(160deg, ${book.coverColor}1f 0%, hsl(var(--background)) 65%)`,
+      paddingTop: 'var(--header-top)'
+    }}
+  >
  
  <button
  onClick={() => goTo('/')}
  className={cn(
-  "fixed left-5 top-[max(1.25rem,env(safe-area-inset-top))] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip transition-[background-color,box-shadow,backdrop-filter] duration-200",
+  "fixed left-5 top-[var(--header-top)] z-30 flex h-10 w-10 items-center justify-center rounded-full ring-1 smooth-colors tap-scale-sm header-chip transition-[background-color,box-shadow,backdrop-filter] duration-200",
   scrolled
   ?"bg-background/85 backdrop-blur-xl ring-border/60"
   :"bg-background/70 backdrop-blur-md ring-border/40"

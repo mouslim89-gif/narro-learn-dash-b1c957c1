@@ -6,7 +6,11 @@
 
 @layer base {
   html, body {
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
+    height: 100%;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
   }
 
   body {
@@ -15,6 +19,7 @@
   }
 
   :root {
+    --header-top: calc(env(safe-area-inset-top) + 20px);
     --background: 36 33% 97%;
     --foreground: 210 22% 15%;
     --card: 0 0% 100%;
@@ -372,6 +377,19 @@
   font-family: 'Merriweather', serif;
   font-weight: 900;
   letter-spacing: -0.02em;
+}
+
+.page-top {
+  padding-top: var(--header-top);
+}
+
+/* Hide scrollbars globally but keep functionality */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Colors for mastery levels */

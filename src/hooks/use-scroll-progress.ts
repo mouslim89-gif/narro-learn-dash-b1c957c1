@@ -1,4 +1,6 @@
-import { useEffect, type RefObject } from 'react';
+import { useEffect, type RefObject, useContext, createContext } from 'react';
+
+export const ScrollContext = createContext<RefObject<HTMLDivElement> | null>(null);
 
 /**
  * Writes a CSS variable `--p` (0 → 1) on `ref.current` based on window scrollY
@@ -16,6 +18,8 @@ export function useScrollProgress(
   end = 56,
   varName = '--p',
 ) {
+  const containerRef = useContext(ScrollContext);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -33,9 +37,12 @@ export function useScrollProgress(
     let running = false;
 
     const computeTarget = () => {
-      // Snap scrollY to integer pixels so fractional wheel/momentum events
-      // don't generate micro-variations in --p.
-      const y = Math.round(window.scrollY);
+      // Use standard window scroll unless a container ref is provided
+      const scrollY = containerRef?.current 
+        ? containerRef.current.scrollTop 
+        : window.scrollY;
+      
+      const y = Math.round(scrollY);
       target = Math.min(1, Math.max(0, (y - start) / range));
     };
 
@@ -75,9 +82,18 @@ export function useScrollProgress(
     current = target;
     write(current);
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    if (containerRef?.current) {
+      containerRef.current.addEventListener('scroll', onScroll, { passive: true });
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+    
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      if (containerRef?.current) {
+        containerRef.current.removeEventListener('scroll', onScroll);
+      } else {
+        window.removeEventListener('scroll', onScroll);
+      }
       if (raf) cancelAnimationFrame(raf);
     };
   }, [ref, start, end, varName]);
