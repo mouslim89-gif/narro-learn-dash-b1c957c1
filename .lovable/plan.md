@@ -25,8 +25,18 @@ Global rule in `src/index.css`: hide scrollbars on the scroll container and ever
 - CSS: `touch-action: manipulation` on `body` to remove double-tap zoom, and `-webkit-text-size-adjust: 100%` so the WebView does not resize text.
 - Ruby/furigana and reader font-size settings are unaffected.
 
+## 4. Top safe zone: smaller and applied everywhere
+
+Today each page hardcodes its own top padding (main pages use `calc(env(safe-area-inset-top) + 40px ...)`, detail/legal pages use their own values). Since the status bar no longer overlays the WebView, `env(safe-area-inset-top)` is 0 on native and the extra 40px reads as too much empty space, while secondary pages are inconsistent.
+
+- Add one shared CSS variable in `src/index.css`, e.g. `--header-top: calc(env(safe-area-inset-top) + 20px)` (down from 40px), plus a `.page-top` utility.
+- Use it in every page header: Library, My Books, Flashcards, Dictionary, Word Detail, Grammar Detail, Book Detail, Settings, Premium, and the legal pages (Terms, Privacy, Credits, Support, Account Deletion) so the spacing is identical app-wide.
+- Scroll-driven headers keep their `--p` collapse maths, just based on the new variable.
+- Reader chrome is left untouched (its own UI rules).
+
 ## Technical notes
 
-Files touched: `capacitor.config.ts`, `index.html`, `src/index.css`, `src/App.tsx`, `src/hooks/use-scroll-progress.ts`, `src/components/ScrollToTop.tsx`.
+Files touched: `capacitor.config.ts`, `index.html`, `src/index.css`, `src/App.tsx`, `src/hooks/use-scroll-progress.ts`, `src/components/ScrollToTop.tsx`, and the page headers listed above.
 
 After merging you need to `git pull` then run `npx cap sync` before the next native build for the Capacitor config changes to apply.
+
