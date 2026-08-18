@@ -83,7 +83,33 @@ export default function DictionaryPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial : '');
   const headerRef = useRef<HTMLElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   useScrollProgress(headerRef, 0, 56);
+
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + 10);
+  }, []);
+
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        loadMore();
+      }
+    }, {
+      rootMargin: '200px',
+    });
+
+    if (sentinelRef.current) {
+      observerRef.current.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, [loadMore]);
 
   const grammarPoints = useMemo(() => {
     if (mode !== 'grammar') return [];
