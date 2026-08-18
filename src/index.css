@@ -379,6 +379,19 @@
   letter-spacing: -0.02em;
 }
 
+.page-top {
+  padding-top: var(--header-top);
+}
+
+/* Hide scrollbars globally but keep functionality */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+::-webkit-scrollbar {
+  display: none !important;
+}
+
 /* Colors for mastery levels */
 .known-new {
   background-color: hsl(var(--state-new) / 0.12);
