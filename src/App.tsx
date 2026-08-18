@@ -95,7 +95,8 @@ function CloudSyncMount() {
 
 
 function AnimatedRoutes() {
- const location = useLocation();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
  const { user, loading } = useAuth();
  const isReviewing = useFlashcardStore(s => s.isReviewing);
  const isAuthRoute = location.pathname ==='/auth'|| location.pathname ==='/reset-password';
@@ -113,47 +114,52 @@ function AnimatedRoutes() {
  const hideNav = isDetailRoute || isReviewing || isAuthRoute || isLegalRoute;
  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
 
- return (
- <>
- <div className="relative">
- <AnimatePresence mode={shouldWaitForPageTransition ?"wait":"popLayout"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
- <motion.div
- key={location.pathname}
- variants={pageVariants}
- initial="initial"
- animate="animate"
- exit="exit"
- transition={pageTransition}
- className="w-full bg-background min-h-screen"
- >
- <Routes location={location}>
- <Route path="/auth"element={<Auth />} />
- <Route path="/reset-password"element={<ResetPassword />} />
- <Route path="/terms"element={<Terms />} />
- <Route path="/privacy"element={<Privacy />} />
- <Route path="/credits"element={<Credits />} />
- <Route path="/support"element={<Support />} />
- <Route path="/account-deletion"element={<AccountDeletion />} />
- <Route path="/"element={<ProtectedRoute><Library /></ProtectedRoute>} />
- <Route path="/my-books"element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
- <Route path="/flashcards"element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
- <Route path="/dictionary"element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
- <Route path="/dictionary/:word"element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
- <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
- <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/grammar/:id"element={<ProtectedRoute><GrammarDetail /></ProtectedRoute>} />
- <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-  <Route path="/premium"element={<ProtectedRoute><Premium /></ProtectedRoute>} />
-
- <Route path="*"element={<NotFound />} />
- </Routes>
- </motion.div>
- </AnimatePresence>
- </div>
- {!hideNav && <BottomNav />}
- </>
- );
+  return (
+    <div className="relative h-full overflow-hidden flex flex-col">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto overscroll-none overscroll-y-contain -webkit-overflow-scrolling-touch no-scrollbar"
+      >
+        <ScrollContext.Provider value={scrollContainerRef}>
+          <ScrollToTop />
+          <AnimatePresence mode={shouldWaitForPageTransition ? "wait" : "popLayout"} initial={false}>
+            <motion.div
+              key={location.pathname}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={pageTransition}
+              className="w-full bg-background min-h-full"
+            >
+              <Routes location={location}>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/credits" element={<Credits />} />
+                <Route path="/support" element={<Support />} />
+                <Route path="/account-deletion" element={<AccountDeletion />} />
+                <Route path="/" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+                <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
+                <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
+                <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+                <Route path="/dictionary/:word" element={<ProtectedRoute><WordDetail /></ProtectedRoute>} />
+                <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
+                <Route path="/reader/:id/:difficulty" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+                <Route path="/reader/:id/:difficulty/:chapterId" element={<ProtectedRoute><Reader /></ProtectedRoute>} />
+                <Route path="/grammar/:id" element={<ProtectedRoute><GrammarDetail /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
+        </ScrollContext.Provider>
+      </div>
+      {!hideNav && <BottomNav />}
+    </div>
+  );
 }
 
 const App = () => (
