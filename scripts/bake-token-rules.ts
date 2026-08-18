@@ -42,7 +42,6 @@ async function bakeRules() {
 
   const booksDir = path.join(process.cwd(), 'src/data/book-tokens/books');
   const bookFiles = fs.readdirSync(booksDir).filter(f => f.endsWith('.ts'));
-  const bakedManifest: Record<string, string[]> = {};
 
   for (const file of bookFiles) {
     const bookId = file.replace('.ts', '');
@@ -54,23 +53,66 @@ async function bakeRules() {
       ...(rulesByBook['*'] ?? [])
     ];
 
-    if (relevantRules.length === 0) continue;
+    if (relevantRules.length === 0) {
+      console.log(`No rules to bake for ${bookId}, skipping.`);
+      continue;
+    }
 
     console.log(`Baking ${relevantRules.length} rules into ${bookId}...`);
     
-    // We can't easily eval the TS file safely, but we can read the raw content
-    // and replace the default export if it's simple enough, or we just record it 
-    // in the manifest for now and let the build step decide if it wants to rewrite files.
-    // Given the complexity of safe TS rewriting, Layer 1 (Offline Cache) is the primary
-    // immediate fix, and this script generates a manifest that the Reader can use
-    // to skip re-applying already-shipped rules if we eventually bundle it.
+    // Read the file and parse its tokens
+    const content = fs.readFileSync(bookPath, 'utf-8');
+    const startMarker = 'const tokens: Record<string, Record<string, BookToken[]>> = ';
+    const startIdx = content.indexOf(startMarker);
+    if (startIdx === -1) {
+      console.error(`Could not find tokens definition in ${file}`);
+      continue;
+    }
     
-    bakedManifest[bookId] = relevantRules.map(r => JSON.stringify(r));
+    const prefix = content.slice(0, startIdx + startMarker.length);
+    // The JSON block ends just before '};'
+    const suffixIdx = content.lastIndexOf('};');
+    if (suffixIdx === -1) {
+       console.error(`Could not find end of tokens object in ${file}`);
+       continue;
+    }
+    const jsonStr = content.slice(startIdx + startMarker.length, suffixIdx);
+    
+    try {
+      const data = JSON.parse(jsonStr);
+      
+      // Data shape: { [bookId]: { [difficulty]: BookToken[] } }
+      const bookData = data[bookId];
+      if (!bookData) {
+        console.error(`Book data for ${bookId} not found in ${file}`);
+        continue;
+      }
+
+      for (const difficulty in bookData) {
+        const originalTokens = bookData[difficulty];
+        if (Array.isArray(originalTokens)) {
+          const bakedTokens = applyRules(relevantRules, originalTokens);
+          bookData[difficulty] = bakedTokens;
+          console.log(`  [${difficulty}] ${originalTokens.length} -> ${bakedTokens.length} tokens`);
+        }
+      }
+
+      // Re-emit with the original structure
+      const updatedContent = `${prefix}${JSON.stringify(data)};\n\nexport default tokens;\n`;
+      fs.writeFileSync(bookPath, updatedContent);
+      console.log(`  Updated ${file} successfully.`);
+      
+    } catch (e) {
+      console.error(`Failed to bake rules for ${file}:`, e);
+      console.error(`  JSON snippet (start): ${jsonStr.slice(0, 100)}...`);
+      console.error(`  JSON snippet (end): ...${jsonStr.slice(-100)}`);
+    }
   }
 
+  // Clear manifest since rules are now in files
   const manifestPath = path.join(process.cwd(), 'src/data/book-tokens/baked-rules.json');
-  fs.writeFileSync(manifestPath, JSON.stringify(bakedManifest, null, 2));
-  console.log(`Baked rules manifest written to ${manifestPath}`);
+  fs.writeFileSync(manifestPath, JSON.stringify({}, null, 2));
+  console.log(`Baked rules manifest cleared.`);
 }
 
 bakeRules().catch(console.error);

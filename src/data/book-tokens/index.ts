@@ -1,3 +1,4 @@
+// baked-rules.json is now an empty object as rules are baked into book files.
 import bakedRules from './baked-rules.json';
 import { tokenWordCounts } from './word-counts';
 
