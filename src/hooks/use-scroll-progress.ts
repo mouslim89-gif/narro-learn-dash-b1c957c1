@@ -82,9 +82,18 @@ export function useScrollProgress(
     current = target;
     write(current);
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    if (containerRef?.current) {
+      containerRef.current.addEventListener('scroll', onScroll, { passive: true });
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+    
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      if (containerRef?.current) {
+        containerRef.current.removeEventListener('scroll', onScroll);
+      } else {
+        window.removeEventListener('scroll', onScroll);
+      }
       if (raf) cancelAnimationFrame(raf);
     };
   }, [ref, start, end, varName]);
