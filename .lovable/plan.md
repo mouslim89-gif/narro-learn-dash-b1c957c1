@@ -1,57 +1,40 @@
-# Restore the scroll-driven headers (web + native)
+# Make edited tokens work offline in the native app
 
-## What broke
+## The situation
 
-The over-scroll fix changed the global scroll container in `src/index.css`:
+Shared token rules live in `shared_token_rules` (database) and are fetched by the Reader at runtime (`loadShared()`), then applied on top of the pre-tokenized arrays in `src/data/book-tokens/books/*.ts`. In the standalone APK, if the device is offline, that fetch fails and the reader falls back to the raw tokens, so all your corrections disappear.
 
-```css
-html, body { height: 100%; overflow: hidden; }
-body { overflow-y: auto; padding-top: env(safe-area-inset-top); }
-```
+An in-app button cannot write to the project's source files (the APK ships a compiled bundle; it has no access to the repo). So "sync rules into the book/token files" has to happen at build time, not from the phone. But we can make the phone side offline-proof too.
 
-That makes `body` the scroller instead of the document. Every page header reads
-`window.scrollY` through `useScrollProgress` (Library, My Books, Dictionary,
-Cards, Settings), and `window.scrollY` now stays at `0` forever, so `--p` never
-moves: the headers are frozen in their "expanded" state, the hairline never
-fades in, and the collapse animation is gone. It also added a second layer of
-top padding on top of each header's own `env(safe-area-inset-top)`.
+## Recommended: two layers
 
-This was collateral from the over-scroll work, not something you asked for.
+### Layer 1 - Offline cache (works immediately, no rebuild)
+Persist the shared rules the app already downloads:
+- Add `persist` middleware to `src/stores/shared-rules.ts` (key `shared-token-rules-v1`), storing `saved` + a `fetchedAt` timestamp.
+- On Reader mount, rules render instantly from the cache, then refresh in the background when online.
+- Result: after one online launch, every book edit stays correct offline. Also removes the current network round-trip before the text renders.
+- Same treatment for the user's personal rules (`user_token_rules`) so signed-in users keep their own edits offline.
 
-## Fix
+### Layer 2 - Bake rules into the shipped files (permanent, offline from first launch)
+A build-time script, run by me on request ("bake the token rules"):
+- `scripts/bake-token-rules.ts` reads all rows from `shared_token_rules`, then for each book applies the rules directly to `src/data/book-tokens/books/<book>.ts` with the existing `applyRules()` logic, rewriting the token arrays in place.
+- Rules that were baked are recorded in a manifest (`src/data/book-tokens/baked-rules.json`) so the runtime layer skips re-applying them (idempotent, no double-merge).
+- Optionally the script can then delete the baked rows from the database so the two layers never fight.
+- After that, the tokens are correct in the bundle itself, even on a fresh offline install.
 
-1. Revert `src/index.css` to document-level scrolling: drop `h-full overflow-hidden`
-   on `html, body`, drop `overflow-y-auto` and the `padding-top` on `body`.
-   Keep only `overscroll-behavior: none` (that alone kills the rubber-band /
-   squish, and it does not change the scroller).
-2. Keep `overscroll-behavior-y: none` on `html` so the native WebView bounce stays
-   disabled; `capacitor.config.ts` (`ios.contentInset: 'never'`) and
-   `StatusBar.setOverlaysWebView({ overlay: false })` stay as they are — those are
-   the status-bar settings you actually asked for.
-3. Leave the per-header `env(safe-area-inset-top)` in the five pages: with the
-   status bar non-overlaying it evaluates to `0` on Android and only adds inset
-   on notched iOS, so the web version is unaffected.
+### The "button" you asked for
+Inside the admin token-rules dialog (`TokenEditFloatingBar`), add an **Export rules** action that copies/downloads the full rule set as JSON. That gives you a one-tap way to hand me the exact rules to bake, if you ever want to bake without hitting the database from the script.
 
-After this, headers animate again on scroll in the browser and in the app, and
-the app content still starts below the status bar.
+## Alternatives considered
 
-## Why there is a `dictionary` table *and* dictionary data in the code
+- **Rules-only, no baking**: just Layer 1. Simplest, zero build steps, but a brand-new install that never goes online once shows uncorrected tokens.
+- **Bake-only**: Layer 2 alone. Perfect offline, but every new edit requires a rebuild + store update before users see it.
+- **Ship rules as a static JSON asset** (`public/token-rules.json`, regenerated at build): middle ground, no token-file rewriting, offline from install, but adds a second source of truth to keep in sync.
 
-They are two layers of the same cache, on purpose:
-
-- **`dictionary` table (backend)** — the shared source of truth. Filled once by
-  `scripts/sync-dictionary-to-db.ts` and by `jisho-lookup` when a word nobody
-  ever looked up appears. Nothing in the reader hits it at read time.
-- **`public/dict/*.json` shards (shipped in the build)** — a snapshot of that
-  table, generated by `scripts/generate-dictionary-shards.ts`. They are static
-  files bundled into the APK, hydrated into IndexedDB by `DictionaryPreloader`,
-  then served from memory. That is why lookups work offline and instantly.
-
-So the DB is the authoring/aggregation layer, the code copy is the offline read
-layer. The only case that needs the network is a word absent from the shards.
+Layer 1 + Layer 2 gives instant feedback for new edits and a clean, permanent baseline in each release.
 
 ## Technical notes
 
-- File touched: `src/index.css` only.
-- No change to `capacitor.config.ts`, `src/lib/native.ts`, page components, or
-  any store/backend code.
+- Files touched: `src/stores/shared-rules.ts`, `src/stores/user-rules.ts` (persist `saved` per user id), `src/pages/Reader.tsx` (skip baked rules via manifest), `src/components/TokenEditFloatingBar.tsx` (export action), new `scripts/bake-token-rules.ts`.
+- Baking preserves the existing `BookToken` shape, so nothing downstream (furigana, lookups, known-word highlights) changes.
+- Persisting `user_token_rules` locally is scoped by user id and cleared on logout to avoid cross-account leaks.
