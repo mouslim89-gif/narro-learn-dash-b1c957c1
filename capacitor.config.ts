@@ -5,11 +5,9 @@ const config: CapacitorConfig = {
   appName: 'Tsundoku',
   webDir: 'dist',
   ios: {
-    contentInset: 'never',
-    backgroundColor: '#F7F4EF'
+    contentInset: 'always'
   },
   plugins: {
-
     SplashScreen: {
       launchAutoHide: false,
       backgroundColor: "#F7F4EF",

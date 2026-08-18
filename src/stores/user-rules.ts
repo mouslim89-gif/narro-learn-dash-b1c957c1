@@ -118,16 +118,11 @@ export const useUserRulesStore = create<UserRulesState>()(
 
  resetForLogout: () => set({ saved: {}, pending: {}, loadedFor: null }),
  }),
-  {
-    name: 'user-token-rules-v2',
-    // We persist both pending and saved rules for offline use.
-    // saved is scoped by loadedFor (userId) so we can clear/re-fetch on switch.
-    partialize: (s) => ({ 
-      pending: s.pending,
-      saved: s.saved,
-      loadedFor: s.loadedFor
-    }),
-  }
+ {
+ name:'user-token-rules-v2',
+ // Only persist pending drafts.`saved`always comes from the cloud to avoid cross-account leaks.
+ partialize: (s) => ({ pending: s.pending }),
+ }
  )
 );
 
