@@ -6,20 +6,20 @@ export async function initializeNativePlatform(darkMode: boolean) {
   if (!Capacitor.isNativePlatform()) return;
 
   try {
-    // Initial status bar setup
+    // Ensure the status bar is NOT overlaying the webview (as requested)
+    await StatusBar.setOverlaysWebView({ overlay: false });
+
+    // Initial status bar style
     await StatusBar.setStyle({
       style: darkMode ? Style.Light : Style.Dark,
     });
     
-    // On Android, we set the background color to match the app theme
-    if (Capacitor.getPlatform() === 'android') {
-      await StatusBar.setBackgroundColor({
-        color: darkMode ? '#111827' : '#F7F4EF',
-      });
-    }
+    // Set background color to match theme
+    await StatusBar.setBackgroundColor({
+      color: darkMode ? '#111827' : '#F7F4EF',
+    });
 
     // Hide the native splash screen after the JS app has hydrated
-    // We wait a tiny bit to ensure the first paint is done
     setTimeout(async () => {
       await SplashScreen.hide();
     }, 500);
@@ -27,6 +27,7 @@ export async function initializeNativePlatform(darkMode: boolean) {
     console.warn('Native platform initialization failed:', e);
   }
 }
+
 
 export async function updateNativeStatusBar(darkMode: boolean) {
   if (!Capacitor.isNativePlatform()) return;

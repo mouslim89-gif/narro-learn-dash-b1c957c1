@@ -5,6 +5,18 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    @apply h-full overflow-hidden;
+    overscroll-behavior: none;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/10 overflow-y-auto;
+    -webkit-tap-highlight-color: transparent;
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
  :root {
  --background: 36 33% 97%;
  --foreground: 210 22% 15%;
