@@ -18,6 +18,8 @@ export function useScrollProgress(
   end = 56,
   varName = '--p',
 ) {
+  const containerRef = useContext(ScrollContext);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -35,9 +37,12 @@ export function useScrollProgress(
     let running = false;
 
     const computeTarget = () => {
-      // Snap scrollY to integer pixels so fractional wheel/momentum events
-      // don't generate micro-variations in --p.
-      const y = Math.round(window.scrollY);
+      // Use standard window scroll unless a container ref is provided
+      const scrollY = containerRef?.current 
+        ? containerRef.current.scrollTop 
+        : window.scrollY;
+      
+      const y = Math.round(scrollY);
       target = Math.min(1, Math.max(0, (y - start) / range));
     };
 
