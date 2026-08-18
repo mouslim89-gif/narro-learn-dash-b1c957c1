@@ -110,20 +110,22 @@ export default function MyBooks() {
  </Link>
  </header>
 
- <div className="px-6">
- {bookProgressList.length > 0 && (
- <div className="stagger-children mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
- {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
- <div
- key={key}
- className="relative overflow-hidden rounded-xl border border-border/40 bg-card bg-clip-padding p-4 card-lift"
- style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
- >
- <Icon className="h-4 w-4"style={{ color:`hsl(${tint})`}} />
- <p className="mt-3 text-3xl font-bold tabular-nums text-foreground">{value}</p>
- <p className="mt-0.5 text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
- </div>
- ))}
+  <div className="px-6 pb-6">
+  {bookProgressList.length > 0 && (
+  <div className="stagger-children mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+  {STAT_TILES.map(({ key, value, label, Icon, tint }) => (
+  <div
+  key={key}
+  className="relative overflow-hidden rounded-2xl border border-border/40 bg-card bg-clip-padding p-5 shadow-sm card-lift ring-1 ring-border/5"
+  style={{ backgroundImage:`linear-gradient(140deg, hsl(${tint} / 0.14) 0%, hsl(var(--card)) 60%)`}}
+  >
+  <div className="flex items-center justify-between">
+    <Icon className="h-4 w-4"style={{ color:`hsl(${tint})`}} />
+  </div>
+  <p className="mt-4 text-3xl font-bold tabular-nums text-foreground tracking-tight">{value}</p>
+  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/80">{label}</p>
+  </div>
+  ))}
   </div>
   )}
 
