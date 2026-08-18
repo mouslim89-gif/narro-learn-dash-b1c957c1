@@ -6,7 +6,11 @@
 
 @layer base {
   html, body {
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
+    height: 100%;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
   }
 
   body {
@@ -15,6 +19,8 @@
   }
 
   :root {
+    --header-top: calc(env(safe-area-inset-top) + 20px);
+  }
     --background: 36 33% 97%;
     --foreground: 210 22% 15%;
     --card: 0 0% 100%;
