@@ -61,16 +61,18 @@ async function bakeRules() {
     console.log(`Baking ${relevantRules.length} rules into ${bookId}...`);
     
     // Read the file and parse its tokens
-    // We use a simple regex to find the Record value to avoid full TS parsing
     const content = fs.readFileSync(bookPath, 'utf-8');
-    const startIdx = content.indexOf('const tokens: Record<string, Record<string, BookToken[]>> = ');
+    const startMarker = 'const tokens: Record<string, Record<string, BookToken[]>> = ';
+    const startIdx = content.indexOf(startMarker);
     if (startIdx === -1) {
       console.error(`Could not find tokens definition in ${file}`);
       continue;
     }
     
-    const prefix = content.slice(0, startIdx + 'const tokens: Record<string, Record<string, BookToken[]>> = '.length);
-    const jsonStr = content.slice(startIdx + 'const tokens: Record<string, Record<string, BookToken[]>> = '.length, content.lastIndexOf(';'));
+    const prefix = content.slice(0, startIdx + startMarker.length);
+    // Find the end of the JSON object (the last '}' before the trailing semicolon)
+    const trailingSemicolonIdx = content.lastIndexOf(';');
+    const jsonStr = content.slice(startIdx + startMarker.length, trailingSemicolonIdx);
     
     try {
       const data = JSON.parse(jsonStr);
@@ -91,19 +93,23 @@ async function bakeRules() {
         }
       }
 
+      // Re-emit with the original structure
       const updatedContent = `${prefix}${JSON.stringify(data)};\n\nexport default tokens;\n`;
       fs.writeFileSync(bookPath, updatedContent);
       console.log(`  Updated ${file} successfully.`);
       
     } catch (e) {
       console.error(`Failed to bake rules for ${file}:`, e);
+      // Log a bit of the string that failed to parse to help debug
+      console.error(`  JSON snippet (start): ${jsonStr.slice(0, 100)}...`);
+      console.error(`  JSON snippet (end): ...${jsonStr.slice(-100)}`);
     }
   }
 
-  // Also update the baked manifest (as a backup/legacy layer if needed, or clear it if empty)
+  // Clear manifest since rules are now in files
   const manifestPath = path.join(process.cwd(), 'src/data/book-tokens/baked-rules.json');
   fs.writeFileSync(manifestPath, JSON.stringify({}, null, 2));
-  console.log(`Baked rules manifest cleared (integrated into book files).`);
+  console.log(`Baked rules manifest cleared.`);
 }
 
 bakeRules().catch(console.error);

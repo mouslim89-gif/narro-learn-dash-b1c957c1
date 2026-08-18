@@ -342,12 +342,11 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = tokensForBook[tokenKey]?.[difficulty] || tokensForBook[id]?.[difficulty];
     
-    // Layer rules: baked (manifest) → shared (admin-published) → user saved (cloud) → user pending (local).
+    // Layer rules: shared (admin-published) → user saved (cloud) → user pending (local).
+    // Note: older baked rules from baked-rules.json are now integrated into the book files themselves.
     const allRules: Rule[] = [
-      ...(bakedRules[id] ?? []).map(r => JSON.parse(r) as Rule),
-      ...(bakedRules['*'] ?? []).map(r => JSON.parse(r) as Rule),
-      ...((sharedRules[id] ?? []).map((r) => r.rule)),
-      ...((sharedRules['*'] ?? []).map((r) => r.rule)),
+      ...(sharedRules[id] ?? []).map((r) => r.rule),
+      ...(sharedRules['*'] ?? []).map((r) => r.rule),
       ...((savedRules[id] ?? []).map((r) => r.rule)),
       ...((savedRules['*'] ?? []).map((r) => r.rule)),
       ...(pendingRules[id] ?? []),
