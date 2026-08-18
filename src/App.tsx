@@ -1,24 +1,24 @@
-import { useEffect } from"react";
-import { QueryClient, QueryClientProvider } from"@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useLocation } from"react-router-dom";
-import { Toaster as Sonner } from"@/components/ui/sonner";
-import { Toaster } from"@/components/ui/toaster";
-import { TooltipProvider } from"@/components/ui/tooltip";
-import { AnimatePresence, motion, MotionConfig } from"framer-motion";
-import { BottomNav } from"@/components/BottomNav";
+import { useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
+import { BottomNav } from "@/components/BottomNav";
 import { OnboardingCarousel } from "@/components/onboarding/OnboardingCarousel";
-import { AuthProvider, useAuth } from"@/contexts/AuthContext";
-import { ProtectedRoute } from"@/components/ProtectedRoute";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SplashScreen } from "@/components/SplashScreen";
 import { DictionaryPreloader } from "@/components/DictionaryPreloader";
 import { useOnboardingStore } from "@/stores/onboarding";
+import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
 
+import { useCloudSync } from "@/hooks/use-cloud-sync";
+import { useSubscriptionSync } from "@/hooks/use-premium";
 
-import { useCloudSync } from"@/hooks/use-cloud-sync";
-import { useSubscriptionSync } from"@/hooks/use-premium";
-
-import { useReadingProgressStore } from"@/stores/reading-progress";
-import { useFlashcardStore } from"@/stores/flashcards";
+import { useReadingProgressStore } from "@/stores/reading-progress";
+import { useFlashcardStore } from "@/stores/flashcards";
 import Library from"./pages/Library";
 import MyBooks from"./pages/MyBooks";
 import Flashcards from"./pages/Flashcards";
@@ -53,10 +53,19 @@ const pageTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
 
 function DarkModeSync() {
  const darkMode = useReadingProgressStore((s) => s.darkMode);
- useEffect(() => {
- document.documentElement.classList.toggle("dark", darkMode);
- }, [darkMode]);
- return null;
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    updateNativeStatusBar(darkMode);
+  }, [darkMode]);
+  return null;
+}
+
+function NativeInitializer() {
+  const darkMode = useReadingProgressStore((s) => s.darkMode);
+  useEffect(() => {
+    initializeNativePlatform(darkMode);
+  }, []);
+  return null;
 }
 
 function MotionPreference({ children }: { children: React.ReactNode }) {
@@ -152,14 +161,15 @@ const App = () => (
  <Sonner />
  <BrowserRouter>
  <AuthProvider>
-  <MotionPreference>
-   <DarkModeSync />
-   <CloudSyncMount />
-   <SplashScreen />
-   <OnboardingCarousel />
-   <DictionaryPreloader />
-   <AnimatedRoutes />
-  </MotionPreference>
+   <MotionPreference>
+    <DarkModeSync />
+    <NativeInitializer />
+    <CloudSyncMount />
+    <SplashScreen />
+    <OnboardingCarousel />
+    <DictionaryPreloader />
+    <AnimatedRoutes />
+   </MotionPreference>
  </AuthProvider>
  </BrowserRouter>
 

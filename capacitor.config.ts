@@ -4,14 +4,17 @@ const config: CapacitorConfig = {
   appId: 'com.tsundoku.app',
   appName: 'Tsundoku',
   webDir: 'dist',
-  server: {
-    // This points to the Lovable preview URL for hot reload.
-    // In production, this block should be removed or commented out.
-    url: 'https://narro-learn-dash.lovable.app',
-  },
   ios: {
     contentInset: 'always'
-  }
+  },
+  plugins: {
+    SplashScreen: {
+      launchAutoHide: false,
+      backgroundColor: "#F7F4EF",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
+    },
+  },
 };
 
 export default config;
