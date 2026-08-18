@@ -502,13 +502,9 @@ export default function DictionaryPage() {
     )}
 
     {((mode === 'words' && jishoResults.length > visibleCount) || (mode === 'grammar' && grammarPoints.length > visibleCount)) && (
-      <Button 
-        variant="ghost" 
-        onClick={() => setVisibleCount(prev => prev + 10)}
-        className="mt-4 w-full rounded-2xl bg-muted/40 py-8 text-sm font-semibold text-muted-foreground hover:bg-muted/60"
-      >
-        Load more
-      </Button>
+      <div ref={sentinelRef} className="h-20 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
+      </div>
     )}
 
     {mode === 'words' && !searching && query.trim() && jishoResults.length === 0 && (
