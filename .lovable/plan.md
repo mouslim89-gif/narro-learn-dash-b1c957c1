@@ -1,32 +1,33 @@
-# Standalone Optimization & Performance Plan
+# Dictionary infinite scroll, over-scroll fix, compact Activity strip
 
-Improve app performance and grid layout to better fit the mobile-first "Tsundoku" aesthetic, and optimize dictionary loading for better responsiveness.
+## 1. Dictionary loads more by itself
 
-## User Changes
+Replace the "Load more" button in `src/pages/Dictionary.tsx` with automatic loading:
 
-### My Books (Profile)
-- **Activity Graph**: Change the activity history from ~6 months (24 weeks) to strictly the last 30 days.
-- **Grid Layout**: Improve the visual density and spacing of the status tiles and book shelf cards to feel more "premium".
+- Add a sentinel `<div ref={sentinelRef} />` at the end of the list.
+- An `IntersectionObserver` (rootMargin `400px`) bumps `visibleCount` by 10 as soon as the sentinel approaches the viewport, so the next batch is ready before the user reaches the bottom.
+- While more items remain, show a small centered spinner chip (same style as the existing "Searching…" chip) instead of a button.
+- Reset `visibleCount` to 10 when the query, the mode (Words/Grammar) or the JLPT filter changes, so a new list never starts pre-expanded.
 
-### Dictionary
-- **Performance**: Implement windowed/paginated loading for dictionary results (Jisho results and Grammar index) to avoid UI stutters when searching for common terms that return many results.
-- **Loading Strategy**: Load items 10 by 10 as requested.
+## 2. Over-scroll past the end of the page (native app)
 
-## Technical Details
+In the packaged app the WebView keeps a rubber-band/extra scroll area below the content. Fixes:
 
-### `src/components/my-books/ContributionGraph.tsx`
-- Change `daysToShow` from `24 * 7` to `30`.
-- Adjust grid columns: instead of vertical weeks, show a simpler 6x5 or 10x3 horizontal grid, or just a single row of 30 days if appropriate. *Correction: A 7-day week grid for 30 days looks like 4-5 rows. I will make it a more compact horizontal scrollable container or a fixed grid that fits mobile widths better.*
+- Add `overscroll-behavior-y: none` on `html, body` in `src/index.css` to kill the bounce/extra drag in the WebView.
+- Ensure the page bottom padding uses the safe-area inset once (`padding-bottom: calc(5rem + env(safe-area-inset-bottom))` on scroll containers) instead of a plain `pb-20` stacked on top of other spacers, which is what creates the large empty area under the last card on Dictionary and My Books.
+- Remove the extra bottom margin the old "Load more" block added.
 
-### `src/pages/MyBooks.tsx`
-- Update "Activity" section header label from "Last 6 months" to "Last 30 days".
-- Refine `STAT_TILES` grid spacing/padding.
+## 3. Activity section made much smaller (no grid)
 
-### `src/pages/Dictionary.tsx`
-- Introduce a `visibleCount` state variable initialized to 10.
-- Use `useIntersectionObserver` or a simple "Load More" button (or scroll-based auto-load) to increment `visibleCount` by 10.
-- Slice `jishoResults` and `grammarPoints` using `visibleCount` before mapping.
-- Ensure clearing search resets `visibleCount` to 10.
+Rework `src/components/my-books/ContributionGraph.tsx` into a single thin horizontal strip:
 
-### `src/components/BookShelfRow.tsx` (or similar)
-- Refine shadow/border to match the `card-refined` style defined in `index.css`.
+- One row of 30 small squares (~7px, `rounded-[2px]`, `gap-[3px]`) that flexes to the container width, no grid, no tooltips.
+- Compact card: `rounded-xl`, `p-3`, one line header on the left ("Activity", small uppercase tracked muted label) and "Last 30 days" on the right, strip underneath.
+- Drop the Less/More legend and the per-square entrance animation (single fade-in on the strip).
+- In `src/pages/MyBooks.tsx`, reduce the wrapper spacing (`mt-4` instead of the current `mt-6` + inner `mt-8`).
+
+## Technical notes
+
+- Files touched: `src/pages/Dictionary.tsx`, `src/components/my-books/ContributionGraph.tsx`, `src/pages/MyBooks.tsx`, `src/index.css`.
+- No data, store or backend change; presentation only.
+- Colors stay on design tokens (`bg-primary` for read days, `bg-muted/40` otherwise).
