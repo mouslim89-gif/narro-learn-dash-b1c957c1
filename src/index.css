@@ -6,14 +6,12 @@
 
 @layer base {
   html, body {
-    @apply h-full overflow-hidden;
-    overscroll-behavior: none;
+    overscroll-behavior-y: none;
   }
 
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/10 overflow-y-auto;
+    @apply bg-background text-foreground antialiased selection:bg-primary/10;
     -webkit-tap-highlight-color: transparent;
-    padding-top: env(safe-area-inset-top);
   }
 
   :root {
