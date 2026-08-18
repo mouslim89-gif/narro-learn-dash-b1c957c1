@@ -9,13 +9,20 @@ Replace the "Load more" button in `src/pages/Dictionary.tsx` with automatic load
 - While more items remain, show a small centered spinner chip (same style as the existing "Searching…" chip) instead of a button.
 - Reset `visibleCount` to 10 when the query, the mode (Words/Grammar) or the JLPT filter changes, so a new list never starts pre-expanded.
 
-## 2. Over-scroll past the end of the page (native app)
+## 2. Over-scroll / rubber-band squish in the native app
 
-In the packaged app the WebView keeps a rubber-band/extra scroll area below the content. Fixes:
+In the packaged app the WebView adds a bounce and an extra scroll area past the content. Fixes:
 
-- Add `overscroll-behavior-y: none` on `html, body` in `src/index.css` to kill the bounce/extra drag in the WebView.
-- Ensure the page bottom padding uses the safe-area inset once (`padding-bottom: calc(5rem + env(safe-area-inset-bottom))` on scroll containers) instead of a plain `pb-20` stacked on top of other spacers, which is what creates the large empty area under the last card on Dictionary and My Books.
+- `overscroll-behavior: none` on `html, body` in `src/index.css` (kills the pull-down/pull-up rubber band and any scroll chaining).
+- iOS: set `ios.scrollEnabled` bounce off by switching `contentInset` to `never` and disabling WebView bounce in `capacitor.config.ts`; Android: `android.webContentsDebuggingEnabled` untouched, overscroll handled by the CSS rule plus `overscroll-behavior` on the app root.
+- Ensure the page bottom padding uses the safe-area inset once (`padding-bottom: calc(5rem + env(safe-area-inset-bottom))` on scroll containers) instead of a plain `pb-20` stacked on other spacers, which creates the large empty area under the last card on Dictionary and My Books.
 - Remove the extra bottom margin the old "Load more" block added.
+
+## 2b. App content below the status bar
+
+- Keep the native status bar as a normal (non-overlay) bar: in `src/lib/native.ts` call `StatusBar.setOverlaysWebView({ overlay: false })` and keep the background colour synced with the theme (`#F7F4EF` light / `#111827` dark).
+- As a safety net for notched devices, page headers get `padding-top: calc(<current value> + env(safe-area-inset-top))` so the title never sits under the clock/battery. Applies to the sticky headers of Library, My Books, Dictionary, Cards and Settings.
+
 
 ## 3. Activity section made much smaller (no grid)
 
