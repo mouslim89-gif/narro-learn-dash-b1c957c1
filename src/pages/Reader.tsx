@@ -7,9 +7,9 @@ import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClo
 
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasChapters, hasParts, parsePartId, partChapterId } from '@/data/books';
-import { loadBookTokens, type BookToken, type BookTokenMap } from '@/data/book-tokens';
+import { loadBookTokens, type BookToken, type BookTokenMap, bakedRules } from '@/data/book-tokens';
 import { mergeConjugatedTokens, gluePhrasalCompounds, splitNoParticleNouns, mergeCounterCompounds } from '@/lib/merge-tokens';
-import { applyTokenOverrides, applyRules } from '@/data/token-overrides';
+import { applyTokenOverrides, applyRules, type Rule } from '@/data/token-overrides';
 import { hydrateDictionaryForBook, hydrateDictionaryFromTokens } from '@/lib/dictionary-db';
 import { bookGrammar } from '@/data/book-grammar';
 import { AudioPlayer } from '@/components/AudioPlayer';
@@ -342,9 +342,10 @@ export default function Reader() {
     const tokenKey = chapterKey(id, chapterId);
     const raw = tokensForBook[tokenKey]?.[difficulty] || tokensForBook[id]?.[difficulty];
     
-    // Build time baked rules (manifest can be added later)
-    // For now, layer rules: shared (admin-published) → user saved (cloud) → user pending (local).
-    const allRules = [
+    // Layer rules: baked (manifest) → shared (admin-published) → user saved (cloud) → user pending (local).
+    const allRules: Rule[] = [
+      ...(bakedRules[id] ?? []).map(r => JSON.parse(r) as Rule),
+      ...(bakedRules['*'] ?? []).map(r => JSON.parse(r) as Rule),
       ...((sharedRules[id] ?? []).map((r) => r.rule)),
       ...((sharedRules['*'] ?? []).map((r) => r.rule)),
       ...((savedRules[id] ?? []).map((r) => r.rule)),
