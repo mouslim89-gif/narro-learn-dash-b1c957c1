@@ -70,9 +70,14 @@ async function bakeRules() {
     }
     
     const prefix = content.slice(0, startIdx + startMarker.length);
-    // Find the end of the JSON object (the last '}' before the trailing semicolon)
-    const trailingSemicolonIdx = content.lastIndexOf(';');
-    const jsonStr = content.slice(startIdx + startMarker.length, trailingSemicolonIdx);
+    // The JSON block ends at the last '}' before the sequence '};'
+    // We search for the specific end of the object assignment.
+    const suffixStart = content.lastIndexOf('};');
+    if (suffixStart === -1) {
+       console.error(`Could not find end of tokens object in ${file}`);
+       continue;
+    }
+    const jsonStr = content.slice(startIdx + startMarker.length, suffixStart + 1);
     
     try {
       const data = JSON.parse(jsonStr);
@@ -100,7 +105,6 @@ async function bakeRules() {
       
     } catch (e) {
       console.error(`Failed to bake rules for ${file}:`, e);
-      // Log a bit of the string that failed to parse to help debug
       console.error(`  JSON snippet (start): ${jsonStr.slice(0, 100)}...`);
       console.error(`  JSON snippet (end): ...${jsonStr.slice(-100)}`);
     }
