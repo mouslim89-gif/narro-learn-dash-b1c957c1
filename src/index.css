@@ -15,7 +15,74 @@
     -webkit-tap-highlight-color: transparent;
     padding-top: env(safe-area-inset-top);
   }
+
+  :root {
+    --background: 36 33% 97%;
+    --foreground: 210 22% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 22% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 22% 15%;
+    --primary: 210 29% 24%;
+    --primary-foreground: 36 33% 97%;
+    --secondary: 36 20% 88%;
+    --secondary-foreground: 210 22% 15%;
+    --muted: 36 15% 93%;
+    --muted-foreground: 210 10% 50%;
+    --accent: 36 76% 40%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 15% 88%;
+    --input: 36 15% 88%;
+    --ring: 210 29% 24%;
+    --radius: 0.5rem;
+    --sidebar-background: 36 20% 96%;
+    --sidebar-foreground: 210 22% 15%;
+    --sidebar-primary: 210 29% 24%;
+    --sidebar-primary-foreground: 36 33% 97%;
+    --sidebar-accent: 36 15% 93%;
+    --sidebar-accent-foreground: 210 22% 15%;
+    --sidebar-border: 36 15% 88%;
+    --sidebar-ring: 210 29% 24%;
+    --n5: 168 50% 35%;
+    --n4: 200 55% 42%;
+    --n3: 36 60% 45%;
+    --n2: 20 60% 45%;
+    --n1: 0 50% 42%;
+    --state-new: 38 92% 50%;
+    --state-learning: 199 89% 48%;
+    --state-known: 160 84% 39%;
+    --state-due: 36 80% 55%;
+  }
+
+  .dark {
+    --background: 220 15% 8%;
+    --foreground: 36 15% 90%;
+    --card: 220 15% 12%;
+    --card-foreground: 36 15% 90%;
+    --popover: 220 15% 12%;
+    --popover-foreground: 36 15% 90%;
+    --primary: 36 50% 65%;
+    --primary-foreground: 220 15% 8%;
+    --secondary: 220 12% 20%;
+    --secondary-foreground: 36 15% 90%;
+    --muted: 220 12% 18%;
+    --muted-foreground: 36 10% 55%;
+    --accent: 36 76% 50%;
+    --accent-foreground: 220 15% 8%;
+    --destructive: 0 55% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+    --ring: 36 50% 65%;
+    --state-new: 43 96% 56%;
+    --state-learning: 198 93% 60%;
+    --state-known: 158 64% 52%;
+    --state-due: 36 80% 60%;
+  }
 }
+
 
  :root {
  --background: 36 33% 97%;
