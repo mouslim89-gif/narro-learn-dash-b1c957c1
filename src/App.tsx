@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +13,8 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { DictionaryPreloader } from "@/components/DictionaryPreloader";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
+import { ScrollContext } from "@/hooks/use-scroll-progress";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useSubscriptionSync } from "@/hooks/use-premium";
