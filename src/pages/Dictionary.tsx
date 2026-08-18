@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
 import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams } from 'react-router-dom';
