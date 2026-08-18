@@ -1,36 +1,46 @@
-# Capacitor: point the app at the published URL, then build natively
+# Standalone native build (offline-first APK)
 
-## The URL question
+Goal: the app no longer loads the published URL inside a WebView. The APK ships the built files and runs locally, with the backend used only for sync.
 
-You are right. The current config points at the preview URL:
+## 1. Capacitor config
 
-`https://34e6052a-072a-48df-b850-628e648a6614.lovable.app`
+`capacitor.config.ts`:
+- remove the whole `server` block (no more remote URL, no cleartext)
+- keep `appId: com.tsundoku.app`, `appName: Tsundoku`, `webDir: dist`
+- add `SplashScreen` plugin config: background `#F7F4EF` (paper), no spinner, `launchAutoHide: false` so the JS hides it once React is mounted
+- add `android: { backgroundColor }` and keep `ios.contentInset`
 
-Preview URLs require a Lovable login, so a native shell loading it shows a login wall or a blank screen. The published URL `https://narro-learn-dash.lovable.app` is public and works everywhere.
+## 2. Native chrome bootstrap
 
-Note: "hot reload" here just means the native shell loads a remote URL instead of bundled files. With the published URL, changes appear on the device after you click Update in the publish dialog. True instant reload only works with a local `bun dev` server on your Wi‑Fi IP, which cannot be run from here.
+New `src/lib/native.ts`, called once from `src/main.tsx`:
+- guard with `Capacitor.isNativePlatform()` so the web build is untouched
+- StatusBar: `Style.Dark` in light mode / `Style.Light` in dark mode, background matching the app background
+- re-apply the status bar style whenever the dark-mode store flips (small subscription in `DarkModeSync`)
+- hide the native splash after first paint, which hands over cleanly to the existing `SplashScreen` component
 
-## Change to make
+## 3. App icon and splash assets
 
-Update `capacitor.config.ts`:
+- generate a 1024x1024 Tsundoku icon (paper background, dark navy serif wordmark mark) plus a 2732x2732 splash into `resources/`
+- these feed `bunx @capacitor/assets generate`, which writes every Android/iOS density automatically
 
-- `server.url` -> `https://narro-learn-dash.lovable.app`
-- remove `cleartext: true` (only needed for plain http local dev)
-- keep a commented block showing how to swap in `http://<your-lan-ip>:8080` for local dev, and how to remove `server` entirely for a store build
+## 4. Offline behaviour check
 
-Optional: rename the published slug from `narro-learn-dash` to `tsundoku` so the URL becomes `https://tsundoku.lovable.app`. If you want that, I do the rename first and use the new URL in the config.
+Everything the reader needs is already local: book text (`src/data/books/`), tokens (`src/data/book-tokens/`), dictionary shards (`public/dict/`). Network is only needed for cloud sync, AI lookups of uncached words, TTS and audio sync. No change required, but the plan includes verifying the app boots with no network by relying on the persisted Zustand stores.
 
-## What you do next (on your own machine)
+## What you run locally after this
 
-Capacitor native builds need Xcode / Android Studio, so these steps run locally, not here.
+```text
+git pull
+bun install
+bunx @capacitor/assets generate --android
+bun run build
+bunx cap sync android
+cd android && .\gradlew.bat assembleDebug
+```
 
-1. Push to GitHub from Lovable, then `git clone` and `bun install`
-2. `bunx cap add ios` and/or `bunx cap add android` (the native folders are not committed yet)
-3. `bun run build` then `bunx cap sync`
-4. `bunx cap run ios` (Mac + Xcode) or `bunx cap run android` (Android Studio)
+The APK is then fully self-contained. Clicking Publish in Lovable no longer updates installed devices; you rebuild and reinstall to ship changes.
 
-Since `server.url` is set, the device loads the live published site; step 3 only needs repeating when native config or plugins change.
+## Notes
 
-## For the real store release
-
-Remove the whole `server` block, `bun run build`, `bunx cap sync`, then archive in Xcode / generate a signed AAB in Android Studio. At that point we also add: app icons and splash assets, `@capacitor/status-bar` and safe-area handling, and the in-app-purchase plugin wired to the existing `iap.ts` bridge (currently a stub). I can prepare all of that in a follow-up.
+- Store release still needs a signed keystore and `assembleRelease` / `bundleRelease`; that is a separate step when you are ready to upload.
+- In-app purchases still use the stub in `src/lib/iap.ts`. Wiring a real billing plugin is a follow-up, not part of this change.
