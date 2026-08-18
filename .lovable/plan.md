@@ -1,27 +1,21 @@
-# Fix: nothing scrolls anymore
+# Restore the falling-letter title animation and fix header alignment
 
-## Cause (verified)
+## What happened
 
-`src/index.css` sets `html, body { height: 100%; overflow: hidden }`, and `App.tsx` now scrolls inside a container using `h-full` (`.relative.h-full` → `flex-1 overflow-y-auto`). But there is no rule giving `#root` a height: `src/index.css` contains no `#root` selector at all. So `#root` is `height: auto`, the `h-full` wrapper resolves to 0, the scroll container has no height, and the page cannot scroll while `body` overflow stays hidden.
+`src/index.css` was rewritten during the native/scroll work and lost a whole block of custom utility classes. Verified missing right now:
 
-## Fix
+`animated-title`, `animated-title__char`, `no-anim`, `library-header-bg`, `library-kanji-watermark`, `shadow-inner-sm`, `card-refined`, `hairline-fade`, `press-flash`, `smooth-colors`, `stagger-children`, `animate-soft-pulse`, `reader-icon-btn`, `reader-settings-panel/section/bullet`, `btn-primary-glow`, `audio-slider`, `color-dot-new/learning/known`, `elev-soft-hover`.
 
-One rule in `src/index.css` (base layer):
+`AnimatedTitle` still renders `<span class="animated-title__char">` on Library, Dictionary, Flashcards, My Books and Settings, but with no CSS rule the letters just sit there statically. That is exactly the disappeared animation.
 
-```css
-#root {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-```
+## What to do
 
-That restores the height chain `html → body → #root → app shell → scroll container`, so the internal scroller works again and the overscroll/scrollbar/zoom behaviour from the previous change stays intact.
+1. Restore the missing CSS in `src/index.css`:
+   - `.animated-title` + `.animated-title__char` with the `title-char-in` keyframe (letters start slightly above with 0 opacity and drop into place, `--ease-out-soft`, `animation-fill-mode: both` so the per-letter `animation-delay` staggering works).
+   - `.no-anim` guard so the admin "Disable app animation" toggle kills the letter animation too.
+   - Re-add the other utilities listed above so headers, reader chrome, badges and sliders stop rendering unstyled (`library-header-bg` gradient, `library-kanji-watermark`, `shadow-inner-sm`, `press-flash`, `stagger-children`, etc.).
+2. Fix vertical centering of the page titles: the headers use `items-center`, but the title uses `leading-none`, which centres the glyph box, not the visual text, so the title reads high against the round settings chip. Switch the animated title to a normal line box (`leading-[1.05]`) and let flex centring do the work, applied consistently on Library, Dictionary, Flashcards and My Books so all mastheads match.
 
-## Verification
+## Scope
 
-After the change, check in the preview that Library, My Books, Dictionary and Settings scroll, that the collapsing headers still animate (they read the container's `scrollTop`), and that the reader scrolls normally.
-
-## Fallback if headers misbehave
-
-If the internal scroller still causes trouble, the alternative is to revert to body scrolling (`html, body { overflow: auto }`, remove the container) and rely only on `overscroll-behavior: none` plus the Capacitor `scrollEnabled: false` / `overScrollMode: 'never'` settings for the native bounce. Not preferred: it weakens the iOS fix.
+Only `src/index.css` plus the title `className` on the four main page headers. No logic changes.
