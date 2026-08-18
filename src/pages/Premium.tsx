@@ -137,16 +137,17 @@ export default function Premium() {
     <div className="min-h-screen pb-14">
       <div className="library-header-bg relative overflow-hidden">
         <span className="library-kanji-watermark" aria-hidden>読</span>
-        <header className="relative px-5 pt-safe flex items-center h-16">
+        <header className="relative px-5 h-20 flex items-center">
           <div className="absolute top-[var(--header-top)] left-5">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Back"
-            onClick={() => navigate(-1)}
-            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
-          >
-            <ArrowLeft className="h-[18px] w-[18px]" />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Back"
+              onClick={() => navigate(-1)}
+              className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-md ring-1 ring-border/40 shrink-0 header-chip"
+            >
+              <ArrowLeft className="h-[18px] w-[18px]" />
+            </Button>
           </div>
         </header>
 
