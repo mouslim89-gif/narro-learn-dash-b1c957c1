@@ -13,6 +13,7 @@ export async function initializeNativePlatform(darkMode: boolean) {
     
     // On Android, we set the background color to match the app theme
     if (Capacitor.getPlatform() === 'android') {
+      await StatusBar.setOverlaysWebView({ overlay: false });
       await StatusBar.setBackgroundColor({
         color: darkMode ? '#111827' : '#F7F4EF',
       });

@@ -122,7 +122,7 @@ function AnimatedRoutes() {
  animate="animate"
  exit="exit"
  transition={pageTransition}
- className="w-full bg-background min-h-screen"
+ className="w-full bg-background min-h-[100dvh]"
  >
  <Routes location={location}>
  <Route path="/auth"element={<Auth />} />

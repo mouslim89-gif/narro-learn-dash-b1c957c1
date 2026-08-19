@@ -99,16 +99,25 @@
  @apply border-border;
  }
 
- html {
- /* Prevent scroll-anchoring feedback loop with the collapsing sticky headers:
-    header shrinks → browser re-anchors scroll → --p changes → header grows → infinite jitter */
- overflow-anchor: none;
- }
+  html {
+    /* Prevent scroll-anchoring feedback loop with the collapsing sticky headers:
+       header shrinks → browser re-anchors scroll → --p changes → header grows → infinite jitter */
+    overflow-anchor: none;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+  }
 
- body {
- @apply bg-background text-foreground;
- font-family:'Inter', sans-serif;
- }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    overscroll-behavior: none;
+    touch-action: pan-x pan-y;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
 
  h1, h2, h3, h4, h5, h6 {
  font-family:'Merriweather', serif;

@@ -163,7 +163,7 @@ export default function Flashcards() {
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
  style={{
- paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingTop: 'calc(max(40px, env(safe-area-inset-top)) - var(--p, 0) * 28px)',
  paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',

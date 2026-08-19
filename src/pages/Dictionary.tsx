@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useScrollProgress } from '@/hooks/use-scroll-progress';
 import { ConjugationTable } from '@/components/ConjugationTable';
 import { useSearchParams } from 'react-router-dom';
@@ -83,7 +83,25 @@ export default function DictionaryPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastFetchedRef = useRef<string>(initial && jishoResults.length > 0 ? initial : '');
   const headerRef = useRef<HTMLElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   useScrollProgress(headerRef, 0, 56);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !searching) {
+          setVisibleCount((prev) => prev + 10);
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [searching, mode, query, jlptFilter]);
 
   const grammarPoints = useMemo(() => {
     if (mode !== 'grammar') return [];
@@ -178,7 +196,7 @@ export default function DictionaryPage() {
  ref={headerRef}
  className="sticky top-0 z-30 px-6 flex items-center justify-between"
  style={{
- paddingTop: 'calc(40px - var(--p, 0) * 28px)',
+ paddingTop: 'calc(max(40px, env(safe-area-inset-top)) - var(--p, 0) * 28px)',
  paddingBottom: 'calc(8px + var(--p, 0) * 4px)',
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
@@ -476,13 +494,9 @@ export default function DictionaryPage() {
     )}
 
     {((mode === 'words' && jishoResults.length > visibleCount) || (mode === 'grammar' && grammarPoints.length > visibleCount)) && (
-      <Button 
-        variant="ghost" 
-        onClick={() => setVisibleCount(prev => prev + 10)}
-        className="mt-4 w-full rounded-2xl bg-muted/40 py-8 text-sm font-semibold text-muted-foreground hover:bg-muted/60"
-      >
-        Load more
-      </Button>
+      <div ref={sentinelRef} className="mt-4 flex justify-center py-8">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
+      </div>
     )}
 
     {mode === 'words' && !searching && query.trim() && jishoResults.length === 0 && (
