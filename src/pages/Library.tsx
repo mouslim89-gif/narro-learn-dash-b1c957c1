@@ -90,7 +90,7 @@ export default function Library() {
  ref={headerRef}
  className="library-header-bg sticky top-0 z-30 px-6 flex items-center justify-between overflow-hidden"
  style={{
- paddingTop: 'calc(48px - var(--p, 0) * 36px)',
+ paddingTop: 'calc(max(48px, env(safe-area-inset-top)) - var(--p, 0) * 36px)',
  paddingBottom: 'calc(24px - var(--p, 0) * 16px)',
  backgroundColor: 'hsl(var(--background) / calc(var(--p, 0) * 0.85))',
  backdropFilter: 'blur(calc(var(--p, 0) * 16px))',
