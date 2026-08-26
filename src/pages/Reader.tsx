@@ -44,6 +44,8 @@ import { useIsMobile } from'@/hooks/use-mobile';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Popover, PopoverContent, PopoverTrigger } from'@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from'@/lib/sentence-translations';
+import { useOnboardingStore } from'@/stores/onboarding';
+
 
 const fontSizes: FontSize[] = ['small','medium','large'];
 const fontSizeLabels: Record<FontSize, string> = { small:'S', medium:'M', large:'L'};
