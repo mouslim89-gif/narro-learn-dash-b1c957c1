@@ -123,14 +123,17 @@ export function WordMiniPopup({
  const GAP = 6;
  const BOTTOM_RESERVE = 88;
 
- // Safe-area insets (native shell / notched devices).
- const readInset = (name: string) => {
- const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
- const n = parseFloat(raw);
+ // Safe-area insets (native shell / notched devices), measured once per layout.
+ const readInset = (side: 'top' | 'bottom') => {
+ const probe = document.createElement('div');
+ probe.style.cssText = `position:fixed;visibility:hidden;pointer-events:none;padding-${side}:env(safe-area-inset-${side})`;
+ document.body.appendChild(probe);
+ const n = parseFloat(getComputedStyle(probe)[side === 'top' ? 'paddingTop' : 'paddingBottom']);
+ probe.remove();
  return Number.isFinite(n) ? n : 0;
  };
- const insetTop = readInset('--sat');
- const insetBottom = readInset('--sab');
+ const insetTop = readInset('top');
+ const insetBottom = readInset('bottom');
 
  const topLimit = PADDING + 56 + insetTop;
  const bottomLimit = vh - BOTTOM_RESERVE - insetBottom;
