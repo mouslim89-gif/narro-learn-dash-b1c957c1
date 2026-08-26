@@ -44,6 +44,8 @@ import { useIsMobile } from'@/hooks/use-mobile';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Popover, PopoverContent, PopoverTrigger } from'@/components/ui/popover';
 import { preloadTranslations, hashSentence, type TranslationMap } from'@/lib/sentence-translations';
+import { useOnboardingStore } from'@/stores/onboarding';
+
 
 const fontSizes: FontSize[] = ['small','medium','large'];
 const fontSizeLabels: Record<FontSize, string> = { small:'S', medium:'M', large:'L'};
@@ -403,6 +405,28 @@ export default function Reader() {
  return stripParens(getChapterContent(book, chapterId, difficulty));
  }, [book, chapterId, difficulty]);
 
+ // Direction-aware chapter transitions: compare the ordinal of the chapter we
+ // leave with the one we enter, so the text slides the way the reader moves.
+ const chapterOrdinal = useMemo(() => {
+ if (!book) return 0;
+ if (partIdx !== null) return partIdx;
+ if (book.chapters && book.chapters.length > 1) {
+ const i = book.chapters.findIndex((c) => c.id === chapterId);
+ return i < 0 ? 0 : i;
+ }
+ return 0;
+ }, [book, chapterId, partIdx]);
+
+ const prevOrdinalRef = useRef(chapterOrdinal);
+ const slideDirRef = useRef(1);
+ if (prevOrdinalRef.current !== chapterOrdinal) {
+ slideDirRef.current = chapterOrdinal > prevOrdinalRef.current ? 1 : -1;
+ prevOrdinalRef.current = chapterOrdinal;
+ }
+ const slideDir = slideDirRef.current;
+ const noAnim = useOnboardingStore((s) => s.disableAnimation);
+
+
  // Split tokens into sentences. A sentence breaks on 。！？ OR on a newline
  // (newlines in source are authoritative paragraph hints from the book).
  // We strip pure-newline tokens so they never render visually, but record a
@@ -591,6 +615,11 @@ export default function Reader() {
   useEffect(() => {
     restoredScroll.current = false;
     currentSentenceRef.current = null;
+    // The reader chrome stays mounted across chapter changes, so reset the
+    // scroll ourselves; the restore effect below re-adjusts when resuming.
+    window.scrollTo(0, 0);
+    
+
     
     if (id) {
       // Always hydrate using the ROOT book ID to ensure we hit the correct shard
@@ -1365,6 +1394,36 @@ export default function Reader() {
 
 
  <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+ <AnimatePresence mode="wait" initial={false}>
+ {tokensLoading ? (
+ <motion.div
+ key="reader-skeleton"
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ duration: noAnim ? 0 : 0.18 }}
+ className="px-6 py-8 sm:px-12 sm:py-12"
+ aria-hidden
+ >
+ <div className="space-y-5" style={{ lineHeight: showFurigana ? 2.6 : 2 }}>
+ {[0.96, 0.88, 0.93, 0.72, 0.9, 0.85, 0.6].map((w, i) => (
+ <div
+ key={i}
+ className="h-4 rounded-full bg-muted/60 animate-soft-pulse"
+ style={{ width: `${w * 100}%`, animationDelay: `${i * 90}ms` }}
+ />
+ ))}
+ </div>
+ </motion.div>
+ ) : (
+ <motion.div
+ key={`${chapterId}-${difficulty}`}
+ initial={noAnim ? false : { opacity: 0, x: slideDir * 18 }}
+ animate={{ opacity: 1, x: 0 }}
+ exit={noAnim ? { opacity: 0 } : { opacity: 0, x: slideDir * -18 }}
+ transition={{ duration: noAnim ? 0 : 0.26, ease: [0.22, 1, 0.36, 1] }}
+ >
+
 
  {(() => {
  const isFirstChapter = book.chapters && book.chapters.length > 1
@@ -1600,7 +1659,11 @@ export default function Reader() {
  ))}
  </div>
  </div>
+ </motion.div>
+ )}
+ </AnimatePresence>
  </article>
+
 
   {hasParts(book) && partIdx !== null && book.anchors && (
     <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">

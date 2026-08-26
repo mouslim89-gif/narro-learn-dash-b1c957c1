@@ -110,13 +110,16 @@ function AnimatedRoutes() {
 
  const hideNav = isDetailRoute || isReviewing || isAuthRoute || isLegalRoute;
  const shouldWaitForPageTransition = !loading && !!user && !isAuthRoute;
+ // Reader chapter/difficulty changes must not remount (and cross-fade) the whole
+ // page: key those routes on the book id so only the article animates.
+ const routeKey = path.startsWith('/reader/') ? `/reader/${path.split('/')[2] ?? ''}` : path;
 
  return (
  <>
  <div className="relative">
  <AnimatePresence mode={shouldWaitForPageTransition ?"wait":"popLayout"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
  <motion.div
- key={location.pathname}
+ key={routeKey}
  variants={pageVariants}
  initial="initial"
  animate="animate"

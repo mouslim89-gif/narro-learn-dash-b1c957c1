@@ -123,36 +123,47 @@ export function WordMiniPopup({
  const GAP = 6;
  const BOTTOM_RESERVE = 88;
 
- // Center horizontally on sentence, clamp to viewport
- const sentenceCenter = (sentenceRect.left + sentenceRect.right) / 2;
- let left = sentenceCenter - rect.width / 2;
- left = Math.max(PADDING, Math.min(left, vw - rect.width - PADDING));
+ // Safe-area insets (native shell / notched devices), measured once per layout.
+ const readInset = (side: 'top' | 'bottom') => {
+ const probe = document.createElement('div');
+ probe.style.cssText = `position:fixed;visibility:hidden;pointer-events:none;padding-${side}:env(safe-area-inset-${side})`;
+ document.body.appendChild(probe);
+ const n = parseFloat(getComputedStyle(probe)[side === 'top' ? 'paddingTop' : 'paddingBottom']);
+ probe.remove();
+ return Number.isFinite(n) ? n : 0;
+ };
+ const insetTop = readInset('top');
+ const insetBottom = readInset('bottom');
 
- // Prefer above the sentence
- let placement:'above'|'below'='above';
- let top = sentenceRect.top - rect.height - GAP;
- if (top < PADDING + 56) {
- // Not enough room above, place below
- placement ='below';
- top = sentenceRect.bottom + GAP;
- }
- const bottomLimit = vh - BOTTOM_RESERVE;
- if (top + rect.height > bottomLimit) {
- if (placement ==='below') {
- const above = sentenceRect.top - rect.height - GAP;
- if (above >= PADDING + 56) {
- placement ='above';
- top = above;
- } else {
- top = Math.max(PADDING + 56, bottomLimit - rect.height);
- }
- } else {
- top = Math.max(PADDING + 56, bottomLimit - rect.height);
- }
- }
+ const topLimit = PADDING + 56 + insetTop;
+ const bottomLimit = vh - BOTTOM_RESERVE - insetBottom;
+
+ // Center horizontally on the sentence, then nudge fully inside the viewport.
+ const sentenceCenter = (sentenceRect.left + sentenceRect.right) / 2;
+ const maxLeft = Math.max(PADDING, vw - rect.width - PADDING);
+ let left = sentenceCenter - rect.width / 2;
+ left = Math.max(PADDING, Math.min(left, maxLeft));
+
+ // Pick the side with the most room, preferring above when both fit.
+ const roomAbove = sentenceRect.top - GAP - topLimit;
+ const roomBelow = bottomLimit - (sentenceRect.bottom + GAP);
+
+ let placement: 'above' | 'below';
+ if (rect.height <= roomAbove) placement = 'above';
+ else if (rect.height <= roomBelow) placement = 'below';
+ else placement = roomAbove >= roomBelow ? 'above' : 'below';
+
+ let top = placement === 'above'
+ ? sentenceRect.top - rect.height - GAP
+ : sentenceRect.bottom + GAP;
+
+ // Final clamp so the popup is never clipped by either edge.
+ top = Math.min(top, bottomLimit - rect.height);
+ top = Math.max(topLimit, top);
 
  setPosition({ top, left, placement });
  }, [sentenceRect, loading, result]);
+
 
  // Close on click outside
  useEffect(() => {
