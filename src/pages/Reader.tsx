@@ -615,6 +615,11 @@ export default function Reader() {
   useEffect(() => {
     restoredScroll.current = false;
     currentSentenceRef.current = null;
+    // The reader chrome stays mounted across chapter changes, so reset the
+    // scroll ourselves; the restore effect below re-adjusts when resuming.
+    window.scrollTo(0, 0);
+    
+
     
     if (id) {
       // Always hydrate using the ROOT book ID to ensure we hit the correct shard
