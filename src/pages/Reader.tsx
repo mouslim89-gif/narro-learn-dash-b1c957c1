@@ -1659,7 +1659,11 @@ export default function Reader() {
  ))}
  </div>
  </div>
+ </motion.div>
+ )}
+ </AnimatePresence>
  </article>
+
 
   {hasParts(book) && partIdx !== null && book.anchors && (
     <nav key={`nav-${id}-${chapterId}`} className="mx-4 mb-10 mt-2 flex items-center justify-between gap-3 animate-fade-in-soft sm:mx-auto sm:max-w-2xl">
