@@ -1,31 +1,41 @@
-# Native polish: infinite scroll, safe area, no bounce/zoom/scrollbar
+# Reader gesture & navigation polish
 
-## 1. Dictionary: auto-load instead of "Load more"
+Make the core reading experience feel more like a native e-reader: move between chapters and positions with fewer taps and no buried menus.
 
-Replace the "Load more" button with an IntersectionObserver sentinel at the end of the list. When the sentinel enters the viewport (with a ~400px root margin), `visibleCount` grows by 10. Same behaviour for both Words and Grammar tabs. A small spinner row shows while more items remain; nothing shows once the list is exhausted. `visibleCount` still resets to 10 on a new query, tab change or JLPT filter change.
+## 1. Swipe between chapters / parts
 
-## 2. Too much scroll at the bottom (native)
+Add horizontal swipe gestures to the reader article to jump to the next or previous chapter (or part). Only the article area responds, so vertical scrolling is unaffected.
 
-The page wrapper in `App.tsx` uses `min-h-screen` (`100vh`) while pages also add their own bottom padding (`pb-24`), so every page is at least one full viewport tall plus the padding, which creates dead scroll space. On native, `100vh` also ignores the status/navigation bar insets, adding more.
+- Swipe left → next chapter/part (if one exists).
+- Swipe right → previous chapter/part (if one exists).
+- Use a small threshold and a short haptic-style visual nudge at the edge when there is no next/previous chapter.
+- Keep the existing bottom part-navigation buttons for discoverability; the swipe is an additional shortcut.
 
-Fix: switch the route wrapper to `min-h-[100dvh]` and let page padding account for the bottom nav plus `env(safe-area-inset-bottom)`, so short pages no longer scroll at all.
+## 2. Tap/drag the progress bar to jump
 
-## 3. No rubber-band / stretch overscroll
+The thin top progress bar currently only displays scroll position. Make it interactive:
 
-- Add `overscroll-behavior: none` on `html, body` (kills the iOS bounce and the Android stretch/glow inside the WebView).
-- Add `overscroll-behavior: contain` on the scrollable horizontal rails so a sideways flick never chains to the page.
+- Tap anywhere on the bar to jump to that percentage of the article.
+- Drag to scrub; the current percentage updates live under the finger and the page scrolls on release.
+- Add a small touch target (at least 24px high) so it is easy to hit on mobile.
 
-## 4. No scrollbar, no zoom (native and mobile web)
+## 3. Bottom chapter dots for multi-chapter books
 
-- Hide scrollbars globally: `::-webkit-scrollbar { display: none }` on `html, body` plus `scrollbar-width: none`. The existing `.no-scrollbar` utility stays for rails.
-- Block pinch/double-tap zoom: add `maximum-scale=1, user-scalable=no` to the viewport meta and `touch-action: pan-x pan-y` on `body`. The reader keeps its own touch handling untouched.
+For books with more than one chapter or part, show a compact row of dots above the article (or just below it) so users can see where they are and jump quickly.
 
-## 5. Top of the app behind the status bar
+- Each dot represents one chapter/part.
+- The active dot is filled with the book cover color.
+- Tapping a dot jumps to that chapter/part.
+- Hide on single-chapter books so the UI stays clean.
 
-The sticky page headers use a hard-coded `40px` / `48px` top padding, which sits under the status bar on device. Each of them (Library, Dictionary, Cards, My Books, Settings) gets `env(safe-area-inset-top)` added to the base padding, keeping the existing scroll-collapse maths (`--p`) intact. Book Detail's fixed back button and the Reader chrome already use `max(..., env(safe-area-inset-top))` and stay as is.
+## 4. Safer mini-popup positioning
 
-Also set the Android status bar to non-overlaying so the WebView starts below it, and keep the theme-colour sync already in `src/lib/native.ts`.
+The word mini popup is positioned relative to the sentence rect. On small screens or near edges it can be clipped. Improve the layout calculation so it always flips above/below and nudges left/right to stay fully inside the viewport, including the safe-area insets.
 
 ## Technical notes
 
-Files touched: `src/pages/Dictionary.tsx`, `src/App.tsx`, `src/index.css`, `index.html`, `src/lib/native.ts`, and the top-padding line of `Library.tsx`, `Flashcards.tsx`, `MyBooks.tsx`, `Settings.tsx`. No backend or business-logic change.
+- Files touched: `src/pages/Reader.tsx`, `src/components/WordMiniPopup.tsx`, `src/index.css` (only if a new swipe indicator style is needed).
+- Use native touch events on the article wrapper for swipe detection; do not add a gesture library.
+- Keep the existing `goTo` delayed navigation helper for chapter transitions.
+- Progress scrubbing uses the article's `scrollHeight` and `scrollTop`; suppress auto-save while scrubbing so the saved progress does not flicker.
+- No backend or schema changes; this is a pure frontend UX improvement.
