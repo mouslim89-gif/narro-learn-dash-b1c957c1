@@ -403,6 +403,28 @@ export default function Reader() {
  return stripParens(getChapterContent(book, chapterId, difficulty));
  }, [book, chapterId, difficulty]);
 
+ // Direction-aware chapter transitions: compare the ordinal of the chapter we
+ // leave with the one we enter, so the text slides the way the reader moves.
+ const chapterOrdinal = useMemo(() => {
+ if (!book) return 0;
+ if (partIdx !== null) return partIdx;
+ if (book.chapters && book.chapters.length > 1) {
+ const i = book.chapters.findIndex((c) => c.id === chapterId);
+ return i < 0 ? 0 : i;
+ }
+ return 0;
+ }, [book, chapterId, partIdx]);
+
+ const prevOrdinalRef = useRef(chapterOrdinal);
+ const slideDirRef = useRef(1);
+ if (prevOrdinalRef.current !== chapterOrdinal) {
+ slideDirRef.current = chapterOrdinal > prevOrdinalRef.current ? 1 : -1;
+ prevOrdinalRef.current = chapterOrdinal;
+ }
+ const slideDir = slideDirRef.current;
+ const noAnim = useOnboardingStore((s) => s.disableAnimation);
+
+
  // Split tokens into sentences. A sentence breaks on 。！？ OR on a newline
  // (newlines in source are authoritative paragraph hints from the book).
  // We strip pure-newline tokens so they never render visually, but record a
