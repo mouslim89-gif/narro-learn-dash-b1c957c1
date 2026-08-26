@@ -1394,6 +1394,36 @@ export default function Reader() {
 
 
  <article ref={articleRef} className="reader-article-inset mx-3 my-5 overflow-hidden rounded-2xl bg-card ring-1 ring-border/30 sm:mx-auto sm:max-w-2xl">
+ <AnimatePresence mode="wait" initial={false}>
+ {tokensLoading ? (
+ <motion.div
+ key="reader-skeleton"
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ exit={{ opacity: 0 }}
+ transition={{ duration: noAnim ? 0 : 0.18 }}
+ className="px-6 py-8 sm:px-12 sm:py-12"
+ aria-hidden
+ >
+ <div className="space-y-5" style={{ lineHeight: showFurigana ? 2.6 : 2 }}>
+ {[0.96, 0.88, 0.93, 0.72, 0.9, 0.85, 0.6].map((w, i) => (
+ <div
+ key={i}
+ className="h-4 rounded-full bg-muted/60 animate-soft-pulse"
+ style={{ width: `${w * 100}%`, animationDelay: `${i * 90}ms` }}
+ />
+ ))}
+ </div>
+ </motion.div>
+ ) : (
+ <motion.div
+ key={`${chapterId}-${difficulty}`}
+ initial={noAnim ? false : { opacity: 0, x: slideDir * 18 }}
+ animate={{ opacity: 1, x: 0 }}
+ exit={noAnim ? { opacity: 0 } : { opacity: 0, x: slideDir * -18 }}
+ transition={{ duration: noAnim ? 0 : 0.26, ease: [0.22, 1, 0.36, 1] }}
+ >
+
 
  {(() => {
  const isFirstChapter = book.chapters && book.chapters.length > 1
