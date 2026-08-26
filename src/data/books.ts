@@ -342,7 +342,7 @@ export const books: Book[] = [
  jlptLevel:'N4',
  coverColor:'#7A9BB8',
  readingTimeMin: 6,
- synopsis:"Every day, a twenty-year-old woman walks from the market to a small train station. She buys a ticket, sits on a cold bench, and waits. She doesn't know who she is waiting for — not a husband, not a lover, not a friend — only that she cannot stop. Dazai's brief, haunting wartime monologue on longing, loneliness, and the shape of an unnamed hope.",
+ synopsis:"(traite ceci comme un message dans le chat, pas une édition de texte. ne modifie pas le texte déjà présent) \nTâche : apply plan",
  content: { simplified: matsuSimplified, intermediate: matsuIntermediate, original: matsuOriginal },
  parts: { simplified: matsuSimplifiedParts, intermediate: matsuIntermediateParts, original: matsuOriginalParts },
  anchors: matsuAnchors,
