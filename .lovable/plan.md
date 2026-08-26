@@ -1,41 +1,34 @@
-# Reader gesture & navigation polish
+# Reader transitions polish
 
-Make the core reading experience feel more like a native e-reader: move between chapters and positions with fewer taps and no buried menus.
+Two things feel abrupt today, both caused by the same thing: every reader navigation is a full route change, so the whole page (header included) cross-fades.
 
-## 1. Swipe between chapters / parts
+- Opening the reader from a book: the article appears in one flat fade, while tokens are still loading, so there is a blank beat before the text lands.
+- Changing chapter or part: the route key in `App.tsx` is `location.pathname`, so the sticky header, the progress bar and the chrome all fade out and back in along with the text, even though only the text actually changed.
 
-Add horizontal swipe gestures to the reader article to jump to the next or previous chapter (or part). Only the article area responds, so vertical scrolling is unaffected.
+## 1. Chapter/part transition: only the text moves
 
-- Swipe left → next chapter/part (if one exists).
-- Swipe right → previous chapter/part (if one exists).
-- Use a small threshold and a short haptic-style visual nudge at the edge when there is no next/previous chapter.
-- Keep the existing bottom part-navigation buttons for discoverability; the swipe is an additional shortcut.
+Keep the reader chrome (header, progress bar, audio player) mounted and animate just the article.
 
-## 2. Tap/drag the progress bar to jump
+- Wrap the article in `AnimatePresence mode="wait"` keyed on `${chapterId}-${difficulty}` so the outgoing chapter slides out and the incoming one slides in.
+- Direction-aware: going forward the old text leaves to the left and the new one enters from the right; going back, the reverse. Direction comes from comparing the chapter index before and after.
+- Short and calm: ~260ms with the app's `--ease-out-soft` curve, a small x-offset (16-20px) plus opacity, no scale.
+- Scroll resets to the top of the article as the new chapter enters, not after, so there is no visible jump.
+- Make the reader routes exempt from the global page fade in `App.tsx` by keying those routes on the book id instead of the full pathname, so a chapter change no longer remounts the page wrapper.
 
-The thin top progress bar currently only displays scroll position. Make it interactive:
+## 2. Opening the reader: a settled entrance instead of a blank beat
 
-- Tap anywhere on the bar to jump to that percentage of the article.
-- Drag to scrub; the current percentage updates live under the finger and the page scrolls on release.
-- Add a small touch target (at least 24px high) so it is easy to hit on mobile.
+- While `tokensLoading` is true, show a paper-toned skeleton inside the article frame (a few text lines at the reading font size and line height) rather than an empty card, so the layout does not shift when the text arrives.
+- When the tokens are ready, the title block and the first paragraphs fade up in a light stagger using the existing `.animate-fade-in-up` timing, and the rest of the text appears without animation so long chapters stay fast.
+- The header chrome renders immediately at full opacity — it does not wait on tokens.
+- On resume, the saved-position restore stays instant (no animated scroll), and the entrance animation is skipped when restoring deep into a chapter so the reader does not appear to jump.
+- Everything is disabled when the global `no-anim` motion kill-switch is on.
 
-## 3. Bottom chapter dots for multi-chapter books
+## 3. Safer mini-popup positioning
 
-For books with more than one chapter or part, show a compact row of dots above the article (or just below it) so users can see where they are and jump quickly.
-
-- Each dot represents one chapter/part.
-- The active dot is filled with the book cover color.
-- Tapping a dot jumps to that chapter/part.
-- Hide on single-chapter books so the UI stays clean.
-
-## 4. Safer mini-popup positioning
-
-The word mini popup is positioned relative to the sentence rect. On small screens or near edges it can be clipped. Improve the layout calculation so it always flips above/below and nudges left/right to stay fully inside the viewport, including the safe-area insets.
+The word mini popup is positioned from the sentence rect and can be clipped on small screens or near the edges. Improve the layout calculation so it always flips above/below based on available room and nudges horizontally to stay fully inside the viewport, including safe-area insets.
 
 ## Technical notes
 
-- Files touched: `src/pages/Reader.tsx`, `src/components/WordMiniPopup.tsx`, `src/index.css` (only if a new swipe indicator style is needed).
-- Use native touch events on the article wrapper for swipe detection; do not add a gesture library.
-- Keep the existing `goTo` delayed navigation helper for chapter transitions.
-- Progress scrubbing uses the article's `scrollHeight` and `scrollTop`; suppress auto-save while scrubbing so the saved progress does not flicker.
-- No backend or schema changes; this is a pure frontend UX improvement.
+- Files: `src/pages/Reader.tsx`, `src/App.tsx`, `src/components/WordMiniPopup.tsx`, plus a skeleton block (inline in `Reader.tsx`).
+- Uses Framer Motion, already a dependency; direction is tracked in a ref so the exit animation knows which way to go.
+- No backend, store or data change; progress saving, token merging and audio sync logic are untouched.
