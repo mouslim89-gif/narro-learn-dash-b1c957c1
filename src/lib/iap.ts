@@ -1,7 +1,21 @@
-// Thin bridge to native in-app purchases.
-// Purchases only happen inside the native shell (App Store / Google Play).
-// In a browser this resolves with `unavailable`, and the paywall says so.
-// When the native wrapper is added, it only has to expose window.Tsundoku.iap.
+/**
+ * Native in-app purchase bridge.
+ *
+ * Uses capacitor-plugin-cdv-purchase for Apple App Store / Google Play.
+ * The browser build has no store, so purchases return "unavailable".
+ *
+ * Server-side verification goes through the "verify-purchase" Supabase
+ * edge function; the client never writes entitlements directly.
+ */
+import { Capacitor } from '@capacitor/core';
+import {
+  store,
+  ProductType,
+  Platform,
+  ErrorCode,
+  type CdvPurchase,
+} from 'capacitor-plugin-cdv-purchase';
+import { supabase } from '@/integrations/supabase/client';
 
 export type PlanId = 'monthly' | 'yearly' | 'lifetime';
 
@@ -18,69 +32,180 @@ export interface NativePurchase {
   purchaseToken?: string;
 }
 
-interface NativeIap {
-  purchase(productId: string): Promise<NativePurchase>;
-  restore(): Promise<NativePurchase[]>;
-  manageSubscriptions?(): Promise<void>;
-}
-
-declare global {
-  interface Window {
-    Tsundoku?: { iap?: NativeIap };
-  }
-}
-
-export function getNativeIap(): NativeIap | null {
-  if (typeof window === 'undefined') return null;
-  return window.Tsundoku?.iap ?? null;
-}
-
-export function isIapAvailable(): boolean {
-  return getNativeIap() !== null;
-}
-
 export type PurchaseOutcome =
   | { kind: 'purchased'; purchases: NativePurchase[] }
   | { kind: 'cancelled' }
   | { kind: 'unavailable' }
   | { kind: 'error'; message: string };
 
-export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
-  const iap = getNativeIap();
-  if (!iap) return { kind: 'unavailable' };
+let initPromise: Promise<void> | null = null;
+let initStarted = false;
+let storeReady = false;
+
+function isNative(): boolean {
+  return Capacitor.isNativePlatform();
+}
+
+function currentPlatformName(): 'ios' | 'android' | null {
+  if (!isNative()) return null;
+  const p = Capacitor.getPlatform();
+  if (p === 'ios') return 'ios';
+  if (p === 'android') return 'android';
+  return null;
+}
+
+function currentPlatformConstant(): Platform | null {
+  const p = currentPlatformName();
+  if (p === 'ios') return Platform.APPLE_APPSTORE;
+  if (p === 'android') return Platform.GOOGLE_PLAY;
+  return null;
+}
+
+function planIdFromProductId(id: string): PlanId | null {
+  for (const key of Object.keys(PRODUCT_IDS) as PlanId[]) {
+    if (PRODUCT_IDS[key] === id) return key;
+  }
+  return null;
+}
+
+/**
+ * Custom validator: forwards the plugin's receipt validation payload to our
+ * "verify-purchase" edge function with the user's auth token attached.
+ */
+async function validator(
+  request: CdvPurchase.Validator.Request.Body,
+  callback: CdvPurchase.Callback<CdvPurchase.Validator.Response.Payload>,
+) {
   try {
-    const purchase = await iap.purchase(PRODUCT_IDS[plan]);
-    if (!purchase) return { kind: 'cancelled' };
-    return { kind: 'purchased', purchases: [purchase] };
+    const { data, error } = await supabase.functions.invoke('verify-purchase', {
+      body: request,
+    });
+    if (error || !data || typeof data !== 'object') {
+      callback({ ok: false, message: error?.message ?? 'verification_failed' });
+      return;
+    }
+    callback(data as CdvPurchase.Validator.Response.Payload);
   } catch (err: any) {
-    if (err?.code === 'cancelled' || /cancel/i.test(err?.message ?? '')) return { kind: 'cancelled' };
+    callback({ ok: false, message: err?.message ?? 'verification_failed' });
+  }
+}
+
+/**
+ * Initialize the native store once.
+ * Safe to call multiple times; the second call is a no-op.
+ */
+export async function initIap(): Promise<void> {
+  if (!isNative()) return;
+  if (initStarted) return initPromise ?? Promise.resolve();
+  initStarted = true;
+
+  initPromise = (async () => {
+    const platform = currentPlatformConstant();
+    if (!platform) return;
+
+    store.validator = validator as any;
+
+    store.register(
+      (Object.values(PRODUCT_IDS) as string[]).map((id) => ({
+        id,
+        platform,
+        type: id === PRODUCT_IDS.lifetime
+          ? ProductType.NON_CONSUMABLE
+          : ProductType.PAID_SUBSCRIPTION,
+      })),
+    );
+
+    store.when()
+      .approved((transaction) => transaction.verify())
+      .verified((receipt) => receipt.finish());
+
+    await store.initialize([
+      {
+        platform,
+        options: {
+          needAppReceipt: platform === Platform.APPLE_APPSTORE,
+        },
+      },
+    ]);
+
+    storeReady = true;
+  })();
+
+  return initPromise;
+}
+
+export function isIapAvailable(): boolean {
+  return isNative();
+}
+
+export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
+  if (!isNative()) {
+    return { kind: 'unavailable' };
+  }
+
+  try {
+    await initIap();
+    const product = store.get(PRODUCT_IDS[plan]);
+    if (!product) {
+      return { kind: 'error', message: 'Product not found in the store.' };
+    }
+
+    const offer = product.getOffer();
+    if (!offer) {
+      return { kind: 'error', message: 'No offer available for this product.' };
+    }
+
+    const error = await offer.order();
+    if (error) {
+      if (error.code === ErrorCode.PAYMENT_CANCELLED) {
+        return { kind: 'cancelled' };
+      }
+      return { kind: 'error', message: error.message || 'Purchase failed' };
+    }
+
+    const platform = currentPlatformName();
+    return {
+      kind: 'purchased',
+      purchases: platform ? [{ platform, productId: PRODUCT_IDS[plan] }] : [],
+    };
+  } catch (err: any) {
+    if (/cancel/i.test(err?.message ?? '')) return { kind: 'cancelled' };
     return { kind: 'error', message: err?.message ?? 'Purchase failed' };
   }
 }
 
 export async function restorePurchases(): Promise<PurchaseOutcome> {
-  const iap = getNativeIap();
-  if (!iap) return { kind: 'unavailable' };
+  if (!isNative()) {
+    return { kind: 'unavailable' };
+  }
+
   try {
-    const purchases = await iap.restore();
-    return { kind: 'purchased', purchases: purchases ?? [] };
+    await initIap();
+    await store.restorePurchases();
+    const platform = currentPlatformName();
+    const purchases: NativePurchase[] = platform
+      ? (Object.values(PRODUCT_IDS) as string[])
+          .filter((id) => store.owned(id))
+          .map((id) => ({ platform, productId: id }))
+      : [];
+
+    if (purchases.length === 0) {
+      return { kind: 'error', message: 'No previous purchases found for this account.' };
+    }
+    return { kind: 'purchased', purchases };
   } catch (err: any) {
-    return { kind: 'error', message: err?.message ?? 'Restore failed' };
+    return { kind: 'error', message: err?.message ?? 'Could not restore purchases' };
   }
 }
 
-/** Opens the platform subscription management screen. */
-export async function openManageSubscriptions() {
-  const iap = getNativeIap();
-  if (iap?.manageSubscriptions) {
-    await iap.manageSubscriptions();
-    return;
+/**
+ * Returns the currently owned plan, or null. Useful on cold start when a
+ * verified subscription is already present.
+ */
+export function ownedPlanId(): PlanId | null {
+  if (!isNative() || !storeReady) return null;
+  for (const plan of Object.keys(PRODUCT_IDS) as PlanId[]) {
+    if (store.owned(PRODUCT_IDS[plan])) return plan;
   }
-  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  window.open(
-    isIos
-      ? 'https://apps.apple.com/account/subscriptions'
-      : 'https://play.google.com/store/account/subscriptions',
-    '_blank',
-  );
+  return null;
 }
