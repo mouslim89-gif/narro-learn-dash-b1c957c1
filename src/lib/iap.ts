@@ -8,8 +8,13 @@
  * edge function; the client never writes entitlements directly.
  */
 import { Capacitor } from '@capacitor/core';
-import { store, ProductType, Platform } from 'capacitor-plugin-cdv-purchase';
-import type { CdvPurchase } from 'capacitor-plugin-cdv-purchase';
+import {
+  store,
+  ProductType,
+  Platform,
+  ErrorCode,
+  type CdvPurchase,
+} from 'capacitor-plugin-cdv-purchase';
 
 export type PlanId = 'monthly' | 'yearly' | 'lifetime';
 
@@ -32,7 +37,7 @@ export type PurchaseOutcome =
   | { kind: 'unavailable' }
   | { kind: 'error'; message: string };
 
-let storeReady = false;
+let initPromise: Promise<void> | null = null;
 let initStarted = false;
 
 function isNative(): boolean {
@@ -44,6 +49,13 @@ function platformName(): 'ios' | 'android' | null {
   const p = Capacitor.getPlatform();
   if (p === 'ios') return 'ios';
   if (p === 'android') return 'android';
+  return null;
+}
+
+function platformConstant(): Platform | null {
+  const p = platformName();
+  if (p === 'ios') return Platform.APPLE_APPSTORE;
+  if (p === 'android') return Platform.GOOGLE_PLAY;
   return null;
 }
 
@@ -59,17 +71,20 @@ function nativePurchaseFromTransaction(
 ): NativePurchase | null {
   const platform = platformName();
   if (!platform) return null;
+
   const productId = tx.products[0]?.id ?? '';
-  return {
-    platform,
-    productId,
-    receipt: tx.platform === Platform.APPLE_APPSTORE
-      ? (tx.nativeTransaction as any)?.transactionReceipt as string | undefined
-      : undefined,
-    purchaseToken: tx.platform === Platform.GOOGLE_PLAY
-      ? (tx.nativeTransaction as any)?.purchaseToken as string | undefined
-      : undefined,
-  };
+  let receipt: string | undefined;
+  let purchaseToken: string | undefined;
+
+  const native = tx.nativeTransaction as any;
+  if (tx.platform === Platform.APPLE_APPSTORE) {
+    receipt = native?.transactionReceipt as string | undefined;
+  } else if (tx.platform === Platform.GOOGLE_PLAY) {
+    purchaseToken = native?.purchaseToken as string | undefined;
+    receipt = native?.receipt as string | undefined;
+  }
+
+  return { platform, productId, receipt, purchaseToken };
 }
 
 /**
@@ -78,43 +93,39 @@ function nativePurchaseFromTransaction(
  */
 export async function initIap(): Promise<void> {
   if (!isNative()) return;
-  if (initStarted) return;
+  if (initStarted) return initPromise ?? Promise.resolve();
   initStarted = true;
 
-  const platform =
-    Capacitor.getPlatform() === 'ios' ? Platform.APPLE_APPSTORE : Platform.GOOGLE_PLAY;
+  initPromise = (async () => {
+    const platform = platformConstant();
+    if (!platform) return;
 
-  store.register(
-    (Object.values(PRODUCT_IDS) as string[]).map((id) => ({
-      id,
-      platform,
-      type: id === PRODUCT_IDS.lifetime
-        ? ProductType.NON_CONSUMABLE
-        : ProductType.PAID_SUBSCRIPTION,
-    })),
-  );
+    store.register(
+      (Object.values(PRODUCT_IDS) as string[]).map((id) => ({
+        id,
+        platform,
+        type: id === PRODUCT_IDS.lifetime
+          ? ProductType.NON_CONSUMABLE
+          : ProductType.PAID_SUBSCRIPTION,
+      })),
+    );
 
-  store.when()
-    .approved((transaction) => {
-      transaction.verify();
-    })
-    .verified((receipt) => {
-      receipt.finish();
-    })
-    .unverified((receipt) => {
-      console.warn('[IAP] unverified receipt', receipt);
+    // Finish transactions immediately; Premium.tsx calls verify-purchase itself.
+    store.when().approved((transaction) => {
+      transaction.finish();
     });
 
-  await store.initialize([
-    {
-      platform,
-      options: {
-        needAppReceipt: platform === Platform.APPLE_APPSTORE,
+    await store.initialize([
+      {
+        platform,
+        options: {
+          needAppReceipt: platform === Platform.APPLE_APPSTORE,
+        },
       },
-    },
-  ]);
+    ]);
+  })();
 
-  storeReady = true;
+  return initPromise;
 }
 
 export function isIapAvailable(): boolean {
@@ -138,18 +149,23 @@ export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
       return { kind: 'error', message: 'No offer available for this product.' };
     }
 
+    const productId = PRODUCT_IDS[plan];
+    const purchasePromise = waitForApprovedTransaction(productId, 60_000);
+
     const error = await offer.order();
     if (error) {
-      if (error.code === CdvPurchase.ErrorCode.PAYMENT_CANCELLED) {
+      if (error.code === ErrorCode.PAYMENT_CANCELLED) {
         return { kind: 'cancelled' };
       }
       return { kind: 'error', message: error.message || 'Purchase failed' };
     }
 
-    // Wait a moment for the verified receipt to be processed, then collect owned purchases.
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    const purchases = collectOwnedPurchases();
-    return { kind: 'purchased', purchases };
+    const tx = await purchasePromise;
+    const purchase = nativePurchaseFromTransaction(tx);
+    if (!purchase) {
+      return { kind: 'error', message: 'Purchase completed but receipt was missing.' };
+    }
+    return { kind: 'purchased', purchases: [purchase] };
   } catch (err: any) {
     if (/cancel/i.test(err?.message ?? '')) return { kind: 'cancelled' };
     return { kind: 'error', message: err?.message ?? 'Purchase failed' };
@@ -165,8 +181,19 @@ export async function restorePurchases(): Promise<PurchaseOutcome> {
     await initIap();
     await store.restorePurchases();
     // Give the store a beat to surface restored receipts.
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    const purchases = collectOwnedPurchases();
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    const purchases: NativePurchase[] = [];
+    const seen = new Set<string>();
+
+    for (const tx of store.transactions) {
+      const purchase = nativePurchaseFromTransaction(tx);
+      if (purchase && !seen.has(purchase.productId)) {
+        seen.add(purchase.productId);
+        purchases.push(purchase);
+      }
+    }
+
     if (purchases.length === 0) {
       return { kind: 'error', message: 'No previous purchases found for this account.' };
     }
@@ -176,29 +203,36 @@ export async function restorePurchases(): Promise<PurchaseOutcome> {
   }
 }
 
-function collectOwnedPurchases(): NativePurchase[] {
-  const out: NativePurchase[] = [];
-  const seen = new Set<string>();
-  for (const id of Object.values(PRODUCT_IDS)) {
-    if (store.owned(id)) {
-      // We do not have a per-product receipt here; Premium.tsx sends the
-      // purchase info to verify-purchase which will re-verify server-side.
-      const platform = platformName();
-      if (platform && !seen.has(id)) {
-        seen.add(id);
-        out.push({ platform, productId: id });
+function waitForApprovedTransaction(
+  productId: string,
+  timeoutMs: number,
+): Promise<CdvPurchase.Transaction> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Purchase timed out'));
+    }, timeoutMs);
+
+    const handler = store.when().approved((transaction) => {
+      if (transaction.products.some((p) => p.id === productId)) {
+        cleanup();
+        resolve(transaction);
       }
+    });
+
+    function cleanup() {
+      clearTimeout(timer);
+      handler?.stop?.();
     }
-  }
-  return out;
+  });
 }
 
 /**
- * Returns the currently owned plan, or null. Useful when restoring without a
- * fresh purchase (the caller still calls verify-purchase).
+ * Returns the currently owned plan, or null. Useful on cold start when a
+ * verified subscription is already present.
  */
 export function ownedPlanId(): PlanId | null {
-  if (!isNative() || !storeReady) return null;
+  if (!isNative()) return null;
   for (const plan of Object.keys(PRODUCT_IDS) as PlanId[]) {
     if (store.owned(PRODUCT_IDS[plan])) return plan;
   }
