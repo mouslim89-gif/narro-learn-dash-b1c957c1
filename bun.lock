@@ -47,6 +47,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
+        "cordova-plugin-purchase": "^13.18.0",
         "date-fns": "^3.6.0",
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^11.0.0",
@@ -662,6 +663,8 @@
     "commander": ["commander@8.3.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/commander/-/commander-8.3.0.tgz", {}, "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww=="],
 
     "concat-map": ["concat-map@0.0.1", "", {}, "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="],
+
+    "cordova-plugin-purchase": ["cordova-plugin-purchase@13.18.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/cordova-plugin-purchase/-/cordova-plugin-purchase-13.18.0.tgz", {}, "sha512-1wDTQxBDS+JYwUN5+0Ivs8MjG2s5HXB4UXnm84pc/WGIdx/K0/fBme20l4C0H0102Iohwvuf77u8FkRXRJaPSA=="],
 
     "cross-spawn": ["cross-spawn@7.0.6", "", { "dependencies": { "path-key": "^3.1.0", "shebang-command": "^2.0.0", "which": "^2.0.1" } }, "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="],
 
