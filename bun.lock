@@ -44,10 +44,10 @@
         "@supabase/supabase-js": "^2.102.1",
         "@tanstack/react-query": "^5.83.0",
         "canvas-confetti": "^1.9.4",
+        "capacitor-plugin-cdv-purchase": "^13.18.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
-        "cordova-plugin-purchase": "^13.18.0",
         "date-fns": "^3.6.0",
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^11.0.0",
@@ -630,6 +630,8 @@
 
     "canvas-confetti": ["canvas-confetti@1.9.4", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/canvas-confetti/-/canvas-confetti-1.9.4.tgz", {}, "sha512-yxQbJkAVrFXWNbTUjPqjF7G+g6pDotOUHGbkZq2NELZUMDpiJ85rIEazVb8GTaAptNW2miJAXbs1BtioA251Pw=="],
 
+    "capacitor-plugin-cdv-purchase": ["capacitor-plugin-cdv-purchase@13.18.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/capacitor-plugin-cdv-purchase/-/capacitor-plugin-cdv-purchase-13.18.0.tgz", { "peerDependencies": { "@capacitor/core": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-9OJvDqI1voFv2dM7yE2Vmc/5cw1dLF6J3o32sFsfGytyxYNCAgJnff1vecOgTQFfyDm+BHVrb+eJQ0eX9OmSqg=="],
+
     "chai": ["chai@5.3.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/chai/-/chai-5.3.3.tgz", { "dependencies": { "assertion-error": "^2.0.1", "check-error": "^2.1.1", "deep-eql": "^5.0.1", "loupe": "^3.1.0", "pathval": "^2.0.0" } }, "sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw=="],
 
     "chalk": ["chalk@4.1.2", "", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }, "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="],
@@ -663,8 +665,6 @@
     "commander": ["commander@8.3.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/commander/-/commander-8.3.0.tgz", {}, "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww=="],
 
     "concat-map": ["concat-map@0.0.1", "", {}, "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="],
-
-    "cordova-plugin-purchase": ["cordova-plugin-purchase@13.18.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/cordova-plugin-purchase/-/cordova-plugin-purchase-13.18.0.tgz", {}, "sha512-1wDTQxBDS+JYwUN5+0Ivs8MjG2s5HXB4UXnm84pc/WGIdx/K0/fBme20l4C0H0102Iohwvuf77u8FkRXRJaPSA=="],
 
     "cross-spawn": ["cross-spawn@7.0.6", "", { "dependencies": { "path-key": "^3.1.0", "shebang-command": "^2.0.0", "which": "^2.0.1" } }, "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="],
 
