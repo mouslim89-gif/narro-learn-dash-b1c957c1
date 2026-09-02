@@ -15,6 +15,7 @@ import {
   ErrorCode,
   type CdvPurchase,
 } from 'capacitor-plugin-cdv-purchase';
+import { supabase } from '@/integrations/supabase/client';
 
 export type PlanId = 'monthly' | 'yearly' | 'lifetime';
 
@@ -39,12 +40,13 @@ export type PurchaseOutcome =
 
 let initPromise: Promise<void> | null = null;
 let initStarted = false;
+let storeReady = false;
 
 function isNative(): boolean {
   return Capacitor.isNativePlatform();
 }
 
-function platformName(): 'ios' | 'android' | null {
+function currentPlatformName(): 'ios' | 'android' | null {
   if (!isNative()) return null;
   const p = Capacitor.getPlatform();
   if (p === 'ios') return 'ios';
@@ -52,8 +54,8 @@ function platformName(): 'ios' | 'android' | null {
   return null;
 }
 
-function platformConstant(): Platform | null {
-  const p = platformName();
+function currentPlatformConstant(): Platform | null {
+  const p = currentPlatformName();
   if (p === 'ios') return Platform.APPLE_APPSTORE;
   if (p === 'android') return Platform.GOOGLE_PLAY;
   return null;
@@ -66,25 +68,26 @@ function planIdFromProductId(id: string): PlanId | null {
   return null;
 }
 
-function nativePurchaseFromTransaction(
-  tx: CdvPurchase.Transaction,
-): NativePurchase | null {
-  const platform = platformName();
-  if (!platform) return null;
-
-  const productId = tx.products[0]?.id ?? '';
-  let receipt: string | undefined;
-  let purchaseToken: string | undefined;
-
-  const native = tx.nativeTransaction as any;
-  if (tx.platform === Platform.APPLE_APPSTORE) {
-    receipt = native?.transactionReceipt as string | undefined;
-  } else if (tx.platform === Platform.GOOGLE_PLAY) {
-    purchaseToken = native?.purchaseToken as string | undefined;
-    receipt = native?.receipt as string | undefined;
+/**
+ * Custom validator: forwards the plugin's receipt validation payload to our
+ * "verify-purchase" edge function with the user's auth token attached.
+ */
+async function validator(
+  request: CdvPurchase.Validator.Request.Body,
+  callback: CdvPurchase.Callback<CdvPurchase.Validator.Response.Payload>,
+) {
+  try {
+    const { data, error } = await supabase.functions.invoke('verify-purchase', {
+      body: request,
+    });
+    if (error || !data || typeof data !== 'object') {
+      callback({ ok: false, message: error?.message ?? 'verification_failed' });
+      return;
+    }
+    callback(data as CdvPurchase.Validator.Response.Payload);
+  } catch (err: any) {
+    callback({ ok: false, message: err?.message ?? 'verification_failed' });
   }
-
-  return { platform, productId, receipt, purchaseToken };
 }
 
 /**
@@ -97,8 +100,10 @@ export async function initIap(): Promise<void> {
   initStarted = true;
 
   initPromise = (async () => {
-    const platform = platformConstant();
+    const platform = currentPlatformConstant();
     if (!platform) return;
+
+    store.validator = validator as any;
 
     store.register(
       (Object.values(PRODUCT_IDS) as string[]).map((id) => ({
@@ -110,10 +115,9 @@ export async function initIap(): Promise<void> {
       })),
     );
 
-    // Finish transactions immediately; Premium.tsx calls verify-purchase itself.
-    store.when().approved((transaction) => {
-      transaction.finish();
-    });
+    store.when()
+      .approved((transaction) => transaction.verify())
+      .verified((receipt) => receipt.finish());
 
     await store.initialize([
       {
@@ -123,6 +127,8 @@ export async function initIap(): Promise<void> {
         },
       },
     ]);
+
+    storeReady = true;
   })();
 
   return initPromise;
@@ -149,9 +155,6 @@ export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
       return { kind: 'error', message: 'No offer available for this product.' };
     }
 
-    const productId = PRODUCT_IDS[plan];
-    const purchasePromise = waitForApprovedTransaction(productId, 60_000);
-
     const error = await offer.order();
     if (error) {
       if (error.code === ErrorCode.PAYMENT_CANCELLED) {
@@ -160,12 +163,11 @@ export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
       return { kind: 'error', message: error.message || 'Purchase failed' };
     }
 
-    const tx = await purchasePromise;
-    const purchase = nativePurchaseFromTransaction(tx);
-    if (!purchase) {
-      return { kind: 'error', message: 'Purchase completed but receipt was missing.' };
-    }
-    return { kind: 'purchased', purchases: [purchase] };
+    const platform = currentPlatformName();
+    return {
+      kind: 'purchased',
+      purchases: platform ? [{ platform, productId: PRODUCT_IDS[plan] }] : [],
+    };
   } catch (err: any) {
     if (/cancel/i.test(err?.message ?? '')) return { kind: 'cancelled' };
     return { kind: 'error', message: err?.message ?? 'Purchase failed' };
@@ -180,19 +182,12 @@ export async function restorePurchases(): Promise<PurchaseOutcome> {
   try {
     await initIap();
     await store.restorePurchases();
-    // Give the store a beat to surface restored receipts.
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    const purchases: NativePurchase[] = [];
-    const seen = new Set<string>();
-
-    for (const tx of store.transactions) {
-      const purchase = nativePurchaseFromTransaction(tx);
-      if (purchase && !seen.has(purchase.productId)) {
-        seen.add(purchase.productId);
-        purchases.push(purchase);
-      }
-    }
+    const platform = currentPlatformName();
+    const purchases: NativePurchase[] = platform
+      ? (Object.values(PRODUCT_IDS) as string[])
+          .filter((id) => store.owned(id))
+          .map((id) => ({ platform, productId: id }))
+      : [];
 
     if (purchases.length === 0) {
       return { kind: 'error', message: 'No previous purchases found for this account.' };
@@ -203,36 +198,12 @@ export async function restorePurchases(): Promise<PurchaseOutcome> {
   }
 }
 
-function waitForApprovedTransaction(
-  productId: string,
-  timeoutMs: number,
-): Promise<CdvPurchase.Transaction> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error('Purchase timed out'));
-    }, timeoutMs);
-
-    const handler = store.when().approved((transaction) => {
-      if (transaction.products.some((p) => p.id === productId)) {
-        cleanup();
-        resolve(transaction);
-      }
-    });
-
-    function cleanup() {
-      clearTimeout(timer);
-      handler?.stop?.();
-    }
-  });
-}
-
 /**
  * Returns the currently owned plan, or null. Useful on cold start when a
  * verified subscription is already present.
  */
 export function ownedPlanId(): PlanId | null {
-  if (!isNative()) return null;
+  if (!isNative() || !storeReady) return null;
   for (const plan of Object.keys(PRODUCT_IDS) as PlanId[]) {
     if (store.owned(PRODUCT_IDS[plan])) return plan;
   }
