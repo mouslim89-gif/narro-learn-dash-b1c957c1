@@ -1,34 +1,69 @@
-# Reader transitions polish
+# Store-ready plan (Google Play + App Store)
 
-Two things feel abrupt today, both caused by the same thing: every reader navigation is a full route change, so the whole page (header included) cross-fades.
+Goal: get Tsundoku from "works in preview" to "submittable build with working paid subscriptions", then a polish pass. Adding more books is out of scope here.
 
-- Opening the reader from a book: the article appears in one flat fade, while tokens are still loading, so there is a blank beat before the text lands.
-- Changing chapter or part: the route key in `App.tsx` is `location.pathname`, so the sticky header, the progress bar and the chrome all fade out and back in along with the text, even though only the text actually changed.
+Current state: Capacitor 8 is installed and configured standalone (`webDir: dist`, no `server.url`), legal pages (`/terms`, `/privacy`, `/support`, `/credits`, `/account-deletion`) exist, `verify-purchase` edge function + `subscriptions` table + `use-premium` gating exist. What is missing is the actual native side.
 
-## 1. Chapter/part transition: only the text moves
+---
 
-Keep the reader chrome (header, progress bar, audio player) mounted and animate just the article.
+## Phase 1 — Blockers (nothing ships without these)
 
-- Wrap the article in `AnimatePresence mode="wait"` keyed on `${chapterId}-${difficulty}` so the outgoing chapter slides out and the incoming one slides in.
-- Direction-aware: going forward the old text leaves to the left and the new one enters from the right; going back, the reverse. Direction comes from comparing the chapter index before and after.
-- Short and calm: ~260ms with the app's `--ease-out-soft` curve, a small x-offset (16-20px) plus opacity, no scale.
-- Scroll resets to the top of the article as the new chapter enters, not after, so there is no visible jump.
-- Make the reader routes exempt from the global page fade in `App.tsx` by keying those routes on the book id instead of the full pathname, so a chapter change no longer remounts the page wrapper.
+### 1. Real in-app purchases
+Today `src/lib/iap.ts` talks to `window.Tsundoku.iap`, a bridge that does not exist. In a real build every purchase returns `unavailable`.
 
-## 2. Opening the reader: a settled entrance instead of a blank beat
+- Install a maintained Capacitor IAP plugin (`@capgo/capacitor-purchases` / RevenueCat, or `cordova-plugin-purchase` via Capacitor) and implement `iap.ts` against it instead of the fake `window` bridge. Keep the same `PurchaseOutcome` contract so `Premium.tsx` needs no change.
+- Keep server-side verification: purchase -> `verify-purchase` edge function -> `subscriptions` upsert (service role). The client must never write entitlements.
+- Add the required secrets: `APPLE_SHARED_SECRET`, Google Play service-account JSON (`GOOGLE_PLAY_SA_JSON`). Without them `verify-purchase` throws `not_configured`.
+- Implement **Restore purchases** end to end (Apple requires a visible restore button) and subscription-management deep links (Play/App Store manage URLs).
+- Create the three products in both consoles with the exact ids already in code: `tsundoku.premium.monthly`, `tsundoku.premium.yearly`, `tsundoku.premium.lifetime`.
+- Test with a Play internal-testing track licence tester and an App Store sandbox account.
 
-- While `tokensLoading` is true, show a paper-toned skeleton inside the article frame (a few text lines at the reading font size and line height) rather than an empty card, so the layout does not shift when the text arrives.
-- When the tokens are ready, the title block and the first paragraphs fade up in a light stagger using the existing `.animate-fade-in-up` timing, and the rest of the text appears without animation so long chapters stay fast.
-- The header chrome renders immediately at full opacity — it does not wait on tokens.
-- On resume, the saved-position restore stays instant (no animated scroll), and the entrance animation is skipped when restoring deep into a chapter so the reader does not appear to jump.
-- Everything is disabled when the global `no-anim` motion kill-switch is on.
+### 2. Remove debug/dev backdoors
+- `guest-bypass` in `localStorage` (`Auth.tsx` + `ProtectedRoute.tsx`) lets anyone skip login by editing storage — remove it, or gate it behind `import.meta.env.DEV`.
+- Audit admin toggles (replay onboarding, disable animation, token editing): they must be invisible unless `useIsAdmin()` returns true, never based on an email string in the client.
+- Remove any console noise and dev-only routes from the production build.
 
-## 3. Safer mini-popup positioning
+### 3. Native projects and assets
+- `npx cap add android` / `npx cap add ios` (currently neither folder exists).
+- Replace the placeholder `resources/icon.png` and `resources/splash.png` with the real branded artwork, then generate every density with `@capacitor/assets` (already a dependency).
+- Set version code/name, app display name, and the `com.tsundoku.app` bundle id in both native projects; create the signing keystore (Android) and the distribution certificate/provisioning profile (iOS).
+- Verify safe areas, status bar colour switching in dark mode, back-button behaviour on Android, and that the splash hides reliably (today it hides on a 500 ms timer — make it hide on first paint with a timeout fallback).
 
-The word mini popup is positioned from the sentence rect and can be clipped on small screens or near the edges. Improve the layout calculation so it always flips above/below based on available room and nudges horizontally to stay fully inside the viewport, including safe-area insets.
+### 4. Store compliance
+- Privacy policy and terms must be reachable from a public URL, not only inside the app — publish the web build and link `/privacy` and `/terms` from the store listings.
+- Fill Apple's Privacy Nutrition Labels and Google's Data Safety form: account email, reading progress, saved words — all tied to identity, no third-party ad tracking.
+- Account deletion must be reachable both in-app and from a public web URL (`/account-deletion`) — Apple and Google both require this.
+- Age rating, content rating questionnaire, export-compliance answer (HTTPS only = exempt), store screenshots for every required device size, and a short description.
+- Paywall must state price, period, auto-renewal and link to terms/privacy on the purchase screen itself.
+
+### 5. Backend hardening
+- Run the security scan and resolve every critical finding (RLS on `subscriptions`, `saved_grammar`, `user_token_rules`, `book_content_overrides`; confirm no table is writable by `anon`).
+- Confirm every edge function that writes to a cache table uses the service role, and that cached reads work for unauthenticated/offline-degraded cases.
+- Set a hard cap or rate limit on the AI-backed functions (`grammar-examples`, `tatoeba-example`, `translate-sentences-batch`) so a single user cannot burn credits.
+
+---
+
+## Phase 2 — Polish before submission
+
+- **Offline resilience**: the app ships all books and the dictionary shards in the bundle, but every network call must degrade gracefully. Add a lightweight offline banner and make grammar/example fetches fail silently to cached data.
+- **Error boundaries**: a top-level React error boundary with a "reload" action, so a crash never leaves a white screen in a native shell (a reviewer hitting a white screen = rejection).
+- **Cold-start perf**: measure the first paint on a mid-range Android; lazy-load the heaviest routes (Reader, Dictionary) and defer the dictionary preloader until after first interaction.
+- **Auth polish**: password reset deep link must work inside the native shell (custom scheme / universal link), and sign-in errors must be readable in English.
+- **QA sweep on device**: full pass through library -> book -> reader (all three difficulties, chapters, audio) -> word popup -> flashcards -> grammar -> premium paywall -> settings -> logout, on one Android phone and one iPhone.
+
+---
+
+## Phase 3 — Left to fix / nice to have (post-submission)
+
+- Push notifications for daily reviews (needs `@capacitor/push-notifications` and a scheduler).
+- Book download management if audio grows too large to bundle.
+- Analytics/crash reporting (Sentry or similar) to see real crashes after launch.
+- Onboarding conversion tuning once there are real users.
+
+---
 
 ## Technical notes
 
-- Files: `src/pages/Reader.tsx`, `src/App.tsx`, `src/components/WordMiniPopup.tsx`, plus a skeleton block (inline in `Reader.tsx`).
-- Uses Framer Motion, already a dependency; direction is tracked in a ref so the exit animation knows which way to go.
-- No backend, store or data change; progress saving, token merging and audio sync logic are untouched.
+- IAP is the only true code blocker; everything else is configuration, assets, or console work.
+- Nothing in Phase 1 changes the app's visual language or existing behaviour except removing the guest bypass.
+- Build command stays `bun run build` then `npx cap sync`, run from a local clone (native builds cannot run in Lovable).
