@@ -169,14 +169,11 @@ export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
       return { kind: 'error', message: error.message || 'Purchase failed' };
     }
 
-    const receipt = await verified.promise;
-    const purchase = receipt.verifiedPurchases.find((p) => p.id === productId);
+    await verified.promise;
     const platform = currentPlatformName();
     return {
       kind: 'purchased',
-      purchases: platform && purchase
-        ? [{ platform, productId, receipt: purchase.receipt, purchaseToken: purchase.purchaseToken }]
-        : [{ platform: platform ?? 'ios', productId }],
+      purchases: platform ? [{ platform, productId }] : [],
     };
   } catch (err: any) {
     if (/cancel/i.test(err?.message ?? '')) return { kind: 'cancelled' };
@@ -193,7 +190,7 @@ function waitForVerified(productId: string, timeoutMs: number) {
     }, timeoutMs);
 
     const handler = store.when().verified((receipt) => {
-      if (receipt.verifiedPurchases.some((p) => p.id === productId)) {
+      if (receipt.collection.some((p) => p.id === productId)) {
         clearTimeout(timer);
         cleanup();
         resolve(receipt);
