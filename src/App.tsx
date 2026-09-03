@@ -181,9 +181,11 @@ const App = () => (
     <CloudSyncMount />
     <SplashScreen />
     <OnboardingCarousel />
-    <DictionaryPreloader />
-    <AnimatedRoutes />
-   </MotionPreference>
+     <DictionaryPreloader />
+     <ErrorBoundary>
+      <AnimatedRoutes />
+     </ErrorBoundary>
+    </MotionPreference>
  </AuthProvider>
  </BrowserRouter>
 
