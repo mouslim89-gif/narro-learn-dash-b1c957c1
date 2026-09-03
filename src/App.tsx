@@ -13,6 +13,8 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { DictionaryPreloader } from "@/components/DictionaryPreloader";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
+import { initIap } from "@/lib/iap";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useSubscriptionSync } from "@/hooks/use-premium";
