@@ -8,6 +8,7 @@
  * edge function; the client never writes entitlements directly.
  */
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import {
   store,
   ProductType,
@@ -155,23 +156,58 @@ export async function purchasePlan(plan: PlanId): Promise<PurchaseOutcome> {
       return { kind: 'error', message: 'No offer available for this product.' };
     }
 
+    // Wait for the receipt to be verified server-side before resolving.
+    const productId = PRODUCT_IDS[plan];
+    const verified = waitForVerified(productId, 60_000);
+
     const error = await offer.order();
     if (error) {
+      verified.cancel();
       if (error.code === ErrorCode.PAYMENT_CANCELLED) {
         return { kind: 'cancelled' };
       }
       return { kind: 'error', message: error.message || 'Purchase failed' };
     }
 
+    await verified.promise;
     const platform = currentPlatformName();
     return {
       kind: 'purchased',
-      purchases: platform ? [{ platform, productId: PRODUCT_IDS[plan] }] : [],
+      purchases: platform ? [{ platform, productId }] : [],
     };
   } catch (err: any) {
     if (/cancel/i.test(err?.message ?? '')) return { kind: 'cancelled' };
     return { kind: 'error', message: err?.message ?? 'Purchase failed' };
   }
+}
+
+function waitForVerified(productId: string, timeoutMs: number) {
+  let cleanup = () => {};
+  const promise = new Promise<CdvPurchase.VerifiedReceipt>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Purchase verification timed out'));
+    }, timeoutMs);
+
+    const handler = store.when().verified((receipt) => {
+      if (receipt.collection.some((p) => p.id === productId)) {
+        clearTimeout(timer);
+        cleanup();
+        resolve(receipt);
+      }
+    });
+
+    cleanup = () => {
+      clearTimeout(timer);
+      // The plugin keeps the listener; silence future callbacks by replacing the handler.
+      handler.verified(() => {});
+    };
+  });
+
+  return {
+    promise,
+    cancel: cleanup,
+  };
 }
 
 export async function restorePurchases(): Promise<PurchaseOutcome> {
@@ -208,4 +244,21 @@ export function ownedPlanId(): PlanId | null {
     if (store.owned(PRODUCT_IDS[plan])) return plan;
   }
   return null;
+}
+
+/**
+ * Open the platform's subscription management page.
+ * No-op in browser builds.
+ */
+export async function openManageSubscriptions(): Promise<void> {
+  if (!isNative()) return;
+  const url =
+    Capacitor.getPlatform() === 'ios'
+      ? 'https://apps.apple.com/account/subscriptions'
+      : 'https://play.google.com/store/account/subscriptions';
+  try {
+    await Browser.open({ url });
+  } catch {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

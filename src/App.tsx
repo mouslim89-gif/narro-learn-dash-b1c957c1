@@ -13,6 +13,8 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { DictionaryPreloader } from "@/components/DictionaryPreloader";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
+import { initIap } from "@/lib/iap";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useSubscriptionSync } from "@/hooks/use-premium";
@@ -91,6 +93,15 @@ function CloudSyncMount() {
  return null;
 }
 
+function IapInitializer() {
+  useEffect(() => {
+    initIap().catch(() => {
+      // IAP is optional on web and may fail early in native dev builds.
+    });
+  }, []);
+  return null;
+}
+
 
 function AnimatedRoutes() {
  const location = useLocation();
@@ -165,14 +176,17 @@ const App = () => (
  <BrowserRouter>
  <AuthProvider>
    <MotionPreference>
-    <DarkModeSync />
-    <NativeInitializer />
-    <CloudSyncMount />
+     <DarkModeSync />
+     <NativeInitializer />
+     <IapInitializer />
+     <CloudSyncMount />
     <SplashScreen />
     <OnboardingCarousel />
-    <DictionaryPreloader />
-    <AnimatedRoutes />
-   </MotionPreference>
+     <DictionaryPreloader />
+     <ErrorBoundary>
+      <AnimatedRoutes />
+     </ErrorBoundary>
+    </MotionPreference>
  </AuthProvider>
  </BrowserRouter>
 

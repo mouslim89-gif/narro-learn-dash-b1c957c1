@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useSubscriptionStore } from '@/stores/subscription';
 import { usePremium } from '@/hooks/use-premium';
 import { isIapAvailable, purchasePlan, restorePurchases, type PlanId } from '@/lib/iap';
@@ -67,23 +66,13 @@ export default function Premium() {
 
   const available = isIapAvailable();
 
-  const syncPurchases = async (purchases: Awaited<ReturnType<typeof purchasePlan>>) => {
-    if (purchases.kind !== 'purchased') return false;
-    let granted = false;
-    for (const p of purchases.purchases) {
-      const { data, error } = await supabase.functions.invoke('verify-purchase', {
-        body: {
-          platform: p.platform,
-          productId: p.productId,
-          receipt: p.receipt,
-          purchaseToken: p.purchaseToken,
-        },
-      });
-      if (error) continue;
-      if (data?.status === 'active' || data?.status === 'grace') granted = true;
-    }
+  /**
+   * After a successful native purchase the server validator has already
+   * written the subscription row. Just sync from the database.
+   */
+  const refreshSubscription = async () => {
     if (user?.id) await refresh(user.id, true);
-    return granted;
+    return useSubscriptionStore.getState().isPremium;
   };
 
   const handleBuy = async () => {
@@ -99,7 +88,7 @@ export default function Premium() {
         toast.error(outcome.message);
         return;
       }
-      const granted = await syncPurchases(outcome);
+      const granted = await refreshSubscription();
       if (granted) {
         toast.success('Welcome to Tsundoku Premium');
         navigate(-1);
@@ -123,7 +112,7 @@ export default function Premium() {
         toast.error(outcome.message);
         return;
       }
-      const granted = await syncPurchases(outcome);
+      const granted = await refreshSubscription();
       toast[granted ? 'success' : 'error'](
         granted ? 'Your subscription is active again' : 'No purchase found for this account',
       );

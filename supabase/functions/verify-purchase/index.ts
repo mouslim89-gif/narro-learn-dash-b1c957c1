@@ -1,4 +1,6 @@
 // Verifies an App Store / Google Play purchase and upserts the user's entitlement.
+// Supports both the legacy client payload { platform, productId, receipt, purchaseToken }
+// and the capacitor-plugin-cdv-purchase validator payload.
 // The client never writes to public.subscriptions: only this function (service role) does.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
@@ -27,6 +29,43 @@ interface Verified {
   expiresAt: string | null;
   originalTransactionId: string | null;
   status: "active" | "grace" | "expired";
+}
+
+/** Extract verification inputs from either the legacy or plugin-validator payload. */
+function parsePayload(body: any): {
+  platform: "ios" | "android";
+  productId: string;
+  receipt?: string;
+  purchaseToken?: string;
+} {
+  if (body?.transaction) {
+    const tx = body.transaction;
+    const productId = (body.id as string) || (tx.id as string) || "";
+    if (tx.type === "ios-appstore") {
+      return {
+        platform: "ios",
+        productId,
+        receipt: tx.appStoreReceipt || tx.transactionReceipt,
+      };
+    }
+    if (tx.type === "android-playstore") {
+      return {
+        platform: "android",
+        productId,
+        purchaseToken: tx.purchaseToken,
+      };
+    }
+    throw new Error("unsupported_transaction_type");
+  }
+
+  const platform = body?.platform as "ios" | "android";
+  const productId = body?.productId as string;
+  return {
+    platform,
+    productId,
+    receipt: body?.receipt,
+    purchaseToken: body?.purchaseToken,
+  };
 }
 
 /** Apple verifyReceipt (legacy endpoint, works for both sandbox and production). */
@@ -160,6 +199,57 @@ async function verifyGoogle(purchaseToken: string, productId: string): Promise<V
   };
 }
 
+/** Upsert the entitlement and return a capacitor-plugin-cdv-purchase response payload. */
+async function finalize(
+  admin: ReturnType<typeof createClient>,
+  userId: string,
+  platform: "ios" | "android",
+  productId: string,
+  verified: Verified,
+) {
+  const plan = PRODUCTS[productId];
+  const { error } = await admin.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      status: verified.status,
+      plan,
+      platform,
+      original_transaction_id: verified.originalTransactionId,
+      expires_at: verified.expiresAt,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
+  if (error) throw error;
+
+  const now = Date.now();
+  const expiryMs = verified.expiresAt ? new Date(verified.expiresAt).getTime() : 0;
+
+  return {
+    ok: true,
+    data: {
+      id: productId,
+      latest_receipt: true,
+      transaction: {
+        type: platform === "ios" ? "ios-appstore" : "android-playstore",
+        product_id: productId,
+        status: verified.status,
+        expires_date_ms: expiryMs || undefined,
+      },
+      collection: [
+        {
+          id: productId,
+          platform: platform === "ios" ? "apple-appstore" : "google-play",
+          purchaseDate: now,
+          expiryDate: expiryMs || undefined,
+          isExpired: verified.status === "expired",
+          isAcknowledged: true,
+        },
+      ],
+    },
+  };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -168,47 +258,29 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const platform = body?.platform as "ios" | "android";
-    const productId = body?.productId as string;
+    const { platform, productId, receipt, purchaseToken } = parsePayload(body);
     const plan = PRODUCTS[productId];
 
-    if (!plan) return json({ error: "unknown_product" }, 400);
-    if (platform !== "ios" && platform !== "android") return json({ error: "unknown_platform" }, 400);
+    if (!plan) return json({ ok: false, message: "unknown_product" }, 400);
+    if (platform !== "ios" && platform !== "android") {
+      return json({ ok: false, message: "unknown_platform" }, 400);
+    }
 
     const verified =
       platform === "ios"
-        ? await verifyApple(String(body?.receipt ?? ""), productId)
-        : await verifyGoogle(String(body?.purchaseToken ?? ""), productId);
+        ? await verifyApple(String(receipt ?? ""), productId)
+        : await verifyGoogle(String(purchaseToken ?? ""), productId);
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { error } = await admin.from("subscriptions").upsert(
-      {
-        user_id: auth.user.id,
-        status: verified.status,
-        plan,
-        platform,
-        original_transaction_id: verified.originalTransactionId,
-        expires_at: verified.expiresAt,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" },
-    );
-    if (error) throw error;
-
-    return json({
-      status: verified.status,
-      plan,
-      platform,
-      expiresAt: verified.expiresAt,
-    });
+    const result = await finalize(admin, auth.user.id, platform, productId, verified);
+    return json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "verification_failed";
     console.error("verify-purchase failed:", message);
-    // Never grant access on failure.
-    return json({ error: message }, message === "not_configured" ? 503 : 400);
+    return json({ ok: false, message }, message === "not_configured" ? 503 : 400);
   }
 });
