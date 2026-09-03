@@ -245,3 +245,20 @@ export function ownedPlanId(): PlanId | null {
   }
   return null;
 }
+
+/**
+ * Open the platform's subscription management page.
+ * No-op in browser builds.
+ */
+export async function openManageSubscriptions(): Promise<void> {
+  if (!isNative()) return;
+  const url =
+    Capacitor.getPlatform() === 'ios'
+      ? 'https://apps.apple.com/account/subscriptions'
+      : 'https://play.google.com/store/account/subscriptions';
+  try {
+    await Browser.open({ url });
+  } catch {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
