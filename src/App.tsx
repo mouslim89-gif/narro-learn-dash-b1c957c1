@@ -176,9 +176,10 @@ const App = () => (
  <BrowserRouter>
  <AuthProvider>
    <MotionPreference>
-    <DarkModeSync />
-    <NativeInitializer />
-    <CloudSyncMount />
+     <DarkModeSync />
+     <NativeInitializer />
+     <IapInitializer />
+     <CloudSyncMount />
     <SplashScreen />
     <OnboardingCarousel />
      <DictionaryPreloader />
