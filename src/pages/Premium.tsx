@@ -113,7 +113,7 @@ export default function Premium() {
         toast.error(outcome.message);
         return;
       }
-      const granted = await syncPurchases(outcome);
+      const granted = await refreshSubscription();
       toast[granted ? 'success' : 'error'](
         granted ? 'Your subscription is active again' : 'No purchase found for this account',
       );
