@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useSubscriptionStore } from '@/stores/subscription';
 import { usePremium } from '@/hooks/use-premium';
 import { isIapAvailable, purchasePlan, restorePurchases, type PlanId } from '@/lib/iap';
