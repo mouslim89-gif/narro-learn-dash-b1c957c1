@@ -8,6 +8,7 @@
  * edge function; the client never writes entitlements directly.
  */
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import {
   store,
   ProductType,
