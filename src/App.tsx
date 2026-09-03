@@ -93,6 +93,15 @@ function CloudSyncMount() {
  return null;
 }
 
+function IapInitializer() {
+  useEffect(() => {
+    initIap().catch(() => {
+      // IAP is optional on web and may fail early in native dev builds.
+    });
+  }, []);
+  return null;
+}
+
 
 function AnimatedRoutes() {
  const location = useLocation();
