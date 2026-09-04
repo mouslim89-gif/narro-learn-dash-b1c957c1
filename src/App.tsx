@@ -16,6 +16,7 @@ import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
 import { initIap } from "@/lib/iap";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+import { useAuthDeepLink } from "@/hooks/use-auth-deep-link";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useSubscriptionSync } from "@/hooks/use-premium";
 
