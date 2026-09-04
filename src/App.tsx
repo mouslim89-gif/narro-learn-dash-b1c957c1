@@ -183,10 +183,11 @@ const App = () => (
  <AuthProvider>
    <MotionPreference>
      <DarkModeSync />
-     <NativeInitializer />
-     <IapInitializer />
-     <CloudSyncMount />
-    <SplashScreen />
+      <NativeInitializer />
+      <IapInitializer />
+      <AuthDeepLink />
+      <CloudSyncMount />
+      <SplashScreen />
     <OnboardingCarousel />
      <DictionaryPreloader />
      <ErrorBoundary>
