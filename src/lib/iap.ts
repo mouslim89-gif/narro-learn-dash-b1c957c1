@@ -12,7 +12,7 @@ import { Browser } from '@capacitor/browser';
 import {
   store,
   ProductType,
-  Platform,
+  Platform as PlatformValue,
   ErrorCode,
   type CdvPurchase,
 } from 'capacitor-plugin-cdv-purchase';
