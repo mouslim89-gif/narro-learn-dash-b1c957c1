@@ -55,10 +55,10 @@ function currentPlatformName(): 'ios' | 'android' | null {
   return null;
 }
 
-function currentPlatformConstant(): Platform | null {
+function currentPlatformConstant(): CdvPurchase.Platform | null {
   const p = currentPlatformName();
-  if (p === 'ios') return Platform.APPLE_APPSTORE;
-  if (p === 'android') return Platform.GOOGLE_PLAY;
+  if (p === 'ios') return PlatformValue.APPLE_APPSTORE;
+  if (p === 'android') return PlatformValue.GOOGLE_PLAY;
   return null;
 }
 
