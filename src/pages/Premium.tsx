@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscriptionStore } from '@/stores/subscription';
+import { isEntitled, useSubscriptionStore } from '@/stores/subscription';
 import { usePremium } from '@/hooks/use-premium';
 import { isIapAvailable, purchasePlan, restorePurchases, type PlanId } from '@/lib/iap';
 import type { PremiumFeature } from '@/lib/entitlements';
@@ -72,7 +72,7 @@ export default function Premium() {
    */
   const refreshSubscription = async () => {
     if (user?.id) await refresh(user.id, true);
-    return useSubscriptionStore.getState().isPremium;
+    return isEntitled(useSubscriptionStore.getState());
   };
 
   const handleBuy = async () => {

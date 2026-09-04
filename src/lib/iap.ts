@@ -12,7 +12,7 @@ import { Browser } from '@capacitor/browser';
 import {
   store,
   ProductType,
-  Platform,
+  Platform as PlatformValue,
   ErrorCode,
   type CdvPurchase,
 } from 'capacitor-plugin-cdv-purchase';
@@ -55,10 +55,10 @@ function currentPlatformName(): 'ios' | 'android' | null {
   return null;
 }
 
-function currentPlatformConstant(): Platform | null {
+function currentPlatformConstant(): CdvPurchase.Platform | null {
   const p = currentPlatformName();
-  if (p === 'ios') return Platform.APPLE_APPSTORE;
-  if (p === 'android') return Platform.GOOGLE_PLAY;
+  if (p === 'ios') return PlatformValue.APPLE_APPSTORE;
+  if (p === 'android') return PlatformValue.GOOGLE_PLAY;
   return null;
 }
 
@@ -124,7 +124,7 @@ export async function initIap(): Promise<void> {
       {
         platform,
         options: {
-          needAppReceipt: platform === Platform.APPLE_APPSTORE,
+          needAppReceipt: platform === PlatformValue.APPLE_APPSTORE,
         },
       },
     ]);

@@ -16,6 +16,7 @@ import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
 import { initIap } from "@/lib/iap";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+import { useAuthDeepLink } from "@/hooks/use-auth-deep-link";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
 import { useSubscriptionSync } from "@/hooks/use-premium";
 
@@ -102,6 +103,11 @@ function IapInitializer() {
   return null;
 }
 
+function AuthDeepLink() {
+  useAuthDeepLink();
+  return null;
+}
+
 
 function AnimatedRoutes() {
  const location = useLocation();
@@ -177,10 +183,11 @@ const App = () => (
  <AuthProvider>
    <MotionPreference>
      <DarkModeSync />
-     <NativeInitializer />
-     <IapInitializer />
-     <CloudSyncMount />
-    <SplashScreen />
+      <NativeInitializer />
+      <IapInitializer />
+      <AuthDeepLink />
+      <CloudSyncMount />
+      <SplashScreen />
     <OnboardingCarousel />
      <DictionaryPreloader />
      <ErrorBoundary>
