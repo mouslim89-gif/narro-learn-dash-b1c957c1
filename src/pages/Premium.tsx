@@ -72,7 +72,7 @@ export default function Premium() {
    */
   const refreshSubscription = async () => {
     if (user?.id) await refresh(user.id, true);
-    return useSubscriptionStore.getState().isPremium;
+    return isEntitled(useSubscriptionStore.getState());
   };
 
   const handleBuy = async () => {
