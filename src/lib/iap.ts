@@ -124,7 +124,7 @@ export async function initIap(): Promise<void> {
       {
         platform,
         options: {
-          needAppReceipt: platform === Platform.APPLE_APPSTORE,
+          needAppReceipt: platform === PlatformValue.APPLE_APPSTORE,
         },
       },
     ]);
