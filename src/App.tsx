@@ -103,6 +103,11 @@ function IapInitializer() {
   return null;
 }
 
+function AuthDeepLink() {
+  useAuthDeepLink();
+  return null;
+}
+
 
 function AnimatedRoutes() {
  const location = useLocation();
