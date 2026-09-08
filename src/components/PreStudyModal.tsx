@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { X, Check, BookmarkPlus, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Check, BookmarkPlus, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { Difficulty } from '@/data/books';
 
@@ -252,6 +251,3 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
   );
 }
 
-// Re-exported so the modal's internal helpers stay tree-shakeable.
-export const __preStudyInternals = { pickKeyWords, KANJI_RE, CONTENT_POS };
-void ArrowLeft; void useMemo; void cn;
