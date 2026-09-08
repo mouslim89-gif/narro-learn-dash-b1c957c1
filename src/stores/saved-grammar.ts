@@ -194,7 +194,11 @@ export const useSavedGrammarStore = create<SavedGrammarStore>()(
           pushSavedGrammar(userId, toCloud(m)).catch(() => {});
         }
       },
-      clearGrammar: () => set({ savedItems: [], syncUserId: null }),
+      clearGrammar: () => {
+        pendingDeletes.forEach((pd) => clearTimeout(pd.timer));
+        pendingDeletes.clear();
+        set({ savedItems: [], syncUserId: null });
+      },
     }),
     {
       name: 'tsundoku-saved-grammar',

@@ -58,6 +58,12 @@ interface ReadingProgressState {
  highlightNew: boolean;
  highlightLearning: boolean;
  highlightKnown: boolean;
+ // Daily review reminder (local-only, per device)
+ notificationsEnabled: boolean;
+ /**"HH:mm"24h */
+ notificationTime: string;
+ // Pre-study modal: keys"bookId__difficulty"already shown (local-only)
+ preStudySeen: Record<string, boolean>;
  // Auth-synced user
  syncUserId: string | null;
  // Actions
