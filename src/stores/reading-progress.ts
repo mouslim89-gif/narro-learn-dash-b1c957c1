@@ -272,6 +272,10 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  setHighlightNew: (highlightNew) => { set({ highlightNew }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setHighlightLearning: (highlightLearning) => { set({ highlightLearning }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
  setHighlightKnown: (highlightKnown) => { set({ highlightKnown }); const s = get(); if (s.syncUserId) schedulePrefsPush(s.syncUserId, currentPrefs(s)); },
+ // Local-only: notifications are scheduled per device, no cloud push.
+ setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
+ setNotificationTime: (notificationTime) => set({ notificationTime }),
+ markPreStudySeen: (key) => set((s) => ({ preStudySeen: { ...s.preStudySeen, [key]: true } })),
  hydrateProgress: (incoming, userId) => {
  // Merge instead of replace: keep whichever side is newer per chapter so
  // a slow cloud pull can't clobber a fresh local write (or vice-versa).
