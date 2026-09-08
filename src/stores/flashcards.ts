@@ -98,7 +98,9 @@ export const useFlashcardStore = create<FlashcardStore>()(
       setIsReviewing: (v) => set({ isReviewing: v }),
       setDailyGoal: (v) => set({ dailyGoal: v }),
       setDailyNewGoal: (v) => set({ dailyNewGoal: v }),
-      addWord: (entry) => {
+ addWord: (entry) => {
+        // Re-adding a word that was just removed cancels its pending cloud delete.
+        cancelPendingDelete(entry.id);
         if (get().savedWords.find(w => w.id === entry.id)) return;
         const newWord: SavedWord = {
           ...entry,
@@ -114,14 +116,38 @@ export const useFlashcardStore = create<FlashcardStore>()(
  if (uid) schedulePush(uid, newWord);
  },
  removeWord: (id) => {
- set({ savedWords: get().savedWords.filter(w => w.id !== id) });
- const uid = get().syncUserId;
- if (uid) {
+ const words = get().savedWords;
+ const index = words.findIndex(w => w.id === id);
+ if (index < 0) return;
+ const word = words[index];
+ set({ savedWords: words.filter(w => w.id !== id) });
+ // Cancel any pending push, then delay the cloud delete so it can be undone.
  const t = pushTimers.get(id);
  if (t) { clearTimeout(t); pushTimers.delete(id); }
- cloudDeleteFlashcard(uid, id).catch(() => {});
- }
-  },
+ cancelPendingDelete(id);
+ const timer = window.setTimeout(() => {
+ pendingDeletes.delete(id);
+ const uid = get().syncUserId;
+ if (uid) cloudDeleteFlashcard(uid, id).catch(() => {});
+ }, UNDO_WINDOW_MS);
+ pendingDeletes.set(id, { word, index, timer });
+ toast('Word removed', {
+ duration: UNDO_WINDOW_MS,
+ action: {
+ label:'Undo',
+ onClick: () => {
+ const pd = pendingDeletes.get(id);
+ if (!pd) return;
+ cancelPendingDelete(id);
+ const current = get().savedWords;
+ if (current.some(w => w.id === id)) return;
+ const next = [...current];
+ next.splice(Math.min(pd.index, next.length), 0, pd.word);
+ set({ savedWords: next });
+ },
+ },
+ });
+   },
   attachContext: (id, context) => {
     const word = get().savedWords.find(w => w.id === id);
     if (!word) return;
@@ -229,6 +255,8 @@ export const useFlashcardStore = create<FlashcardStore>()(
  clearWords: () => {
  pushTimers.forEach((t) => clearTimeout(t));
  pushTimers.clear();
+ pendingDeletes.forEach((pd) => clearTimeout(pd.timer));
+ pendingDeletes.clear();
  set({ savedWords: [], syncUserId: null });
  },
  }),
