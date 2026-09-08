@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { X, Check, BookmarkPlus, ArrowRight } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { X, Check, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { useFlashcardStore } from '@/stores/flashcards';
-import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import type { Difficulty } from '@/data/books';
 
 const KANJI_RE = /[一-鿿]/;
@@ -80,18 +80,15 @@ async function pickKeyWords(bookId: string, difficulty: Difficulty): Promise<Pre
 
 export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyModalProps) {
   const [words, setWords] = useState<PreStudyWord[] | null>(null);
-  const [index, setIndex] = useState(0);
-  const [learning, setLearning] = useState<PreStudyWord[]>([]);
-  const [done, setDone] = useState(false);
   const addWord = useFlashcardStore((s) => s.addWord);
-  const hasWord = useFlashcardStore((s) => s.hasWord);
+  const removeWord = useFlashcardStore((s) => s.removeWord);
+  const savedWords = useFlashcardStore((s) => s.savedWords);
+
+  const savedIds = useMemo(() => new Set(savedWords.map((w) => w.id)), [savedWords]);
 
   useEffect(() => {
     if (!open) return;
     setWords(null);
-    setIndex(0);
-    setLearning([]);
-    setDone(false);
     let cancelled = false;
     // Make sure the dictionary shards for this book are warm before we read them.
     hydrateDictionaryForBook(bookId)
@@ -110,31 +107,29 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     };
   }, [open, bookId, difficulty]);
 
-  const current = words?.[index];
   const total = words?.length ?? 0;
+  const selectedCount = words ? words.filter((w) => savedIds.has(w.base)).length : 0;
+  const allSelected = total > 0 && selectedCount === total;
 
-  const advance = (learn: boolean) => {
-    if (!current) return;
-    if (learn && !hasWord(current.base)) setLearning((l) => [...l, current]);
-    if (index + 1 >= total) setDone(true);
-    else setIndex(index + 1);
+  const save = (w: PreStudyWord) =>
+    addWord({
+      id: w.base,
+      word: w.base,
+      reading: w.reading,
+      meanings: w.meanings,
+      jlpt: w.jlpt,
+      partsOfSpeech: w.partsOfSpeech,
+    });
+
+  const toggle = (w: PreStudyWord) => {
+    if (savedIds.has(w.base)) removeWord(w.base);
+    else save(w);
   };
 
-  const finish = (addToFlashcards: boolean) => {
-    if (addToFlashcards && learning.length > 0) {
-      for (const w of learning) {
-        addWord({
-          id: w.base,
-          word: w.base,
-          reading: w.reading,
-          meanings: w.meanings,
-          jlpt: w.jlpt,
-          partsOfSpeech: w.partsOfSpeech,
-        });
-      }
-      toast.success(`${learning.length} word${learning.length === 1 ? '' : 's'} added to your flashcards`);
-    }
-    onClose();
+  const toggleAll = () => {
+    if (!words) return;
+    if (allSelected) words.forEach((w) => removeWord(w.base));
+    else words.filter((w) => !savedIds.has(w.base)).forEach(save);
   };
 
   return (
@@ -159,95 +154,74 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
           <div className="flex h-72 items-center justify-center">
             <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
           </div>
-        ) : !done && current ? (
-          <div className="px-5 pb-6 pt-1">
-            <p className="text-center text-[11px] tabular-nums text-muted-foreground">
-              {index + 1} / {total}
-            </p>
-            <div className="mt-3 flex min-h-[220px] flex-col items-center justify-center rounded-2xl bg-card p-6 ring-1 ring-border/30 shadow-sm">
-              <p className="font-jp-serif text-5xl font-bold leading-tight">{current.base}</p>
-              {current.reading && current.reading !== current.base && (
-                <p className="mt-2 font-japanese text-lg text-muted-foreground">{current.reading}</p>
-              )}
-              <p className="mt-4 text-center text-[15px] leading-relaxed text-foreground/80">
-                {current.meanings.length > 0 ? current.meanings.join(', ') : '—'}
+        ) : (
+          <div className="px-5 pb-6 pt-2">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] tabular-nums text-muted-foreground">
+                {selectedCount} of {total} saved
               </p>
-              <div className="mt-3 flex items-center gap-2">
-                {current.jlpt.slice(0, 1).map((j) => (
-                  <span
-                    key={j}
-                    className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700 dark:text-amber-300"
-                  >
-                    {j.replace('jlpt-', '')}
-                  </span>
-                ))}
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  ×{current.frequency} in this book
-                </span>
-              </div>
+              <button
+                onClick={toggleAll}
+                className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
+              >
+                {allSelected ? 'Clear' : 'Select all'}
+              </button>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => advance(true)}
-                className="h-12 rounded-full text-[15px] font-semibold tap-scale"
-              >
-                <BookmarkPlus className="mr-1.5 h-4 w-4" />
-                Learn it
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => advance(false)}
-                className="h-12 rounded-full text-[15px] font-semibold tap-scale"
-              >
-                <Check className="mr-1.5 h-4 w-4" />
-                I know it
-              </Button>
+            <div className="no-scrollbar mt-2.5 grid max-h-[58vh] grid-cols-2 gap-2.5 overflow-y-auto">
+              {words.map((w) => {
+                const selected = savedIds.has(w.base);
+                return (
+                  <button
+                    key={w.base}
+                    onClick={() => toggle(w)}
+                    aria-pressed={selected}
+                    className={cn(
+                      'relative flex flex-col items-start rounded-2xl bg-card p-3 text-left ring-1 ring-border/30 shadow-sm tap-scale smooth-colors',
+                      selected && 'bg-accent/5 ring-2 ring-accent/60'
+                    )}
+                  >
+                    {selected && (
+                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                        <Check className="h-3 w-3" strokeWidth={3} />
+                      </span>
+                    )}
+                    <p className="font-jp-serif text-[22px] font-bold leading-tight">{w.base}</p>
+                    {w.reading && w.reading !== w.base && (
+                      <p className="mt-0.5 font-japanese text-[11px] text-muted-foreground">{w.reading}</p>
+                    )}
+                    <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-foreground/75">
+                      {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
+                    </p>
+                    <div className="mt-2 flex items-center gap-1.5">
+                      {w.jlpt.slice(0, 1).map((j) => (
+                        <span
+                          key={j}
+                          className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:text-amber-300"
+                        >
+                          {j.replace('jlpt-', '')}
+                        </span>
+                      ))}
+                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground tabular-nums">
+                        ×{w.frequency}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-            <button
+
+            <Button
+              size="lg"
               onClick={onClose}
-              className="mt-3 w-full text-center text-xs text-muted-foreground tap-scale-sm"
+              className="btn-tsundoku-premium mt-4 h-12 w-full rounded-full border-none font-serif text-[15px] font-bold tap-scale"
             >
-              Skip
-            </button>
-          </div>
-        ) : (
-          <div className="px-5 pb-6 pt-1 text-center">
-            <div className="mt-2 flex min-h-[220px] flex-col items-center justify-center rounded-2xl bg-card p-6 ring-1 ring-border/30 shadow-sm">
-              <p className="font-serif text-2xl font-bold">You're ready</p>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {learning.length > 0
-                  ? `${learning.length} word${learning.length === 1 ? '' : 's'} marked as still learning.`
-                  : 'You know all the key words — nice.'}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-col gap-2.5">
-              {learning.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => finish(true)}
-                  className="h-12 w-full rounded-full text-[15px] font-semibold tap-scale"
-                >
-                  <BookmarkPlus className="mr-1.5 h-4 w-4" />
-                  Add {learning.length} to flashcards
-                </Button>
-              )}
-              <Button
-                size="lg"
-                onClick={() => finish(false)}
-                className="btn-tsundoku-premium h-12 w-full rounded-full border-none font-serif text-[15px] font-bold tap-scale"
-              >
-                Start reading
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            </div>
+              Start reading
+              <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Button>
           </div>
         )}
       </DialogContent>
     </Dialog>
   );
 }
-
