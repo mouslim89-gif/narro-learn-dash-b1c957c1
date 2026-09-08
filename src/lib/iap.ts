@@ -126,7 +126,7 @@ export async function initIap(): Promise<void> {
         options: {
           needAppReceipt: platform === PlatformValue.APPLE_APPSTORE,
         },
-      },
+      } as CdvPurchase.PlatformWithOptions,
     ]);
 
     storeReady = true;

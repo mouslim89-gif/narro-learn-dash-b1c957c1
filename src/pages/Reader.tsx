@@ -3,7 +3,7 @@ import { useDelayedNav } from "@/hooks/use-delayed-nav";
 import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, forwardRef, Fragment, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown, BookMarked } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Settings, Sun, Moon, Type, BookType, Eye, EyeClosed, Wrench, Languages, ChevronDown, BookMarked, Headphones } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { books, difficultyConfig, type Difficulty, getChapterContent, chapterKey, DEFAULT_CHAPTER_ID, hasChapters, hasParts, parsePartId, partChapterId } from '@/data/books';
@@ -27,6 +27,24 @@ import { ReaderTutorial } from '@/components/onboarding/ReaderTutorial';
 import { Progress } from '@/components/ui/progress';
 
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
+import { PreStudyModal } from '@/components/PreStudyModal';
+
+
+/** First-access key-word review — shown once per book + difficulty, ever. */
+function ReaderPreStudy({ bookId, difficulty }: { bookId: string; difficulty: Difficulty }) {
+  const key = `${bookId}__${difficulty}`;
+  const seen = useReadingProgressStore((s) => s.preStudySeen[key]);
+  const markSeen = useReadingProgressStore((s) => s.markPreStudySeen);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!seen) {
+      markSeen(key);
+      setOpen(true);
+    }
+  }, [seen, key, markSeen]);
+  if (!open) return null;
+  return <PreStudyModal open bookId={bookId} difficulty={difficulty} onClose={() => setOpen(false)} />;
+}
 import { toast } from '@/hooks/use-toast';
 
 import { loadAudioSync, buildAudioUrl, findSentenceAt, type AudioSync } from'@/lib/audio-sync';
@@ -1139,6 +1157,16 @@ export default function Reader() {
     <BookType className="h-5 w-5" />
   </HeaderChip>
 
+  {book?.audio && Object.keys(book.audio).length > 0 && (
+    <HeaderChip
+      onClick={() => navigate(`/listen/${id}/${difficulty}`)}
+      title="Listen"
+      data-tutorial="listen"
+    >
+      <Headphones className="h-5 w-5" />
+    </HeaderChip>
+  )}
+
    <HeaderChip
 
    onClick={() => setShowSettings(!showSettings)}
@@ -1157,7 +1185,11 @@ export default function Reader() {
  style={{ width:`${scrollPercent}%`, backgroundColor: book.coverColor }}
  />
  </div>
- </header>
+  </header>
+
+  {id && difficulty && <ReaderPreStudy bookId={id} difficulty={difficulty} />}
+
+
 
 
 

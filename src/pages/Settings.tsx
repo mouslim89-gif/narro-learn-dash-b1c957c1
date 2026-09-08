@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { ArrowLeft, LogOut, Loader2, User as UserIcon, Bell } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { requestNotificationPermission } from '@/lib/notifications';
 
 const fontSizeOptions: { label: string; value: FontSize }[] = [
   { label: 'S', value: 'small' },
@@ -50,7 +51,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function Settings() {
-  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
+  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana,
+    notificationsEnabled, notificationTime, setNotificationsEnabled, setNotificationTime } =
     useReadingProgressStore();
   const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
@@ -68,19 +70,41 @@ export default function Settings() {
     navigate('/auth', { replace: true });
   };
 
-  const handleDeleteAccount = async () => {
+  const deleteTimerRef = useRef<number | null>(null);
+  useEffect(() => () => {
+    if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+  }, []);
+
+  const handleDeleteAccount = () => {
     if (!user) return;
     setDeleting(true);
-    try {
-      const { error } = await supabase.functions.invoke('delete-account');
-      if (error) throw error;
-      await signOut();
-      toast.success('Account deleted');
-      navigate('/auth', { replace: true });
-    } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to delete account');
-      setDeleting(false);
-    }
+    // Deletion is delayed a few seconds so it can be undone.
+    const UNDO_MS = 8000;
+    deleteTimerRef.current = window.setTimeout(async () => {
+      deleteTimerRef.current = null;
+      try {
+        const { error } = await supabase.functions.invoke('delete-account');
+        if (error) throw error;
+        await signOut();
+        toast.success('Account deleted');
+        navigate('/auth', { replace: true });
+      } catch (err: any) {
+        toast.error(err?.message ?? 'Failed to delete account');
+        setDeleting(false);
+      }
+    }, UNDO_MS);
+    toast('Account deletion scheduled', {
+      duration: UNDO_MS,
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+          deleteTimerRef.current = null;
+          setDeleting(false);
+          toast.success('Deletion cancelled');
+        },
+      },
+    });
   };
 
   const initial = (user?.email ?? '?').slice(0, 1).toUpperCase();
@@ -277,6 +301,48 @@ export default function Settings() {
           </div>
         </section>
 
+        {/* Notifications */}
+        <section>
+          <SectionLabel>Notifications</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex items-center gap-3">
+                <Bell className="h-4 w-4 text-muted-foreground" />
+                <div className="flex flex-col">
+                  <Label htmlFor="review-reminder" className="text-[15px] font-medium">Daily review reminder</Label>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Keeps your streak alive</span>
+                </div>
+              </div>
+              <Switch
+                id="review-reminder"
+                checked={notificationsEnabled}
+                onCheckedChange={async (v) => {
+                  if (v) {
+                    const ok = await requestNotificationPermission();
+                    if (!ok) {
+                      toast.error('Notifications are blocked by the system');
+                      return;
+                    }
+                  }
+                  setNotificationsEnabled(v);
+                }}
+              />
+            </div>
+            {notificationsEnabled && (
+              <div className="flex items-center justify-between px-4 py-4">
+                <Label htmlFor="reminder-time" className="text-[15px] font-medium">Reminder time</Label>
+                <input
+                  id="reminder-time"
+                  type="time"
+                  value={notificationTime}
+                  onChange={(e) => setNotificationTime(e.target.value)}
+                  className="h-9 rounded-full bg-muted px-4 text-sm font-medium tabular-nums ring-1 ring-border/30 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Help */}
         <section>
           <SectionLabel>Help & Onboarding</SectionLabel>
@@ -403,7 +469,7 @@ export default function Settings() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This permanently deletes your account, flashcards, and reading progress. This cannot be undone.
+                  This permanently deletes your account, flashcards, and reading progress. You'll have a few seconds to undo after confirming.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
