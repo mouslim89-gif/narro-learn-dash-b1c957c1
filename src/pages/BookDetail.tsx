@@ -265,6 +265,19 @@ export default function BookDetail() {
         </Button>
       </Link>
 
+      {hasAnyAudio(book) && (
+        <Link to={`/listen/${book.id}/${difficulty}`}>
+          <Button
+            variant="outline"
+            size="lg"
+            className="mt-3 h-12 w-full rounded-full text-[15px] font-semibold tap-scale"
+          >
+            <Headphones className="mr-2 h-4 w-4" />
+            Listen to the audiobook
+          </Button>
+        </Link>
+      )}
+
       {bookWords.length > 0 && (
         <section className="mt-10 pb-4">
           <div className="mb-4 flex items-baseline justify-between">

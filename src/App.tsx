@@ -41,6 +41,8 @@ import Credits from"./pages/Credits";
 import Support from"./pages/Support";
 import AccountDeletion from"./pages/AccountDeletion";
 import Premium from"./pages/Premium";
+import ListenMode from"./pages/ListenMode";
+import { scheduleDailyReviewReminder } from"@/lib/notifications";
 
 
 const queryClient = new QueryClient();
@@ -103,6 +105,21 @@ function IapInitializer() {
   return null;
 }
 
+// (Re)schedules the daily review reminder whenever the preference or due count changes.
+function NotificationScheduler() {
+  const enabled = useReadingProgressStore((s) => s.notificationsEnabled);
+  const time = useReadingProgressStore((s) => s.notificationTime);
+  const savedWords = useFlashcardStore((s) => s.savedWords);
+  const dueCount = savedWords.filter(
+    (w) => w.nextReviewAt && new Date(w.nextReviewAt).getTime() <= Date.now()
+  ).length;
+
+  useEffect(() => {
+    scheduleDailyReviewReminder({ enabled, time, dueCount });
+  }, [enabled, time, dueCount]);
+  return null;
+}
+
 function AuthDeepLink() {
   useAuthDeepLink();
   return null;
@@ -120,8 +137,9 @@ function AnimatedRoutes() {
  path.startsWith('/reader/') ||
  path.startsWith('/book/') ||
  (path.startsWith('/dictionary/') && path !=='/dictionary') ||
- path.startsWith('/grammar/') ||
- path ==='/premium'||
+  path.startsWith('/grammar/') ||
+  path.startsWith('/listen/') ||
+  path ==='/premium'||
  path ==='/settings';
 
 
@@ -160,7 +178,9 @@ function AnimatedRoutes() {
  <Route path="/book/:id"element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
  <Route path="/reader/:id/:difficulty"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
  <Route path="/reader/:id/:difficulty/:chapterId"element={<ProtectedRoute><Reader /></ProtectedRoute>} />
- <Route path="/grammar/:id"element={<ProtectedRoute><GrammarDetail /></ProtectedRoute>} />
+  <Route path="/grammar/:id"element={<ProtectedRoute><GrammarDetail /></ProtectedRoute>} />
+  <Route path="/listen/:id"element={<ProtectedRoute><ListenMode /></ProtectedRoute>} />
+  <Route path="/listen/:id/:difficulty"element={<ProtectedRoute><ListenMode /></ProtectedRoute>} />
  <Route path="/settings"element={<ProtectedRoute><Settings /></ProtectedRoute>} />
   <Route path="/premium"element={<ProtectedRoute><Premium /></ProtectedRoute>} />
 
@@ -186,7 +206,8 @@ const App = () => (
       <NativeInitializer />
       <IapInitializer />
       <AuthDeepLink />
-      <CloudSyncMount />
+       <CloudSyncMount />
+       <NotificationScheduler />
       <SplashScreen />
     <OnboardingCarousel />
      <DictionaryPreloader />
