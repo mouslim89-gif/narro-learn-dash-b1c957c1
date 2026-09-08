@@ -301,6 +301,48 @@ export default function Settings() {
           </div>
         </section>
 
+        {/* Notifications */}
+        <section>
+          <SectionLabel>Notifications</SectionLabel>
+          <div className="rounded-2xl bg-card ring-1 ring-border/30 shadow-sm divide-y divide-border/40">
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex items-center gap-3">
+                <Bell className="h-4 w-4 text-muted-foreground" />
+                <div className="flex flex-col">
+                  <Label htmlFor="review-reminder" className="text-[15px] font-medium">Daily review reminder</Label>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-tight">Keeps your streak alive</span>
+                </div>
+              </div>
+              <Switch
+                id="review-reminder"
+                checked={notificationsEnabled}
+                onCheckedChange={async (v) => {
+                  if (v) {
+                    const ok = await requestNotificationPermission();
+                    if (!ok) {
+                      toast.error('Notifications are blocked by the system');
+                      return;
+                    }
+                  }
+                  setNotificationsEnabled(v);
+                }}
+              />
+            </div>
+            {notificationsEnabled && (
+              <div className="flex items-center justify-between px-4 py-4">
+                <Label htmlFor="reminder-time" className="text-[15px] font-medium">Reminder time</Label>
+                <input
+                  id="reminder-time"
+                  type="time"
+                  value={notificationTime}
+                  onChange={(e) => setNotificationTime(e.target.value)}
+                  className="h-9 rounded-full bg-muted px-4 text-sm font-medium tabular-nums ring-1 ring-border/30 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Help */}
         <section>
           <SectionLabel>Help & Onboarding</SectionLabel>
@@ -427,7 +469,7 @@ export default function Settings() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This permanently deletes your account, flashcards, and reading progress. This cannot be undone.
+                  This permanently deletes your account, flashcards, and reading progress. You'll have a few seconds to undo after confirming.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
