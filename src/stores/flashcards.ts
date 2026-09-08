@@ -1,5 +1,6 @@
 import { create } from'zustand';
 import { persist } from'zustand/middleware';
+import { toast } from'sonner';
 import { pushFlashcard, deleteFlashcard as cloudDeleteFlashcard } from'@/lib/sync/cloud-sync';
 import { applyReview, migrateCard, type Quality } from'@/lib/srs';
 
@@ -70,6 +71,17 @@ function schedulePush(userId: string, word: SavedWord) {
  pushTimers.delete(word.id);
  }, 1500);
  pushTimers.set(word.id, t);
+}
+
+// Removed words awaiting their cloud delete — undoable for a few seconds.
+const UNDO_WINDOW_MS = 5000;
+const pendingDeletes = new Map<string, { word: SavedWord; index: number; timer: number }>();
+
+function cancelPendingDelete(id: string) {
+ const pd = pendingDeletes.get(id);
+ if (!pd) return;
+ clearTimeout(pd.timer);
+ pendingDeletes.delete(id);
 }
 
 export const useFlashcardStore = create<FlashcardStore>()(
