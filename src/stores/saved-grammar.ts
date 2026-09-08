@@ -82,6 +82,8 @@ export const useSavedGrammarStore = create<SavedGrammarStore>()(
       savedItems: [],
       syncUserId: null,
       saveGrammar: (item) => {
+        // Re-saving an item that was just removed cancels its pending cloud delete.
+        cancelPendingDelete(item.id);
         if (get().isSaved(item.id)) return;
         const entry: SavedGrammar = {
           ...item,
@@ -98,11 +100,36 @@ export const useSavedGrammarStore = create<SavedGrammarStore>()(
         if (uid) pushSavedGrammar(uid, toCloud(entry)).catch(() => {});
       },
       removeGrammar: (id) => {
+        const items = get().savedItems;
+        const index = items.findIndex((i) => i.id === id);
+        if (index < 0) return;
+        const item = items[index];
         set((state) => ({
           savedItems: state.savedItems.filter((i) => i.id !== id),
         }));
-        const uid = get().syncUserId;
-        if (uid) deleteSavedGrammar(uid, id).catch(() => {});
+        cancelPendingDelete(id);
+        const timer = window.setTimeout(() => {
+          pendingDeletes.delete(id);
+          const uid = get().syncUserId;
+          if (uid) deleteSavedGrammar(uid, id).catch(() => {});
+        }, UNDO_WINDOW_MS);
+        pendingDeletes.set(id, { item, index, timer });
+        toast('Grammar point removed', {
+          duration: UNDO_WINDOW_MS,
+          action: {
+            label: 'Undo',
+            onClick: () => {
+              const pd = pendingDeletes.get(id);
+              if (!pd) return;
+              cancelPendingDelete(id);
+              const current = get().savedItems;
+              if (current.some((i) => i.id === id)) return;
+              const next = [...current];
+              next.splice(Math.min(pd.index, next.length), 0, pd.item);
+              set({ savedItems: next });
+            },
+          },
+        });
       },
       isSaved: (id) => get().savedItems.some((i) => i.id === id),
       adjustMastery: (id, quality) => {
