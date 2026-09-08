@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { toast } from 'sonner';
 import type { GrammarNote } from '@/data/book-grammar';
 import { applyReview, migrateCard, type SrsCard, type Quality } from '@/lib/srs';
 import { useFlashcardStore } from '@/stores/flashcards';
@@ -8,6 +9,17 @@ import {
   deleteSavedGrammar,
   type CloudSavedGrammar,
 } from '@/lib/sync/cloud-sync';
+
+// Removed items awaiting their cloud delete — undoable for a few seconds.
+const UNDO_WINDOW_MS = 5000;
+const pendingDeletes = new Map<string, { item: SavedGrammar; index: number; timer: number }>();
+
+function cancelPendingDelete(id: string) {
+  const pd = pendingDeletes.get(id);
+  if (!pd) return;
+  clearTimeout(pd.timer);
+  pendingDeletes.delete(id);
+}
 
 export interface SavedGrammar extends GrammarNote, SrsCard {
   id: string;
