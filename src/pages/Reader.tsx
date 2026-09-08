@@ -28,7 +28,7 @@ import { Progress } from '@/components/ui/progress';
 
 import { useReadingProgressStore, fontSizeMap, japaneseFontClassMap, type FontSize, type JapaneseFont } from '@/stores/reading-progress';
 import { PreStudyModal } from '@/components/PreStudyModal';
-import type { Difficulty } from '@/data/books';
+
 
 /** First-access key-word review — shown once per book + difficulty, ever. */
 function ReaderPreStudy({ bookId, difficulty }: { bookId: string; difficulty: Difficulty }) {
