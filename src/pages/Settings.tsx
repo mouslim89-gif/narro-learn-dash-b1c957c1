@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, Loader2, User as UserIcon } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { ArrowLeft, LogOut, Loader2, User as UserIcon, Bell } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReadingProgressStore, type FontSize } from '@/stores/reading-progress';
@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { requestNotificationPermission } from '@/lib/notifications';
 
 const fontSizeOptions: { label: string; value: FontSize }[] = [
   { label: 'S', value: 'small' },
@@ -50,7 +51,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function Settings() {
-  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana } =
+  const { darkMode, setDarkMode, fontSize, setFontSize, showFurigana, setShowFurigana,
+    notificationsEnabled, notificationTime, setNotificationsEnabled, setNotificationTime } =
     useReadingProgressStore();
   const { alwaysReplayOnboarding, setAlwaysReplayOnboarding, disableAnimation, setDisableAnimation } = useOnboardingStore();
   const isAdmin = useIsAdmin();
@@ -68,19 +70,41 @@ export default function Settings() {
     navigate('/auth', { replace: true });
   };
 
-  const handleDeleteAccount = async () => {
+  const deleteTimerRef = useRef<number | null>(null);
+  useEffect(() => () => {
+    if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+  }, []);
+
+  const handleDeleteAccount = () => {
     if (!user) return;
     setDeleting(true);
-    try {
-      const { error } = await supabase.functions.invoke('delete-account');
-      if (error) throw error;
-      await signOut();
-      toast.success('Account deleted');
-      navigate('/auth', { replace: true });
-    } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to delete account');
-      setDeleting(false);
-    }
+    // Deletion is delayed a few seconds so it can be undone.
+    const UNDO_MS = 8000;
+    deleteTimerRef.current = window.setTimeout(async () => {
+      deleteTimerRef.current = null;
+      try {
+        const { error } = await supabase.functions.invoke('delete-account');
+        if (error) throw error;
+        await signOut();
+        toast.success('Account deleted');
+        navigate('/auth', { replace: true });
+      } catch (err: any) {
+        toast.error(err?.message ?? 'Failed to delete account');
+        setDeleting(false);
+      }
+    }, UNDO_MS);
+    toast('Account deletion scheduled', {
+      duration: UNDO_MS,
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+          deleteTimerRef.current = null;
+          setDeleting(false);
+          toast.success('Deletion cancelled');
+        },
+      },
+    });
   };
 
   const initial = (user?.email ?? '?').slice(0, 1).toUpperCase();
