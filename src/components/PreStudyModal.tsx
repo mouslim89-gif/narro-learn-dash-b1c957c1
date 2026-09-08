@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X, Check, ArrowRight } from 'lucide-react';
+import { X, Check, Plus, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
@@ -29,6 +29,15 @@ interface PreStudyModalProps {
   difficulty: Difficulty;
   /** Called on skip or finish — must mark the book+difficulty as seen. */
   onClose: () => void;
+}
+
+function frequencyLabel(count: number) {
+  if (count >= 50) return 'everywhere';
+  if (count >= 30) return 'very common';
+  if (count >= 15) return 'common';
+  if (count >= 7) return 'frequent';
+  if (count >= 4) return 'uncommon';
+  return 'rare';
 }
 
 /** Pick the most useful words to pre-study: frequent, kanji-bearing content words. */
@@ -134,7 +143,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="max-w-md rounded-3xl border-border/40 bg-background p-0 overflow-hidden [&>button]:hidden">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[360px] sm:max-w-md rounded-3xl border-border/40 bg-background p-0 overflow-hidden [&>button]:hidden">
         <DialogTitle className="sr-only">Pre-study key words</DialogTitle>
 
         <div className="flex items-center justify-between px-5 pt-4">
@@ -156,10 +165,15 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
           </div>
         ) : (
           <div className="px-5 pb-6 pt-2">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] tabular-nums text-muted-foreground">
-                {selectedCount} of {total} saved
-              </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[11px] tabular-nums text-muted-foreground">
+                  {selectedCount} of {total} selected
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground/80">
+                  Tap a card to add it to your flashcards
+                </p>
+              </div>
               <button
                 onClick={toggleAll}
                 className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
@@ -168,7 +182,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
               </button>
             </div>
 
-            <div className="no-scrollbar mt-2.5 grid max-h-[58vh] grid-cols-2 gap-2.5 overflow-y-auto">
+            <div className="no-scrollbar mt-3 grid max-h-[48vh] grid-cols-2 gap-2 overflow-y-auto">
               {words.map((w) => {
                 const selected = savedIds.has(w.base);
                 return (
@@ -176,34 +190,44 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                     key={w.base}
                     onClick={() => toggle(w)}
                     aria-pressed={selected}
+                    aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
                     className={cn(
-                      'relative flex flex-col items-start rounded-2xl bg-card p-3 text-left ring-1 ring-border/30 shadow-sm tap-scale smooth-colors',
+                      'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 shadow-sm tap-scale smooth-colors',
                       selected && 'bg-accent/5 ring-2 ring-accent/60'
                     )}
                   >
-                    {selected && (
-                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                    <span
+                      className={cn(
+                        'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
+                        selected
+                          ? 'bg-accent text-accent-foreground'
+                          : 'bg-muted text-muted-foreground ring-1 ring-border/50'
+                      )}
+                    >
+                      {selected ? (
                         <Check className="h-3 w-3" strokeWidth={3} />
-                      </span>
-                    )}
-                    <p className="font-jp-serif text-[22px] font-bold leading-tight">{w.base}</p>
+                      ) : (
+                        <Plus className="h-3 w-3" strokeWidth={3} />
+                      )}
+                    </span>
+                    <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
                     {w.reading && w.reading !== w.base && (
-                      <p className="mt-0.5 font-japanese text-[11px] text-muted-foreground">{w.reading}</p>
+                      <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
                     )}
-                    <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-foreground/75">
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
                       {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
                     </p>
-                    <div className="mt-2 flex items-center gap-1.5">
+                    <div className="mt-2 flex flex-wrap items-center gap-1">
                       {w.jlpt.slice(0, 1).map((j) => (
                         <span
                           key={j}
-                          className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:text-amber-300"
+                          className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
                         >
                           {j.replace('jlpt-', '')}
                         </span>
                       ))}
-                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground tabular-nums">
-                        ×{w.frequency}
+                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                        {frequencyLabel(w.frequency)}
                       </span>
                     </div>
                   </button>
