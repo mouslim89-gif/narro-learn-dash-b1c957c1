@@ -95,6 +95,9 @@ interface ReadingProgressState {
  setHighlightNew: (v: boolean) => void;
  setHighlightLearning: (v: boolean) => void;
  setHighlightKnown: (v: boolean) => void;
+ setNotificationsEnabled: (v: boolean) => void;
+ setNotificationTime: (v: string) => void;
+ markPreStudySeen: (key: string) => void;
  // Sync helpers
  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
  clearProgress: () => void;
@@ -190,6 +193,9 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  highlightNew: true,
  highlightLearning: true,
  highlightKnown: false,
+ notificationsEnabled: false,
+ notificationTime:'19:00',
+ preStudySeen: {},
  syncUserId: null,
  updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
  const cid = chapterId || DEFAULT_CHAPTER_ID;
