@@ -170,18 +170,23 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
       <DialogContent className="w-[calc(100%-2rem)] max-w-[360px] sm:max-w-md rounded-3xl border-border/40 bg-background p-0 overflow-hidden [&>button]:hidden">
         <DialogTitle className="sr-only">Pre-study key words</DialogTitle>
 
-        <div className="flex items-center justify-between px-5 pt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Before you read
-          </p>
+        <div className="flex items-start justify-between gap-3 px-5 pt-4">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-foreground">Before you read</h2>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+              The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
+              flashcards, or mark it as already known.
+            </p>
+          </div>
           <button
             onClick={onClose}
             aria-label="Skip pre-study"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground tap-scale-sm"
+            className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground tap-scale-sm"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
+
 
         {!words ? (
           <div className="flex h-72 items-center justify-center">
