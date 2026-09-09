@@ -1208,7 +1208,9 @@ export default function Reader() {
  </div>
   </header>
 
-  {id && difficulty && <ReaderPreStudy bookId={id} difficulty={difficulty} />}
+  {id && difficulty && (
+    <ReaderPreStudy bookId={id} difficulty={difficulty} onActiveChange={setPreStudyActive} />
+  )}
 
 
 
