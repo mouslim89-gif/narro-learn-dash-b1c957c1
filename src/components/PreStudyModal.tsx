@@ -100,16 +100,26 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
   const removeWord = useFlashcardStore((s) => s.removeWord);
   const savedWords = useFlashcardStore((s) => s.savedWords);
 
+  const knownWords = useReadingProgressStore((s) => s.knownWords);
+  const markWordKnown = useReadingProgressStore((s) => s.markWordKnown);
+
   const savedIds = useMemo(() => new Set(savedWords.map((w) => w.id)), [savedWords]);
+
+  // Frozen at open time so tiles don't vanish the moment they're tapped.
+  const excludeRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!open) return;
     setWords(null);
+    excludeRef.current = new Set([
+      ...useFlashcardStore.getState().savedWords.map((w) => w.id),
+      ...useReadingProgressStore.getState().knownWords,
+    ]);
     let cancelled = false;
     // Make sure the dictionary shards for this book are warm before we read them.
     hydrateDictionaryForBook(bookId)
       .catch(() => {})
-      .then(() => pickKeyWords(bookId, difficulty))
+      .then(() => pickKeyWords(bookId, difficulty, excludeRef.current))
       .then((picked) => {
         if (cancelled) return;
         setWords(picked);
