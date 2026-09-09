@@ -115,7 +115,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
  const uid = get().syncUserId;
  if (uid) schedulePush(uid, newWord);
  },
- removeWord: (id) => {
+ removeWord: (id, opts) => {
  const words = get().savedWords;
  const index = words.findIndex(w => w.id === id);
  if (index < 0) return;
