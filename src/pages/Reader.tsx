@@ -43,11 +43,10 @@ function ReaderPreStudy({
   const key = `${bookId}__${difficulty}`;
   const seen = useReadingProgressStore((s) => s.preStudySeen[key]);
   const markSeen = useReadingProgressStore((s) => s.markPreStudySeen);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => !useReadingProgressStore.getState().preStudySeen[key]);
   useEffect(() => {
     if (!seen) {
       markSeen(key);
-      setOpen(true);
       onActiveChange(true);
     }
   }, [seen, key, markSeen, onActiveChange]);
@@ -233,8 +232,6 @@ export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
   const goTo = useDelayedNav();
-  // The reader tutorial must not start while the pre-study screen is up.
-  const [preStudyActive, setPreStudyActive] = useState(false);
  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
  const knownIndex = useKnownWordsIndex();
@@ -250,6 +247,12 @@ export default function Reader() {
 
  const [difficulty, setDifficulty] = useState<Difficulty>(
  (diffParam as Difficulty) || saved?.difficulty ||'simplified');
+  // Initialize synchronously so the Reader never flashes before first-time pre-study.
+  const [preStudyActive, setPreStudyActive] = useState(() => {
+    if (!id) return false;
+    const initialDifficulty = (diffParam as Difficulty) || saved?.difficulty || 'simplified';
+    return !useReadingProgressStore.getState().preStudySeen[`${id}__${initialDifficulty}`];
+  });
  const [showSettings, setShowSettings] = useState(false);
  const [settingsScrolled, setSettingsScrolled] = useState(false);
  const [miniPopup, setMiniPopup] = useState<{ text: string; baseForm?: string; reading?: string; pos?: string; contextSentence?: string; contextTokens?: { t: string; r?: string }[]; sentenceRect: { top: number; bottom: number; left: number; right: number }; sentenceIdx: number; tokenIdx: number } | null>(null);
@@ -1040,8 +1043,13 @@ export default function Reader() {
 
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
- return (
- <div className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}>
+  return (
+  <motion.div
+    initial={false}
+    animate={{ x: preStudyActive ? '12%' : 0, opacity: preStudyActive ? 0.92 : 1 }}
+    transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+    className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}
+  >
   <header className="sticky top-0 z-30 glass-subtle">
 
   <div className="flex items-center justify-between gap-2 px-3 py-2.5">
@@ -1865,7 +1873,7 @@ export default function Reader() {
  />
  )}
   {!preStudyActive && <ReaderTutorial />}
-  </div>
+  </motion.div>
 
  );
 }
