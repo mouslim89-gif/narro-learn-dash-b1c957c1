@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
@@ -102,8 +101,10 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
   const knownWords = useReadingProgressStore((s) => s.knownWords);
   const markWordKnown = useReadingProgressStore((s) => s.markWordKnown);
+  const unmarkWordKnown = useReadingProgressStore((s) => s.unmarkWordKnown);
 
   const savedIds = useMemo(() => new Set(savedWords.map((w) => w.id)), [savedWords]);
+  const knownIds = useMemo(() => new Set(knownWords), [knownWords]);
 
   // Frozen at open time so tiles don't vanish the moment they're tapped.
   const excludeRef = useRef<Set<string>>(new Set());
@@ -133,6 +134,8 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     };
   }, [open, bookId, difficulty]);
 
+  if (!open) return null;
+
   const total = words?.length ?? 0;
   const selectedCount = words ? words.filter((w) => savedIds.has(w.base)).length : 0;
   const allSelected = total > 0 && selectedCount === total;
@@ -158,144 +161,160 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     else words.filter((w) => !savedIds.has(w.base)).forEach(save);
   };
 
-  /** Mark as already known: no flashcard, never proposed again. */
-  const markKnown = (w: PreStudyWord) => {
-    if (savedIds.has(w.base)) removeWord(w.base);
-    markWordKnown(w.base);
-    setWords((prev) => (prev ? prev.filter((x) => x.base !== w.base) : prev));
+  /** Toggle "already known": no flashcard, never proposed again. The tile just turns green. */
+  const toggleKnown = (w: PreStudyWord) => {
+    if (knownIds.has(w.base)) {
+      unmarkWordKnown(w.base);
+    } else {
+      if (savedIds.has(w.base)) removeWord(w.base);
+      markWordKnown(w.base);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-[360px] sm:max-w-md rounded-3xl border-border/40 bg-background p-0 overflow-hidden [&>button]:hidden">
-        <DialogTitle className="sr-only">Pre-study key words</DialogTitle>
-
-        <div className="flex items-start justify-between gap-3 px-5 pt-4">
-          <div>
-            <h2 className="font-serif text-lg font-semibold text-foreground">Before you read</h2>
-            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-              The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
-              flashcards, or mark it as already known.
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Skip pre-study"
-            className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground tap-scale-sm"
-          >
-            <X className="h-4 w-4" />
-          </button>
+    <div className="fixed inset-0 z-[70] flex flex-col bg-background">
+      {/* Header */}
+      <div
+        className="flex items-start justify-between gap-3 px-5 pb-3"
+        style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}
+      >
+        <div>
+          <h2 className="font-serif text-xl font-semibold text-foreground">Before you read</h2>
+          <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
+            The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
+            flashcards, or mark it as already known.
+          </p>
         </div>
+        <button
+          onClick={onClose}
+          aria-label="Skip pre-study"
+          className="-mr-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card text-muted-foreground ring-1 ring-border/40 relief-raised tap-scale-sm"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
 
-
-        {!words ? (
-          <div className="flex h-72 items-center justify-center">
-            <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
+      {!words ? (
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between px-5">
+            <p className="text-[11px] tabular-nums text-muted-foreground">
+              {selectedCount} of {total} selected
+            </p>
+            <button
+              onClick={toggleAll}
+              className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
+            >
+              {allSelected ? 'Clear' : 'Select all'}
+            </button>
           </div>
-        ) : (
-          <div className="px-5 pb-6 pt-3">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] tabular-nums text-muted-foreground">
-                {selectedCount} of {total} selected
-              </p>
-              <button
-                onClick={toggleAll}
-                className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
-              >
-                {allSelected ? 'Clear' : 'Select all'}
-              </button>
-            </div>
 
-            {/* p-1 -m-1 so the selected ring isn't clipped by the scroll container */}
-            <div className="no-scrollbar -mx-1 mt-2 max-h-[48vh] overflow-y-auto px-1 py-1">
-              <div className="grid grid-cols-2 gap-2.5">
-                {words.map((w) => {
-                  const selected = savedIds.has(w.base);
-                  return (
-                    <div
-                      key={w.base}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => toggle(w)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          toggle(w);
-                        }
-                      }}
-                      aria-pressed={selected}
-                      aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
+          {/* p-1 so the selected ring isn't clipped by the scroll container */}
+          <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-4">
+            <div className="grid grid-cols-2 gap-2.5">
+              {words.map((w) => {
+                const selected = savedIds.has(w.base);
+                const known = knownIds.has(w.base);
+                return (
+                  <div
+                    key={w.base}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => toggle(w)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle(w);
+                      }
+                    }}
+                    aria-pressed={selected}
+                    aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
+                    className={cn(
+                      'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
+                      selected && 'bg-accent/5 ring-2 ring-accent/60',
+                      known && 'bg-emerald-500/10 ring-2 ring-emerald-500/50'
+                    )}
+                  >
+                    <span
                       className={cn(
-                        'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
-                        selected && 'bg-accent/5 ring-2 ring-accent/60'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
-                          selected
+                        'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
+                        known
+                          ? 'bg-emerald-500 text-white'
+                          : selected
                             ? 'bg-accent text-accent-foreground'
                             : 'bg-muted text-muted-foreground ring-1 ring-border/50'
-                        )}
-                      >
-                        {selected ? (
-                          <Check className="h-3 w-3" strokeWidth={3} />
-                        ) : (
-                          <Plus className="h-3 w-3" strokeWidth={3} />
-                        )}
-                      </span>
-                      <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
-                      {w.reading && w.reading !== w.base && (
-                        <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
                       )}
-                      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
-                        {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
-                      </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-1">
-                        {w.jlpt.slice(0, 1).map((j) => (
-                          <span
-                            key={j}
-                            className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
-                          >
-                            {j.replace('jlpt-', '')}
-                          </span>
-                        ))}
-                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-                          {frequencyLabel(w.frequency)}
+                    >
+                      {selected || known ? (
+                        <Check className="h-3 w-3" strokeWidth={3} />
+                      ) : (
+                        <Plus className="h-3 w-3" strokeWidth={3} />
+                      )}
+                    </span>
+                    <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
+                    {w.reading && w.reading !== w.base && (
+                      <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
+                    )}
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
+                      {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1">
+                      {w.jlpt.slice(0, 1).map((j) => (
+                        <span
+                          key={j}
+                          className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
+                        >
+                          {j.replace('jlpt-', '')}
                         </span>
-                      </div>
-                      <p className="mt-1 text-[9px] tabular-nums text-muted-foreground/80">
-                        appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
-                      </p>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          markKnown(w);
-                        }}
-                        aria-label={`Mark ${w.base} as already known`}
-                        className="mt-2 flex items-center gap-1 rounded-full bg-muted/70 px-2 py-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground tap-scale-sm"
-                      >
-                        <CircleCheck className="h-3 w-3" strokeWidth={2.5} />
-                        Known
-                      </button>
+                      ))}
+                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                        {frequencyLabel(w.frequency)}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
+                    <p className="mt-1 text-[9px] tabular-nums text-muted-foreground/80">
+                      appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleKnown(w);
+                      }}
+                      aria-pressed={known}
+                      aria-label={`Mark ${w.base} as already known`}
+                      className={cn(
+                        'mt-2 flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
+                        known
+                          ? 'bg-emerald-500/20 text-emerald-700 ring-1 ring-emerald-500/40 dark:text-emerald-300'
+                          : 'bg-muted/70 text-muted-foreground'
+                      )}
+                    >
+                      <CircleCheck className="h-3 w-3" strokeWidth={2.5} />
+                      {known ? 'Known ✓' : 'Known'}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
-
+          <div
+            className="px-5 pt-3"
+            style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
+          >
             <Button
               size="lg"
               onClick={onClose}
-              className="btn-tsundoku-premium mt-4 h-12 w-full rounded-full border-none font-serif text-[15px] font-bold tap-scale"
+              className="btn-tsundoku-premium h-12 w-full rounded-full border-none font-serif text-[15px] font-bold tap-scale"
             >
               Start reading
               <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        </>
+      )}
+    </div>
   );
 }
