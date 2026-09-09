@@ -63,7 +63,9 @@ async function pickKeyWords(
       freq.set(base, entry);
     }
   }
+  // Skip words already saved as flashcards or marked known, then fill up to TARGET_COUNT.
   const ranked = [...freq.entries()]
+    .filter(([base]) => !exclude.has(base))
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, TARGET_COUNT);
 
