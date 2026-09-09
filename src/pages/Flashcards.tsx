@@ -26,6 +26,7 @@ import {
 } from'@/components/ui/dropdown-menu';
 import { useDelayed } from'@/hooks/use-delayed';
 import { DailyGoalCard } from '@/components/my-books/DailyGoalCard';
+import { StretchyCards } from '@/components/StretchyCards';
 
 type StatusFilter ='all'|'due'|'new'|'learning'|'known';
 type SortOption ='added'|'mastery';
