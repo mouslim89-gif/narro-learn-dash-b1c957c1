@@ -42,7 +42,11 @@ function frequencyLabel(count: number) {
 }
 
 /** Pick the most useful words to pre-study: frequent, kanji-bearing content words. */
-async function pickKeyWords(bookId: string, difficulty: Difficulty): Promise<PreStudyWord[]> {
+async function pickKeyWords(
+  bookId: string,
+  difficulty: Difficulty,
+  exclude: Set<string>
+): Promise<PreStudyWord[]> {
   const map = await loadBookTokens(bookId);
   const freq = new Map<string, { count: number; reading?: string; pos?: string }>();
   for (const chapterDict of Object.values(map)) {
