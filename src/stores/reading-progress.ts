@@ -280,6 +280,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
  setNotificationTime: (notificationTime) => set({ notificationTime }),
  markPreStudySeen: (key) => set((s) => ({ preStudySeen: { ...s.preStudySeen, [key]: true } })),
+ markWordKnown: (id) => set((s) => (s.knownWords.includes(id) ? s : { knownWords: [...s.knownWords, id] })),
  hydrateProgress: (incoming, userId) => {
  // Merge instead of replace: keep whichever side is newer per chapter so
  // a slow cloud pull can't clobber a fresh local write (or vice-versa).
