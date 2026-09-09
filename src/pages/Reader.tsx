@@ -1044,10 +1044,7 @@ export default function Reader() {
  if (!book) return <div className="p-8 text-center">Book not found.</div>;
 
   return (
-  <motion.div
-    initial={false}
-    animate={{ x: preStudyActive ? '12%' : 0, opacity: preStudyActive ? 0.92 : 1 }}
-    transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+  <div
     className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}
   >
   <header className="sticky top-0 z-30 glass-subtle">
@@ -1873,7 +1870,7 @@ export default function Reader() {
  />
  )}
   {!preStudyActive && <ReaderTutorial />}
-  </motion.div>
+  </div>
 
  );
 }
