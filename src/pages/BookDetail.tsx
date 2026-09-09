@@ -11,6 +11,7 @@ import { isChapterFree } from'@/lib/entitlements';
 
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
+import { StretchyCards } from '@/components/StretchyCards';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { loadBookTokens, type BookTokenMap } from '@/data/book-tokens';
@@ -317,7 +318,7 @@ export default function BookDetail() {
             <h2 className="font-serif text-lg font-semibold">Chapters</h2>
             <span className="text-[11px] tabular-nums text-muted-foreground">{book.chapters!.length} total</span>
           </div>
-          <ul className="space-y-2">
+          <StretchyCards as="ul" gap={2} className="flex flex-col">
             {book.chapters!.map((ch, idx) => {
               const cp = chapterProgressMap[ch.id];
               const pct = cp?.progressPercent ?? 0;
@@ -360,19 +361,19 @@ export default function BookDetail() {
               );
             })}
 
-          </ul>
+          </StretchyCards>
         </section>
       )}
 
 
- {isMultiPart && (
+  {isMultiPart && (
  <section className="mt-8">
  <div className="mb-3 flex items-baseline justify-between">
  <h2 className="font-serif text-lg font-semibold">Chapters</h2>
  <span className="text-[11px] tabular-nums text-muted-foreground">{book.anchors!.length} total</span>
  </div>
- <ul className="space-y-2">
- {book.anchors!.map((title, idx) => {
+  <StretchyCards as="ul" gap={2} className="flex flex-col">
+  {book.anchors!.map((title, idx) => {
  const partId = partChapterId(idx);
  const cp = chapterProgressMap[partId];
  const pct = cp?.progressPercent ?? 0;
@@ -415,11 +416,11 @@ export default function BookDetail() {
  </li>
  );
  })}
- </ul>
- </section>
- )}
+  </StretchyCards>
+  </section>
+  )}
 
- </div>
+  </div>
  </div>
  );
 }

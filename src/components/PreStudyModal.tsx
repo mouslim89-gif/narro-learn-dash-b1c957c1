@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { StretchyCards } from '@/components/StretchyCards';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
@@ -233,7 +234,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
           {/* p-1 so the selected ring isn't clipped by the scroll container */}
           <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-24">
-            <div className="grid grid-cols-2 gap-2.5">
+            <StretchyCards as="div" gap={2.5} className="grid grid-cols-2 gap-2.5">
               {words.map((w) => {
                 const selected = savedIds.has(w.base);
                 const known = knownIds.has(w.base);
@@ -303,7 +304,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                   </div>
                 );
               })}
-            </div>
+            </StretchyCards>
           </div>
 
           <div

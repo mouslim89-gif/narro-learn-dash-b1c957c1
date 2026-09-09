@@ -13,6 +13,7 @@ import { toRomaji } from 'wanakana';
 import { ExampleSentence } from '@/components/ExampleSentence';
 import { Input } from '@/components/ui/input';
 import { AnimatedTitle } from '@/components/AnimatedTitle';
+import { StretchyCards } from '@/components/StretchyCards';
 import { romajiToKana } from '@/lib/romaji';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAllGrammarPoints } from '@/lib/grammar-index';
@@ -338,7 +339,7 @@ export default function DictionaryPage() {
     </div>
   )}
 
-  <div className={cn("stagger-children flex flex-col gap-3 px-6 pb-20", mode === 'grammar' ? "mt-4" : "mt-5")}>
+  <StretchyCards as="div" gap={3} className={cn("stagger-children flex flex-col px-6 pb-20", mode === 'grammar' ? "mt-4" : "mt-5")}>
     {mode === 'words' ? (
       <>
         {jishoResults.slice(0, visibleCount).map((result, idx) => {
@@ -514,7 +515,7 @@ export default function DictionaryPage() {
         </p>
       </div>
     )}
-  </div>
+  </StretchyCards>
 </div>
 );
 }
