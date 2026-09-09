@@ -37,7 +37,7 @@ interface FlashcardStore {
   setDailyGoal: (v: number) => void;
   setDailyNewGoal: (v: number) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
-  removeWord: (id: string) => void;
+  removeWord: (id: string, opts?: { silent?: boolean }) => void;
   attachContext: (id: string, context: { sentence?: string; tokens?: { t: string; r?: string }[] }) => void;
   hasWord: (id: string) => boolean;
   incrementMastery: (id: string) => void;
