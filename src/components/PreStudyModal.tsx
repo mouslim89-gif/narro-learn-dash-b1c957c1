@@ -234,7 +234,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       className={cn(
                         'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
                         known
-                          ? 'bg-emerald-500 text-white'
+                          ? 'bg-primary text-primary-foreground'
                           : selected
                             ? 'bg-accent text-accent-foreground'
                             : 'bg-muted text-muted-foreground ring-1 ring-border/50'
