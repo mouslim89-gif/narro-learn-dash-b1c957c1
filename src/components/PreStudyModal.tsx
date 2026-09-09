@@ -266,7 +266,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       className={cn(
                         'mt-2 flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
                         known
-                          ? 'bg-emerald-500/20 text-emerald-700 ring-1 ring-emerald-500/40 dark:text-emerald-300'
+                          ? 'bg-primary/15 text-primary ring-1 ring-primary/40'
                           : 'bg-muted/70 text-muted-foreground'
                       )}
                     >
