@@ -14,6 +14,7 @@ import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
+import { StretchyCards } from '@/components/StretchyCards';
 import { useDelayed } from'@/hooks/use-delayed';
 
 

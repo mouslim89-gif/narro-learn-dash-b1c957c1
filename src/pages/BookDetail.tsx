@@ -11,6 +11,7 @@ import { isChapterFree } from'@/lib/entitlements';
 
 import { Button } from'@/components/ui/button';
 import { Progress } from'@/components/ui/progress';
+import { StretchyCards } from '@/components/StretchyCards';
 import { useReadingProgressStore } from'@/stores/reading-progress';
 import { useFlashcardStore } from '@/stores/flashcards';
 import { loadBookTokens, type BookTokenMap } from '@/data/book-tokens';

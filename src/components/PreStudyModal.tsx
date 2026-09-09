@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { StretchyCards } from '@/components/StretchyCards';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
