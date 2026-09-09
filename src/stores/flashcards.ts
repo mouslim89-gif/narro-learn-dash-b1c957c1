@@ -131,7 +131,8 @@ export const useFlashcardStore = create<FlashcardStore>()(
  if (uid) cloudDeleteFlashcard(uid, id).catch(() => {});
  }, UNDO_WINDOW_MS);
  pendingDeletes.set(id, { word, index, timer });
- toast('Word removed', {
+  if (opts?.silent) return;
+  toast('Word removed', {
  duration: UNDO_WINDOW_MS,
  action: {
  label:'Undo',
