@@ -64,6 +64,8 @@ interface ReadingProgressState {
  notificationTime: string;
  // Pre-study modal: keys"bookId__difficulty"already shown (local-only)
  preStudySeen: Record<string, boolean>;
+ // Words the user marked as already known in pre-study (local-only, no flashcard)
+ knownWords: string[];
  // Auth-synced user
  syncUserId: string | null;
  // Actions
