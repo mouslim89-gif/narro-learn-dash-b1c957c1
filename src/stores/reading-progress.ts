@@ -101,6 +101,7 @@ interface ReadingProgressState {
  setNotificationTime: (v: string) => void;
  markPreStudySeen: (key: string) => void;
  markWordKnown: (id: string) => void;
+ unmarkWordKnown: (id: string) => void;
  // Sync helpers
  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
  clearProgress: () => void;
@@ -280,7 +281,8 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
  setNotificationTime: (notificationTime) => set({ notificationTime }),
  markPreStudySeen: (key) => set((s) => ({ preStudySeen: { ...s.preStudySeen, [key]: true } })),
- markWordKnown: (id) => set((s) => (s.knownWords.includes(id) ? s : { knownWords: [...s.knownWords, id] })),
+  markWordKnown: (id) => set((s) => (s.knownWords.includes(id) ? s : { knownWords: [...s.knownWords, id] })),
+  unmarkWordKnown: (id) => set((s) => ({ knownWords: s.knownWords.filter((w) => w !== id) })),
  hydrateProgress: (incoming, userId) => {
  // Merge instead of replace: keep whichever side is newer per chapter so
  // a slow cloud pull can't clobber a fresh local write (or vice-versa).
