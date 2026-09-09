@@ -31,14 +31,6 @@ interface PreStudyModalProps {
   onClose: () => void;
 }
 
-function frequencyLabel(count: number) {
-  if (count >= 50) return 'everywhere';
-  if (count >= 30) return 'very common';
-  if (count >= 15) return 'common';
-  if (count >= 7) return 'frequent';
-  if (count >= 4) return 'uncommon';
-  return 'rare';
-}
 
 /** Pick the most useful words to pre-study: frequent, kanji-bearing content words. */
 async function pickKeyWords(
