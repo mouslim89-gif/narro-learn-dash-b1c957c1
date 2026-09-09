@@ -234,7 +234,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
           {/* p-1 so the selected ring isn't clipped by the scroll container */}
           <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-24">
-            <div className="grid grid-cols-2 gap-2.5">
+            <StretchyCards as="div" gap={2.5} className="grid grid-cols-2 gap-2.5">
               {words.map((w) => {
                 const selected = savedIds.has(w.base);
                 const known = knownIds.has(w.base);
@@ -304,7 +304,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                   </div>
                 );
               })}
-            </div>
+            </StretchyCards>
           </div>
 
           <div

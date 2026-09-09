@@ -147,17 +147,17 @@ export default function Library() {
 
  {/* Search results */}
  {filteredBooks ? (
- <section className="px-6 py-4">
- <p className="mb-3 text-xs text-muted-foreground">{filteredBooks.length} result{filteredBooks.length !== 1 ?'s':''}</p>
- <div className="flex flex-wrap gap-4">
- {filteredBooks.map(book => (
+  <section className="px-6 py-4">
+  <p className="mb-3 text-xs text-muted-foreground">{filteredBooks.length} result{filteredBooks.length !== 1 ?'s':''}</p>
+  <StretchyCards as="div" gap={4} className="flex flex-wrap gap-4">
+  {filteredBooks.map(book => (
  <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
  ))}
- </div>
- {filteredBooks.length === 0 && (
- <p className="py-10 text-center text-sm text-muted-foreground">No books found.</p>
- )}
- </section>
+  </StretchyCards>
+  {filteredBooks.length === 0 && (
+  <p className="py-10 text-center text-sm text-muted-foreground">No books found.</p>
+  )}
+  </section>
  ) : (
   <>
   {/* Hero Section */}

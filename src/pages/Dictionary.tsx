@@ -339,7 +339,7 @@ export default function DictionaryPage() {
     </div>
   )}
 
-  <div className={cn("stagger-children flex flex-col gap-3 px-6 pb-20", mode === 'grammar' ? "mt-4" : "mt-5")}>
+  <StretchyCards as="div" gap={3} className={cn("stagger-children flex flex-col px-6 pb-20", mode === 'grammar' ? "mt-4" : "mt-5")}>
     {mode === 'words' ? (
       <>
         {jishoResults.slice(0, visibleCount).map((result, idx) => {
@@ -515,7 +515,7 @@ export default function DictionaryPage() {
         </p>
       </div>
     )}
-  </div>
+  </StretchyCards>
 </div>
 );
 }
