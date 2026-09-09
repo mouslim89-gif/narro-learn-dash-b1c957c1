@@ -193,16 +193,11 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
             <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
           </div>
         ) : (
-          <div className="px-5 pb-6 pt-2">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[11px] tabular-nums text-muted-foreground">
-                  {selectedCount} of {total} selected
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground/80">
-                  Tap a card to add it to your flashcards
-                </p>
-              </div>
+          <div className="px-5 pb-6 pt-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] tabular-nums text-muted-foreground">
+                {selectedCount} of {total} selected
+              </p>
               <button
                 onClick={toggleAll}
                 className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
@@ -211,58 +206,84 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
               </button>
             </div>
 
-            <div className="no-scrollbar mt-3 grid max-h-[48vh] grid-cols-2 gap-2 overflow-y-auto">
-              {words.map((w) => {
-                const selected = savedIds.has(w.base);
-                return (
-                  <button
-                    key={w.base}
-                    onClick={() => toggle(w)}
-                    aria-pressed={selected}
-                    aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
-                    className={cn(
-                      'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 shadow-sm tap-scale smooth-colors',
-                      selected && 'bg-accent/5 ring-2 ring-accent/60'
-                    )}
-                  >
-                    <span
+            {/* p-1 -m-1 so the selected ring isn't clipped by the scroll container */}
+            <div className="no-scrollbar -mx-1 mt-2 max-h-[48vh] overflow-y-auto px-1 py-1">
+              <div className="grid grid-cols-2 gap-2.5">
+                {words.map((w) => {
+                  const selected = savedIds.has(w.base);
+                  return (
+                    <div
+                      key={w.base}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => toggle(w)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggle(w);
+                        }
+                      }}
+                      aria-pressed={selected}
+                      aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
                       className={cn(
-                        'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
-                        selected
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-muted text-muted-foreground ring-1 ring-border/50'
+                        'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
+                        selected && 'bg-accent/5 ring-2 ring-accent/60'
                       )}
                     >
-                      {selected ? (
-                        <Check className="h-3 w-3" strokeWidth={3} />
-                      ) : (
-                        <Plus className="h-3 w-3" strokeWidth={3} />
-                      )}
-                    </span>
-                    <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
-                    {w.reading && w.reading !== w.base && (
-                      <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
-                    )}
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
-                      {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1">
-                      {w.jlpt.slice(0, 1).map((j) => (
-                        <span
-                          key={j}
-                          className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
-                        >
-                          {j.replace('jlpt-', '')}
-                        </span>
-                      ))}
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-                        {frequencyLabel(w.frequency)}
+                      <span
+                        className={cn(
+                          'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
+                          selected
+                            ? 'bg-accent text-accent-foreground'
+                            : 'bg-muted text-muted-foreground ring-1 ring-border/50'
+                        )}
+                      >
+                        {selected ? (
+                          <Check className="h-3 w-3" strokeWidth={3} />
+                        ) : (
+                          <Plus className="h-3 w-3" strokeWidth={3} />
+                        )}
                       </span>
+                      <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
+                      {w.reading && w.reading !== w.base && (
+                        <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
+                      )}
+                      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
+                        {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-1">
+                        {w.jlpt.slice(0, 1).map((j) => (
+                          <span
+                            key={j}
+                            className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
+                          >
+                            {j.replace('jlpt-', '')}
+                          </span>
+                        ))}
+                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                          {frequencyLabel(w.frequency)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[9px] tabular-nums text-muted-foreground/80">
+                        appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
+                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markKnown(w);
+                        }}
+                        aria-label={`Mark ${w.base} as already known`}
+                        className="mt-2 flex items-center gap-1 rounded-full bg-muted/70 px-2 py-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground tap-scale-sm"
+                      >
+                        <CircleCheck className="h-3 w-3" strokeWidth={2.5} />
+                        Known
+                      </button>
                     </div>
-                  </button>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+
 
             <Button
               size="lg"
