@@ -158,6 +158,13 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     else words.filter((w) => !savedIds.has(w.base)).forEach(save);
   };
 
+  /** Mark as already known: no flashcard, never proposed again. */
+  const markKnown = (w: PreStudyWord) => {
+    if (savedIds.has(w.base)) removeWord(w.base);
+    markWordKnown(w.base);
+    setWords((prev) => (prev ? prev.filter((x) => x.base !== w.base) : prev));
+  };
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="w-[calc(100%-2rem)] max-w-[360px] sm:max-w-md rounded-3xl border-border/40 bg-background p-0 overflow-hidden [&>button]:hidden">
