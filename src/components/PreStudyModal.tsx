@@ -1,17 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
-import { X, Check, Plus, ArrowRight } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { useFlashcardStore } from '@/stores/flashcards';
+import { useReadingProgressStore } from '@/stores/reading-progress';
 import { cn } from '@/lib/utils';
 import type { Difficulty } from '@/data/books';
 
 const KANJI_RE = /[一-鿿]/;
 const CONTENT_POS = /^(名詞|動詞|形容詞|副詞)/;
-const TARGET_COUNT = 15;
+const TARGET_COUNT = 20;
 
 interface PreStudyWord {
   /** dictionary form (also used as flashcard id) */
