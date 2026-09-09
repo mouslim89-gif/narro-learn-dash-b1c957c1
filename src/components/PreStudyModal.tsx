@@ -253,20 +253,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                     <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
                       {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
                     </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1">
-                      {w.jlpt.slice(0, 1).map((j) => (
-                        <span
-                          key={j}
-                          className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
-                        >
-                          {j.replace('jlpt-', '')}
-                        </span>
-                      ))}
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-                        {frequencyLabel(w.frequency)}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[9px] tabular-nums text-muted-foreground/80">
+                    <p className="mt-2 text-[9px] tabular-nums text-muted-foreground/80">
                       appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
                     </p>
                     <button
