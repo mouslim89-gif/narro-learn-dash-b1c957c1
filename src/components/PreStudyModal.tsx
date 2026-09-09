@@ -143,22 +143,22 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     });
 
   const toggle = (w: PreStudyWord) => {
-    if (savedIds.has(w.base)) removeWord(w.base);
+    if (savedIds.has(w.base)) removeWord(w.base, { silent: true });
     else save(w);
   };
 
   const toggleAll = () => {
     if (!words) return;
-    if (allSelected) words.forEach((w) => removeWord(w.base));
+    if (allSelected) words.forEach((w) => removeWord(w.base, { silent: true }));
     else words.filter((w) => !savedIds.has(w.base)).forEach(save);
   };
 
-  /** Toggle "already known": no flashcard, never proposed again. The tile just turns green. */
+  /** Toggle "already known": no flashcard, never proposed again. The tile stays, just marked. */
   const toggleKnown = (w: PreStudyWord) => {
     if (knownIds.has(w.base)) {
       unmarkWordKnown(w.base);
     } else {
-      if (savedIds.has(w.base)) removeWord(w.base);
+      if (savedIds.has(w.base)) removeWord(w.base, { silent: true });
       markWordKnown(w.base);
     }
   };
