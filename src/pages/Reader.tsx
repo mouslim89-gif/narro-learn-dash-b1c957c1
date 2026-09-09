@@ -1864,7 +1864,7 @@ export default function Reader() {
  }}
  />
  )}
-  <ReaderTutorial />
+  {!preStudyActive && <ReaderTutorial />}
   </div>
 
  );
