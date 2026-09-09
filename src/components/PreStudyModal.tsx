@@ -181,6 +181,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
   };
 
   return (
+    <div className="fixed inset-0 z-[70] overflow-hidden">
     <AnimatePresence onExitComplete={onClose}>
     {visible && (
     <motion.div
@@ -188,7 +189,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: '-100%', opacity: 0.98 }}
       transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-background"
+      className="absolute inset-0 flex flex-col overflow-hidden bg-background"
     >
       {/* Header */}
       <div

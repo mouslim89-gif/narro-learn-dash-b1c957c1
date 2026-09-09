@@ -1870,7 +1870,7 @@ export default function Reader() {
  />
  )}
   {!preStudyActive && <ReaderTutorial />}
-  </motion.div>
+  </div>
 
  );
 }
