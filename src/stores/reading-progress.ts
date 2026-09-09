@@ -199,6 +199,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  notificationsEnabled: false,
  notificationTime:'19:00',
  preStudySeen: {},
+ knownWords: [],
  syncUserId: null,
  updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
  const cid = chapterId || DEFAULT_CHAPTER_ID;
