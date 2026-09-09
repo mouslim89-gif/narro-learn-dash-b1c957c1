@@ -31,7 +31,15 @@ import { PreStudyModal } from '@/components/PreStudyModal';
 
 
 /** First-access key-word review — shown once per book + difficulty, ever. */
-function ReaderPreStudy({ bookId, difficulty }: { bookId: string; difficulty: Difficulty }) {
+function ReaderPreStudy({
+  bookId,
+  difficulty,
+  onActiveChange,
+}: {
+  bookId: string;
+  difficulty: Difficulty;
+  onActiveChange: (active: boolean) => void;
+}) {
   const key = `${bookId}__${difficulty}`;
   const seen = useReadingProgressStore((s) => s.preStudySeen[key]);
   const markSeen = useReadingProgressStore((s) => s.markPreStudySeen);
@@ -40,10 +48,21 @@ function ReaderPreStudy({ bookId, difficulty }: { bookId: string; difficulty: Di
     if (!seen) {
       markSeen(key);
       setOpen(true);
+      onActiveChange(true);
     }
-  }, [seen, key, markSeen]);
+  }, [seen, key, markSeen, onActiveChange]);
   if (!open) return null;
-  return <PreStudyModal open bookId={bookId} difficulty={difficulty} onClose={() => setOpen(false)} />;
+  return (
+    <PreStudyModal
+      open
+      bookId={bookId}
+      difficulty={difficulty}
+      onClose={() => {
+        setOpen(false);
+        onActiveChange(false);
+      }}
+    />
+  );
 }
 import { toast } from '@/hooks/use-toast';
 
@@ -214,6 +233,8 @@ export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
   const goTo = useDelayedNav();
+  // The reader tutorial must not start while the pre-study screen is up.
+  const [preStudyActive, setPreStudyActive] = useState(false);
  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
  const knownIndex = useKnownWordsIndex();
@@ -1187,7 +1208,9 @@ export default function Reader() {
  </div>
   </header>
 
-  {id && difficulty && <ReaderPreStudy bookId={id} difficulty={difficulty} />}
+  {id && difficulty && (
+    <ReaderPreStudy bookId={id} difficulty={difficulty} onActiveChange={setPreStudyActive} />
+  )}
 
 
 
@@ -1841,7 +1864,7 @@ export default function Reader() {
  }}
  />
  )}
-  <ReaderTutorial />
+  {!preStudyActive && <ReaderTutorial />}
   </div>
 
  );

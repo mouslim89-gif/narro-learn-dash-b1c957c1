@@ -31,14 +31,6 @@ interface PreStudyModalProps {
   onClose: () => void;
 }
 
-function frequencyLabel(count: number) {
-  if (count >= 50) return 'everywhere';
-  if (count >= 30) return 'very common';
-  if (count >= 15) return 'common';
-  if (count >= 7) return 'frequent';
-  if (count >= 4) return 'uncommon';
-  return 'rare';
-}
 
 /** Pick the most useful words to pre-study: frequent, kanji-bearing content words. */
 async function pickKeyWords(
@@ -151,22 +143,22 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     });
 
   const toggle = (w: PreStudyWord) => {
-    if (savedIds.has(w.base)) removeWord(w.base);
+    if (savedIds.has(w.base)) removeWord(w.base, { silent: true });
     else save(w);
   };
 
   const toggleAll = () => {
     if (!words) return;
-    if (allSelected) words.forEach((w) => removeWord(w.base));
+    if (allSelected) words.forEach((w) => removeWord(w.base, { silent: true }));
     else words.filter((w) => !savedIds.has(w.base)).forEach(save);
   };
 
-  /** Toggle "already known": no flashcard, never proposed again. The tile just turns green. */
+  /** Toggle "already known": no flashcard, never proposed again. The tile stays, just marked. */
   const toggleKnown = (w: PreStudyWord) => {
     if (knownIds.has(w.base)) {
       unmarkWordKnown(w.base);
     } else {
-      if (savedIds.has(w.base)) removeWord(w.base);
+      if (savedIds.has(w.base)) removeWord(w.base, { silent: true });
       markWordKnown(w.base);
     }
   };
@@ -235,14 +227,14 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                     className={cn(
                       'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
                       selected && 'bg-accent/5 ring-2 ring-accent/60',
-                      known && 'bg-emerald-500/10 ring-2 ring-emerald-500/50'
+                      known && 'bg-primary/10 ring-2 ring-primary/50'
                     )}
                   >
                     <span
                       className={cn(
                         'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
                         known
-                          ? 'bg-emerald-500 text-white'
+                          ? 'bg-primary text-primary-foreground'
                           : selected
                             ? 'bg-accent text-accent-foreground'
                             : 'bg-muted text-muted-foreground ring-1 ring-border/50'
@@ -261,20 +253,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                     <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
                       {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
                     </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1">
-                      {w.jlpt.slice(0, 1).map((j) => (
-                        <span
-                          key={j}
-                          className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
-                        >
-                          {j.replace('jlpt-', '')}
-                        </span>
-                      ))}
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-                        {frequencyLabel(w.frequency)}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[9px] tabular-nums text-muted-foreground/80">
+                    <p className="mt-2 text-[9px] tabular-nums text-muted-foreground/80">
                       appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
                     </p>
                     <button
@@ -287,7 +266,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       className={cn(
                         'mt-2 flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
                         known
-                          ? 'bg-emerald-500/20 text-emerald-700 ring-1 ring-emerald-500/40 dark:text-emerald-300'
+                          ? 'bg-primary/15 text-primary ring-1 ring-primary/40'
                           : 'bg-muted/70 text-muted-foreground'
                       )}
                     >

@@ -37,7 +37,7 @@ interface FlashcardStore {
   setDailyGoal: (v: number) => void;
   setDailyNewGoal: (v: number) => void;
   addWord: (entry: Omit<SavedWord, 'mastery'>) => void;
-  removeWord: (id: string) => void;
+  removeWord: (id: string, opts?: { silent?: boolean }) => void;
   attachContext: (id: string, context: { sentence?: string; tokens?: { t: string; r?: string }[] }) => void;
   hasWord: (id: string) => boolean;
   incrementMastery: (id: string) => void;
@@ -115,7 +115,7 @@ export const useFlashcardStore = create<FlashcardStore>()(
  const uid = get().syncUserId;
  if (uid) schedulePush(uid, newWord);
  },
- removeWord: (id) => {
+ removeWord: (id, opts) => {
  const words = get().savedWords;
  const index = words.findIndex(w => w.id === id);
  if (index < 0) return;
@@ -131,7 +131,8 @@ export const useFlashcardStore = create<FlashcardStore>()(
  if (uid) cloudDeleteFlashcard(uid, id).catch(() => {});
  }, UNDO_WINDOW_MS);
  pendingDeletes.set(id, { word, index, timer });
- toast('Word removed', {
+  if (opts?.silent) return;
+  toast('Word removed', {
  duration: UNDO_WINDOW_MS,
  action: {
  label:'Undo',
