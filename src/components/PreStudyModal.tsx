@@ -1,17 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
-import { X, Check, Plus, ArrowRight } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { useFlashcardStore } from '@/stores/flashcards';
+import { useReadingProgressStore } from '@/stores/reading-progress';
 import { cn } from '@/lib/utils';
 import type { Difficulty } from '@/data/books';
 
 const KANJI_RE = /[一-鿿]/;
 const CONTENT_POS = /^(名詞|動詞|形容詞|副詞)/;
-const TARGET_COUNT = 15;
+const TARGET_COUNT = 20;
 
 interface PreStudyWord {
   /** dictionary form (also used as flashcard id) */
@@ -41,7 +42,11 @@ function frequencyLabel(count: number) {
 }
 
 /** Pick the most useful words to pre-study: frequent, kanji-bearing content words. */
-async function pickKeyWords(bookId: string, difficulty: Difficulty): Promise<PreStudyWord[]> {
+async function pickKeyWords(
+  bookId: string,
+  difficulty: Difficulty,
+  exclude: Set<string>
+): Promise<PreStudyWord[]> {
   const map = await loadBookTokens(bookId);
   const freq = new Map<string, { count: number; reading?: string; pos?: string }>();
   for (const chapterDict of Object.values(map)) {
@@ -58,7 +63,9 @@ async function pickKeyWords(bookId: string, difficulty: Difficulty): Promise<Pre
       freq.set(base, entry);
     }
   }
+  // Skip words already saved as flashcards or marked known, then fill up to TARGET_COUNT.
   const ranked = [...freq.entries()]
+    .filter(([base]) => !exclude.has(base))
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, TARGET_COUNT);
 
@@ -93,16 +100,26 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
   const removeWord = useFlashcardStore((s) => s.removeWord);
   const savedWords = useFlashcardStore((s) => s.savedWords);
 
+  const knownWords = useReadingProgressStore((s) => s.knownWords);
+  const markWordKnown = useReadingProgressStore((s) => s.markWordKnown);
+
   const savedIds = useMemo(() => new Set(savedWords.map((w) => w.id)), [savedWords]);
+
+  // Frozen at open time so tiles don't vanish the moment they're tapped.
+  const excludeRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!open) return;
     setWords(null);
+    excludeRef.current = new Set([
+      ...useFlashcardStore.getState().savedWords.map((w) => w.id),
+      ...useReadingProgressStore.getState().knownWords,
+    ]);
     let cancelled = false;
     // Make sure the dictionary shards for this book are warm before we read them.
     hydrateDictionaryForBook(bookId)
       .catch(() => {})
-      .then(() => pickKeyWords(bookId, difficulty))
+      .then(() => pickKeyWords(bookId, difficulty, excludeRef.current))
       .then((picked) => {
         if (cancelled) return;
         setWords(picked);
@@ -141,39 +158,46 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     else words.filter((w) => !savedIds.has(w.base)).forEach(save);
   };
 
+  /** Mark as already known: no flashcard, never proposed again. */
+  const markKnown = (w: PreStudyWord) => {
+    if (savedIds.has(w.base)) removeWord(w.base);
+    markWordKnown(w.base);
+    setWords((prev) => (prev ? prev.filter((x) => x.base !== w.base) : prev));
+  };
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="w-[calc(100%-2rem)] max-w-[360px] sm:max-w-md rounded-3xl border-border/40 bg-background p-0 overflow-hidden [&>button]:hidden">
         <DialogTitle className="sr-only">Pre-study key words</DialogTitle>
 
-        <div className="flex items-center justify-between px-5 pt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Before you read
-          </p>
+        <div className="flex items-start justify-between gap-3 px-5 pt-4">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-foreground">Before you read</h2>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+              The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
+              flashcards, or mark it as already known.
+            </p>
+          </div>
           <button
             onClick={onClose}
             aria-label="Skip pre-study"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground tap-scale-sm"
+            className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground tap-scale-sm"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
+
 
         {!words ? (
           <div className="flex h-72 items-center justify-center">
             <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
           </div>
         ) : (
-          <div className="px-5 pb-6 pt-2">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[11px] tabular-nums text-muted-foreground">
-                  {selectedCount} of {total} selected
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground/80">
-                  Tap a card to add it to your flashcards
-                </p>
-              </div>
+          <div className="px-5 pb-6 pt-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] tabular-nums text-muted-foreground">
+                {selectedCount} of {total} selected
+              </p>
               <button
                 onClick={toggleAll}
                 className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
@@ -182,58 +206,84 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
               </button>
             </div>
 
-            <div className="no-scrollbar mt-3 grid max-h-[48vh] grid-cols-2 gap-2 overflow-y-auto">
-              {words.map((w) => {
-                const selected = savedIds.has(w.base);
-                return (
-                  <button
-                    key={w.base}
-                    onClick={() => toggle(w)}
-                    aria-pressed={selected}
-                    aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
-                    className={cn(
-                      'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 shadow-sm tap-scale smooth-colors',
-                      selected && 'bg-accent/5 ring-2 ring-accent/60'
-                    )}
-                  >
-                    <span
+            {/* p-1 -m-1 so the selected ring isn't clipped by the scroll container */}
+            <div className="no-scrollbar -mx-1 mt-2 max-h-[48vh] overflow-y-auto px-1 py-1">
+              <div className="grid grid-cols-2 gap-2.5">
+                {words.map((w) => {
+                  const selected = savedIds.has(w.base);
+                  return (
+                    <div
+                      key={w.base}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => toggle(w)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggle(w);
+                        }
+                      }}
+                      aria-pressed={selected}
+                      aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
                       className={cn(
-                        'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
-                        selected
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-muted text-muted-foreground ring-1 ring-border/50'
+                        'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
+                        selected && 'bg-accent/5 ring-2 ring-accent/60'
                       )}
                     >
-                      {selected ? (
-                        <Check className="h-3 w-3" strokeWidth={3} />
-                      ) : (
-                        <Plus className="h-3 w-3" strokeWidth={3} />
-                      )}
-                    </span>
-                    <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
-                    {w.reading && w.reading !== w.base && (
-                      <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
-                    )}
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
-                      {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1">
-                      {w.jlpt.slice(0, 1).map((j) => (
-                        <span
-                          key={j}
-                          className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
-                        >
-                          {j.replace('jlpt-', '')}
-                        </span>
-                      ))}
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-                        {frequencyLabel(w.frequency)}
+                      <span
+                        className={cn(
+                          'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
+                          selected
+                            ? 'bg-accent text-accent-foreground'
+                            : 'bg-muted text-muted-foreground ring-1 ring-border/50'
+                        )}
+                      >
+                        {selected ? (
+                          <Check className="h-3 w-3" strokeWidth={3} />
+                        ) : (
+                          <Plus className="h-3 w-3" strokeWidth={3} />
+                        )}
                       </span>
+                      <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
+                      {w.reading && w.reading !== w.base && (
+                        <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
+                      )}
+                      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
+                        {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-1">
+                        {w.jlpt.slice(0, 1).map((j) => (
+                          <span
+                            key={j}
+                            className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent"
+                          >
+                            {j.replace('jlpt-', '')}
+                          </span>
+                        ))}
+                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                          {frequencyLabel(w.frequency)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[9px] tabular-nums text-muted-foreground/80">
+                        appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
+                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markKnown(w);
+                        }}
+                        aria-label={`Mark ${w.base} as already known`}
+                        className="mt-2 flex items-center gap-1 rounded-full bg-muted/70 px-2 py-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground tap-scale-sm"
+                      >
+                        <CircleCheck className="h-3 w-3" strokeWidth={2.5} />
+                        Known
+                      </button>
                     </div>
-                  </button>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+
 
             <Button
               size="lg"

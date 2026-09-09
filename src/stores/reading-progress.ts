@@ -64,6 +64,8 @@ interface ReadingProgressState {
  notificationTime: string;
  // Pre-study modal: keys"bookId__difficulty"already shown (local-only)
  preStudySeen: Record<string, boolean>;
+ // Words the user marked as already known in pre-study (local-only, no flashcard)
+ knownWords: string[];
  // Auth-synced user
  syncUserId: string | null;
  // Actions
@@ -98,6 +100,7 @@ interface ReadingProgressState {
  setNotificationsEnabled: (v: boolean) => void;
  setNotificationTime: (v: string) => void;
  markPreStudySeen: (key: string) => void;
+ markWordKnown: (id: string) => void;
  // Sync helpers
  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
  clearProgress: () => void;
@@ -196,6 +199,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  notificationsEnabled: false,
  notificationTime:'19:00',
  preStudySeen: {},
+ knownWords: [],
  syncUserId: null,
  updateProgress: (bookId, chapterId, difficulty, percent, sentenceIdx) => {
  const cid = chapterId || DEFAULT_CHAPTER_ID;
@@ -276,6 +280,7 @@ export const useReadingProgressStore = create<ReadingProgressState>()(
  setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
  setNotificationTime: (notificationTime) => set({ notificationTime }),
  markPreStudySeen: (key) => set((s) => ({ preStudySeen: { ...s.preStudySeen, [key]: true } })),
+ markWordKnown: (id) => set((s) => (s.knownWords.includes(id) ? s : { knownWords: [...s.knownWords, id] })),
  hydrateProgress: (incoming, userId) => {
  // Merge instead of replace: keep whichever side is newer per chapter so
  // a slow cloud pull can't clobber a fresh local write (or vice-versa).
