@@ -233,6 +233,8 @@ export default function Reader() {
  const { id, difficulty: diffParam, chapterId: chapterParam } = useParams();
   const navigate = useNavigate();
   const goTo = useDelayedNav();
+  // The reader tutorial must not start while the pre-study screen is up.
+  const [preStudyActive, setPreStudyActive] = useState(false);
  const { updateProgress, getProgress, flushPendingProgressPushes, fontSize, setFontSize, readerDarkMode, setReaderDarkMode, showFurigana, setShowFurigana, showTranslations, setShowTranslations, japaneseFont, setJapaneseFont, setHasSeenLongPressHint, showKnownHighlights, setShowKnownHighlights, highlightNew, setHighlightNew, highlightLearning, setHighlightLearning, highlightKnown, setHighlightKnown } = useReadingProgressStore();
 
  const knownIndex = useKnownWordsIndex();
