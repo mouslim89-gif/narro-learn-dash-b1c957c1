@@ -31,7 +31,15 @@ import { PreStudyModal } from '@/components/PreStudyModal';
 
 
 /** First-access key-word review — shown once per book + difficulty, ever. */
-function ReaderPreStudy({ bookId, difficulty }: { bookId: string; difficulty: Difficulty }) {
+function ReaderPreStudy({
+  bookId,
+  difficulty,
+  onActiveChange,
+}: {
+  bookId: string;
+  difficulty: Difficulty;
+  onActiveChange: (active: boolean) => void;
+}) {
   const key = `${bookId}__${difficulty}`;
   const seen = useReadingProgressStore((s) => s.preStudySeen[key]);
   const markSeen = useReadingProgressStore((s) => s.markPreStudySeen);
@@ -40,10 +48,21 @@ function ReaderPreStudy({ bookId, difficulty }: { bookId: string; difficulty: Di
     if (!seen) {
       markSeen(key);
       setOpen(true);
+      onActiveChange(true);
     }
-  }, [seen, key, markSeen]);
+  }, [seen, key, markSeen, onActiveChange]);
   if (!open) return null;
-  return <PreStudyModal open bookId={bookId} difficulty={difficulty} onClose={() => setOpen(false)} />;
+  return (
+    <PreStudyModal
+      open
+      bookId={bookId}
+      difficulty={difficulty}
+      onClose={() => {
+        setOpen(false);
+        onActiveChange(false);
+      }}
+    />
+  );
 }
 import { toast } from '@/hooks/use-toast';
 
