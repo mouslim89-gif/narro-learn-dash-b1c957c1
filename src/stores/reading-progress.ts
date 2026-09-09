@@ -100,6 +100,7 @@ interface ReadingProgressState {
  setNotificationsEnabled: (v: boolean) => void;
  setNotificationTime: (v: string) => void;
  markPreStudySeen: (key: string) => void;
+ markWordKnown: (id: string) => void;
  // Sync helpers
  hydrateProgress: (progress: Record<string, ReadingProgress>, userId: string) => void;
  clearProgress: () => void;
