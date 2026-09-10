@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
+import { books } from '@/data/books';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { useFlashcardStore } from '@/stores/flashcards';
@@ -100,6 +101,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
   const savedIds = useMemo(() => new Set(savedWords.map((w) => w.id)), [savedWords]);
   const knownIds = useMemo(() => new Set(knownWords), [knownWords]);
+  const book = useMemo(() => books.find((b) => b.id === bookId), [bookId]);
 
   // Frozen at open time so tiles don't vanish the moment they're tapped.
   const excludeRef = useRef<Set<string>>(new Set());
@@ -185,23 +187,32 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     <AnimatePresence onExitComplete={onClose}>
     {visible && (
     <motion.div
-      initial={{ x: '100%', opacity: 0.98 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '-100%', opacity: 0.98 }}
-      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       className="absolute inset-0 flex flex-col overflow-hidden bg-background"
     >
-      {/* Header */}
+      <div className="stagger-children relative mx-auto flex h-full w-full max-w-[430px] flex-col">
+      {/* Book row */}
       <div
-        className="flex items-start justify-between gap-3 px-5 pb-3"
+        className="flex items-center gap-3 px-5 pb-3"
         style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}
       >
-        <div>
-          <h2 className="font-serif text-xl font-semibold text-foreground">Before you read</h2>
-          <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-            The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
-            flashcards, or mark it as already known.
+        {book && (
+          <div
+            className="book-paper relative flex h-[52px] w-[38px] shrink-0 items-end overflow-hidden rounded-xl p-1 shadow-md ring-1 ring-black/5"
+            style={{ backgroundColor: book.coverColor }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/35" />
+            <div className="absolute inset-y-0 left-0 w-1 bg-black/20" />
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-serif text-[15px] font-semibold text-foreground">
+            {book?.titleEn ?? ''}
           </p>
+          <p className="text-[12px] capitalize text-muted-foreground">{difficulty}</p>
         </div>
         <button
           onClick={requestClose}
@@ -213,6 +224,17 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
         </button>
       </div>
 
+      {/* Title + intro */}
+      <div className="px-5 pb-3">
+        <h2 className="font-serif text-[22px] font-bold leading-tight text-foreground">
+          Before you read
+        </h2>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+          The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
+          flashcards, or mark it as already known.
+        </p>
+      </div>
+
       {!words ? (
         <div className="flex flex-1 items-center justify-center">
           <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
@@ -220,20 +242,20 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
       ) : (
         <>
           <div className="flex items-center justify-between px-5">
-            <p className="text-[11px] tabular-nums text-muted-foreground">
+            <p className="text-[12px] tabular-nums text-muted-foreground">
               {selectedCount} of {total} selected
             </p>
             <button
               onClick={toggleAll}
-              className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
+              className="rounded-full px-2 py-1 text-[12px] font-semibold text-accent tap-scale-sm"
             >
               {allSelected ? 'Clear' : 'Select all'}
             </button>
           </div>
 
           {/* p-1 so the selected ring isn't clipped by the scroll container */}
-          <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-24">
-            <div data-stretch-list data-stretch-cols="2" className="grid grid-cols-2 gap-2.5">
+          <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-28">
+            <div data-stretch-list data-stretch-cols="2" className="grid grid-cols-2 gap-3">
               {words.map((w) => {
                 const selected = savedIds.has(w.base);
                 const known = knownIds.has(w.base);
@@ -252,14 +274,14 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                     aria-pressed={selected}
                     aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
                     className={cn(
-                      'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
+                      'relative flex flex-col items-start rounded-2xl bg-card p-3.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
                       selected && 'bg-accent/5 ring-2 ring-accent/60',
                       known && 'bg-primary/10 ring-2 ring-primary/50'
                     )}
                   >
                     <span
                       className={cn(
-                        'absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full',
+                        'absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full',
                         known
                           ? 'bg-primary text-primary-foreground'
                           : selected
@@ -268,19 +290,19 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       )}
                     >
                       {selected || known ? (
-                        <Check className="h-3 w-3" strokeWidth={3} />
+                        <Check className="h-3.5 w-3.5" strokeWidth={3} />
                       ) : (
-                        <Plus className="h-3 w-3" strokeWidth={3} />
+                        <Plus className="h-3.5 w-3.5" strokeWidth={3} />
                       )}
                     </span>
-                    <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
+                    <p className="font-jp-serif text-xl font-semibold leading-tight pr-7">{w.base}</p>
                     {w.reading && w.reading !== w.base && (
-                      <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
+                      <p className="mt-1 font-japanese text-[12px] text-muted-foreground">{w.reading}</p>
                     )}
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
+                    <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-foreground/75">
                       {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
                     </p>
-                    <p className="mt-2 text-[9px] tabular-nums text-muted-foreground/80">
+                    <p className="mt-2 text-[11px] tabular-nums text-muted-foreground/80">
                       appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
                     </p>
                     <button
@@ -291,13 +313,13 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       aria-pressed={known}
                       aria-label={`Mark ${w.base} as already known`}
                       className={cn(
-                        'mt-2 flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
+                        'mt-2.5 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
                         known
                           ? 'bg-primary/15 text-primary ring-1 ring-primary/40'
                           : 'bg-muted/70 text-muted-foreground'
                       )}
                     >
-                      <CircleCheck className="h-3 w-3" strokeWidth={2.5} />
+                      <CircleCheck className="h-3.5 w-3.5" strokeWidth={2.5} />
                       {known ? 'Known ✓' : 'Known'}
                     </button>
                   </div>
@@ -322,6 +344,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
           </div>
         </>
       )}
+      </div>
     </motion.div>
     )}
     </AnimatePresence>
