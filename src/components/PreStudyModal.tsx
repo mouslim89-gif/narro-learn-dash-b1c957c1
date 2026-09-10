@@ -186,23 +186,32 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
     <AnimatePresence onExitComplete={onClose}>
     {visible && (
     <motion.div
-      initial={{ x: '100%', opacity: 0.98 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '-100%', opacity: 0.98 }}
-      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       className="absolute inset-0 flex flex-col overflow-hidden bg-background"
     >
-      {/* Header */}
+      <div className="stagger-children mx-auto flex h-full w-full max-w-[430px] flex-col">
+      {/* Book row */}
       <div
-        className="flex items-start justify-between gap-3 px-5 pb-3"
+        className="flex items-center gap-3 px-5 pb-3"
         style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}
       >
-        <div>
-          <h2 className="font-serif text-xl font-semibold text-foreground">Before you read</h2>
-          <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-            The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
-            flashcards, or mark it as already known.
+        {book && (
+          <div
+            className="book-paper relative flex h-[52px] w-[38px] shrink-0 items-end overflow-hidden rounded-xl p-1 shadow-md ring-1 ring-black/5"
+            style={{ backgroundColor: book.coverColor }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/35" />
+            <div className="absolute inset-y-0 left-0 w-1 bg-black/20" />
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-serif text-[15px] font-semibold text-foreground">
+            {book?.titleEn ?? ''}
           </p>
+          <p className="text-[12px] capitalize text-muted-foreground">{difficulty}</p>
         </div>
         <button
           onClick={requestClose}
@@ -214,6 +223,17 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
         </button>
       </div>
 
+      {/* Title + intro */}
+      <div className="px-5 pb-3">
+        <h2 className="font-serif text-[22px] font-bold leading-tight text-foreground">
+          Before you read
+        </h2>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+          The {TARGET_COUNT} most frequent words in this book. Tap one to add it to your
+          flashcards, or mark it as already known.
+        </p>
+      </div>
+
       {!words ? (
         <div className="flex flex-1 items-center justify-center">
           <p className="text-sm text-muted-foreground animate-pulse">Preparing key words…</p>
@@ -221,19 +241,19 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
       ) : (
         <>
           <div className="flex items-center justify-between px-5">
-            <p className="text-[11px] tabular-nums text-muted-foreground">
+            <p className="text-[12px] tabular-nums text-muted-foreground">
               {selectedCount} of {total} selected
             </p>
             <button
               onClick={toggleAll}
-              className="rounded-full px-2 py-1 text-[11px] font-semibold text-accent tap-scale-sm"
+              className="rounded-full px-2 py-1 text-[12px] font-semibold text-accent tap-scale-sm"
             >
               {allSelected ? 'Clear' : 'Select all'}
             </button>
           </div>
 
           {/* p-1 so the selected ring isn't clipped by the scroll container */}
-          <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-24">
+          <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-28">
             <div data-stretch-list data-stretch-cols="2" className="grid grid-cols-2 gap-2.5">
               {words.map((w) => {
                 const selected = savedIds.has(w.base);
