@@ -254,7 +254,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
           {/* p-1 so the selected ring isn't clipped by the scroll container */}
           <div className="no-scrollbar mt-2 flex-1 overflow-y-auto px-5 py-1 pb-28">
-            <div data-stretch-list data-stretch-cols="2" className="grid grid-cols-2 gap-2.5">
+            <div data-stretch-list data-stretch-cols="2" className="grid grid-cols-2 gap-3">
               {words.map((w) => {
                 const selected = savedIds.has(w.base);
                 const known = knownIds.has(w.base);
