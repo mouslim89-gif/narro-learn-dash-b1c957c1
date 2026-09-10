@@ -343,6 +343,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
           </div>
         </>
       )}
+      </div>
     </motion.div>
     )}
     </AnimatePresence>
