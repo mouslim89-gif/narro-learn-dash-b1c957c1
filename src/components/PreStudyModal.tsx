@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, Plus, ArrowRight, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { loadBookTokens, type BookToken } from '@/data/book-tokens';
+import { books } from '@/data/books';
 import { getCached } from '@/lib/jisho';
 import { readWordEntry, hydrateDictionaryForBook } from '@/lib/dictionary-db';
 import { useFlashcardStore } from '@/stores/flashcards';
