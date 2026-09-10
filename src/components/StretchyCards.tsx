@@ -47,9 +47,10 @@ export function StretchyCards({
     style: {
       ...style,
       rowGap: `calc(${baseGap}rem * (1 + ${stretch}))`,
+      paddingTop: `calc(${baseGap}rem * ${stretch})`,
       transition:
         stretch === 0
-          ? 'row-gap 0.28s cubic-bezier(0.22, 1, 0.36, 1)'
+          ? 'row-gap 0.28s cubic-bezier(0.22, 1, 0.36, 1), padding-top 0.28s cubic-bezier(0.22, 1, 0.36, 1)'
           : 'none',
     },
     ...props,

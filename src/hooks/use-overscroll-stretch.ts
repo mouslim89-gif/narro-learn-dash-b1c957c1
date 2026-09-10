@@ -7,10 +7,24 @@ interface UseOverscrollStretchOptions {
   disabled?: boolean;
 }
 
+/** Nearest scrollable ancestor, or null when the page itself is the scroller. */
+function findScroller(el: HTMLElement | null): HTMLElement | null {
+  let node: HTMLElement | null = el;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const style = window.getComputedStyle(node);
+    const oy = style.overflowY;
+    if ((oy === 'auto' || oy === 'scroll' || oy === 'overlay') && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+}
+
 /**
  * Returns a value in [0, 1] that grows linearly as the user pulls down
- * past the top of the page (window scroll) or a scrollable container.
- * The value resets to 0 with a smooth CSS transition when the touch ends.
+ * past the top of the page (window scroll) or the nearest scrollable
+ * ancestor. Resets to 0 when the touch ends.
  *
  * Does not re-enable native rubber-band bounce; it works on top of
  * `overscroll-behavior: none` by tracking touch deltas directly.
@@ -25,23 +39,27 @@ export function useOverscrollStretch<T extends HTMLElement = HTMLElement>(
   useEffect(() => {
     if (disabled) return;
 
-    const el = ref.current;
-    const getScrollTop = () => (el ? el.scrollTop : window.scrollY);
-    const target = el ?? document;
+    // Resolved lazily on each touchstart: the scroller may only become
+    // scrollable after content hydrates.
+    let scroller: HTMLElement | null = null;
+    const getScrollTop = () =>
+      scroller
+        ? scroller.scrollTop
+        : window.scrollY || document.documentElement.scrollTop || 0;
 
     let engaged = false;
     let startY = 0;
 
     const onTouchStart = (e: TouchEvent) => {
+      scroller = findScroller(ref.current);
       startY = e.touches[0].clientY;
       engaged = getScrollTop() <= 0;
     };
 
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY;
-      const atTop = getScrollTop() <= 0;
 
-      if (!atTop) {
+      if (getScrollTop() > 0) {
         if (engaged) {
           engaged = false;
           setStretch(0);
@@ -55,28 +73,26 @@ export function useOverscrollStretch<T extends HTMLElement = HTMLElement>(
       }
 
       const delta = y - startY;
-      if (delta > 0) {
-        setStretch(Math.min(1, delta / maxPull));
-      } else {
-        setStretch(0);
-      }
+      setStretch(delta > 0 ? Math.min(1, delta / maxPull) : 0);
     };
 
     const onTouchEnd = () => {
-      if (engaged) {
-        engaged = false;
-        setStretch(0);
-      }
+      engaged = false;
+      setStretch(0);
     };
 
-    target.addEventListener('touchstart', onTouchStart, { passive: true });
-    target.addEventListener('touchmove', onTouchMove, { passive: true });
-    target.addEventListener('touchend', onTouchEnd, { passive: true });
+    // Always listen on the window: touch events bubble up from whichever
+    // element the finger started on, page-scrolled or not.
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
     return () => {
-      target.removeEventListener('touchstart', onTouchStart);
-      target.removeEventListener('touchmove', onTouchMove);
-      target.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
     };
   }, [maxPull, disabled, ref]);
 
