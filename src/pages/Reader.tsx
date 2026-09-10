@@ -1045,6 +1045,7 @@ export default function Reader() {
 
   return (
   <div
+    data-no-stretch
     className={`min-h-screen bg-[hsl(40,30%,97%)] ${audioUrl ?'pb-20':'pb-8'} dark:bg-background`}
   >
   <header className="sticky top-0 z-30 glass-subtle">

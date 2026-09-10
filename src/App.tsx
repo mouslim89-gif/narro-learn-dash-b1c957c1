@@ -15,6 +15,7 @@ import { useOnboardingStore } from "@/stores/onboarding";
 import { initializeNativePlatform, updateNativeStatusBar } from "@/lib/native";
 import { initIap } from "@/lib/iap";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { StretchProvider } from "@/components/StretchProvider";
 
 import { useAuthDeepLink } from "@/hooks/use-auth-deep-link";
 import { useCloudSync } from "@/hooks/use-cloud-sync";
@@ -155,6 +156,7 @@ function AnimatedRoutes() {
  <AnimatePresence mode={shouldWaitForPageTransition ?"wait":"popLayout"} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
  <motion.div
  key={routeKey}
+ data-stretch-root
  variants={pageVariants}
  initial="initial"
  animate="animate"
@@ -211,6 +213,7 @@ const App = () => (
       <SplashScreen />
     <OnboardingCarousel />
      <DictionaryPreloader />
+     <StretchProvider />
      <ErrorBoundary>
       <AnimatedRoutes />
      </ErrorBoundary>
