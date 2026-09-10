@@ -318,7 +318,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                           : 'bg-muted/70 text-muted-foreground'
                       )}
                     >
-                      <CircleCheck className="h-3 w-3" strokeWidth={2.5} />
+                      <CircleCheck className="h-3.5 w-3.5" strokeWidth={2.5} />
                       {known ? 'Known ✓' : 'Known'}
                     </button>
                   </div>
