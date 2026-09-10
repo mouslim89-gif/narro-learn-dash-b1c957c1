@@ -312,7 +312,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       aria-pressed={known}
                       aria-label={`Mark ${w.base} as already known`}
                       className={cn(
-                        'mt-2 flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
+                        'mt-2.5 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide tap-scale-sm smooth-colors',
                         known
                           ? 'bg-primary/15 text-primary ring-1 ring-primary/40'
                           : 'bg-muted/70 text-muted-foreground'
