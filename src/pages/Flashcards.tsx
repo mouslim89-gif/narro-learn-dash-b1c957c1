@@ -26,7 +26,6 @@ import {
 } from'@/components/ui/dropdown-menu';
 import { useDelayed } from'@/hooks/use-delayed';
 import { DailyGoalCard } from '@/components/my-books/DailyGoalCard';
-import { StretchyCards } from '@/components/StretchyCards';
 
 type StatusFilter ='all'|'due'|'new'|'learning'|'known';
 type SortOption ='added'|'mastery';
@@ -376,7 +375,7 @@ export default function Flashcards() {
  <Link to="/" className="mt-5"><Button size="sm" className="rounded-full px-5 relief-raised">Browse Library</Button></Link>
  </div>
  ) : tab === 'grammar' ? (
-  <StretchyCards as="ul" gap={2} className="stagger-children mt-2 flex flex-col px-6">
+  <ul data-stretch-list className="stagger-children mt-2 flex flex-col gap-2 px-6">
     {filteredGrammar.map((item) => {
      const mastery = item.mastery || 0;
      const level = masteryLevel(mastery);
@@ -416,9 +415,9 @@ export default function Flashcards() {
        {savedGrammar.length === 0 ? 'No grammar saved yet.' : 'No grammar matches your filters.'}
      </p>
    )}
-  </StretchyCards>
+  </ul>
   ) : (
-  <StretchyCards as="ul" gap={2} className="stagger-children mt-2 flex flex-col px-6">
+  <ul data-stretch-list className="stagger-children mt-2 flex flex-col gap-2 px-6">
   {filteredWords.map((w) => {
  const mastery = w.mastery || 0;
  const level = masteryLevel(mastery);
@@ -466,7 +465,7 @@ export default function Flashcards() {
  {filteredWords.length === 0 && (
  <p className="text-center text-sm text-muted-foreground mt-8">No words match your filters.</p>
  )}
-  </StretchyCards>
+  </ul>
   )}
   </div>
 

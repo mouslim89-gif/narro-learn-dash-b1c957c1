@@ -12,7 +12,6 @@ import { AnimatedTitle } from '@/components/AnimatedTitle';
 import { romajiToKana } from '@/lib/romaji';
 import { ContinueHero } from '@/components/library/ContinueHero';
 import { PremiumUpsellCard } from '@/components/library/PremiumUpsellCard';
-import { StretchyCards } from '@/components/StretchyCards';
 
 import { cn } from '@/lib/utils';
 
@@ -149,11 +148,11 @@ export default function Library() {
  {filteredBooks ? (
   <section className="px-6 py-4">
   <p className="mb-3 text-xs text-muted-foreground">{filteredBooks.length} result{filteredBooks.length !== 1 ?'s':''}</p>
-  <StretchyCards as="div" gap={4} className="flex flex-wrap gap-4">
+  <div data-stretch-list className="flex flex-wrap gap-4">
   {filteredBooks.map(book => (
  <BookCard key={book.id} book={book} progress={progress[book.id]?.progressPercent} />
  ))}
-  </StretchyCards>
+  </div>
   {filteredBooks.length === 0 && (
   <p className="py-10 text-center text-sm text-muted-foreground">No books found.</p>
   )}
