@@ -273,7 +273,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                     aria-pressed={selected}
                     aria-label={`${selected ? 'Remove' : 'Add'} ${w.base}`}
                     className={cn(
-                      'relative flex flex-col items-start rounded-2xl bg-card p-2.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
+                      'relative flex flex-col items-start rounded-2xl bg-card p-3.5 text-left ring-1 ring-border/30 relief-raised tap-scale smooth-colors',
                       selected && 'bg-accent/5 ring-2 ring-accent/60',
                       known && 'bg-primary/10 ring-2 ring-primary/50'
                     )}
