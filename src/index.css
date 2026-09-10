@@ -911,49 +911,101 @@ html.no-anim *::after {
   isolation: isolate;
 }
 
-
 /* ──────────────────────────────────────────
    Pull-to-stretch
    `--stretch` (0 → 1) is written on <html> by StretchProvider while the user
-   pulls down past the top. Every stacked block on the current page gains
-   vertical breathing room, then eases back on release.
+   pulls down past the top. Each stacked block is shifted down a little more
+   than the one above it, so the page breathes apart and snaps back on release.
+   Only the `translate` property is used — spacing (margins/paddings) is never
+   touched, so the app's own layout is untouched at rest.
    ────────────────────────────────────────── */
 
 [data-stretch-root] {
-  --stretch-step: 1rem;
+  --stretch-step: 0.5rem;
 }
 
-/* Space above the very first block, so the top of the page moves too. */
-[data-stretch-root] > *:not([data-no-stretch]) {
-  padding-top: calc(var(--stretch, 0) * var(--stretch-step));
-  transition: padding-top 0.32s var(--ease-out-soft);
-}
-
-/* Every following page-level block. */
-[data-stretch-root] > *:not([data-no-stretch]) > * + * {
-  margin-top: calc(var(--stretch, 0) * var(--stretch-step));
-  transition: margin-top 0.32s var(--ease-out-soft);
+[data-stretch-root] > *:not([data-no-stretch]) > *:not(header):not([data-no-stretch]),
+[data-stretch-list] > * {
+  transition: translate 0.32s var(--ease-out-soft);
 }
 
 /* Vertical lists / grids inside a page (tighter step). */
 [data-stretch-list] {
-  --stretch-step: 0.5rem;
-}
-[data-stretch-list] > * + * {
-  margin-top: calc(var(--stretch, 0) * var(--stretch-step));
-  transition: margin-top 0.32s var(--ease-out-soft);
-}
-/* In a 2-column grid only the rows below the first one shift. */
-[data-stretch-list][data-stretch-cols="2"] > * + * {
-  margin-top: 0;
-}
-[data-stretch-list][data-stretch-cols="2"] > *:nth-child(n + 3) {
-  margin-top: calc(var(--stretch, 0) * var(--stretch-step));
+  --stretch-step: 0.25rem;
 }
 
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(1):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 1); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(2):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 2); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(3):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 3); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(4):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 4); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(5):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 5); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(6):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 6); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(7):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 7); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(8):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 8); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(9):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 9); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(10):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 10); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(11):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 11); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(12):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 12); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(13):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 13); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(14):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 14); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(15):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 15); }
+[data-stretch-root] > *:not([data-no-stretch]) > *:nth-child(16):not(header):not([data-no-stretch]) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 16); }
+
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(1) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 1); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(2) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 2); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(3) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 3); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(4) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 4); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(5) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 5); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(6) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 6); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(7) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 7); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(8) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 8); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(9) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 9); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(10) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 10); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(11) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 11); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(12) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 12); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(13) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 13); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(14) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 14); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(15) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 15); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(16) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 16); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(17) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 17); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(18) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 18); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(19) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 19); }
+[data-stretch-list]:not([data-stretch-cols="2"]) > *:nth-child(20) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 20); }
+
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(1) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 1); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(2) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 1); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(3) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 2); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(4) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 2); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(5) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 3); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(6) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 3); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(7) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 4); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(8) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 4); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(9) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 5); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(10) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 5); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(11) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 6); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(12) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 6); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(13) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 7); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(14) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 7); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(15) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 8); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(16) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 8); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(17) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 9); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(18) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 9); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(19) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 10); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(20) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 10); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(21) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 11); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(22) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 11); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(23) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 12); }
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(24) { translate: 0 calc(var(--stretch, 0) * var(--stretch-step) * 12); }
+
 /* No easing while the finger is down — the value follows the pull 1:1. */
-html.stretching [data-stretch-root] > *,
 html.stretching [data-stretch-root] > * > *,
 html.stretching [data-stretch-list] > * {
   transition: none;
 }
+
+/* Never move excluded subtrees (reader, review deck, fixed overlays). */
+[data-no-stretch],
+[data-no-stretch] * {
+  translate: none;
+}
+
