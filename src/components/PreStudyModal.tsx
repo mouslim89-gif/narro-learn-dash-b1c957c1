@@ -101,6 +101,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
 
   const savedIds = useMemo(() => new Set(savedWords.map((w) => w.id)), [savedWords]);
   const knownIds = useMemo(() => new Set(knownWords), [knownWords]);
+  const book = useMemo(() => books.find((b) => b.id === bookId), [bookId]);
 
   // Frozen at open time so tiles don't vanish the moment they're tapped.
   const excludeRef = useRef<Set<string>>(new Set());
