@@ -14,7 +14,6 @@ import { Button } from'@/components/ui/button';
 import { AnimatedTitle } from'@/components/AnimatedTitle';
 import { BookShelfRow } from'@/components/my-books/BookShelfRow';
 import { ContributionGraph } from '@/components/my-books/ContributionGraph';
-import { StretchyCards } from '@/components/StretchyCards';
 import { useDelayed } from'@/hooks/use-delayed';
 
 
@@ -148,11 +147,11 @@ export default function MyBooks() {
  </Link>
  </div>
  ) : (
-  <StretchyCards as="div" gap={3} className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <div data-stretch-list className="stagger-children mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
   {bookProgressList.map(({ book, progress: p }) => (
  <BookShelfRow key={book.id} book={book} progress={p} />
  ))}
-  </StretchyCards>
+  </div>
   )}
 
 
