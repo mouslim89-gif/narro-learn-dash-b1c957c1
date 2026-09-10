@@ -289,19 +289,19 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
                       )}
                     >
                       {selected || known ? (
-                        <Check className="h-3 w-3" strokeWidth={3} />
+                        <Check className="h-3.5 w-3.5" strokeWidth={3} />
                       ) : (
-                        <Plus className="h-3 w-3" strokeWidth={3} />
+                        <Plus className="h-3.5 w-3.5" strokeWidth={3} />
                       )}
                     </span>
-                    <p className="font-jp-serif text-lg font-semibold leading-tight pr-6">{w.base}</p>
+                    <p className="font-jp-serif text-xl font-semibold leading-tight pr-7">{w.base}</p>
                     {w.reading && w.reading !== w.base && (
-                      <p className="mt-0.5 font-japanese text-[10px] text-muted-foreground">{w.reading}</p>
+                      <p className="mt-1 font-japanese text-[12px] text-muted-foreground">{w.reading}</p>
                     )}
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-foreground/75">
+                    <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-foreground/75">
                       {w.meanings.length > 0 ? w.meanings.join(', ') : '—'}
                     </p>
-                    <p className="mt-2 text-[9px] tabular-nums text-muted-foreground/80">
+                    <p className="mt-2 text-[11px] tabular-nums text-muted-foreground/80">
                       appears {w.frequency} {w.frequency === 1 ? 'time' : 'times'}
                     </p>
                     <button
