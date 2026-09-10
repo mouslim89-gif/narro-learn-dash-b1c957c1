@@ -911,3 +911,49 @@ html.no-anim *::after {
   isolation: isolate;
 }
 
+
+/* ──────────────────────────────────────────
+   Pull-to-stretch
+   `--stretch` (0 → 1) is written on <html> by StretchProvider while the user
+   pulls down past the top. Every stacked block on the current page gains
+   vertical breathing room, then eases back on release.
+   ────────────────────────────────────────── */
+
+[data-stretch-root] {
+  --stretch-step: 1rem;
+}
+
+/* Space above the very first block, so the top of the page moves too. */
+[data-stretch-root] > *:not([data-no-stretch]) {
+  padding-top: calc(var(--stretch, 0) * var(--stretch-step));
+  transition: padding-top 0.32s var(--ease-out-soft);
+}
+
+/* Every following page-level block. */
+[data-stretch-root] > *:not([data-no-stretch]) > * + * {
+  margin-top: calc(var(--stretch, 0) * var(--stretch-step));
+  transition: margin-top 0.32s var(--ease-out-soft);
+}
+
+/* Vertical lists / grids inside a page (tighter step). */
+[data-stretch-list] {
+  --stretch-step: 0.5rem;
+}
+[data-stretch-list] > * + * {
+  margin-top: calc(var(--stretch, 0) * var(--stretch-step));
+  transition: margin-top 0.32s var(--ease-out-soft);
+}
+/* In a 2-column grid only the rows below the first one shift. */
+[data-stretch-list][data-stretch-cols="2"] > * + * {
+  margin-top: 0;
+}
+[data-stretch-list][data-stretch-cols="2"] > *:nth-child(n + 3) {
+  margin-top: calc(var(--stretch, 0) * var(--stretch-step));
+}
+
+/* No easing while the finger is down — the value follows the pull 1:1. */
+html.stretching [data-stretch-root] > *,
+html.stretching [data-stretch-root] > * > *,
+html.stretching [data-stretch-list] > * {
+  transition: none;
+}
