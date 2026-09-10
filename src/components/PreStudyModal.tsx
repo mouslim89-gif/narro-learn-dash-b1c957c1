@@ -192,7 +192,7 @@ export function PreStudyModal({ open, bookId, difficulty, onClose }: PreStudyMod
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       className="absolute inset-0 flex flex-col overflow-hidden bg-background"
     >
-      <div className="stagger-children mx-auto flex h-full w-full max-w-[430px] flex-col">
+      <div className="stagger-children relative mx-auto flex h-full w-full max-w-[430px] flex-col">
       {/* Book row */}
       <div
         className="flex items-center gap-3 px-5 pb-3"
